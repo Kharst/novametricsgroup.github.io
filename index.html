@@ -87,5 +87,21 @@
       testimonials[i].classList.add('active');
     }, 4000);
   </script>
+  <script>
+  // Adjust anchor scrolling for fixed header
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        e.preventDefault();
+        const offsetTop = target.getBoundingClientRect().top + window.scrollY - document.querySelector('header').offsetHeight;
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
+
