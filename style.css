@@ -3,14 +3,12 @@ margin: 0;
 padding: 0;
 box-sizing: border-box;
 font-family: ‘Segoe UI’, sans-serif;
-word-wrap: break-word;
--webkit-hyphens: auto;
--ms-word-break: break-word;
 word-break: break-word;
 }
+/* Page-level /
 html, body {
-overflow-x: hidden;
-max-width: 100vw;
+overflow-x: hidden; / prevent horizontal dragging */
+max-width: 100%;
 background-color: #000;
 color: #eee;
 height: 100%;
@@ -20,14 +18,14 @@ body {
 line-height: 1.6;
 }
 
-/* Header */
+/* Header /
 header {
 background: #111;
 color: #fff;
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 15px 40px;
+padding: 15px 24px; / reduced from 40 to avoid causing overflow on small screens */
 position: sticky;
 top: 0;
 z-index: 1000;
@@ -35,7 +33,7 @@ width: 100%;
 box-sizing: border-box;
 }
 
-/* Small container/helper classes (if used in pages) */
+/* small container helper */
 .container {
 width: 100%;
 max-width: 1200px;
@@ -45,6 +43,7 @@ padding-right: 16px;
 box-sizing: border-box;
 }
 
+/* Brand / logo */
 .logo {
 width: 140px;
 max-width: 100%;
@@ -52,29 +51,32 @@ height: auto;
 display: block;
 }
 
+/* Nav */
 nav {
 display: flex;
 align-items: center;
 gap: 12px;
+box-sizing: border-box;
+max-width: 100%;
 }
 
 nav a {
 color: #fff;
 text-decoration: none;
-margin-left: 20px;
+margin-left: 16px;
 font-weight: 500;
 transition: color 0.3s;
-white-space: nowrap;
+white-space: nowrap; /* keep each link on one line */
 }
 
 nav a:hover {
 color: #f0b41a;
 }
 
-/* Hero */
+/* Hero / product hero */
 .hero, .product-hero {
 background: linear-gradient(to right, #000, #1a1a1a);
-padding: 120px 40px;
+padding: 120px 24px;
 text-align: center;
 width: 100%;
 box-sizing: border-box;
@@ -86,9 +88,9 @@ font-size: 42px;
 margin-bottom: 10px;
 }
 
-/* Sections */
-.section, .section.alt, .product-details, .product-hero, .services-section {
-padding: 80px 40px;
+/* Generic sections */
+.section, .product-details, .services-section {
+padding: 80px 24px;
 text-align: center;
 width: 100%;
 box-sizing: border-box;
@@ -104,34 +106,41 @@ margin-bottom: 20px;
 font-size: 28px;
 }
 
-/* Services grid /
+/* Services grid: restored side-by-side tile layout /
 .services {
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-gap: 25px;
+grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); / tiles side-by-side where space allows /
+gap: 24px;
 margin-top: 30px;
 width: 100%;
 box-sizing: border-box;
-min-width: 0; / allow grid items to shrink */
+min-width: 0; / allow shrinking */
 }
 
 .service {
 background: #1a1a1a;
-padding: 25px;
+padding: 22px;
 border-radius: 10px;
 border: 1px solid #333;
-transition: all 0.3s ease;
+transition: all 0.28s ease;
 box-sizing: border-box;
 min-width: 0;
+}
+.service h3 {
+margin-bottom: 12px;
+}
+.service p {
+color: #ddd;
+font-size: 0.95rem;
 }
 .service:hover {
 background: #2b2100;
 border-color: #f0b41a;
-transform: translateY(-5px);
-box-shadow: 0 0 20px rgba(240,180,26,0.4);
+transform: translateY(-6px);
+box-shadow: 0 8px 28px rgba(240,180,26,0.09);
 }
 
-/* Video container (responsive) /
+/* Video: responsive wrapper to avoid overflow /
 .video-container {
 position: relative;
 width: 100%;
@@ -161,20 +170,21 @@ height: auto;
 display: block;
 }
 
-/* Smooth scroll (optional) */
+/* Smooth scrolling */
 html {
 scroll-behavior: smooth;
 }
 
-/* Anchor spacer variables (single source) /
+/* Anchor spacer variables /
 :root {
-–header-height-desktop: 70px; / adjust if desktop header taller /
-–header-height-mobile: 96px; / adjust if mobile header taller */
+–header-height-desktop: 70px; / adjust if needed on desktop /
+–header-height-mobile: 96px; / adjust if needed on mobile */
 –anchor-offset-extra: 12px;
 }
 
-/* Reliable anchor spacer using ::before on sections with id */
-section[id]::before {
+/* Reliable anchor spacer using ::before (does not reflow content) */
+section[id]::before,
+[role=“region”][id]::before {
 content: “”;
 display: block;
 height: calc(var(–header-height-desktop) + var(–anchor-offset-extra));
@@ -196,12 +206,14 @@ padding: 10px 16px;
 width: 110px;
 }
 
-/* make nav stack vertically on small screens */
+/* keep nav usable but don’t produce large horizontal width /
 nav {
 display: flex;
-flex-direction: column;
-align-items: center;
-gap: 8px;
+flex-direction: row;
+flex-wrap: nowrap; / don’t wrap into multiple rows /
+overflow-x: auto; / allow horizontal scroll of nav only if needed */
+-webkit-overflow-scrolling: touch;
+gap: 12px;
 width: 100%;
 padding: 6px 0;
 box-sizing: border-box;
@@ -209,26 +221,29 @@ box-sizing: border-box;
 
 nav a {
 margin-left: 0;
-padding: 8px 12px;
+padding: 8px 10px;
 font-size: 0.95rem;
-white-space: normal;
-width: auto;
+white-space: nowrap;
+flex: 0 0 auto;
 }
 
 .hero, .product-hero {
-padding: 80px 20px;
+padding: 80px 16px;
 }
 
 .section, .product-details {
-padding: 60px 20px;
+padding: 60px 16px;
 }
 
+/* Service grid: keep tiles side-by-side as much as possible, min column width reduced */
 .services {
-gap: 18px;
+grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+gap: 16px;
 }
 
 /* mobile-specific anchor spacer */
-section[id]::before {
+section[id]::before,
+[role=“region”][id]::before {
 height: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
 margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
 }
@@ -237,13 +252,10 @@ margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra
 /* Prevent accidental overflow from long content */
 
 {
--webkit-box-sizing: border-box;
--moz-box-sizing: border-box;
-box-sizing: border-box;
 min-width: 0;
 }
 /* Final safety clamps */
 header, .hero, .section, .services, .video-container, .container {
-max-width: 100vw;
+max-width: 100%;
 overflow-x: hidden;
 }
