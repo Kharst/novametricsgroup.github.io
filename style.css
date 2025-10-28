@@ -10,6 +10,7 @@ color: #eee;
 line-height: 1.6;
 }
 
+/* Header */
 header {
 background: #111;
 color: #fff;
@@ -38,6 +39,7 @@ nav a:hover {
 color: #f0b41a;
 }
 
+/* Hero */
 .hero {
 background: linear-gradient(to right, #000, #1a1a1a);
 padding: 120px 40px;
@@ -50,6 +52,7 @@ font-size: 42px;
 margin-bottom: 10px;
 }
 
+/* Sections */
 .section {
 padding: 80px 40px;
 text-align: center;
@@ -65,6 +68,7 @@ margin-bottom: 20px;
 font-size: 28px;
 }
 
+/* Services grid */
 .services {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -86,38 +90,39 @@ transform: translateY(-5px);
 box-shadow: 0 0 20px rgba(240,180,26,0.4);
 }
 
+/* Video container /
 .video-container iframe {
 border-radius: 10px;
 width: 100%;
 max-width: 700px;
-height: 394px; /* standard 16:9 height for 700px width */
+height: 394px; / standard 16:9 for 700px width */
 }
 
-/* Anchor link smooth scroll (optional) */
+/* Smooth scroll behavior (optional) */
 html {
 scroll-behavior: smooth;
 }
 
-/* Desktop header height variable (used for fallback) */
+/* Anchor offset and header height variables /
 :root {
-–header-height-desktop: 70px;
-–header-height-mobile: 96px;
+–header-height-desktop: 70px; / adjust if desktop header is taller /
+–header-height-mobile: 96px; / adjust if mobile header is taller /
+–anchor-offset-extra: 16px; / extra gap so section isn’t flush under header */
 }
 
-/* Let the browser offset anchored targets so headers don’t cover them */
-html {
-scroll-padding-top: var(–header-height-desktop);
-}
-
-/* MOBILE / SMALL SCREENS
-Single, consistent mobile block. This stacks the header, centers logo,
-stacks nav links vertically (avoids multi-row wrapping), and ensures anchor targets clear the sticky header.
+/* RELIABLE ANCHOR OFFSET
+Uses negative margin + top padding on each section with an id so
+clicking a nav anchor lands the visible heading below the sticky header.
 */
-@media (max-width: 720px) {
-html {
-scroll-padding-top: var(–header-height-mobile);
+section[id] {
+position: relative;
+padding-top: calc(var(–header-height-desktop) + var(–anchor-offset-extra));
+margin-top: calc(-1 * (var(–header-height-desktop) + var(–anchor-offset-extra)));
 }
 
+/* MOBILE / SMALL SCREENS /
+@media (max-width: 720px) {
+/ Mobile header adjustments */
 header {
 flex-direction: column;
 align-items: center;
@@ -129,9 +134,10 @@ padding: 10px 16px;
 width: 110px;
 }
 
+/* Stack nav links vertically to avoid wrapping and misalignment */
 nav {
 display: flex;
-flex-direction: column; /* stack links vertically to avoid multiple rows */
+flex-direction: column;
 align-items: center;
 gap: 8px;
 width: 100%;
@@ -142,10 +148,11 @@ nav a {
 margin-left: 0;
 padding: 8px 12px;
 font-size: 0.95rem;
-white-space: normal; /* allow wrap within a link if necessary */
+white-space: normal;
 width: auto;
 }
 
+/* Reduce hero/section padding for mobile */
 .hero {
 padding: 80px 20px;
 }
@@ -157,46 +164,10 @@ padding: 60px 20px;
 .services {
 gap: 18px;
 }
-}
-/* Ensure anchored sections clear sticky header /
-:root {
-–header-height-mobile: 96px; / adjust if your header is taller/shorter */
-–header-height-desktop: 70px;
-}
 
-/* Fallback for browsers that use scroll-padding */
-html {
-scroll-padding-top: var(–header-height-desktop);
-}
-
-@media (max-width:720px) {
-html { scroll-padding-top: var(–header-height-mobile); }
-/* Add an explicit scroll margin to section headings so anchors land correctly */
-.section, .section h2, section[id] {
-scroll-margin-top: calc(var(–header-height-mobile) + 8px);
-}
-}
-
-/* Desktop: small offset for anchors too */
-@media (min-width:721px) {
-.section, .section h2, section[id] {
-scroll-margin-top: calc(var(–header-height-desktop) + 8px);
-}
-}
-/* Ensure all anchored targets clear the sticky header /
-:root {
-–header-height-desktop: 70px; / adjust if desktop header is taller /
-–header-height-mobile: 96px; / adjust if mobile header is taller */
-}
-
-/* Default for browsers */
-section[id], [id] {
-scroll-margin-top: var(–header-height-desktop);
-}
-
-/* Mobile override */
-@media (max-width: 720px) {
-section[id], [id] {
-scroll-margin-top: var(–header-height-mobile);
+/* Mobile-specific anchor offset */
+section[id] {
+padding-top: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
+margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
 }
 }
