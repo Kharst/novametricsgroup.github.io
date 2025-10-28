@@ -158,3 +158,28 @@ padding: 60px 20px;
 gap: 18px;
 }
 }
+/* Ensure anchored sections clear sticky header /
+:root {
+–header-height-mobile: 96px; / adjust if your header is taller/shorter */
+–header-height-desktop: 70px;
+}
+
+/* Fallback for browsers that use scroll-padding */
+html {
+scroll-padding-top: var(–header-height-desktop);
+}
+
+@media (max-width:720px) {
+html { scroll-padding-top: var(–header-height-mobile); }
+/* Add an explicit scroll margin to section headings so anchors land correctly */
+.section, .section h2, section[id] {
+scroll-margin-top: calc(var(–header-height-mobile) + 8px);
+}
+}
+
+/* Desktop: small offset for anchors too */
+@media (min-width:721px) {
+.section, .section h2, section[id] {
+scroll-margin-top: calc(var(–header-height-desktop) + 8px);
+}
+}
