@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Metrics (Pty) Ltd</title>
+  <title>Nova Metrics Group — Data & Solar Intelligence</title>
+  <meta name="description" content="Nova Metrics Group — Data Intelligence, Power BI Solutions, and Solar Analytics. We help organizations turn data into actionable insights through dashboards, automation, and energy intelligence.">
+  <meta name="keywords" content="Nova Metrics, Power BI, data analytics, dashboards, solar intelligence, automation, energy analytics, South Africa">
+  <meta name="author" content="Nova Metrics Group">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
     <img src="assets/logo.png" alt="Nova Metrics Logo" class="logo">
     <nav>
-      <a href="#home">Home</a>
+      <a href="#home" class="nav-active">Home</a>
       <a href="#services">What We Do</a>
       <a href="#solar">Solar Intelligence</a>
       <a href="#testimonials">Testimonials</a>
-      <a href="#about">About</a>
+      <a href="about.html">About</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -51,32 +54,18 @@
   <section id="solar" class="section alt">
     <h2>Solar Intelligence</h2>
     <p>Our flagship analytics product for solar energy optimization — enabling users to forecast, store, and manage energy efficiently.</p>
-
     <div class="video-container">
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/fe5q3Ipr4qY" title="Solar Intelligence Demo" frameborder="0" allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/fe5q3Ipr4qY" title="Solar Intelligence Demo" allowfullscreen></iframe>
     </div>
   </section>
 
-  <section id="dashboard" class="section">
-    <h2>Interactive Project Management Dashboard</h2>
-    <p>Explore how Nova Metrics builds intelligent dashboards for real-time project insights.</p>
-    <div class="dashboard-container">
-      <iframe title="Project Management Dashboard" src="https://app.powerbi.com/view?r=eyJrIjoiNTg2MmJiZGYtNjY4NC00MjMzLWJhZWMtNjIwZWEwODRhYTU1IiwidCI6IjFhYmZiNTU4LTUwZmMtNGYxMS05ODExLTAzMDAyNjkyMjY1NyJ9" frameborder="0" allowfullscreen="true"></iframe>
-    </div>
-  </section>
-
-  <section id="testimonials" class="section alt">
+  <section id="testimonials" class="section">
     <h2>What Our Clients Say</h2>
     <div class="testimonial-container">
       <p class="testimonial active">"Nova Metrics helped us automate our entire reporting workflow seamlessly."</p>
       <p class="testimonial">"Their dashboards transformed how our management team makes decisions."</p>
       <p class="testimonial">"Professional, responsive, and technically brilliant."</p>
     </div>
-  </section>
-
-  <section id="about" class="section">
-    <h2>About Nova Metrics (Pty) Ltd</h2>
-    <p>Nova Metrics is a data intelligence firm specializing in analytics, automation, and digital transformation. Our mission is to simplify complex data ecosystems and deliver real business value through smart reporting and automation.</p>
   </section>
 
   <section id="contact" class="section alt">
@@ -86,12 +75,10 @@
   </section>
 
   <footer>
-  <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
-</footer>
-
+    <p>Powered by Nova Metrics Group © 2025</p>
+  </footer>
 
   <script>
-    // Simple testimonial rotation
     const testimonials = document.querySelectorAll('.testimonial');
     let i = 0;
     setInterval(() => {
