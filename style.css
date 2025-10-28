@@ -183,3 +183,20 @@ scroll-margin-top: calc(var(–header-height-mobile) + 8px);
 scroll-margin-top: calc(var(–header-height-desktop) + 8px);
 }
 }
+/* Ensure all anchored targets clear the sticky header /
+:root {
+–header-height-desktop: 70px; / adjust if desktop header is taller /
+–header-height-mobile: 96px; / adjust if mobile header is taller */
+}
+
+/* Default for browsers */
+section[id], [id] {
+scroll-margin-top: var(–header-height-desktop);
+}
+
+/* Mobile override */
+@media (max-width: 720px) {
+section[id], [id] {
+scroll-margin-top: var(–header-height-mobile);
+}
+}
