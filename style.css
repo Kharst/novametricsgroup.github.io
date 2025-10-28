@@ -170,3 +170,27 @@ section[id]::before {
 height: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
 margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
 }
+/* Prevent horizontal scrolling and force elements to fit viewport /
+html, body {
+overflow-x: hidden; / hide any accidental horizontal overflow */
+}
+
+/* Make images and iframes truly responsive */
+img, .logo, .video-container iframe {
+max-width: 100%;
+height: auto;
+display: block;
+}
+
+/* Ensure header padding doesn’t push content wider on small screens */
+header {
+padding-left: 16px;
+padding-right: 16px;
+}
+
+/* Ensure wide grid/items don’t overflow */
+.services, .service {
+max-width: 100%;
+box-sizing: border-box;
+overflow: visible;
+}
