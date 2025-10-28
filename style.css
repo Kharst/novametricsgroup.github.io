@@ -194,3 +194,46 @@ max-width: 100%;
 box-sizing: border-box;
 overflow: visible;
 }
+/* Force no horizontal overflow and clamp wide elements /
+html, body {
+overflow-x: hidden; / hide any accidental horizontal overflow /
+max-width: 100vw; / prevent viewport widening by children */
+}
+
+/* Make top-level containers never exceed viewport */
+header, .hero, .section, .services, .video-container {
+width: 100%;
+max-width: 100vw;
+box-sizing: border-box;
+}
+
+/* Ensure nav doesn’t create extra width when links are long /
+nav {
+width: 100%;
+max-width: 100vw;
+box-sizing: border-box;
+padding-right: 16px; / match header padding so content doesn’t push out /
+overflow: hidden; / hide any accidental overflow from long link text */
+}
+
+/* Make inline elements safe */
+img, .logo, .video-container iframe, iframe, embed, object {
+max-width: 100%;
+width: 100%;
+height: auto;
+display: block;
+}
+
+/* Extra clamp for grid items that may stretch wider /
+.services, .service {
+min-width: 0; / allow flex/grid items to shrink inside container */
+}
+
+/* Safety: prevent long words or URLs from causing overflow */
+
+{
+word-wrap: break-word;
+-webkit-hyphens: auto;
+-ms-word-break: break-word;
+word-break: break-word;
+}
