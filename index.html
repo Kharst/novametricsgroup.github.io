@@ -1,111 +1,261 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Metrics (Pty) Ltd</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <img src="assets/logo.png" alt="Nova Metrics Logo" class="logo">
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#services">What We Do</a>
-      <a href="#solar">Solar Intelligence</a>
-      <a href="#testimonials">Testimonials</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: ‘Segoe UI’, sans-serif;
+word-break: break-word;
+}
+/* Page-level /
+html, body {
+overflow-x: hidden; / stop horizontal dragging /
+max-width: 100%;
+background-color: #0a0a0a; / near-black /
+color: #e6e6e6; / light grey text */
+height: 100%;
+}
 
-  <section id="home" class="hero">
-    <div class="hero-content">
-      <h1>Data Intelligence & Automation</h1>
-      <p>Empowering organizations with data-driven insights, automation, and intelligent dashboards.</p>
-    </div>
-  </section>
+body {
+line-height: 1.6;
+}
 
-  <section id="services" class="section">
-    <h2>What We Do</h2>
-    <div class="services">
-      <div class="service">
-        <h3>Data Engineering & Integration</h3>
-        <p>We build automated pipelines and integrate cloud and on-premise data systems for unified analytics.</p>
-      </div>
-      <div class="service">
-        <h3>Automation & Intelligence</h3>
-        <p>We use Power Automate and API-driven workflows to instantly generate and deliver dynamic reports.</p>
-      </div>
-      <div class="service">
-        <h3>Dashboard Design</h3>
-        <p>Interactive Power BI dashboards and web analytics tools crafted for decision-makers.</p>
-      </div>
-      <div class="service">
-        <h3>Predictive Analytics & AI</h3>
-        <p>We build custom models to forecast, optimize, and drive strategic decisions.</p>
-      </div>
-    </div>
-  </section>
+/* Header - matches original structure: logo left, nav right /
+header {
+background: #111; / dark grey */
+color: #e6e6e6;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 16px 32px;
+position: sticky;
+top: 0;
+z-index: 1000;
+width: 100%;
+box-sizing: border-box;
+border-bottom: 1px solid rgba(255,255,255,0.03);
+}
 
-  <section id="solar" class="section alt">
-    <h2>Solar Intelligence</h2>
-    <p>Our flagship analytics product for solar energy optimization — enabling users to forecast, store, and manage energy efficiently.</p>
+.logo {
+width: 140px;
+max-width: 100%;
+height: auto;
+display: block;
+}
 
-    <div class="video-container">
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/fe5q3Ipr4qY" title="Solar Intelligence Demo" frameborder="0" allowfullscreen></iframe>
-    </div>
-  </section>
+/* Navigation */
+nav {
+display: flex;
+gap: 12px;
+align-items: center;
+box-sizing: border-box;
+}
 
-  <section id="dashboard" class="section">
-    <h2>Interactive Project Management Dashboard</h2>
-    <p>Explore how Nova Metrics builds intelligent dashboards for real-time project insights.</p>
-    <div class="dashboard-container">
-      <iframe title="Project Management Dashboard" src="https://app.powerbi.com/view?r=eyJrIjoiNTg2MmJiZGYtNjY4NC00MjMzLWJhZWMtNjIwZWEwODRhYTU1IiwidCI6IjFhYmZiNTU4LTUwZmMtNGYxMS05ODExLTAzMDAyNjkyMjY1NyJ9" frameborder="0" allowfullscreen="true"></iframe>
-    </div>
-  </section>
+nav a {
+color: #dcdcdc; /* medium-light grey */
+text-decoration: none;
+margin-left: 12px;
+font-weight: 600;
+transition: color 0.18s ease, background 0.18s ease;
+padding: 6px 10px;
+border-radius: 6px;
+white-space: nowrap;
+}
 
-  <section id="testimonials" class="section alt">
-    <h2>What Our Clients Say</h2>
-    <div class="testimonial-container">
-      <p class="testimonial active">"Nova Metrics helped us automate our entire reporting workflow seamlessly."</p>
-      <p class="testimonial">"Their dashboards transformed how our management team makes decisions."</p>
-      <p class="testimonial">"Professional, responsive, and technically brilliant."</p>
-    </div>
-  </section>
+nav a:hover {
+color: #f0b41a; /* gold accent on hover */
+background: rgba(240,180,26,0.06);
+}
 
-  <section id="about" class="section">
-    <h2>About Nova Metrics (Pty) Ltd</h2>
-    <p>Nova Metrics is a data intelligence firm specializing in analytics, automation, and digital transformation. Our mission is to simplify complex data ecosystems and deliver real business value through smart reporting and automation.</p>
-  </section>
+/* Hero */
+.hero {
+background: linear-gradient(to right, #070707, #121212);
+padding: 120px 32px;
+text-align: center;
+width: 100%;
+box-sizing: border-box;
+}
 
-  <section id="contact" class="section alt">
-    <h2>Contact Us</h2>
-    <p>Email: <a href="mailto:info@novametricsgroup.co.za">info@novametricsgroup.co.za</a></p>
-    <p>Phone: <a href="tel:+27677167716">+27 67 716 7716</a></p>
-  </section>
+.hero .hero-content {
+max-width: 1000px;
+margin: 0 auto;
+}
 
-  <footer>
-  <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
-</footer>
+.hero h1 {
+color: #f0b41a; /* gold accent */
+font-size: 42px;
+margin-bottom: 10px;
+}
 
+/* Sections */
+.section {
+padding: 80px 32px;
+text-align: center;
+width: 100%;
+box-sizing: border-box;
+background: transparent;
+}
 
-  <script>
-    // Simple testimonial rotation
-    const testimonials = document.querySelectorAll('.testimonial');
-    let i = 0;
-    setInterval(() => {
-      testimonials[i].classList.remove('active');
-      i = (i + 1) % testimonials.length;
-      testimonials[i].classList.add('active');
-    }, 4000);
-  </script>
-</body>
-</html>
+.section h2 {
+color: #f0b41a;
+margin-bottom: 20px;
+font-size: 28px;
+}
 
+/* Services tiles: side-by-side layout restored /
+.services {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+gap: 24px;
+margin-top: 30px;
+width: 100%;
+box-sizing: border-box;
+align-items: start;
+min-width: 0; / allow shrink */
+}
 
+.service {
+background: linear-gradient(180deg, #141414 0%, #0f0f0f 100%);
+padding: 22px;
+border-radius: 10px;
+border: 1px solid rgba(255,255,255,0.03);
+transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
+box-sizing: border-box;
+min-width: 0;
+}
+
+.service h3 {
+color: #e6e6e6;
+margin-bottom: 10px;
+}
+
+.service p {
+color: #cfcfcf;
+font-size: 0.95rem;
+line-height: 1.5;
+}
+
+.service:hover {
+background: linear-gradient(180deg, #2c2200 0%, #231a00 100%);
+border-color: rgba(240,180,26,0.18);
+transform: translateY(-6px);
+box-shadow: 0 8px 28px rgba(240,180,26,0.07);
+}
+
+/* Video: responsive wrapper to avoid overflow (use .video-container around iframe) /
+.video-container {
+position: relative;
+width: 100%;
+max-width: 100%;
+box-sizing: border-box;
+overflow: hidden;
+padding-top: 56.25%; / 16:9 ratio */
+}
+
+.video-container iframe,
+.video-container embed,
+.video-container object {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border: 0;
+display: block;
+max-width: 100%;
+}
+
+/* Small helpers */
+img, iframe, embed, object {
+max-width: 100%;
+height: auto;
+display: block;
+}
+
+/* Smooth scroll */
+html {
+scroll-behavior: smooth;
+}
+
+/* Anchor spacer variables - single source of truth for header height */
+:root {
+–header-height-desktop: 70px;
+–header-height-mobile: 96px;
+–anchor-offset-extra: 12px;
+}
+
+/* Anchor spacer: reliable ::before method so browser lands heading below sticky header */
+section[id]::before,
+[role=“region”][id]::before {
+content: “”;
+display: block;
+height: calc(var(–header-height-desktop) + var(–anchor-offset-extra));
+margin-top: calc(-1 * (var(–header-height-desktop) + var(–anchor-offset-extra)));
+visibility: hidden;
+pointer-events: none;
+}
+
+/* Responsive / mobile adjustments */
+@media (max-width: 720px) {
+header {
+flex-direction: column;
+align-items: center;
+gap: 8px;
+padding: 10px 16px;
+}
+
+.logo {
+width: 110px;
+}
+
+/* Keep nav visible but horizontally scrollable on very narrow devices */
+nav {
+display: flex;
+flex-direction: row;
+flex-wrap: nowrap;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+gap: 10px;
+width: 100%;
+padding: 6px 0;
+box-sizing: border-box;
+}
+
+nav a {
+margin-left: 0;
+padding: 8px 10px;
+font-size: 0.95rem;
+white-space: nowrap;
+flex: 0 0 auto;
+}
+
+.hero {
+padding: 80px 16px;
+}
+
+.section {
+padding: 60px 16px;
+}
+
+/* Keep tiles side-by-side where possible (reduce min width) */
+.services {
+grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+gap: 16px;
+}
+
+/* mobile-specific anchor spacer */
+section[id]::before,
+[role=“region”][id]::before {
+height: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
+margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
+}
+}
+
+/* Prevent accidental overflow from long content */
+
+{
+min-width: 0;
+}
+/* Final safety clamps */
+header, .hero, .section, .services, .video-container {
+max-width: 100%;
+overflow-x: hidden;
+}
