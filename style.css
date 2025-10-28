@@ -187,4 +187,51 @@ font-size: 0.95rem;
 white-space: nowrap; / keep each link as a single unit */
 }
 }
+/* Keep header height consistent for scroll offset /
+:root {
+–header-height-desktop: 70px;
+–header-height-mobile: 96px; / adjust if your mobile header is taller */
+}
+
+/* Let the browser account for the sticky header when scrolling to anchors */
+html {
+scroll-padding-top: var(–header-height-desktop);
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 720px) {
+html {
+scroll-padding-top: var(–header-height-mobile);
+}
+
+header {
+flex-direction: row; /* keep header as single row visually */
+align-items: center;
+gap: 8px;
+padding: 10px 16px;
+}
+
+.logo {
+width: 110px;
+}
+
+/* Make nav a single scrollable row instead of wrapping into two rows /
+nav {
+display: flex;
+flex-direction: row;
+flex-wrap: nowrap; / prevent wrapping /
+overflow-x: auto; / allow horizontal scroll if it doesn’t fit /
+-webkit-overflow-scrolling: touch;
+gap: 8px;
+width: 100%;
+justify-content: flex-end; / keep links to the right */
+}
+
+nav a {
+white-space: nowrap; /* prevent individual links from breaking /
+margin-left: 0;
+padding: 6px 10px;
+font-size: 0.95rem;
+flex: 0 0 auto; / prevent flex-grow so items stay their size */
+}
 
