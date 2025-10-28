@@ -103,21 +103,21 @@ html {
 scroll-behavior: smooth;
 }
 
-/* Anchor offset and header height variables /
+/* Anchor spacer variables /
 :root {
 –header-height-desktop: 70px; / adjust if desktop header is taller /
 –header-height-mobile: 96px; / adjust if mobile header is taller /
-–anchor-offset-extra: 16px; / extra gap so section isn’t flush under header */
+–anchor-offset-extra: 12px; / extra gap so heading isn’t flush under header */
 }
 
-/* RELIABLE ANCHOR OFFSET
-Uses negative margin + top padding on each section with an id so
-clicking a nav anchor lands the visible heading below the sticky header.
-*/
-section[id] {
-position: relative;
-padding-top: calc(var(–header-height-desktop) + var(–anchor-offset-extra));
+/* Reliable anchor spacer using ::before (safer than negative margins) */
+section[id]::before {
+content: “”;
+display: block;
+height: calc(var(–header-height-desktop) + var(–anchor-offset-extra));
 margin-top: calc(-1 * (var(–header-height-desktop) + var(–anchor-offset-extra)));
+visibility: hidden;
+pointer-events: none;
 }
 
 /* MOBILE / SMALL SCREENS /
@@ -165,9 +165,8 @@ padding: 60px 20px;
 gap: 18px;
 }
 
-/* Mobile-specific anchor offset */
-section[id] {
-padding-top: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
+/* Mobile-specific anchor spacer */
+section[id]::before {
+height: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
 margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
-}
 }
