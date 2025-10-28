@@ -7,10 +7,10 @@ word-break: break-word;
 }
 /* Page-level /
 html, body {
-overflow-x: hidden; / prevent horizontal dragging */
+overflow-x: hidden; / stop horizontal dragging /
 max-width: 100%;
-background-color: #000;
-color: #eee;
+background-color: #0a0a0a; / near-black /
+color: #e6e6e6; / light grey text */
 height: 100%;
 }
 
@@ -18,32 +18,22 @@ body {
 line-height: 1.6;
 }
 
-/* Header /
+/* Header - matches original structure: logo left, nav right /
 header {
-background: #111;
-color: #fff;
+background: #111; / dark grey */
+color: #e6e6e6;
 display: flex;
 justify-content: space-between;
 align-items: center;
-padding: 15px 24px; / reduced from 40 to avoid causing overflow on small screens */
+padding: 16px 32px;
 position: sticky;
 top: 0;
 z-index: 1000;
 width: 100%;
 box-sizing: border-box;
+border-bottom: 1px solid rgba(255,255,255,0.03);
 }
 
-/* small container helper */
-.container {
-width: 100%;
-max-width: 1200px;
-margin: 0 auto;
-padding-left: 16px;
-padding-right: 16px;
-box-sizing: border-box;
-}
-
-/* Brand / logo */
 .logo {
 width: 140px;
 max-width: 100%;
@@ -51,103 +41,113 @@ height: auto;
 display: block;
 }
 
-/* Nav */
+/* Navigation */
 nav {
 display: flex;
-align-items: center;
 gap: 12px;
+align-items: center;
 box-sizing: border-box;
-max-width: 100%;
 }
 
 nav a {
-color: #fff;
+color: #dcdcdc; /* medium-light grey */
 text-decoration: none;
-margin-left: 16px;
-font-weight: 500;
-transition: color 0.3s;
-white-space: nowrap; /* keep each link on one line */
+margin-left: 12px;
+font-weight: 600;
+transition: color 0.18s ease, background 0.18s ease;
+padding: 6px 10px;
+border-radius: 6px;
+white-space: nowrap;
 }
 
 nav a:hover {
-color: #f0b41a;
+color: #f0b41a; /* gold accent on hover */
+background: rgba(240,180,26,0.06);
 }
 
-/* Hero / product hero */
-.hero, .product-hero {
-background: linear-gradient(to right, #000, #1a1a1a);
-padding: 120px 24px;
+/* Hero */
+.hero {
+background: linear-gradient(to right, #070707, #121212);
+padding: 120px 32px;
 text-align: center;
 width: 100%;
 box-sizing: border-box;
 }
 
-.hero h1, .product-hero h1 {
-color: #f0b41a;
+.hero .hero-content {
+max-width: 1000px;
+margin: 0 auto;
+}
+
+.hero h1 {
+color: #f0b41a; /* gold accent */
 font-size: 42px;
 margin-bottom: 10px;
 }
 
-/* Generic sections */
-.section, .product-details, .services-section {
-padding: 80px 24px;
+/* Sections */
+.section {
+padding: 80px 32px;
 text-align: center;
 width: 100%;
 box-sizing: border-box;
+background: transparent;
 }
 
-.section.alt {
-background: #111;
-}
-
-.section h2, .product-details h2 {
+.section h2 {
 color: #f0b41a;
 margin-bottom: 20px;
 font-size: 28px;
 }
 
-/* Services grid: restored side-by-side tile layout /
+/* Services tiles: side-by-side layout restored /
 .services {
 display: grid;
-grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); / tiles side-by-side where space allows /
+grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 gap: 24px;
 margin-top: 30px;
 width: 100%;
 box-sizing: border-box;
-min-width: 0; / allow shrinking */
+align-items: start;
+min-width: 0; / allow shrink */
 }
 
 .service {
-background: #1a1a1a;
+background: linear-gradient(180deg, #141414 0%, #0f0f0f 100%);
 padding: 22px;
 border-radius: 10px;
-border: 1px solid #333;
-transition: all 0.28s ease;
+border: 1px solid rgba(255,255,255,0.03);
+transition: transform 0.28s ease, box-shadow 0.28s ease, background 0.28s ease;
 box-sizing: border-box;
 min-width: 0;
 }
+
 .service h3 {
-margin-bottom: 12px;
-}
-.service p {
-color: #ddd;
-font-size: 0.95rem;
-}
-.service:hover {
-background: #2b2100;
-border-color: #f0b41a;
-transform: translateY(-6px);
-box-shadow: 0 8px 28px rgba(240,180,26,0.09);
+color: #e6e6e6;
+margin-bottom: 10px;
 }
 
-/* Video: responsive wrapper to avoid overflow /
+.service p {
+color: #cfcfcf;
+font-size: 0.95rem;
+line-height: 1.5;
+}
+
+.service:hover {
+background: linear-gradient(180deg, #2c2200 0%, #231a00 100%);
+border-color: rgba(240,180,26,0.18);
+transform: translateY(-6px);
+box-shadow: 0 8px 28px rgba(240,180,26,0.07);
+}
+
+/* Video: responsive wrapper to avoid overflow (use .video-container around iframe) /
 .video-container {
 position: relative;
 width: 100%;
 max-width: 100%;
 box-sizing: border-box;
 overflow: hidden;
-padding-top: 56.25%; / 16:9 aspect ratio */
+padding-top: 56.25%; / 16:9 ratio */
 }
 
 .video-container iframe,
@@ -170,19 +170,19 @@ height: auto;
 display: block;
 }
 
-/* Smooth scrolling */
+/* Smooth scroll */
 html {
 scroll-behavior: smooth;
 }
 
-/* Anchor spacer variables /
+/* Anchor spacer variables - single source of truth for header height */
 :root {
-–header-height-desktop: 70px; / adjust if needed on desktop /
-–header-height-mobile: 96px; / adjust if needed on mobile */
+–header-height-desktop: 70px;
+–header-height-mobile: 96px;
 –anchor-offset-extra: 12px;
 }
 
-/* Reliable anchor spacer using ::before (does not reflow content) */
+/* Anchor spacer: reliable ::before method so browser lands heading below sticky header */
 section[id]::before,
 [role=“region”][id]::before {
 content: “”;
@@ -193,7 +193,7 @@ visibility: hidden;
 pointer-events: none;
 }
 
-/* MOBILE / SMALL SCREENS */
+/* Responsive / mobile adjustments */
 @media (max-width: 720px) {
 header {
 flex-direction: column;
@@ -206,14 +206,14 @@ padding: 10px 16px;
 width: 110px;
 }
 
-/* keep nav usable but don’t produce large horizontal width /
+/* Keep nav visible but horizontally scrollable on very narrow devices */
 nav {
 display: flex;
 flex-direction: row;
-flex-wrap: nowrap; / don’t wrap into multiple rows /
-overflow-x: auto; / allow horizontal scroll of nav only if needed */
+flex-wrap: nowrap;
+overflow-x: auto;
 -webkit-overflow-scrolling: touch;
-gap: 12px;
+gap: 10px;
 width: 100%;
 padding: 6px 0;
 box-sizing: border-box;
@@ -227,15 +227,15 @@ white-space: nowrap;
 flex: 0 0 auto;
 }
 
-.hero, .product-hero {
+.hero {
 padding: 80px 16px;
 }
 
-.section, .product-details {
+.section {
 padding: 60px 16px;
 }
 
-/* Service grid: keep tiles side-by-side as much as possible, min column width reduced */
+/* Keep tiles side-by-side where possible (reduce min width) */
 .services {
 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 gap: 16px;
@@ -255,7 +255,7 @@ margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra
 min-width: 0;
 }
 /* Final safety clamps */
-header, .hero, .section, .services, .video-container, .container {
+header, .hero, .section, .services, .video-container {
 max-width: 100%;
 overflow-x: hidden;
 }
