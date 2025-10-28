@@ -259,6 +259,26 @@
     testimonials[i].classList.add('active');
   }, 4000);
 </script>
+  <script>
+  // Smooth scroll with fixed header offset
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const targetId = this.getAttribute('href').substring(1);
+      const target = document.getElementById(targetId);
+      if (target) {
+        e.preventDefault();
+        const headerHeight = document.querySelector('header').offsetHeight;
+        const targetPosition = target.getBoundingClientRect().top + window.scrollY - headerHeight - 10; // extra 10px padding
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+</script>
+
 
 </body>
 </html>
+
