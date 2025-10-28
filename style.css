@@ -3,10 +3,20 @@ margin: 0;
 padding: 0;
 box-sizing: border-box;
 font-family: ‘Segoe UI’, sans-serif;
+word-wrap: break-word;
+-webkit-hyphens: auto;
+-ms-word-break: break-word;
+word-break: break-word;
 }
-body {
+html, body {
+overflow-x: hidden;
+max-width: 100vw;
 background-color: #000;
 color: #eee;
+height: 100%;
+}
+
+body {
 line-height: 1.6;
 }
 
@@ -21,10 +31,31 @@ padding: 15px 40px;
 position: sticky;
 top: 0;
 z-index: 1000;
+width: 100%;
+box-sizing: border-box;
+}
+
+/* Small container/helper classes (if used in pages) */
+.container {
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;
+padding-left: 16px;
+padding-right: 16px;
+box-sizing: border-box;
 }
 
 .logo {
 width: 140px;
+max-width: 100%;
+height: auto;
+display: block;
+}
+
+nav {
+display: flex;
+align-items: center;
+gap: 12px;
 }
 
 nav a {
@@ -33,6 +64,7 @@ text-decoration: none;
 margin-left: 20px;
 font-weight: 500;
 transition: color 0.3s;
+white-space: nowrap;
 }
 
 nav a:hover {
@@ -40,40 +72,47 @@ color: #f0b41a;
 }
 
 /* Hero */
-.hero {
+.hero, .product-hero {
 background: linear-gradient(to right, #000, #1a1a1a);
 padding: 120px 40px;
 text-align: center;
+width: 100%;
+box-sizing: border-box;
 }
 
-.hero h1 {
+.hero h1, .product-hero h1 {
 color: #f0b41a;
 font-size: 42px;
 margin-bottom: 10px;
 }
 
 /* Sections */
-.section {
+.section, .section.alt, .product-details, .product-hero, .services-section {
 padding: 80px 40px;
 text-align: center;
+width: 100%;
+box-sizing: border-box;
 }
 
 .section.alt {
 background: #111;
 }
 
-.section h2 {
+.section h2, .product-details h2 {
 color: #f0b41a;
 margin-bottom: 20px;
 font-size: 28px;
 }
 
-/* Services grid */
+/* Services grid /
 .services {
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 gap: 25px;
 margin-top: 30px;
+width: 100%;
+box-sizing: border-box;
+min-width: 0; / allow grid items to shrink */
 }
 
 .service {
@@ -82,6 +121,8 @@ padding: 25px;
 border-radius: 10px;
 border: 1px solid #333;
 transition: all 0.3s ease;
+box-sizing: border-box;
+min-width: 0;
 }
 .service:hover {
 background: #2b2100;
@@ -90,27 +131,49 @@ transform: translateY(-5px);
 box-shadow: 0 0 20px rgba(240,180,26,0.4);
 }
 
-/* Video container /
-.video-container iframe {
-border-radius: 10px;
+/* Video container (responsive) /
+.video-container {
+position: relative;
 width: 100%;
-max-width: 700px;
-height: 394px; / standard 16:9 for 700px width */
+max-width: 100%;
+box-sizing: border-box;
+overflow: hidden;
+padding-top: 56.25%; / 16:9 aspect ratio */
 }
 
-/* Smooth scroll behavior (optional) */
+.video-container iframe,
+.video-container embed,
+.video-container object {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border: 0;
+display: block;
+max-width: 100%;
+}
+
+/* Small helpers */
+img, iframe, embed, object {
+max-width: 100%;
+height: auto;
+display: block;
+}
+
+/* Smooth scroll (optional) */
 html {
 scroll-behavior: smooth;
 }
 
-/* Anchor spacer variables /
+/* Anchor spacer variables (single source) /
 :root {
-–header-height-desktop: 70px; / adjust if desktop header is taller /
-–header-height-mobile: 96px; / adjust if mobile header is taller /
-–anchor-offset-extra: 12px; / extra gap so heading isn’t flush under header */
+–header-height-desktop: 70px; / adjust if desktop header taller /
+–header-height-mobile: 96px; / adjust if mobile header taller */
+–anchor-offset-extra: 12px;
 }
 
-/* Reliable anchor spacer using ::before (safer than negative margins) */
+/* Reliable anchor spacer using ::before on sections with id */
 section[id]::before {
 content: “”;
 display: block;
@@ -120,9 +183,8 @@ visibility: hidden;
 pointer-events: none;
 }
 
-/* MOBILE / SMALL SCREENS /
+/* MOBILE / SMALL SCREENS */
 @media (max-width: 720px) {
-/ Mobile header adjustments */
 header {
 flex-direction: column;
 align-items: center;
@@ -134,7 +196,7 @@ padding: 10px 16px;
 width: 110px;
 }
 
-/* Stack nav links vertically to avoid wrapping and misalignment */
+/* make nav stack vertically on small screens */
 nav {
 display: flex;
 flex-direction: column;
@@ -142,6 +204,7 @@ align-items: center;
 gap: 8px;
 width: 100%;
 padding: 6px 0;
+box-sizing: border-box;
 }
 
 nav a {
@@ -152,12 +215,11 @@ white-space: normal;
 width: auto;
 }
 
-/* Reduce hero/section padding for mobile */
-.hero {
+.hero, .product-hero {
 padding: 80px 20px;
 }
 
-.section {
+.section, .product-details {
 padding: 60px 20px;
 }
 
@@ -165,75 +227,23 @@ padding: 60px 20px;
 gap: 18px;
 }
 
-/* Mobile-specific anchor spacer */
+/* mobile-specific anchor spacer */
 section[id]::before {
 height: calc(var(–header-height-mobile) + var(–anchor-offset-extra));
 margin-top: calc(-1 * (var(–header-height-mobile) + var(–anchor-offset-extra)));
 }
-/* Prevent horizontal scrolling and force elements to fit viewport /
-html, body {
-overflow-x: hidden; / hide any accidental horizontal overflow */
 }
 
-/* Make images and iframes truly responsive */
-img, .logo, .video-container iframe {
-max-width: 100%;
-height: auto;
-display: block;
-}
-
-/* Ensure header padding doesn’t push content wider on small screens */
-header {
-padding-left: 16px;
-padding-right: 16px;
-}
-
-/* Ensure wide grid/items don’t overflow */
-.services, .service {
-max-width: 100%;
-box-sizing: border-box;
-overflow: visible;
-}
-/* Force no horizontal overflow and clamp wide elements /
-html, body {
-overflow-x: hidden; / hide any accidental horizontal overflow /
-max-width: 100vw; / prevent viewport widening by children */
-}
-
-/* Make top-level containers never exceed viewport */
-header, .hero, .section, .services, .video-container {
-width: 100%;
-max-width: 100vw;
-box-sizing: border-box;
-}
-
-/* Ensure nav doesn’t create extra width when links are long /
-nav {
-width: 100%;
-max-width: 100vw;
-box-sizing: border-box;
-padding-right: 16px; / match header padding so content doesn’t push out /
-overflow: hidden; / hide any accidental overflow from long link text */
-}
-
-/* Make inline elements safe */
-img, .logo, .video-container iframe, iframe, embed, object {
-max-width: 100%;
-width: 100%;
-height: auto;
-display: block;
-}
-
-/* Extra clamp for grid items that may stretch wider /
-.services, .service {
-min-width: 0; / allow flex/grid items to shrink inside container */
-}
-
-/* Safety: prevent long words or URLs from causing overflow */
+/* Prevent accidental overflow from long content */
 
 {
-word-wrap: break-word;
--webkit-hyphens: auto;
--ms-word-break: break-word;
-word-break: break-word;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+min-width: 0;
+}
+/* Final safety clamps */
+header, .hero, .section, .services, .video-container, .container {
+max-width: 100vw;
+overflow-x: hidden;
 }
