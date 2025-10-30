@@ -1,86 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contact — Nova Metrics (Pty) Ltd</title>
-  <meta name="description" content="Contact Nova Metrics (Pty) Ltd — Analytics, Automation & Solar Intelligence Experts" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Contact Nova Metrics (Pty) Ltd — experts in data analytics and automation solutions." />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="page-transition">
-
-  <!-- HEADER -->
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" /></a>
+      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo"></a>
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
       <nav>
         <a href="index.html">Home</a>
-        <a href="index.html#what-we-do">What We Do</a>
-        <a href="index.html#solar">Solar Intelligence</a>
-        <a href="index.html#dashboard">Dashboards</a>
-        <a href="index.html#testimonials">Testimonials</a>
         <a href="about.html">About</a>
         <a href="contact.html" class="active">Contact</a>
+        <a href="products.html">Products</a>
       </nav>
     </div>
   </header>
 
-  <!-- HERO -->
-  <section class="hero fade-in">
-    <div class="hero-content container">
-      <h1>Contact Nova Metrics (Pty) Ltd</h1>
-      <p>We’re ready to help you with analytics, automation, and solar intelligence solutions. Reach out to us for enquiries or project discussions.</p>
-    </div>
-  </section>
+  <main>
+    <section class="hero fade-in">
+      <div class="hero-content container">
+        <h1>Contact Us</h1>
+        <p>We’d love to hear from you. Reach out for partnerships, project inquiries, or support.</p>
+      </div>
+    </section>
 
-  <!-- CONTACT CARD -->
-  <section class="section container fade-in">
-    <div class="contact-card">
-      <div class="contact-row">
-        <div style="min-width:220px;">
-          <strong>Nova Metrics (Pty) Ltd</strong><br>
-          30 Elizabeth Avenue<br>
-          Rivonia, Johannesburg<br>
-          South Africa
-        </div>
-        <div>
-          <div><strong>Email:</strong> <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></div>
-          <div style="margin-top:8px;"><strong>Phone:</strong> <a href="tel:+27677167716">+27 67 716 7716</a></div>
-          <div style="margin-top:8px;"><strong>International:</strong> Serving clients across Africa, Europe & UK • GDPR-compliant data practices</div>
+    <section class="section container fade-in">
+      <div class="contact-card">
+        <div class="contact-row">
+          <div>
+            <strong>Nova Metrics (Pty) Ltd</strong><br>
+            30 Elizabeth Avenue<br>
+            Rivonia, Johannesburg<br>
+            South Africa
+          </div>
+          <div>
+            <p><strong>Email:</strong> <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></p>
+            <p><strong>Phone:</strong> <a href="tel:+27677167716">+27 67 716 7716</a></p>
+            <p><strong>International:</strong> Serving Africa, Europe & UK</p>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- FOOTER -->
   <footer>
-    <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
+    <p>© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
   </footer>
-
-  <script>
-    // Page transition
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.classList.remove('page-transition');
-    });
-
-    // Mobile nav toggle
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('nav').classList.toggle('open');
-    });
-
-    // Fade-in sections on scroll
-    const faders = document.querySelectorAll('.fade-in');
-    const appearOptions = { threshold: 0.1 };
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('appear');
-        observer.unobserve(entry.target);
-      });
-    }, appearOptions);
-    faders.forEach(fader => appearOnScroll.observe(fader));
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-
