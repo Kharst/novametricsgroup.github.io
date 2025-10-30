@@ -24,12 +24,13 @@
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
       <nav>
         <a href="#home" class="active">Home</a>
+        <a href="#about">About</a>
         <a href="#services">What We Do</a>
         <a href="#solar">Solar Intelligence</a>
         <a href="#dashboard">Dashboards</a>
         <a href="#testimonials">Testimonials</a>
         <a href="products.html">Products</a>
-        <a href="about.html">About & Contact</a>
+        <a href="contact.html">Contact</a>
       </nav>
     </div>
   </header>
@@ -42,30 +43,35 @@
     </div>
   </section>
 
+  <!-- ABOUT -->
+  <section id="about" class="section container fade-in">
+    <h2>About Nova Metrics (Pty) Ltd</h2>
+    <p>Nova Metrics is a professional analytics and automation company headquartered in Johannesburg, South Africa, serving clients across Africa, Europe, and the UK. We deliver intelligent Power BI dashboards, automation workflows, and solar performance analytics that help organizations make decisions with confidence.</p>
+  </section>
+
   <!-- SERVICES -->
-  <section class="section alt" id="what-we-do">
-  <div class="container">
-    <h2>What We Do</h2>
-    <div class="services">
-      <div class="service">
-        <div class="icon">⚡</div>
-        <h3>Data Intelligence</h3>
-        <p>We transform complex datasets into meaningful insights using Power BI, Python, and Fabric analytics.</p>
-      </div>
-      <div class="service">
-        <div class="icon">🧠</div>
-        <h3>Automation</h3>
-        <p>We streamline operations using Power Automate and AI-driven workflows that boost efficiency.</p>
-      </div>
-      <div class="service">
-        <div class="icon">🌍</div>
-        <h3>Energy Analytics</h3>
-        <p>We provide end-to-end analytics for renewable energy and sustainability initiatives.</p>
+  <section class="section alt" id="services">
+    <div class="container">
+      <h2>What We Do</h2>
+      <div class="services">
+        <div class="service">
+          <div class="icon">⚡</div>
+          <h3>Data Intelligence</h3>
+          <p>We transform complex datasets into meaningful insights using Power BI, Python, and Fabric analytics.</p>
+        </div>
+        <div class="service">
+          <div class="icon">🧠</div>
+          <h3>Automation</h3>
+          <p>We streamline operations using Power Automate and AI-driven workflows that boost efficiency.</p>
+        </div>
+        <div class="service">
+          <div class="icon">🌍</div>
+          <h3>Energy Analytics</h3>
+          <p>We provide end-to-end analytics for renewable energy and sustainability initiatives.</p>
+        </div>
       </div>
     </div>
-  </div>
-</section>
-
+  </section>
 
   <!-- SOLAR INTELLIGENCE -->
   <section id="solar" class="section alt fade-in">
@@ -95,40 +101,19 @@
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section id="about" class="section container fade-in">
-    <h2>About Nova Metrics (Pty) Ltd</h2>
-    <p>Nova Metrics is a data intelligence firm specializing in analytics, automation, and digital transformation. We simplify complex data ecosystems and deliver measurable business value through smart reporting and predictive insights.</p>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="section alt fade-in">
-    <h2>Contact Us</h2>
-    <p>Email: <a href="mailto:info@novametricsgroup.co.za">info@novametricsgroup.co.za</a></p>
-    <p>Phone: <a href="tel:+27677167716">+27 67 716 7716</a></p>
-  </section>
-
   <!-- FOOTER -->
   <footer>
     <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
   </footer>
 
+  <!-- PAGE TRANSITION SCRIPT -->
   <script>
     // Mobile nav toggle
     document.querySelector('.menu-toggle').addEventListener('click', () => {
       document.querySelector('nav').classList.toggle('open');
     });
 
-    // Testimonial rotation
-    const testimonials = document.querySelectorAll('.testimonial');
-    let i = 0;
-    setInterval(() => {
-      testimonials[i].classList.remove('active');
-      i = (i + 1) % testimonials.length;
-      testimonials[i].classList.add('active');
-    }, 4000);
-
-    // Smooth fade-in on scroll
+    // Smooth fade-in scroll effect
     const faders = document.querySelectorAll('.fade-in');
     const appearOptions = { threshold: 0.1 };
     const appearOnScroll = new IntersectionObserver((entries, observer) => {
@@ -139,7 +124,29 @@
       });
     }, appearOptions);
     faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Testimonial rotation
+    const testimonials = document.querySelectorAll('.testimonial');
+    let i = 0;
+    setInterval(() => {
+      testimonials[i].classList.remove('active');
+      i = (i + 1) % testimonials.length;
+      testimonials[i].classList.add('active');
+    }, 4000);
+
+    // Page transition (fade out on navigation)
+    const links = document.querySelectorAll('a[href]');
+    links.forEach(link => {
+      if (link.hostname === window.location.hostname && !link.href.includes('#')) {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          document.body.classList.add('page-transition');
+          setTimeout(() => {
+            window.location.href = link.href;
+          }, 400);
+        });
+      }
+    });
   </script>
 </body>
 </html>
-
