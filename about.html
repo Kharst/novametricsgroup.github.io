@@ -4,32 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About & Contact — Nova Metrics (Pty) Ltd</title>
-
-  <meta name="description" content="Nova Metrics (Pty) Ltd — Power BI, automation and solar intelligence specialists. Learn about our story, mission, and contact details." />
-  <meta property="og:title" content="About & Contact — Nova Metrics (Pty) Ltd" />
-  <meta property="og:description" content="Nova Metrics delivers Power BI, automation, and solar analytics solutions across Africa, Europe, and the UK." />
-  <meta property="og:image" content="https://novametricsgroup.com/assets/logo.png" />
-  <meta property="og:url" content="https://novametricsgroup.com/about.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <link rel="icon" type="image/png" href="assets/logo.png" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Nova Metrics (Pty) Ltd — trusted Power BI, automation and solar analytics experts serving Africa, Europe and the UK. GDPR-compliant solutions for data-driven organisations." />
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <!-- HEADER -->
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="index.html">
-        <img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" />
-      </a>
+      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo"></a>
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
       <nav>
         <a href="index.html#home">Home</a>
-        <a href="index.html#services">What We Do</a>
-        <a href="index.html#solar">Solar Intelligence</a>
-        <a href="index.html#dashboard">Dashboards</a>
-        <a href="index.html#testimonials">Testimonials</a>
         <a href="products.html">Products</a>
         <a href="about.html" class="active">About & Contact</a>
       </nav>
@@ -37,75 +21,66 @@
   </header>
 
   <main>
-    <!-- HERO -->
-    <section class="hero fade-in">
+    <section class="hero">
       <div class="hero-content container">
         <h1>About Nova Metrics (Pty) Ltd</h1>
-        <p>
-          Nova Metrics (Pty) Ltd is a South African analytics and automation company based in Rivonia, Johannesburg.
-          We build intelligent Power BI dashboards, ETL pipelines, and automation solutions for organisations across
-          Africa, Europe, and the UK.
-        </p>
+        <p>Nova Metrics is a professional analytics and automation company headquartered in Johannesburg, South Africa, serving clients across Africa, Europe, and the UK. We deliver intelligent Power BI dashboards, automation workflows, and solar performance analytics that help organisations make decisions with confidence.</p>
       </div>
     </section>
 
-    <!-- VALUES -->
-    <section class="section container fade-in">
+    <section class="section container">
       <h2>What We Stand For</h2>
-      <ul style="list-style: disc; color: #cfcfcf; max-width: 820px; margin: 0 auto; text-align: left; padding-left: 18px;">
-        <li>Accuracy & rigour in data modelling</li>
-        <li>Practical dashboards that drive action</li>
-        <li>Secure, maintainable integrations</li>
-        <li>Customer-first delivery & support</li>
-      </ul>
+      <div class="values-grid">
+        <div class="value-item">
+          <h3>Accuracy & Rigour</h3>
+          <p>Our models and dashboards are engineered with precision, ensuring the highest standards of data integrity.</p>
+        </div>
+        <div class="value-item">
+          <h3>Actionable Insights</h3>
+          <p>We go beyond visuals — helping clients turn analytics into measurable business outcomes.</p>
+        </div>
+        <div class="value-item">
+          <h3>Secure Integrations</h3>
+          <p>We design with security and compliance in mind — every solution is GDPR-aware and privacy-conscious.</p>
+        </div>
+        <div class="value-item">
+          <h3>Global Client Support</h3>
+          <p>From local projects to global implementations, our clients receive end-to-end delivery and long-term partnership.</p>
+        </div>
+      </div>
     </section>
 
-    <!-- CONTACT -->
-    <section class="section alt container fade-in">
+    <section class="section alt container">
       <h2>Contact</h2>
       <div class="contact-card">
         <div class="contact-row">
-          <div style="min-width: 220px;">
-            <strong>Nova Metrics (Pty) Ltd</strong><br />
-            30 Elizabeth Avenue<br />
-            Rivonia, Johannesburg<br />
+          <div style="min-width:220px;">
+            <strong>Nova Metrics (Pty) Ltd</strong><br>
+            30 Elizabeth Avenue<br>
+            Rivonia, Johannesburg<br>
             South Africa
           </div>
           <div>
             <div><strong>Email:</strong> <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></div>
-            <div style="margin-top: 8px;"><strong>Phone:</strong> <a href="tel:+27677167716">+27 67 716 7716</a></div>
-            <div style="margin-top: 8px;"><strong>International:</strong> Serving clients across Africa, Europe & the UK • GDPR-aware delivery</div>
+            <div style="margin-top:8px;"><strong>Phone:</strong> <a href="tel:+27677167716">+27 67 716 7716</a></div>
+            <div style="margin-top:8px;"><strong>International:</strong> Serving clients across Africa, Europe & the UK • GDPR-compliant data practices</div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div class="container">
       <p>Nova Metrics (Pty) Ltd • 30 Elizabeth Avenue, Rivonia • info@novametricsgroup.com</p>
-      <p style="margin-top: 6px;">© Nova Metrics (Pty) Ltd 2025</p>
+      <p style="margin-top:6px;">© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
     </div>
   </footer>
 
   <script>
-    // Mobile nav toggle
     document.querySelector('.menu-toggle').addEventListener('click', () => {
       document.querySelector('nav').classList.toggle('open');
     });
-
-    // Smooth fade-in on scroll
-    const faders = document.querySelectorAll('.fade-in');
-    const appearOptions = { threshold: 0.1 };
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('appear');
-        observer.unobserve(entry.target);
-      });
-    }, appearOptions);
-    faders.forEach(fader => appearOnScroll.observe(fader));
   </script>
 </body>
 </html>
