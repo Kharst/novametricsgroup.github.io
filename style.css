@@ -168,38 +168,74 @@ nav a.active {
 }
 
 /* WHAT WE DO GRID */
+/* ------------------------------------
+   WHAT WE DO — TILE DESIGN
+   ------------------------------------ */
+
 .services {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 2rem;
-  margin-top: 2rem;
+  margin-top: 3rem;
+  perspective: 1000px;
 }
 
 .service {
-  background: #0d0d0d;
-  border-radius: 14px;
-  padding: 2rem 1.5rem;
+  position: relative;
+  background: linear-gradient(145deg, #0f0f0f, #151515);
   border: 1px solid #1f1f1f;
-  transition: all 0.3s ease;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
   text-align: left;
-}
-
-.service h3 {
-  color: #c6a33b;
-  font-size: 1.2rem;
-  margin-bottom: 0.7rem;
-}
-
-.service p {
-  color: #cfcfcf;
-  font-size: 0.98rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .service:hover {
+  transform: translateY(-8px) scale(1.02);
   border-color: #c6a33b;
-  box-shadow: 0 0 18px rgba(198, 163, 59, 0.08);
-  transform: translateY(-6px);
+  box-shadow: 0 8px 25px rgba(198, 163, 59, 0.15);
+  background: linear-gradient(145deg, #131313, #1a1a1a);
 }
+
+/* Optional icons at top of each tile */
+.service .icon {
+  font-size: 2rem;
+  color: #c6a33b;
+  margin-bottom: 1rem;
+}
+
+/* Headings */
+.service h3 {
+  color: #c6a33b;
+  font-size: 1.2rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Body text */
+.service p {
+  color: #ccc;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+/* Optional subtle shine effect */
+.service::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255, 215, 0, 0.15), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.service:hover::before {
+  left: 125%;
+}
+
 
 /* VIDEO EMBED */
 .video-container {
@@ -328,4 +364,5 @@ button:hover,
     flex-direction: column;
   }
 }
+
 
