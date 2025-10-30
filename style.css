@@ -1,8 +1,8 @@
-/* ----------------------------
-   NOVA METRICS GLOBAL STYLES
-   ---------------------------- */
+/* ------------------------------------
+   NOVA METRICS (PTY) LTD – FINAL STYLE
+   ------------------------------------ */
 
-/* Reset & Base */
+/* RESET & BASE */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -21,14 +21,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Containers */
+/* CONTAINER */
 .container {
   width: 90%;
   max-width: 1180px;
   margin: 0 auto;
 }
 
-/* Header & Navigation */
+/* HEADER & NAVIGATION */
 header {
   background: #000;
   border-bottom: 1px solid #1c1c1c;
@@ -61,16 +61,13 @@ nav a {
   transition: color 0.3s ease, transform 0.2s ease;
 }
 
-nav a:hover {
-  color: #c6a33b; /* gold hover */
+nav a:hover,
+nav a.active {
+  color: #c6a33b;
   transform: translateY(-2px);
 }
 
-nav a.active {
-  color: #c6a33b;
-}
-
-/* Mobile Menu */
+/* MOBILE MENU */
 .menu-toggle {
   display: none;
   background: none;
@@ -108,7 +105,7 @@ nav a.active {
   }
 }
 
-/* Hero Sections */
+/* HERO SECTION */
 .hero {
   padding: 6rem 0 4rem;
   background: linear-gradient(180deg, #0b0b0b 0%, #111 100%);
@@ -116,7 +113,7 @@ nav a.active {
 }
 
 .hero h1 {
-  font-size: 2.5rem;
+  font-size: 2.6rem;
   color: #fff;
   margin-bottom: 1rem;
 }
@@ -128,7 +125,7 @@ nav a.active {
   font-size: 1.1rem;
 }
 
-/* Section Styling */
+/* SECTIONS */
 .section {
   padding: 4rem 0;
   text-align: center;
@@ -144,21 +141,46 @@ nav a.active {
   color: #fff;
 }
 
-/* Lists */
-ul {
-  list-style: none;
+/* WHAT WE DO GRID */
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-ul li {
+.service {
+  background: #0d0d0d;
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  border: 1px solid #1f1f1f;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.service h3 {
+  color: #c6a33b;
+  font-size: 1.2rem;
   margin-bottom: 0.7rem;
 }
 
-/* Video Container */
+.service p {
+  color: #cfcfcf;
+  font-size: 0.98rem;
+}
+
+.service:hover {
+  border-color: #c6a33b;
+  box-shadow: 0 0 18px rgba(198, 163, 59, 0.08);
+  transform: translateY(-6px);
+}
+
+/* VIDEO EMBED */
 .video-container {
   position: relative;
   overflow: hidden;
   padding-top: 56.25%;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.05);
 }
 
@@ -171,7 +193,26 @@ ul li {
   border: none;
 }
 
-/* Contact Section */
+/* TESTIMONIALS */
+.testimonial-container {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.testimonial {
+  display: none;
+  font-size: 1.1rem;
+  color: #ccc;
+  transition: opacity 0.6s ease;
+}
+
+.testimonial.active {
+  display: block;
+  opacity: 1;
+}
+
+/* CONTACT CARD */
 .contact-card {
   background: #0d0d0d;
   border-radius: 12px;
@@ -198,7 +239,7 @@ ul li {
   text-decoration: underline;
 }
 
-/* Footer */
+/* FOOTER */
 footer {
   background: #000;
   border-top: 1px solid #1c1c1c;
@@ -208,7 +249,7 @@ footer {
   font-size: 0.9rem;
 }
 
-/* Animations */
+/* ANIMATIONS */
 .fade-in {
   opacity: 0;
   transform: translateY(20px);
@@ -220,7 +261,7 @@ footer {
   transform: translateY(0);
 }
 
-/* Buttons */
+/* BUTTONS */
 button,
 .btn {
   background: #c6a33b;
@@ -230,15 +271,16 @@ button,
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 button:hover,
 .btn:hover {
   background: #d4b24b;
+  transform: translateY(-2px);
 }
 
-/* Responsive Adjustments */
+/* RESPONSIVE TUNING */
 @media (max-width: 700px) {
   .hero h1 {
     font-size: 2rem;
@@ -250,5 +292,13 @@ button:hover,
 
   .contact-card {
     padding: 1.5rem;
+  }
+
+  .service {
+    text-align: center;
+  }
+
+  .contact-row {
+    flex-direction: column;
   }
 }
