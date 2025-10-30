@@ -1,77 +1,50 @@
-/* ------------------------------------
-   NOVA METRICS (PTY) LTD – FINAL STYLE
-   ------------------------------------ */
+/* ======================================
+   NOVA METRICS — STYLE SHEET (2025)
+   Refined for vivid transitions & motion
+   ====================================== */
 
 /* RESET & BASE */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
 }
-
-html {
-  scroll-behavior: smooth;
-}
-
-.values-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
-  margin-top: 24px;
-  text-align: left;
-}
-
-.value-item {
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 14px;
-  padding: 20px;
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-
-.value-item:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 215, 0, 0.08);
-}
-
-.value-item h3 {
-  color: gold;
-  margin-bottom: 8px;
-}
-
 
 body {
-  font-family: "Segoe UI", sans-serif;
-  background-color: #0b0b0b;
-  color: #e0e0e0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #222;
+  background: #fff;
   line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* CONTAINER */
 .container {
   width: 90%;
-  max-width: 1180px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: auto;
 }
 
-/* HEADER & NAVIGATION */
+/* HEADER */
 header {
-  background: #000;
-  border-bottom: 1px solid #1c1c1c;
+  background: #0a0a0a;
+  color: #fff;
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .header-inner {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 0;
 }
 
 .logo {
-  height: 42px;
+  height: 48px;
   width: auto;
 }
 
@@ -81,19 +54,28 @@ nav {
 }
 
 nav a {
-  color: #d1d1d1;
+  color: #fff;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s ease, transform 0.2s ease;
+  position: relative;
 }
 
-nav a:hover,
-nav a.active {
-  color: #c6a33b;
-  transform: translateY(-2px);
+nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: #00bfff;
+  transition: width 0.3s ease;
 }
 
-/* MOBILE MENU */
+nav a:hover::after,
+nav a.active::after {
+  width: 100%;
+}
+
 .menu-toggle {
   display: none;
   background: none;
@@ -103,281 +85,204 @@ nav a.active {
   cursor: pointer;
 }
 
-@media (max-width: 860px) {
-  nav {
-    position: absolute;
-    top: 68px;
-    right: 0;
-    background: #000;
-    flex-direction: column;
-    width: 100%;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-
-  nav.open {
-    max-height: 400px;
-    border-top: 1px solid #1c1c1c;
-  }
-
-  nav a {
-    padding: 1rem;
-    border-bottom: 1px solid #1c1c1c;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-}
-
 /* HERO SECTION */
 .hero {
-  padding: 6rem 0 4rem;
-  background: linear-gradient(180deg, #0b0b0b 0%, #111 100%);
+  background: linear-gradient(to right, #001f3f, #005f73);
+  color: #fff;
   text-align: center;
+  padding: 8rem 1rem;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+  animation: fadeSlideIn 1.5s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
 }
 
 .hero h1 {
-  font-size: 2.6rem;
-  color: #fff;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
+  font-weight: 700;
 }
 
 .hero p {
-  color: #d4d4d4;
-  max-width: 780px;
-  margin: 0 auto;
-  font-size: 1.1rem;
-}
-
-/* SECTIONS */
-.section {
-  padding: 4rem 0;
-  text-align: center;
-}
-
-.section.alt {
-  background: #111;
-}
-
-.section h2 {
-  font-size: 2rem;
-  margin-bottom: 1.2rem;
-  color: #fff;
-}
-
-/* WHAT WE DO GRID */
-/* ------------------------------------
-   WHAT WE DO — TILE DESIGN
-   ------------------------------------ */
-
-.services {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  margin-top: 3rem;
-  perspective: 1000px;
-}
-
-.service {
-  position: relative;
-  background: linear-gradient(145deg, #0f0f0f, #151515);
-  border: 1px solid #1f1f1f;
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  text-align: left;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.service:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: #c6a33b;
-  box-shadow: 0 8px 25px rgba(198, 163, 59, 0.15);
-  background: linear-gradient(145deg, #131313, #1a1a1a);
-}
-
-/* Optional icons at top of each tile */
-.service .icon {
-  font-size: 2rem;
-  color: #c6a33b;
-  margin-bottom: 1rem;
-}
-
-/* Headings */
-.service h3 {
-  color: #c6a33b;
   font-size: 1.2rem;
-  margin-bottom: 0.6rem;
+  line-height: 1.6;
 }
 
-/* Body text */
-.service p {
-  color: #ccc;
-  font-size: 0.96rem;
-  line-height: 1.5;
-}
-
-/* Optional subtle shine effect */
-.service::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -75%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255, 215, 0, 0.15), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.6s ease;
-}
-
-.service:hover::before {
-  left: 125%;
-}
-
-
-/* VIDEO EMBED */
-.video-container {
-  position: relative;
-  overflow: hidden;
-  padding-top: 56.25%;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.05);
-}
-
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* TESTIMONIALS */
-.testimonial-container {
-  max-width: 720px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.testimonial {
-  display: none;
-  font-size: 1.1rem;
-  color: #ccc;
-  transition: opacity 0.6s ease;
-}
-
-.testimonial.active {
-  display: block;
-  opacity: 1;
-}
-
-/* CONTACT CARD */
-.contact-card {
-  background: #0d0d0d;
-  border-radius: 12px;
-  padding: 2rem;
-  border: 1px solid #1f1f1f;
-  color: #ddd;
-  max-width: 880px;
-  margin: 0 auto;
-}
-
-.contact-row {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 2rem;
-}
-
-.contact-row a {
-  color: #c6a33b;
-  text-decoration: none;
-}
-
-.contact-row a:hover {
-  text-decoration: underline;
-}
-
-/* FOOTER */
-footer {
-  background: #000;
-  border-top: 1px solid #1c1c1c;
-  padding: 2rem 0;
-  text-align: center;
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-/* ANIMATIONS */
-.fade-in {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 1s ease, transform 1s ease;
-}
-/* ------------------------------------
-   FADE-IN ANIMATIONS (ENHANCED)
-   ------------------------------------ */
+/* FADE-IN TRANSITIONS */
 .fade-in {
   opacity: 0;
   transform: translateY(40px) scale(0.98);
-  filter: blur(8px);
-  transition: 
-    opacity 1s ease-out, 
-    transform 1s cubic-bezier(0.19, 1, 0.22, 1),
-    filter 0.8s ease-out;
+  transition: opacity 1s ease, transform 1s ease;
 }
 
 .fade-in.appear {
   opacity: 1;
   transform: translateY(0) scale(1);
-  filter: blur(0);
 }
 
+/* Alternate subtle motion variation */
+.fade-in:nth-child(even) {
+  transform: translateY(40px) scale(0.97);
+}
 
-/* BUTTONS */
-button,
-.btn {
-  background: #c6a33b;
-  color: #000;
-  border: none;
-  padding: 0.75rem 1.5rem;
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* SECTIONS */
+.section {
+  padding: 5rem 1rem;
+  text-align: center;
+}
+
+.section.alt {
+  background: #f8f9fa;
+}
+
+.section h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #003049;
+}
+
+.section p {
+  font-size: 1rem;
+  max-width: 800px;
+  margin: 0.5rem auto;
+  color: #444;
+}
+
+/* SERVICES GRID */
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.service {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.service:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+}
+
+.service .icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* VIDEO CONTAINERS */
+.video-container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+iframe {
+  width: 100%;
+  max-width: 700px;
+  height: 400px;
   border-radius: 8px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* TESTIMONIALS */
+.testimonial-container {
+  position: relative;
+  min-height: 80px;
+  max-width: 700px;
+  margin: 2rem auto;
+}
+
+.testimonial {
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+  position: absolute;
+  width: 100%;
+  left: 0;
+  text-align: center;
+  color: #222;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+
+.testimonial.active {
+  opacity: 1;
+  position: relative;
+}
+
+/* CONTACT SECTION */
+#contact a {
+  color: #005f73;
+  text-decoration: none;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-button:hover,
-.btn:hover {
-  background: #d4b24b;
-  transform: translateY(-2px);
+#contact a:hover {
+  text-decoration: underline;
 }
 
-/* RESPONSIVE TUNING */
-@media (max-width: 700px) {
+/* FOOTER */
+footer {
+  background: #0a0a0a;
+  color: #ddd;
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.9rem;
+}
+
+footer p {
+  margin: 0.3rem 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  nav {
+    display: none;
+    flex-direction: column;
+    background: #000;
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+  }
+
+  nav.open {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
   .hero h1 {
     font-size: 2rem;
   }
 
-  .hero p {
-    font-size: 1rem;
-  }
-
-  .contact-card {
-    padding: 1.5rem;
-  }
-
-  .service {
-    text-align: center;
-  }
-
-  .contact-row {
-    flex-direction: column;
+  iframe {
+    height: 250px;
   }
 }
-
-
-
