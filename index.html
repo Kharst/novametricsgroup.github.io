@@ -16,21 +16,21 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
+<body class="page-transition">
   <!-- HEADER -->
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="#home"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" /></a>
+      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" /></a>
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
       <nav>
-        <a href="#home" class="active">Home</a>
-        <a href="#about">About</a>
+        <a href="index.html" class="active">Home</a>
         <a href="#services">What We Do</a>
         <a href="#solar">Solar Intelligence</a>
         <a href="#dashboard">Dashboards</a>
         <a href="#testimonials">Testimonials</a>
-        <a href="products.html">Products</a>
+        <a href="about.html">About</a>
         <a href="contact.html">Contact</a>
+        <a href="products.html">Products</a>
       </nav>
     </div>
   </header>
@@ -43,14 +43,8 @@
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section id="about" class="section container fade-in">
-    <h2>About Nova Metrics (Pty) Ltd</h2>
-    <p>Nova Metrics is a professional analytics and automation company headquartered in Johannesburg, South Africa, serving clients across Africa, Europe, and the UK. We deliver intelligent Power BI dashboards, automation workflows, and solar performance analytics that help organizations make decisions with confidence.</p>
-  </section>
-
   <!-- SERVICES -->
-  <section class="section alt" id="services">
+  <section class="section alt fade-in" id="services">
     <div class="container">
       <h2>What We Do</h2>
       <div class="services">
@@ -73,8 +67,8 @@
     </div>
   </section>
 
-  <!-- SOLAR INTELLIGENCE -->
-  <section id="solar" class="section alt fade-in">
+  <!-- SOLAR -->
+  <section id="solar" class="section fade-in">
     <h2>Solar Intelligence</h2>
     <p>Our flagship solar analytics product enables users to forecast, size, and optimize solar energy systems.</p>
     <div class="video-container">
@@ -82,8 +76,8 @@
     </div>
   </section>
 
-  <!-- PROJECT MANAGEMENT DASHBOARD -->
-  <section id="dashboard" class="section container fade-in">
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section fade-in">
     <h2>Project Management Dashboard</h2>
     <p>Our Power BI solution gives leaders full visibility into project progress, budgets, and ROI — all in real time.</p>
     <div class="video-container">
@@ -106,47 +100,6 @@
     <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
   </footer>
 
-  <!-- PAGE TRANSITION SCRIPT -->
-  <script>
-    // Mobile nav toggle
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('nav').classList.toggle('open');
-    });
-
-    // Smooth fade-in scroll effect
-    const faders = document.querySelectorAll('.fade-in');
-    const appearOptions = { threshold: 0.1 };
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('appear');
-        observer.unobserve(entry.target);
-      });
-    }, appearOptions);
-    faders.forEach(fader => appearOnScroll.observe(fader));
-
-    // Testimonial rotation
-    const testimonials = document.querySelectorAll('.testimonial');
-    let i = 0;
-    setInterval(() => {
-      testimonials[i].classList.remove('active');
-      i = (i + 1) % testimonials.length;
-      testimonials[i].classList.add('active');
-    }, 4000);
-
-    // Page transition (fade out on navigation)
-    const links = document.querySelectorAll('a[href]');
-    links.forEach(link => {
-      if (link.hostname === window.location.hostname && !link.href.includes('#')) {
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          document.body.classList.add('page-transition');
-          setTimeout(() => {
-            window.location.href = link.href;
-          }, 400);
-        });
-      }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
