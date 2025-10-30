@@ -13,6 +13,32 @@ html {
   scroll-behavior: smooth;
 }
 
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+  text-align: left;
+}
+
+.value-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 14px;
+  padding: 20px;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.value-item:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 215, 0, 0.08);
+}
+
+.value-item h3 {
+  color: gold;
+  margin-bottom: 8px;
+}
+
+
 body {
   font-family: "Segoe UI", sans-serif;
   background-color: #0b0b0b;
@@ -302,3 +328,4 @@ button:hover,
     flex-direction: column;
   }
 }
+
