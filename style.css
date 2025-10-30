@@ -317,11 +317,25 @@ footer {
   transform: translateY(20px);
   transition: opacity 1s ease, transform 1s ease;
 }
+/* ------------------------------------
+   FADE-IN ANIMATIONS (ENHANCED)
+   ------------------------------------ */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  filter: blur(8px);
+  transition: 
+    opacity 1s ease-out, 
+    transform 1s cubic-bezier(0.19, 1, 0.22, 1),
+    filter 0.8s ease-out;
+}
 
 .fade-in.appear {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  filter: blur(0);
 }
+
 
 /* BUTTONS */
 button,
@@ -364,5 +378,6 @@ button:hover,
     flex-direction: column;
   }
 }
+
 
 
