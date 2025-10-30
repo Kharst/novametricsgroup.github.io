@@ -1,89 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About — Nova Metrics (Pty) Ltd</title>
-  <meta name="description" content="About Nova Metrics (Pty) Ltd — Analytics, Automation & Solar Intelligence Experts" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Learn about Nova Metrics — experts in analytics, automation, and solar intelligence solutions." />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="page-transition">
-
-  <!-- HEADER -->
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" /></a>
+      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo"></a>
       <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
       <nav>
         <a href="index.html">Home</a>
-        <a href="index.html#what-we-do">What We Do</a>
-        <a href="index.html#solar">Solar Intelligence</a>
-        <a href="index.html#dashboard">Dashboards</a>
-        <a href="index.html#testimonials">Testimonials</a>
         <a href="about.html" class="active">About</a>
         <a href="contact.html">Contact</a>
+        <a href="products.html">Products</a>
       </nav>
     </div>
   </header>
 
-  <!-- HERO -->
-  <section class="hero fade-in">
-    <div class="hero-content container">
-      <h1>About Nova Metrics (Pty) Ltd</h1>
-      <p>Nova Metrics is a data intelligence firm specializing in analytics, automation, and digital transformation. We simplify complex data ecosystems and deliver measurable business value through smart reporting and predictive insights.</p>
-    </div>
-  </section>
+  <main>
+    <section class="hero fade-in">
+      <div class="hero-content container">
+        <h1>About Nova Metrics</h1>
+        <p>Nova Metrics (Pty) Ltd is a professional analytics and automation company headquartered in Johannesburg, South Africa, serving clients across Africa, Europe, and the UK.</p>
+      </div>
+    </section>
 
-  <!-- VALUES -->
-  <section class="section container fade-in">
-    <h2>Our Core Values</h2>
-    <div class="values-grid">
-      <div class="value-item">
-        <h3>Accuracy & Rigour</h3>
-        <p>Our models and dashboards are engineered with precision, ensuring the highest standards of data integrity.</p>
+    <section class="section container fade-in">
+      <h2>Our Values</h2>
+      <div class="values-grid">
+        <div class="value-item">
+          <h3>Accuracy & Rigour</h3>
+          <p>We engineer models and dashboards with precision and integrity.</p>
+        </div>
+        <div class="value-item">
+          <h3>Actionable Insights</h3>
+          <p>We go beyond visuals — helping clients turn analytics into outcomes.</p>
+        </div>
+        <div class="value-item">
+          <h3>Global Support</h3>
+          <p>Our clients receive end-to-end delivery and long-term partnership.</p>
+        </div>
       </div>
-      <div class="value-item">
-        <h3>Actionable Insights</h3>
-        <p>We help clients turn analytics into measurable business outcomes.</p>
-      </div>
-      <div class="value-item">
-        <h3>Secure Integrations</h3>
-        <p>We design with security and compliance in mind — every solution is GDPR-aware and privacy-conscious.</p>
-      </div>
-      <div class="value-item">
-        <h3>Global Client Support</h3>
-        <p>From local projects to global implementations, our clients receive end-to-end delivery and long-term partnership.</p>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- FOOTER -->
   <footer>
-    <p>Powered by Nova Metrics (Pty) Ltd © 2025</p>
+    <p>© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
   </footer>
-
-  <script>
-    // Page transition
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.classList.remove('page-transition');
-    });
-
-    // Mobile nav toggle
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('nav').classList.toggle('open');
-    });
-
-    // Fade-in sections on scroll
-    const faders = document.querySelectorAll('.fade-in');
-    const appearOptions = { threshold: 0.1 };
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('appear');
-        observer.unobserve(entry.target);
-      });
-    }, appearOptions);
-    faders.forEach(fader => appearOnScroll.observe(fader));
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
