@@ -4,18 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Products — Nova Metrics (Pty) Ltd</title>
-  <meta name="description" content="Explore Nova Metrics' flagship products: Solar Intelligence and the Project Management Dashboard — driving smart analytics for energy and business decisions." />
-
-  <!-- SEO + Open Graph -->
-  <meta property="og:title" content="Nova Metrics (Pty) Ltd — Solar Intelligence & Analytics Solutions" />
-  <meta property="og:description" content="Smart analytics for solar optimization, Power BI dashboards, and intelligent automation." />
-  <meta property="og:image" content="https://novametricsgroup.com/assets/logo.png" />
-  <meta property="og:url" content="https://novametricsgroup.com/products.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Explore Nova Metrics (Pty) Ltd’s analytics solutions — including Solar Intelligence for energy optimization and cost savings." />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
@@ -25,53 +15,34 @@
       <nav>
         <a href="index.html#home">Home</a>
         <a href="products.html" class="active">Products</a>
-        <a href="index.html#services">What We Do</a>
-        <a href="index.html#solar">Solar Intelligence</a>
-        <a href="index.html#dashboard">Dashboards</a>
-        <a href="index.html#testimonials">Testimonials</a>
         <a href="about.html">About & Contact</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <!-- SOLAR INTELLIGENCE -->
-    <section class="hero fade-in">
+    <section class="hero">
       <div class="hero-content container">
-        <h1>Solar Intelligence</h1>
-        <p>Our flagship solar analytics platform — hourly yield modelling, battery optimisation, export planning, and financial scenario comparisons.</p>
+        <h1>Our Solutions</h1>
+        <p>We design powerful analytics tools that turn complex data into clear, actionable insights — built for performance, security, and scalability.</p>
       </div>
     </section>
 
-    <section class="section container fade-in">
-      <h2>Capabilities</h2>
-      <ul class="styled-list">
-        <li>High-resolution hourly production and yield estimates</li>
-        <li>Battery sizing, utilization modelling, and backup runtime forecasts</li>
-        <li>Scenario and financial modelling including export & TOU optimisation</li>
-        <li>Presales reports and visual proposals for installers and clients</li>
-      </ul>
-    </section>
-
-    <section class="section alt container fade-in">
-      <h2>Demo</h2>
-      <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/fe5q3Ipr4qY" title="Solar Intelligence Demo" allowfullscreen></iframe>
-      </div>
-    </section>
-
-    <section class="section container fade-in">
-      <h2>Integrations & Delivery</h2>
-      <p class="text-centered">We integrate with Power BI, Microsoft Fabric, and real-time solar APIs — delivering results as dashboards, presales reports, and automated insights. Hosted or on-premise options available on request.</p>
-    </section>
-
-    <!-- PROJECT MANAGEMENT DASHBOARD -->
-    <section class="section alt fade-in">
-      <div class="container">
-        <h2>Project Management Dashboard</h2>
-        <p>Our Power BI Project Management solution provides executives with real-time project visibility, KPI tracking, and budget performance — built for enterprise and agile teams alike.</p>
-        <div class="video-container">
-          <iframe title="Project Management Dashboard" src="https://app.powerbi.com/view?r=eyJrIjoiNTg2MmJiZGYtNjY4NC00MjMzLWJhZWMtNjIwZWEwODRhYTU1IiwidCI6IjFhYmZiNTU4LTUwZmMtNGYxMS05ODExLTAzMDAyNjkyMjY1NyJ9" frameborder="0" allowfullscreen="true"></iframe>
+    <section class="section container">
+      <div class="product-card">
+        <div class="product-text">
+          <h2>Solar Intelligence Dashboard</h2>
+          <p>The Solar Intelligence Dashboard helps individuals, installers, and corporates optimize panel sizing, energy usage, storage, and grid contributions. It uses live weather and performance data to calculate power output, energy savings, and return on investment.</p>
+          <ul style="list-style:disc; color:#cfcfcf; padding-left:18px;">
+            <li>Live hourly and daily solar performance tracking</li>
+            <li>Cost savings and energy contribution analysis</li>
+            <li>Custom panel sizing and battery optimization</li>
+            <li>Regional solar potential benchmarking</li>
+          </ul>
+          <p style="margin-top:16px;">Now available for deployment and integration with your solar API or IoT system.</p>
+        </div>
+        <div class="product-frame">
+          <iframe title="Solar Intelligence Dashboard" width="100%" height="480" src="https://app.powerbi.com/view?r=eyJrIjoiYzc1YzdkNTAtZjU5ZS00ZTgyLWI2NTItZDRiZTI1NDM0OTM3IiwidCI6IjU5NzVlMWYzLTJmNjYtNDQ1Yy05YjQxLWUxMWZkYzAwOWYxMyIsImMiOjh9" frameborder="0" allowfullscreen></iframe>
         </div>
       </div>
     </section>
@@ -79,28 +50,15 @@
 
   <footer>
     <div class="container">
-      <p>Nova Metrics (Pty) Ltd • Serving clients across Africa, Europe & the UK • <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></p>
-      <p style="margin-top:6px;">© Nova Metrics (Pty) Ltd 2025</p>
+      <p>Nova Metrics (Pty) Ltd • 30 Elizabeth Avenue, Rivonia • info@novametricsgroup.com</p>
+      <p style="margin-top:6px;">© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
     </div>
   </footer>
 
   <script>
-    // mobile nav toggle
     document.querySelector('.menu-toggle').addEventListener('click', () => {
       document.querySelector('nav').classList.toggle('open');
     });
-
-    // fade-in on scroll
-    const faders = document.querySelectorAll('.fade-in');
-    const appearOptions = { threshold: 0.1 };
-    const appearOnScroll = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('appear');
-        observer.unobserve(entry.target);
-      });
-    }, appearOptions);
-    faders.forEach(fader => appearOnScroll.observe(fader));
   </script>
 </body>
 </html>
