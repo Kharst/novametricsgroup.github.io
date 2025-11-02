@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
       const href = link.getAttribute('href');
-
       body.classList.remove('active'); // fade-out
       setTimeout(() => {
         window.location = href;
