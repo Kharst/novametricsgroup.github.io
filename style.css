@@ -289,5 +289,47 @@ footer {
 /* Prevent horizontal scrolling on mobile */
 body {
   overflow-x: hidden;
+
+   /* -------------------- */
+/* LOGO VISIBILITY FIX  */
+/* -------------------- */
+
+.logo {
+  height: 64px;              /* increased from default (around 40–45px) */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  transition: all 0.3s ease-in-out;
 }
+
+/* Make sure header aligns logo correctly */
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+}
+
+/* On hover, subtle upscale effect */
+.logo-link:hover .logo {
+  transform: scale(1.05);
+}
+
+/* Responsive tweak for mobile */
+@media (max-width: 600px) {
+  .logo {
+    height: 54px;
+  }
+}
+
+/* -------------------- */
+/* OPTIONAL: SHRINK LOGO ON SCROLL */
+/* -------------------- */
+header.shrink .logo {
+  height: 48px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+}
+
 
