@@ -1,68 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About — Nova Metrics (Pty) Ltd</title>
-  <meta name="description" content="Nova Metrics (Pty) Ltd — global analytics, automation, and solar intelligence specialists serving clients across Africa, Europe, and the UK." />
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-transition">
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo"></a>
-      <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+      <a href="index.html"><img src="assets/logo.png" class="logo" alt="Nova Metrics Logo"></a>
+      <button class="menu-toggle">☰</button>
       <nav>
         <a href="index.html">Home</a>
-        <a href="products.html">Products</a>
         <a href="about.html" class="active">About</a>
         <a href="contact.html">Contact</a>
+        <a href="products.html">Products</a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-content container">
-        <h1>About Nova Metrics (Pty) Ltd</h1>
-        <p>Nova Metrics is a professional analytics and automation firm based in Johannesburg, South Africa. We deliver data-driven solutions in Power BI, automation, and solar intelligence — serving organisations across Africa, Europe, and the UK.</p>
-      </div>
-    </section>
-
-    <section class="section container">
-      <h2>Our Values</h2>
-      <div class="values-grid">
-        <div class="value-item">
-          <h3>Accuracy & Rigour</h3>
-          <p>Every model, report, and dashboard is built on verified, high-quality data and precision logic.</p>
-        </div>
-        <div class="value-item">
-          <h3>Actionable Insight</h3>
-          <p>We focus on delivering analytics that empower decisions, not just visuals.</p>
-        </div>
-        <div class="value-item">
-          <h3>Security & Compliance</h3>
-          <p>Our systems and practices are GDPR-aware and built for data privacy, integrity, and resilience.</p>
-        </div>
-        <div class="value-item">
-          <h3>Global Partnership</h3>
-          <p>Trusted by clients across continents — with long-term delivery support and local expertise.</p>
-        </div>
-      </div>
-    </section>
-  </main>
+  <section id="about" class="section fade-in">
+    <div class="container">
+      <h2>About Nova Metrics</h2>
+      <p>Nova Metrics (Pty) Ltd is a data and energy intelligence company committed to driving informed decision-making. We empower organizations globally with automation, analytics, and renewable insights, ensuring all data processing complies with GDPR and global data privacy standards.</p>
+    </div>
+  </section>
 
   <footer>
-    <div class="container">
-      <p>Nova Metrics (Pty) Ltd • info@novametricsgroup.com • Serving clients across Africa, Europe & the UK</p>
-      <p style="margin-top:6px;">© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
-    </div>
+    <p>© 2025 Nova Metrics (Pty) Ltd — GDPR Compliant | Africa, Europe & UK</p>
   </footer>
 
-  <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('nav').classList.toggle('open');
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
