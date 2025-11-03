@@ -1,64 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Products — Nova Metrics (Pty) Ltd</title>
-  <meta name="description" content="Explore Nova Metrics (Pty) Ltd’s analytics solutions — including Solar Intelligence for energy optimization and cost savings." />
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="page-transition">
   <header>
     <div class="header-inner container">
-      <a class="logo-link" href="index.html"><img src="assets/logo.png" alt="Nova Metrics Logo" class="logo"></a>
-      <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
+      <a href="index.html"><img src="assets/logo.png" class="logo" alt="Nova Metrics Logo"></a>
+      <button class="menu-toggle">☰</button>
       <nav>
-        <a href="index.html#home">Home</a>
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
         <a href="products.html" class="active">Products</a>
-        <a href="about.html">About & Contact</a>
       </nav>
     </div>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="hero-content container">
-        <h1>Our Solutions</h1>
-        <p>We design powerful analytics tools that turn complex data into clear, actionable insights — built for performance, security, and scalability.</p>
-      </div>
-    </section>
-
-    <section class="section container">
-      <div class="product-card">
-        <div class="product-text">
-          <h2>Solar Intelligence Dashboard</h2>
-          <p>The Solar Intelligence Dashboard helps individuals, installers, and corporates optimize panel sizing, energy usage, storage, and grid contributions. It uses live weather and performance data to calculate power output, energy savings, and return on investment.</p>
-          <ul style="list-style:disc; color:#cfcfcf; padding-left:18px;">
-            <li>Live hourly and daily solar performance tracking</li>
-            <li>Cost savings and energy contribution analysis</li>
-            <li>Custom panel sizing and battery optimization</li>
-            <li>Regional solar potential benchmarking</li>
-          </ul>
-          <p style="margin-top:16px;">Now available for deployment and integration with your solar API or IoT system.</p>
-        </div>
-        <div class="product-frame">
-          <iframe title="Solar Intelligence Dashboard" width="100%" height="480" src="https://app.powerbi.com/view?r=eyJrIjoiYzc1YzdkNTAtZjU5ZS00ZTgyLWI2NTItZDRiZTI1NDM0OTM3IiwidCI6IjU5NzVlMWYzLTJmNjYtNDQ1Yy05YjQxLWUxMWZkYzAwOWYxMyIsImMiOjh9" frameborder="0" allowfullscreen></iframe>
-        </div>
-      </div>
-    </section>
-  </main>
+  <section id="products" class="section fade-in">
+    <div class="container">
+      <h2>Our Products</h2>
+      <p>Explore our intelligent solutions, including our flagship Solar Intelligence platform — empowering clients with real-time energy forecasts and optimization insights, built with full data protection compliance.</p>
+    </div>
+  </section>
 
   <footer>
-    <div class="container">
-      <p>Nova Metrics (Pty) Ltd • 30 Elizabeth Avenue, Rivonia • info@novametricsgroup.com</p>
-      <p style="margin-top:6px;">© Nova Metrics (Pty) Ltd 2025 • Global Data Solutions</p>
-    </div>
+    <p>© 2025 Nova Metrics (Pty) Ltd | GDPR Compliant | Africa, Europe & UK</p>
   </footer>
 
-  <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('nav').classList.toggle('open');
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
