@@ -1,301 +1,49 @@
-/* ------------------------------------
-   NOVA METRICS (PTY) LTD — STYLE
-   ------------------------------------ */
+/* ============================================
+   NOVA METRICS — FINAL POLISH ADJUSTMENTS
+   ============================================ */
 
-/* RESET & BASE */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: "Segoe UI", sans-serif;
-  background-color: #000;
-  color: #e0e0e0;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* BRAND COLORS */
-:root {
-  --gold: #C8A035;
-  --midnight: #0B1A39;
-  --black: #000000;
-}
-
-/* CONTAINER */
-.container {
-  width: 90%;
-  max-width: 1180px;
-  margin: 0 auto;
-}
-
-/* HEADER & NAVIGATION */
-header {
-  background: var(--midnight);
-  border-bottom: 1px solid #1c1c1c;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-}
-
+/* Make logo more readable without enlarging navbar */
 .logo {
-  height: 64px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
-  transition: all 0.3s ease-in-out;
+  height: 70px;
+  max-height: 70px;
+  transition: all 0.3s ease;
+}
+header.shrink .logo {
+  height: 55px;
+  max-height: 55px;
 }
 
-.logo-link:hover .logo {
-  transform: scale(1.05);
+/* Keep header tight but readable */
+.header-inner {
+  padding: 0.6rem 0;
 }
 
-nav {
-  display: flex;
-  gap: 1.5rem;
+/* Prevent horizontal scroll issues on all screens */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
 }
 
-nav a {
-  color: #d1d1d1;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease, transform 0.2s ease;
+/* Fix for YouTube video stretch or overflow */
+.video-container iframe {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
 }
 
-nav a:hover,
-nav a.active {
-  color: var(--gold);
-  transform: translateY(-2px);
-}
-
-nav a:active {
-  color: var(--gold);
-  text-shadow: 0 0 8px rgba(200, 160, 53, 0.8);
-}
-
-/* MOBILE MENU */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-@media (max-width: 860px) {
-  nav {
-    position: absolute;
-    top: 68px;
-    right: 0;
-    background: var(--midnight);
-    flex-direction: column;
-    width: 100%;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+/* Mobile spacing improvements */
+@media (max-width: 700px) {
+  .hero {
+    padding: 5rem 1rem 3rem;
   }
-  nav.open {
-    max-height: 400px;
-    border-top: 1px solid #1c1c1c;
+  .section {
+    padding: 3rem 1rem;
   }
   nav a {
-    padding: 1rem;
-    border-bottom: 1px solid #1c1c1c;
-  }
-  .menu-toggle {
-    display: block;
-  }
-}
-
-/* HERO SECTION */
-.hero {
-  padding: 6rem 0 4rem;
-  background:
-    linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)),
-    url('assets/bg/home-bg.webp') center/cover no-repeat;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 2.6rem;
-  color: var(--gold);
-  margin-bottom: 1rem;
-}
-
-.hero p {
-  color: #d4d4d4;
-  max-width: 780px;
-  margin: 0 auto;
-  font-size: 1.1rem;
-}
-
-/* SECTION STYLING */
-.section {
-  padding: 4rem 0;
-  text-align: center;
-  background-attachment: fixed;
-  transition: background 1.5s ease-in-out;
-}
-
-.section.alt {
-  background: #111;
-}
-
-.section h2 {
-  font-size: 2rem;
-  margin-bottom: 1.2rem;
-  color: var(--gold);
-}
-
-/* BACKGROUND IMAGES FOR EACH SECTION */
-#services {
-  background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
-    url('assets/bg/services-bg.webp') center/cover no-repeat;
-}
-#solar {
-  background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-    url('assets/bg/solar-bg.webp') center/cover no-repeat;
-}
-#testimonials {
-  background:
-    linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
-    url('assets/bg/testimonials-bg.webp') center/cover no-repeat;
-}
-#about {
-  background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
-    url('assets/bg/about-bg.webp') center/cover no-repeat;
-}
-#contact {
-  background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.8)),
-    url('assets/bg/contact-bg.webp') center/cover no-repeat;
-}
-#products {
-  background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
-    url('assets/bg/products-bg.webp') center/cover no-repeat;
-}
-
-/* GRID LAYOUTS */
-.services {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.service {
-  position: relative;
-  background: linear-gradient(145deg, #0f0f0f, #151515);
-  border: 1px solid #1f1f1f;
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  text-align: left;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-  transition: transform 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease, background 0.5s ease;
-}
-
-.service:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: var(--gold);
-  box-shadow: 0 8px 25px rgba(200, 160, 53, 0.15);
-  background: linear-gradient(145deg, #131313, #1a1a1a);
-}
-
-.service .icon {
-  font-size: 2rem;
-  color: var(--gold);
-  margin-bottom: 1rem;
-}
-
-.service h3 {
-  color: var(--gold);
-  font-size: 1.2rem;
-  margin-bottom: 0.6rem;
-}
-
-.service p {
-  color: #ccc;
-  font-size: 0.96rem;
-  line-height: 1.5;
-}
-
-/* TESTIMONIALS */
-.testimonial-container {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.testimonial {
-  display: none;
-  font-size: 1.1rem;
-  color: #ccc;
-  transition: opacity 0.6s ease;
-}
-.testimonial.active {
-  display: block;
-  opacity: 1;
-}
-
-/* FOOTER */
-footer {
-  background: var(--midnight);
-  border-top: 1px solid #1c1c1c;
-  padding: 2rem 0;
-  text-align: center;
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-/* RESPONSIVE */
-@media (max-width: 700px) {
-  .hero h1 {
-    font-size: 2rem;
-  }
-  .hero p {
     font-size: 1rem;
   }
-}
-
-/* Responsive video container */
-.video-container {
-  position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  overflow: hidden;
-  max-width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-/* Shrink logo on scroll */
-header.shrink .logo {
-  height: 48px;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  .logo {
+    height: 60px;
+  }
 }
