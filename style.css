@@ -52,8 +52,15 @@ header {
 }
 
 .logo {
-  height: 42px;
+  height: 64px;
   width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+  transition: all 0.3s ease-in-out;
+}
+
+.logo-link:hover .logo {
+  transform: scale(1.05);
 }
 
 nav {
@@ -119,7 +126,7 @@ nav a:active {
   padding: 6rem 0 4rem;
   background:
     linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.7)),
-    url('assets/bg/home-bg.jpg') center/cover no-repeat;
+    url('assets/bg/home-bg.webp') center/cover no-repeat;
   text-align: center;
 }
 
@@ -158,32 +165,32 @@ nav a:active {
 #services {
   background:
     linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
-    url('assets/bg/services-bg.jpg') center/cover no-repeat;
+    url('assets/bg/services-bg.webp') center/cover no-repeat;
 }
 #solar {
   background:
     linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-    url('assets/bg/solar-bg.jpg') center/cover no-repeat;
+    url('assets/bg/solar-bg.webp') center/cover no-repeat;
 }
 #testimonials {
   background:
     linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)),
-    url('assets/bg/testimonials-bg.jpg') center/cover no-repeat;
+    url('assets/bg/testimonials-bg.webp') center/cover no-repeat;
 }
 #about {
   background:
     linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
-    url('assets/bg/about-bg.jpg') center/cover no-repeat;
+    url('assets/bg/about-bg.webp') center/cover no-repeat;
 }
 #contact {
   background:
     linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.8)),
-    url('assets/bg/contact-bg.jpg') center/cover no-repeat;
+    url('assets/bg/contact-bg.webp') center/cover no-repeat;
 }
 #products {
   background:
     linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.8)),
-    url('assets/bg/products-bg.jpg') center/cover no-repeat;
+    url('assets/bg/products-bg.webp') center/cover no-repeat;
 }
 
 /* GRID LAYOUTS */
@@ -266,10 +273,11 @@ footer {
     font-size: 1rem;
   }
 }
+
 /* Responsive video container */
 .video-container {
   position: relative;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  padding-bottom: 56.25%;
   height: 0;
   overflow: hidden;
   max-width: 100%;
@@ -286,50 +294,8 @@ footer {
   border: 0;
 }
 
-/* Prevent horizontal scrolling on mobile */
-body {
-  overflow-x: hidden;
-
-   /* -------------------- */
-/* LOGO VISIBILITY FIX  */
-/* -------------------- */
-
-.logo {
-  height: 64px;              /* increased from default (around 40–45px) */
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
-  transition: all 0.3s ease-in-out;
-}
-
-/* Make sure header aligns logo correctly */
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-}
-
-/* On hover, subtle upscale effect */
-.logo-link:hover .logo {
-  transform: scale(1.05);
-}
-
-/* Responsive tweak for mobile */
-@media (max-width: 600px) {
-  .logo {
-    height: 54px;
-  }
-}
-
-/* -------------------- */
-/* OPTIONAL: SHRINK LOGO ON SCROLL */
-/* -------------------- */
+/* Shrink logo on scroll */
 header.shrink .logo {
   height: 48px;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
 }
-
-}
-
-
