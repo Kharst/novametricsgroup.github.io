@@ -326,7 +326,13 @@
       show('loading', 'Submitting…');
       submitBtn.disabled = true;
 
-      const payload = { client_name: name, client_email: email, client_phone: phone, client_address: address };
+      const payload = { 
+  installer_id: "123", // TEMP — replace later
+  client_name: name, 
+  client_email: email, 
+  client_phone: phone, 
+  client_address: address 
+};
 
       try {
         const res = await fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/create-client', {
