@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Metrics — Add Client</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:        #B8962E;
+      --gold-light:  #D4B870;
+      --gold-dim:    rgba(184,150,46,0.12);
+      --midnight:    #0A1628;
+      --card-bg:     #0D1E3A;
+      --line:        rgba(184,150,46,0.20);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      background: var(--midnight);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow: hidden;
+      color: #fff;
+      position: relative;
+    }
+
+    /* ── Ambient rings ── */
+    .ring {
+      position: fixed;
+      border-radius: 50%;
+      border: 1px solid rgba(184,150,46,0.06);
+      pointer-events: none;
+    }
+    .ring-1 { width: 700px; height: 700px; top: -250px; right: -250px; }
+    .ring-2 { width: 460px; height: 460px; top: -150px; right: -150px; border-color: rgba(184,150,46,0.04); }
+    .ring-3 { width: 380px; height: 380px; bottom: -140px; left: -140px; }
+    .ring-4 { width: 220px; height: 220px; bottom: -60px;  left: -60px;  border-color: rgba(184,150,46,0.04); }
+
+    /* Subtle grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      width: 100%;
+      max-width: 460px;
+      padding: 3rem 3rem 2.5rem;
+      position: relative;
+      animation: rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Corner accents */
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 44px; height: 44px;
+      border-top: 2px solid var(--gold);
+      border-left: 2px solid var(--gold);
+      border-radius: 3px 0 0 0;
+    }
+    .card::after {
+      content: '';
+      position: absolute; bottom: 0; right: 0;
+      width: 44px; height: 44px;
+      border-bottom: 2px solid var(--gold);
+      border-right: 2px solid var(--gold);
+      border-radius: 0 0 3px 0;
+    }
+
+    /* ── Logo ── */
+    .logo {
+      margin-bottom: 2.25rem;
+    }
+    .logo img {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* ── Heading ── */
+    .heading h1 {
+      font-family: 'DM Serif Display', serif;
+      font-weight: 400;
+      font-size: 1.9rem;
+      line-height: 1.15;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .heading h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .subhead {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.45rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, rgba(184,150,46,0.55), transparent);
+      margin-bottom: 1.9rem;
+    }
+
+    /* ── Fields ── */
+    .field {
+      margin-bottom: 1.4rem;
+      position: relative;
+      animation: rise 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .field:nth-child(1) { animation-delay: 0.07s; }
+    .field:nth-child(2) { animation-delay: 0.13s; }
+    .field:nth-child(3) { animation-delay: 0.19s; }
+    .field:nth-child(4) { animation-delay: 0.25s; }
+
+    .field label {
+      display: block;
+      font-size: 0.66rem;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.45rem;
+      font-weight: 500;
+    }
+    .field label .req { color: var(--gold); margin-left: 2px; }
+
+    .field input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(184,150,46,0.22);
+      padding: 0.55rem 0;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem;
+      font-weight: 300;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.25s;
+      border-radius: 0;
+      caret-color: var(--gold);
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.18); }
+    .field input:focus { border-bottom-color: var(--gold); }
+
+    /* ── Submit ── */
+    .submit-wrap { margin-top: 2rem; }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      background: var(--gold);
+      color: #0A1628;
+      border: none;
+      border-radius: 2px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.25s, transform 0.15s;
+    }
+    button[type="submit"]::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    button[type="submit"]:hover::after { opacity: 0.09; }
+    button[type="submit"] span { position: relative; z-index: 1; }
+    button[type="submit"]:active { transform: scale(0.99); }
+    button[type="submit"]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Message ── */
+    .message {
+      margin-top: 1rem;
+      font-size: 0.79rem;
+      min-height: 1.2rem;
+      letter-spacing: 0.03em;
+      text-align: center;
+      transition: opacity 0.3s;
+    }
+    .message.success { color: #72d4a0; }
+    .message.error   { color: #eb7070; }
+    .message.loading { color: rgba(255,255,255,0.38); }
+
+    /* ── Footer ── */
+    .card-footer {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(184,150,46,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-footer span {
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+    }
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.67rem;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.22);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ring ring-1"></div>
+  <div class="ring ring-2"></div>
+  <div class="ring ring-3"></div>
+  <div class="ring ring-4"></div>
+
+  <div class="card">
+
+    <div class="logo">
+      <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
+    </div>
+
+    <div class="heading">
+      <h1>Add a <em>new</em> client</h1>
+    </div>
+    <p class="subhead">Client onboarding</p>
+    <div class="divider"></div>
+
+    <form id="clientForm" novalidate>
+
+      <div class="field">
+        <label>Client name <span class="req">*</span></label>
+        <input type="text" id="client_name" placeholder="Full name" required autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label>Email address <span class="req">*</span></label>
+        <input type="email" id="client_email" placeholder="client@example.com" required autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="client_phone" placeholder="+27 00 000 0000" autocomplete="tel" />
+      </div>
+
+      <div class="field">
+        <label>Address</label>
+        <input type="text" id="client_address" placeholder="Street, City, Province" autocomplete="street-address" />
+      </div>
+
+      <div class="submit-wrap">
+        <button type="submit" id="submitBtn"><span>Register client</span></button>
+        <div class="message" id="message"></div>
+      </div>
+
+    </form>
+
+    <div class="card-footer">
+      <span>Nova Metrics &copy; 2026</span>
+      <div class="secure-badge">
+        <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
+          <path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+        Secured
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const form      = document.getElementById('clientForm');
+    const msgDiv    = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name    = document.getElementById('client_name').value.trim();
+      const email   = document.getElementById('client_email').value.trim();
+      const phone   = document.getElementById('client_phone').value.trim();
+      const address = document.getElementById('client_address').value.trim();
+
+      if (!name) {
+        show('error', 'Please enter the client name.');
+        return;
+      }
+      if (!email) {
+        show('error', 'Please enter an email address.');
+        return;
+      }
+      if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) {
+        show('error', 'Please enter a valid phone number.');
+        return;
+      }
+
+      show('loading', 'Submitting…');
+      submitBtn.disabled = true;
+
+      const payload = { client_name: name, client_email: email, client_phone: phone, client_address: address };
+
+      try {
+        const res = await fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/create-client', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json',
+	 'Authorization': `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg` 
+	},
+
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        const data = await res.json();
+
+        if (data.success) {
+          show('success', data.message || `Client registered — ID: ${data.client_id}`);
+          form.reset();
+        } else {
+          show('error', data.error || 'Something went wrong. Please try again.');
+        }
+      } catch (err) {
+        show('error', 'Connection error: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    function show(type, text) {
+      msgDiv.className = 'message ' + type;
+      msgDiv.textContent = text;
+    }
+  </script>
+</body>
+</html>
