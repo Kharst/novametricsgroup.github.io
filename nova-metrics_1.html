@@ -1,370 +1,1046 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Metrics — Add Client</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova Metrics — New Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d1117;
+    --ink-2: #3a3f4a;
+    --ink-3: #8a909d;
+    --surface: #ffffff;
+    --surface-2: #f5f6f8;
+    --surface-3: #eceef2;
+    --gold: #c8972a;
+    --gold-light: #f0d080;
+    --gold-dim: #7a5a18;
+    --green: #1a6b4a;
+    --green-light: #e8f5ef;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --border: #dde0e8;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(13,17,23,0.08), 0 1px 3px rgba(13,17,23,0.06);
+    --shadow-lg: 0 8px 40px rgba(13,17,23,0.12), 0 2px 8px rgba(13,17,23,0.08);
+  }
 
-    :root {
-      --gold:        #B8962E;
-      --gold-light:  #D4B870;
-      --gold-dim:    rgba(184,150,46,0.12);
-      --midnight:    #0A1628;
-      --card-bg:     #0D1E3A;
-      --line:        rgba(184,150,46,0.20);
-    }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      background: var(--midnight);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      overflow: hidden;
-      color: #fff;
-      position: relative;
-    }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--surface);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
 
-    /* ── Ambient rings ── */
-    .ring {
-      position: fixed;
-      border-radius: 50%;
-      border: 1px solid rgba(184,150,46,0.06);
-      pointer-events: none;
-    }
-    .ring-1 { width: 700px; height: 700px; top: -250px; right: -250px; }
-    .ring-2 { width: 460px; height: 460px; top: -150px; right: -150px; border-color: rgba(184,150,46,0.04); }
-    .ring-3 { width: 380px; height: 380px; bottom: -140px; left: -140px; }
-    .ring-4 { width: 220px; height: 220px; bottom: -60px;  left: -60px;  border-color: rgba(184,150,46,0.04); }
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(200,151,42,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 90%, rgba(200,151,42,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    /* Subtle grain */
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.025;
-      pointer-events: none;
-    }
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
 
-    /* ── Card ── */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      width: 100%;
-      max-width: 460px;
-      padding: 3rem 3rem 2.5rem;
-      position: relative;
-      animation: rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
-    }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
 
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  .logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+    font-weight: 400;
+    flex-shrink: 0;
+  }
 
-    /* Corner accents */
-    .card::before {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 44px; height: 44px;
-      border-top: 2px solid var(--gold);
-      border-left: 2px solid var(--gold);
-      border-radius: 3px 0 0 0;
-    }
-    .card::after {
-      content: '';
-      position: absolute; bottom: 0; right: 0;
-      width: 44px; height: 44px;
-      border-bottom: 2px solid var(--gold);
-      border-right: 2px solid var(--gold);
-      border-radius: 0 0 3px 0;
-    }
+  .logo-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.01em;
+  }
 
-    /* ── Logo ── */
-    .logo {
-      margin-bottom: 2.25rem;
-    }
-    .logo img {
-      height: 38px;
-      width: auto;
-      object-fit: contain;
-      display: block;
-    }
+  .logo-sub {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
 
-    /* ── Heading ── */
-    .heading h1 {
-      font-family: 'DM Serif Display', serif;
-      font-weight: 400;
-      font-size: 1.9rem;
-      line-height: 1.15;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-    .heading h1 em {
-      font-style: italic;
-      color: var(--gold);
-    }
-    .subhead {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.38);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 0.45rem;
-      margin-bottom: 1.75rem;
-    }
+  .header-badge {
+    font-size: 12px;
+    color: var(--ink-3);
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.05em;
+  }
 
-    .divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(to right, rgba(184,150,46,0.55), transparent);
-      margin-bottom: 1.9rem;
-    }
+  /* ── MAIN LAYOUT ── */
+  main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px 80px;
+    gap: 48px;
+  }
 
-    /* ── Fields ── */
-    .field {
-      margin-bottom: 1.4rem;
-      position: relative;
-      animation: rise 0.6s cubic-bezier(0.22,1,0.36,1) both;
-    }
-    .field:nth-child(1) { animation-delay: 0.07s; }
-    .field:nth-child(2) { animation-delay: 0.13s; }
-    .field:nth-child(3) { animation-delay: 0.19s; }
-    .field:nth-child(4) { animation-delay: 0.25s; }
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    width: 320px;
+    flex-shrink: 0;
+    padding-top: 8px;
+    animation: slideIn 0.6s ease both;
+  }
 
-    .field label {
-      display: block;
-      font-size: 0.66rem;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 0.45rem;
-      font-weight: 500;
-    }
-    .field label .req { color: var(--gold); margin-left: 2px; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    .field input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid rgba(184,150,46,0.22);
-      padding: 0.55rem 0;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.93rem;
-      font-weight: 300;
-      color: #fff;
-      outline: none;
-      transition: border-color 0.25s;
-      border-radius: 0;
-      caret-color: var(--gold);
-    }
-    .field input::placeholder { color: rgba(255,255,255,0.18); }
-    .field input:focus { border-bottom-color: var(--gold); }
+  .page-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 16px;
+  }
 
-    /* ── Submit ── */
-    .submit-wrap { margin-top: 2rem; }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    line-height: 1.1;
+    color: rgba(255,255,255,0.95);
+    margin-bottom: 16px;
+  }
 
-    button[type="submit"] {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      background: var(--gold);
-      color: #0A1628;
-      border: none;
-      border-radius: 2px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: opacity 0.25s, transform 0.15s;
-    }
-    button[type="submit"]::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: #fff;
-      opacity: 0;
-      transition: opacity 0.25s;
-    }
-    button[type="submit"]:hover::after { opacity: 0.09; }
-    button[type="submit"] span { position: relative; z-index: 1; }
-    button[type="submit"]:active { transform: scale(0.99); }
-    button[type="submit"]:disabled { opacity: 0.4; cursor: not-allowed; }
+  .page-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
 
-    /* ── Message ── */
-    .message {
-      margin-top: 1rem;
-      font-size: 0.79rem;
-      min-height: 1.2rem;
-      letter-spacing: 0.03em;
-      text-align: center;
-      transition: opacity 0.3s;
-    }
-    .message.success { color: #72d4a0; }
-    .message.error   { color: #eb7070; }
-    .message.loading { color: rgba(255,255,255,0.38); }
+  .page-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 40px;
+  }
 
-    /* ── Footer ── */
-    .card-footer {
-      margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid rgba(184,150,46,0.14);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card-footer span {
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.22);
-    }
-    .secure-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.67rem;
-      letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.22);
-    }
-  </style>
+  /* Step indicators */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: all 0.3s ease;
+  }
+
+  .step:last-child { border-bottom: none; }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.3);
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .step.active .step-num {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .step.done .step-num {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+
+  .step.done .step-num::after { content: '✓'; font-size: 11px; }
+  .step.active .step-num::after,
+  .step:not(.done) .step-num::after { content: attr(data-n); }
+
+  .step-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.35);
+    transition: color 0.3s ease;
+    line-height: 1.3;
+    margin-top: 4px;
+  }
+
+  .step-sublabel {
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .step.active .step-label { color: rgba(255,255,255,0.9); }
+  .step.active .step-sublabel { color: rgba(255,255,255,0.45); }
+  .step.done .step-label { color: rgba(255,255,255,0.5); }
+
+  /* ── FORM CARD ── */
+  .card {
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 520px;
+    overflow: hidden;
+    animation: slideIn 0.6s 0.1s ease both;
+  }
+
+  .card-header {
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .card-sub {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .card-body {
+    padding: 32px;
+  }
+
+  /* ── FORM ELEMENTS ── */
+  .form-section {
+    display: none;
+  }
+  .form-section.active { display: block; }
+
+  .field-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  label span { color: var(--red); margin-left: 2px; }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    outline: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(200,151,42,0.12);
+  }
+
+  input::placeholder { color: var(--ink-3); }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a909d' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 6px;
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 6px;
+    display: none;
+  }
+
+  .field-group.has-error input,
+  .field-group.has-error select {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+  }
+
+  .field-group.has-error .field-error { display: block; }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ── INSTALLER SELECT STATE ── */
+  .installer-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+
+  .installer-card:hover {
+    border-color: var(--gold);
+    background: #fffdf7;
+  }
+
+  .installer-card.selected {
+    border-color: var(--gold);
+    background: #fffdf7;
+    box-shadow: 0 0 0 3px rgba(200,151,42,0.12);
+  }
+
+  .installer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--surface-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink-2);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .installer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .installer-info { flex: 1; }
+
+  .installer-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .installer-email {
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+
+  .installer-check {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 10px;
+    color: transparent;
+  }
+
+  .installer-card.selected .installer-check {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+  }
+
+  /* Loading state */
+  .skeleton {
+    height: 68px;
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ── BUTTONS ── */
+  .btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: #1e252e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(13,17,23,0.2);
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  .btn-gold:hover:not(:disabled) {
+    background: #d4a030;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(200,151,42,0.3);
+  }
+
+  .btn-ghost {
+    background: none;
+    color: var(--ink-3);
+    padding-left: 0;
+  }
+
+  .btn-ghost:hover { color: var(--ink); }
+
+  .btn-loading .btn-text { display: none; }
+  .btn-loading::after {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .btn-gold.btn-loading::after {
+    border-color: rgba(13,17,23,0.2);
+    border-top-color: var(--ink);
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── SUCCESS STATE ── */
+  .success-panel {
+    display: none;
+    text-align: center;
+    padding: 48px 32px;
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .success-panel.show { display: block; }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+
+  .success-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .success-body {
+    font-size: 14px;
+    color: var(--ink-3);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .success-client {
+    display: inline-block;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 12px 0 28px;
+  }
+
+  .success-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ── ALERT ── */
+  .alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .alert.show { display: flex; }
+  .alert-error { background: var(--red-light); color: var(--red); border: 1px solid rgba(192,57,43,0.15); }
+  .alert-warn  { background: #fffbef; color: #7a5a18; border: 1px solid rgba(200,151,42,0.2); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    height: 3px;
+    background: var(--surface-3);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+    width: 50%;
+  }
+
+  /* ── EXISTING CLIENTS BADGE ── */
+  .existing-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fffbef;
+    border: 1px solid rgba(200,151,42,0.25);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--gold-dim);
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.2);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  footer a { color: var(--gold); text-decoration: none; opacity: 0.7; }
+
+  @media (max-width: 900px) {
+    main { flex-direction: column; align-items: center; }
+    .left-panel { width: 100%; max-width: 520px; }
+    header { padding: 20px 24px; }
+    .card-body { padding: 24px; }
+  }
+</style>
 </head>
 <body>
 
-  <div class="ring ring-1"></div>
-  <div class="ring ring-2"></div>
-  <div class="ring ring-3"></div>
-  <div class="ring ring-4"></div>
-
-  <div class="card">
-
-    <div class="logo">
-      <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
+<header>
+  <div class="logo">
+    <div class="logo-mark">N</div>
+    <div>
+      <div class="logo-text">Nova Metrics</div>
+      <div class="logo-sub">Solar Intelligence</div>
     </div>
+  </div>
+  <div class="header-badge">Installer Portal</div>
+</header>
 
-    <div class="heading">
-      <h1>Add a <em>new</em> client</h1>
-    </div>
-    <p class="subhead">Client onboarding</p>
-    <div class="divider"></div>
+<main>
+  <!-- Left panel -->
+  <div class="left-panel">
+    <div class="page-eyebrow">Client Intake</div>
+    <h1 class="page-title">Add a new<br><em>client</em></h1>
+    <p class="page-desc">Enter the client's details to save them to your pipeline. Once saved, open Power BI to design their system and generate a proposal.</p>
 
-    <form id="clientForm" novalidate>
-
-      <div class="field">
-        <label>Client name <span class="req">*</span></label>
-        <input type="text" id="client_name" placeholder="Full name" required autocomplete="name" />
+    <div class="steps">
+      <div class="step active" id="step-ind-1">
+        <div class="step-num" data-n="1"></div>
+        <div>
+          <div class="step-label">Select installer</div>
+          <div class="step-sublabel">Choose your account</div>
+        </div>
       </div>
-
-      <div class="field">
-        <label>Email address <span class="req">*</span></label>
-        <input type="email" id="client_email" placeholder="client@example.com" required autocomplete="email" />
+      <div class="step" id="step-ind-2">
+        <div class="step-num" data-n="2"></div>
+        <div>
+          <div class="step-label">Client details</div>
+          <div class="step-sublabel">Name, contact & address</div>
+        </div>
       </div>
-
-      <div class="field">
-        <label>Phone number</label>
-        <input type="tel" id="client_phone" placeholder="+27 00 000 0000" autocomplete="tel" />
+      <div class="step" id="step-ind-3">
+        <div class="step-num" data-n="3"></div>
+        <div>
+          <div class="step-label">Design in Power BI</div>
+          <div class="step-sublabel">Location, load & system design</div>
+        </div>
       </div>
-
-      <div class="field">
-        <label>Address</label>
-        <input type="text" id="client_address" placeholder="Street, City, Province" autocomplete="street-address" />
-      </div>
-
-      <div class="submit-wrap">
-        <button type="submit" id="submitBtn"><span>Register client</span></button>
-        <div class="message" id="message"></div>
-      </div>
-
-    </form>
-
-    <div class="card-footer">
-      <span>Nova Metrics &copy; 2026</span>
-      <div class="secure-badge">
-        <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-          <path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.35)"/>
-        </svg>
-        Secured
+      <div class="step" id="step-ind-4">
+        <div class="step-num" data-n="4"></div>
+        <div>
+          <div class="step-label">Generate & send proposal</div>
+          <div class="step-sublabel">Preview PDF, email to client</div>
+        </div>
       </div>
     </div>
-
   </div>
 
-  <script>
-    const form      = document.getElementById('clientForm');
-    const msgDiv    = document.getElementById('message');
-    const submitBtn = document.getElementById('submitBtn');
+  <!-- Form card -->
+  <div class="card">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    <!-- Card header -->
+    <div class="card-header">
+      <div class="card-title" id="card-title">Select your installer account</div>
+      <div class="card-sub" id="card-sub">Choose who is adding this client</div>
+    </div>
 
-      const name    = document.getElementById('client_name').value.trim();
-      const email   = document.getElementById('client_email').value.trim();
-      const phone   = document.getElementById('client_phone').value.trim();
-      const address = document.getElementById('client_address').value.trim();
+    <div class="card-body">
 
-      if (!name) {
-        show('error', 'Please enter the client name.');
-        return;
-      }
-      if (!email) {
-        show('error', 'Please enter an email address.');
-        return;
-      }
-      if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) {
-        show('error', 'Please enter a valid phone number.');
-        return;
-      }
+      <!-- Global error alert -->
+      <div class="alert alert-error" id="global-error">
+        <span>⚠</span>
+        <span id="global-error-msg">Something went wrong. Please try again.</span>
+      </div>
 
-      show('loading', 'Submitting…');
-      submitBtn.disabled = true;
+      <!-- ── STEP 1: Installer select ── -->
+      <div class="form-section active" id="section-1">
+        <div id="installer-list">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
 
-      const payload = { 
-  installer_id: "123", // TEMP — replace later
-  client_name: name, 
-  client_email: email, 
-  client_phone: phone, 
-  client_address: address 
-};
+        <div class="btn-row" style="border-top:none; margin-top:16px; padding-top:0; justify-content:flex-end;">
+          <button class="btn btn-gold" id="btn-step1-next" disabled onclick="goToStep2()">
+            <span class="btn-text">Continue →</span>
+          </button>
+        </div>
+      </div>
 
-      try {
-        const res = await fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/create-client', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json',
-					'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg',
-	 'Authorization': Bearer `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg` 
-	},
+      <!-- ── STEP 2: Client details ── -->
+      <div class="form-section" id="section-2">
 
-          body: JSON.stringify(payload)
-        });
+        <div class="alert alert-warn" id="existing-warn">
+          <span>ℹ</span>
+          <span id="existing-warn-msg">A client with this email already exists in your account.</span>
+        </div>
 
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        const data = await res.json();
+        <div class="row-2">
+          <div class="field-group" id="fg-name">
+            <label>Full name <span>*</span></label>
+            <input type="text" id="client_name" placeholder="John Smith" autocomplete="name">
+            <div class="field-error" id="err-name">Please enter the client's full name</div>
+          </div>
+          <div class="field-group" id="fg-email">
+            <label>Email address <span>*</span></label>
+            <input type="email" id="client_email" placeholder="john@example.com" autocomplete="email">
+            <div class="field-error" id="err-email">Please enter a valid email address</div>
+          </div>
+        </div>
 
-        if (data.success) {
-          show('success', data.message || `Client registered — ID: ${data.client_id}`);
-          form.reset();
-        } else {
-          show('error', data.error || 'Something went wrong. Please try again.');
-        }
-      } catch (err) {
-        show('error', 'Connection error: ' + err.message);
-      } finally {
-        submitBtn.disabled = false;
-      }
+        <div class="row-2">
+          <div class="field-group">
+            <label>Phone number</label>
+            <input type="tel" id="client_phone" placeholder="+27 82 000 0000" autocomplete="tel">
+            <div class="field-hint">Optional — for WhatsApp follow-up</div>
+          </div>
+          <div class="field-group">
+            <label>Address</label>
+            <input type="text" id="client_address" placeholder="123 Main Road, City" autocomplete="street-address">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goToStep1()">← Back</button>
+          <button class="btn btn-gold" id="btn-submit" onclick="submitClient()">
+            <span class="btn-text">Save client →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── SUCCESS ── -->
+      <div class="success-panel" id="success-panel">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Client saved</div>
+        <p class="success-body">Successfully added to your pipeline.</p>
+        <div class="success-client" id="success-name">—</div>
+        <div class="success-actions">
+          <button class="btn btn-primary" onclick="openPowerBI()">Open Power BI to design →</button>
+          <button class="btn btn-ghost" style="justify-content:center" onclick="addAnother()">+ Add another client</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Nova Metrics &nbsp;·&nbsp; <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a>
+</footer>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+const FUNCTION_URL  = `${SUPABASE_URL}/functions/v1/create-client`;
+const HEADERS_ANON  = { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` };
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let selectedInstallerId   = null;
+let selectedInstallerName = null;
+let savedClientId         = null;
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', loadInstallers);
+
+async function loadInstallers() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/installers?select=installer_id,installer_name,contact_email,logo_url,primary_color&order=installer_name.asc`,
+      { headers: HEADERS_ANON }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const installers = await res.json();
+    renderInstallers(installers);
+  } catch (err) {
+    document.getElementById('installer-list').innerHTML =
+      `<div style="color:#c0392b;font-size:13px;padding:16px 0">
+        Failed to load installers. Check your connection and try refreshing.
+       </div>`;
+  }
+}
+
+function renderInstallers(list) {
+  const container = document.getElementById('installer-list');
+  if (!list || list.length === 0) {
+    container.innerHTML = '<p style="color:#8a909d;font-size:13px">No installers found.</p>';
+    return;
+  }
+  container.innerHTML = list.map(inst => {
+    const initials = inst.installer_name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const bg = inst.primary_color || '#dde0e8';
+    const avatarHtml = inst.logo_url
+      ? `<img src="${inst.logo_url}" alt="${initials}" onerror="this.parentElement.textContent='${initials}'">`
+      : initials;
+    return `
+      <div class="installer-card" data-id="${inst.installer_id}" data-name="${inst.installer_name}" onclick="selectInstaller(this)">
+        <div class="installer-avatar" style="background:${bg};color:${contrastColor(bg)}">${avatarHtml}</div>
+        <div class="installer-info">
+          <div class="installer-name">${inst.installer_name}</div>
+          <div class="installer-email">${inst.contact_email || ''}</div>
+        </div>
+        <div class="installer-check">✓</div>
+      </div>`;
+  }).join('');
+}
+
+function contrastColor(hex) {
+  if (!hex || hex.length < 7) return '#333';
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b) > 160 ? '#1a1a1a' : '#ffffff';
+}
+
+function selectInstaller(el) {
+  document.querySelectorAll('.installer-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedInstallerId   = parseInt(el.dataset.id);
+  selectedInstallerName = el.dataset.name;
+  document.getElementById('btn-step1-next').disabled = false;
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function goToStep2() {
+  if (!selectedInstallerId) return;
+  setSection(2);
+  document.getElementById('client_name').focus();
+}
+
+function goToStep1() {
+  setSection(1);
+}
+
+function setSection(n) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`section-${n}`)?.classList.add('active');
+  hideError();
+  hideWarn();
+
+  // Card header
+  const titles = {
+    1: ['Select your installer account', 'Choose who is adding this client'],
+    2: ['Client details', `Adding for ${selectedInstallerName || 'installer'}`],
+  };
+  if (titles[n]) {
+    document.getElementById('card-title').textContent = titles[n][0];
+    document.getElementById('card-sub').textContent   = titles[n][1];
+  }
+
+  // Progress bar
+  const pct = { 1: '30%', 2: '65%' };
+  document.getElementById('progress').style.width = pct[n] || '100%';
+
+  // Step indicators
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active','done');
+    if (i+1 < n) s.classList.add('done');
+    if (i+1 === n) s.classList.add('active');
+  });
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────────────────
+async function submitClient() {
+  hideError();
+  hideWarn();
+
+  const name    = document.getElementById('client_name').value.trim();
+  const email   = document.getElementById('client_email').value.trim().toLowerCase();
+  const phone   = document.getElementById('client_phone').value.trim();
+  const address = document.getElementById('client_address').value.trim();
+
+  // Validate
+  let valid = true;
+  if (!name) {
+    document.getElementById('fg-name').classList.add('has-error');
+    valid = false;
+  } else {
+    document.getElementById('fg-name').classList.remove('has-error');
+  }
+  if (!email || !email.includes('@')) {
+    document.getElementById('fg-email').classList.add('has-error');
+    valid = false;
+  } else {
+    document.getElementById('fg-email').classList.remove('has-error');
+  }
+  if (!valid) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.classList.add('btn-loading');
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { ...HEADERS_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        installer_id:   selectedInstallerId,
+        client_name:    name,
+        client_email:   email,
+        client_phone:   phone   || null,
+        client_address: address || null,
+      })
     });
 
-    function show(type, text) {
-      msgDiv.className = 'message ' + type;
-      msgDiv.textContent = text;
+    const json = await res.json();
+
+    if (!res.ok || json.error) {
+      throw new Error(json.error || `Server error (${res.status})`);
     }
-  </script>
+
+    savedClientId = json.client_id;
+
+    if (!json.is_new) {
+      // Client already exists — show warning but still proceed to success
+      showWarn(`This client already exists in your account (ID ${json.client_id}). Their details are unchanged.`);
+      await new Promise(r => setTimeout(r, 1800));
+    }
+
+    showSuccess(name, json.client_id);
+
+  } catch (err) {
+    showError(err.message || 'Failed to save client. Please try again.');
+  } finally {
+    btn.classList.remove('btn-loading');
+    btn.disabled = false;
+  }
+}
+
+// ── SUCCESS ───────────────────────────────────────────────────────────────────
+function showSuccess(name, id) {
+  document.getElementById('card-title').textContent = 'Client saved';
+  document.getElementById('card-sub').textContent   = `ID #${id} · ${selectedInstallerName}`;
+  document.getElementById('progress').style.width   = '100%';
+  document.getElementById('success-name').textContent = name;
+
+  // Mark all steps done
+  document.querySelectorAll('.step').forEach(s => {
+    s.classList.remove('active');
+    if (parseInt(s.id.split('-')[2]) <= 2) s.classList.add('done');
+    if (parseInt(s.id.split('-')[2]) === 3) s.classList.add('active');
+  });
+
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('success-panel').classList.add('show');
+}
+
+function addAnother() {
+  selectedInstallerId = selectedInstallerId; // keep installer selected
+  savedClientId = null;
+  document.getElementById('success-panel').classList.remove('show');
+  document.getElementById('client_name').value  = '';
+  document.getElementById('client_email').value = '';
+  document.getElementById('client_phone').value = '';
+  document.getElementById('client_address').value = '';
+  hideError();
+  hideWarn();
+  setSection(2);
+}
+
+function openPowerBI() {
+  // Opens Power BI service — update this URL to your actual workspace link
+  window.open('https://app.powerbi.com', '_blank');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('global-error');
+  document.getElementById('global-error-msg').textContent = msg;
+  el.classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('global-error').classList.remove('show');
+}
+
+function showWarn(msg) {
+  const el = document.getElementById('existing-warn');
+  document.getElementById('existing-warn-msg').textContent = msg;
+  el.classList.add('show');
+}
+
+function hideWarn() {
+  document.getElementById('existing-warn').classList.remove('show');
+}
+
+// Clear field errors on input
+['client_name','client_email'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', function() {
+    this.closest('.field-group')?.classList.remove('has-error');
+  });
+});
+</script>
 </body>
 </html>
