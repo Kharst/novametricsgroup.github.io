@@ -1,128 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nova Metrics (Pty) Ltd — Data & Solar Intelligence</title>
-
-  <!-- ✅ Primary SEO -->
-  <meta name="description" content="Nova Metrics (Pty) Ltd provides professional data analytics, Power BI dashboards, and solar intelligence solutions that transform data into action." />
-  <meta name="keywords" content="Nova Metrics, Data Analytics, Power BI, Solar Intelligence, Automation, Data Science, Dashboard Design, Renewable Energy Analytics, South Africa, Europe, UK" />
-  <meta name="robots" content="index, follow" />
-  <meta name="author" content="Nova Metrics (Pty) Ltd" />
-
-  <!-- ✅ Open Graph (Social Share Previews) -->
-  <meta property="og:title" content="Nova Metrics (Pty) Ltd — Data & Solar Intelligence" />
-  <meta property="og:description" content="Smart analytics for Power BI, Solar Intelligence, and automation solutions." />
-  <meta property="og:image" content="https://novametricsgroup.com/assets/logo.png" />
-  <meta property="og:url" content="https://novametricsgroup.com" />
-  <meta property="og:type" content="website" />
-
-  <!-- ✅ Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Nova Metrics (Pty) Ltd — Data & Solar Intelligence" />
-  <meta name="twitter:description" content="Professional data analytics and solar intelligence solutions by Nova Metrics." />
-  <meta name="twitter:image" content="https://novametricsgroup.com/assets/logo.png" />
-
-  <!-- ✅ Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png" />
-
-  <!-- ✅ Sitemap -->
-  <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml" />
-
-  <!-- ✅ Styles -->
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nova Metrics — Solar Energy Intelligence</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body class="page-transition">
-
-  <!-- HEADER -->
-  <header>
-    <div class="header-inner container">
-      <a class="logo-link" href="index.html">
-        <img src="assets/logo.png" alt="Nova Metrics Logo" class="logo" />
-      </a>
-      <button class="menu-toggle" aria-label="Toggle navigation">☰</button>
-      <nav>
-        <a href="index.html" class="active">Home</a>
-        <a href="#services">What We Do</a>
-        <a href="#solar">Solar Intelligence</a>
-        <a href="#testimonials">Testimonials</a>
-        <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <a href="products.html">Products</a>
-      </nav>
-    </div>
+  <header id="site-header">
+    <a class="brand" href="index.html">
+      <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics">
+    </a>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="products.html">Solar Intelligence</a>
+      <a href="about.html">About</a>
+      <a href="about.html#contact" class="nav-cta">Request a Demo</a>
+    </nav>
   </header>
 
-  <!-- HERO -->
-  <section id="home" class="hero fade-in" style="background-image: url('assets/bg/hero-bg.webp'); background-size: cover; background-position: center;">
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-ring ring-a"></div>
+    <div class="hero-ring ring-b"></div>
+    <div class="hero-ring ring-c"></div>
+
     <div class="hero-content">
-      <h1>Data Intelligence & Automation</h1>
-      <p>Empowering organizations with data-driven insights, automation, and intelligent dashboards.</p>
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        <span>Solar Energy Intelligence — South Africa</span>
+      </div>
+      <h1 class="display">We don't just<br>measure solar.<br>We <em>understand</em> it.</h1>
+      <p class="lead">Nova Metrics is a solar energy intelligence company. We turn irradiance data, system specifications, and financial variables into precise predictive models — telling you exactly what a solar asset will do, before and after it's built.</p>
+      <div class="hero-actions">
+        <a href="products.html" class="btn">Explore Solar Intelligence</a>
+        <a href="about.html#contact" class="btn btn-ghost">Request a Demo</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      Scroll to explore
     </div>
   </section>
 
-  <!-- SERVICES -->
-  <section class="section alt fade-in" id="services">
+  <!-- ── POSITIONING STRIP ── -->
+  <div class="stats-bar reveal">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-num">Hourly</div>
+        <div class="stat-label">Yield Resolution Modelling</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">Pre & Post</div>
+        <div class="stat-label">Installation Intelligence</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">Any Scale</div>
+        <div class="stat-label">Residential to Utility-Grade</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Scenario & Sensitivity Models</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── THE PROBLEM ── -->
+  <section class="section" id="problem">
     <div class="container">
-      <h2>What We Do</h2>
-      <div class="services-grid">
-        <div class="service">
-          <div class="icon">⚡</div>
-          <h3>Data Intelligence</h3>
-          <p>We transform complex datasets into meaningful insights using Power BI, Python, and Microsoft Fabric analytics.</p>
+      <div class="services-header stagger reveal">
+        <div>
+          <div class="eyebrow">Why it matters</div>
+          <h2 class="section-title">Solar decisions are made<br>on <em>incomplete</em> information.</h2>
         </div>
-        <div class="service">
-          <div class="icon">🧠</div>
-          <h3>Automation</h3>
-          <p>We streamline operations using Power Automate and AI-driven workflows that boost efficiency and reduce manual errors.</p>
+        <p class="services-intro">Most solar proposals rely on rough estimates, generic assumptions, and gut feel. The result: undersized systems, overpromised returns, and clients who lose trust. Nova Metrics closes that gap — with intelligence that is precise, accountable, and built on real data.</p>
+      </div>
+
+      <div class="services-grid stagger reveal">
+        <div class="service-card">
+          <div class="service-num">01</div>
+          <h3>Yield Forecasting</h3>
+          <p>High-resolution hourly production modelling using real irradiance data. Know exactly what a system will generate — by hour, day, month, and year — before a single panel is installed.</p>
         </div>
-        <div class="service">
-          <div class="icon">🌍</div>
-          <h3>Energy Analytics</h3>
-          <p>We provide end-to-end analytics for renewable energy and sustainability initiatives, supporting clients globally.</p>
+        <div class="service-card">
+          <div class="service-num">02</div>
+          <h3>Storage Intelligence</h3>
+          <p>Battery sizing and dispatch modelling matched to real load profiles. Maximise self-consumption, minimise grid dependency, and quantify every kilowatt-hour of financial value.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">03</div>
+          <h3>Financial Modelling</h3>
+          <p>Payback periods, IRR, NPV, and full tariff sensitivity — modelled with precision. Numbers that hold up in a boardroom and survive the scrutiny of a finance team.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">04</div>
+          <h3>Scenario Intelligence</h3>
+          <p>Compare unlimited system configurations, tariff structures, and grid-export options in seconds. Turn uncertainty into a structured decision framework — instantly.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SOLAR -->
-  <section id="solar" class="section fade-in" style="background-image: url('assets/bg/solar-bg.webp'); background-size: cover; background-position: center;">
+  <!-- ── SOLAR INTELLIGENCE PLATFORM ── -->
+  <section class="section alt" id="solar">
     <div class="container">
-      <h2>Solar Intelligence</h2>
-      <p>Our flagship solar analytics product enables users to forecast, size, and optimize solar energy systems globally, including Europe and the UK — with full GDPR and data protection compliance.</p>
-      <div class="video-container">
-        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px;">
-          <iframe src="https://www.youtube.com/embed/fe5q3Ipr4qY" 
-                  title="Solar Intelligence Demo"
-                  frameborder="0"
-                  allowfullscreen
-                  style="position: absolute; top:0; left:0; width:100%; height:100%;">
-          </iframe>
+      <div class="solar-feature">
+
+        <div class="reveal">
+          <span class="solar-tag">Flagship Platform</span>
+          <div class="gold-line-decor"></div>
+          <h2 class="section-title">Solar<br><em>Intelligence</em></h2>
+          <p style="font-size:0.95rem;color:var(--muted);line-height:1.8;margin-bottom:1.25rem;">Not a calculator. Not a report template. Solar Intelligence is a predictive energy modelling engine — purpose-built for the people who size, sell, finance, and operate solar assets in the real world.</p>
+          <p style="font-size:0.9rem;color:var(--muted);line-height:1.8;margin-bottom:1.75rem;">It ingests your system specifications, location, load profile, and financial parameters — and returns a complete intelligence picture: what the asset will produce, what it will store, what it will earn, and how it compares against every alternative configuration.</p>
+
+          <ul class="solar-bullets">
+            <li>Predictive yield intelligence at hourly resolution — not estimates, not averages</li>
+            <li>Battery dispatch and storage utilisation modelling against real load curves</li>
+            <li>Full financial sensitivity: payback, IRR, NPV, tariff and escalation scenarios</li>
+            <li>Grid export optimisation and time-of-use arbitrage modelling</li>
+            <li>Portfolio-level intelligence for multi-site operators and utility planners</li>
+            <li>Automated, client-ready intelligence reports — on demand or scheduled</li>
+          </ul>
+
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;">
+            <a href="products.html" class="btn">See the Platform</a>
+            <a href="about.html#contact" class="btn btn-ghost">Request a Demo</a>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="solar-video-wrap">
+            <iframe src="https://www.youtube.com/embed/fe5q3Ipr4qY" title="Solar Intelligence Platform" allowfullscreen></iframe>
+            <div class="solar-video-label">Platform walk-through</div>
+          </div>
+
+          <div style="margin-top:1.5rem;border:1px solid var(--gold-line);border-radius:2px;padding:1.5rem;background:var(--card);">
+            <div class="eyebrow" style="margin-bottom:1rem;">Who uses Solar Intelligence</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div style="font-size:0.78rem;color:var(--muted);padding:0.75rem;border:1px solid var(--gold-line);border-radius:2px;">
+                <div style="color:var(--gold-light);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;">Installers</div>
+                Propose with data that wins tenders and protects your margins.
+              </div>
+              <div style="font-size:0.78rem;color:var(--muted);padding:0.75rem;border:1px solid var(--gold-line);border-radius:2px;">
+                <div style="color:var(--gold-light);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;">Energy Managers</div>
+                Build the business case for new assets with defensible numbers.
+              </div>
+              <div style="font-size:0.78rem;color:var(--muted);padding:0.75rem;border:1px solid var(--gold-line);border-radius:2px;">
+                <div style="color:var(--gold-light);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;">Finance & Investment</div>
+                Model returns with precision before committing capital.
+              </div>
+              <div style="font-size:0.78rem;color:var(--muted);padding:0.75rem;border:1px solid var(--gold-line);border-radius:2px;">
+                <div style="color:var(--gold-light);font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;">Utility Planners</div>
+                Scale analysis across portfolios and grid integration scenarios.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DEEPER DATA CAPABILITY ── -->
+  <section class="section" id="capability">
+    <div class="container">
+      <div style="text-align:center;max-width:620px;margin:0 auto 4rem;" class="reveal">
+        <div class="eyebrow">Beyond the platform</div>
+        <div class="gold-line-decor" style="margin:1rem auto 1.5rem;"></div>
+        <h2 class="section-title">Deep data science.<br>Built for <em>energy</em>.</h2>
+        <p style="color:var(--muted);font-size:0.9rem;line-height:1.8;">Solar Intelligence is the product. But the capability behind it runs deeper — data pipelines, predictive models, and performance analytics that give energy businesses a structural intelligence advantage.</p>
+      </div>
+
+      <div class="services-grid stagger reveal">
+        <div class="service-card">
+          <div class="service-num">↗</div>
+          <h3>Predictive Analytics</h3>
+          <p>Machine learning models trained on energy performance data to forecast degradation curves, predict anomalies, and surface optimisation opportunities before they materialise as losses.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">⊕</div>
+          <h3>Data Integration & Pipelines</h3>
+          <p>We connect siloed energy data sources — inverter APIs, weather stations, billing systems, smart meters — into unified automated intelligence flows that update in real time.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">◎</div>
+          <h3>Performance Intelligence</h3>
+          <p>Continuous post-installation tracking against modelled benchmarks. Identify underperformance instantly — and quantify the financial impact in terms decision-makers can act on.</p>
+        </div>
+        <div class="service-card">
+          <div class="service-num">≋</div>
+          <h3>Automated Intelligence Reports</h3>
+          <p>Client-ready, structured intelligence outputs generated automatically on your schedule. No manual effort. No reformatting. Pure insight, delivered on time, every time.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
-  <section id="testimonials" class="section alt fade-in" style="background-image: url('assets/bg/testimonials-bg.webp'); background-size: cover; background-position: center;">
+  <!-- ── TESTIMONIALS ── -->
+  <section class="section alt" id="testimonials">
     <div class="container">
-      <h2>What Our Clients Say</h2>
-      <div class="testimonial-container">
-        <p class="testimonial active">"Nova Metrics helped us automate our entire reporting workflow seamlessly."</p>
-        <p class="testimonial">"Their dashboards transformed how our management team makes decisions."</p>
-        <p class="testimonial">"Professional, responsive, and technically brilliant."</p>
+      <div class="reveal">
+        <div class="eyebrow">Client Intelligence</div>
+        <h2 class="section-title">What happens when<br>you have the right <em>data</em>.</h2>
+      </div>
+      <div class="testimonials-grid stagger reveal">
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>Solar Intelligence changed how we propose to clients. We stopped estimating and started presenting financial models that hold up to scrutiny. Our proposal close rate improved significantly.</p>
+          <div class="testimonial-author">Solar Installer — Gauteng</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>We model every new site with Nova Metrics before committing capital. The yield forecasting is precise enough that our finance team now uses it as the basis for investment approvals.</p>
+          <div class="testimonial-author">Corporate Energy Manager — Johannesburg</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-mark">"</div>
+          <p>The scenario modelling capability is extraordinary. We ran 40 system configurations in an afternoon — that kind of analysis used to take weeks and cost significantly more.</p>
+          <div class="testimonial-author">Utility Planner — Western Cape</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- ── CTA ── -->
+  <section class="cta-strip reveal">
+    <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;">The intelligence layer your solar business is missing</div>
+    <h2>Stop estimating.<br>Start <em>knowing</em>.</h2>
+    <p>Book a tailored demo and see exactly what Solar Intelligence means for your pipeline, your proposals, and your clients.</p>
+    <div class="cta-actions">
+      <a href="about.html#contact" class="btn">Request a Demo</a>
+      <a href="products.html" class="btn btn-ghost">Explore the Platform</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
   <footer>
-    <p>Powered by Nova Metrics (Pty) Ltd © 2025 | Supporting clients in Africa, Europe, and the UK with GDPR-compliant data analytics and automation solutions.</p>
+    <div class="footer-grid container">
+      <div class="footer-brand">
+        <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics">
+        <p>Solar energy intelligence for installers, energy managers, investors, and utility planners who need to know — not estimate.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="products.html">Solar Intelligence</a>
+        <a href="products.html#yield">Yield Forecasting</a>
+        <a href="products.html#financial">Financial Modelling</a>
+        <a href="products.html#portfolio">Portfolio Intelligence</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About Nova Metrics</a>
+        <a href="about.html#contact">Contact & Demos</a>
+        <a href="mailto:info@novametricsgroup.co.za">info@novametricsgroup.co.za</a>
+        <a href="tel:+27677167716">+27 67 716 7716</a>
+      </div>
+    </div>
+    <div class="footer-bottom container">
+      <span>Nova Metrics (Pty) Ltd &copy; 2026</span>
+      <span>Solar Energy Intelligence — South Africa</span>
+    </div>
   </footer>
 
-  <!-- SCRIPT -->
-  <script src="script.js"></script>
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    document.querySelectorAll('.stagger').forEach(parent => {
+      [...parent.children].forEach((child, i) => { child.style.transitionDelay = (i * 0.1) + 's'; });
+    });
+    const hdr = document.getElementById('site-header');
+    window.addEventListener('scroll', () => {
+      hdr.style.background = window.scrollY > 40 ? 'rgba(7,14,28,0.97)' : 'rgba(7,14,28,0.82)';
+    });
+  </script>
 </body>
 </html>
