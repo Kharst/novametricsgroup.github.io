@@ -9,213 +9,90 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --gold:      #B8962E;
-  --gold-l:    #D4B870;
-  --gold-dim:  rgba(184,150,46,0.10);
-  --gold-line: rgba(184,150,46,0.20);
-  --night:     #070E1C;
-  --deep:      #0A1628;
-  --card:      #0D1E3B;
-  --card2:     #0F2347;
-  --muted:     rgba(255,255,255,0.45);
-  --faint:     rgba(255,255,255,0.08);
+  --gold:#B8962E; --gold-l:#D4B870; --gold-dim:rgba(184,150,46,0.10); --gold-line:rgba(184,150,46,0.20);
+  --night:#070E1C; --deep:#0A1628; --card:#0D1E3B; --card2:#0F2347; --muted:rgba(255,255,255,0.45); --faint:rgba(255,255,255,0.08);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--night);
-  color: rgba(255,255,255,0.88);
-  display: flex; flex-direction: column;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── TOPBAR ── */
-.topbar {
-  height: 58px; flex-shrink: 0;
-  background: rgba(7,14,28,0.96);
-  border-bottom: 1px solid var(--gold-line);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 1.5rem;
-  backdrop-filter: blur(12px);
-  position: relative; z-index: 10;
-}
-.topbar-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.topbar-mark  { width:30px; height:30px; border-radius:5px; background:var(--gold); display:grid; place-items:center; font-family:'DM Serif Display',serif; font-size:14px; color:var(--night); }
-.topbar-name  { font-size:13px; font-weight:500; color:rgba(255,255,255,0.88); }
-.topbar-sub   { font-size:9px; color:var(--gold); letter-spacing:0.1em; text-transform:uppercase; margin-top:1px; }
-.topbar-right { display:flex; align-items:center; gap:1rem; }
-.topbar-label { font-size:11px; color:var(--muted); letter-spacing:0.06em; }
-.topbar-user  { font-size:11px; color:var(--gold-l); }
-.btn-logout {
-  font-size:10px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
-  background:none; border:1px solid var(--gold-line); color:var(--muted);
-  border-radius:2px; padding:0.3rem 0.7rem; cursor:pointer;
-  font-family:'DM Sans',sans-serif; transition:color 0.2s, border-color 0.2s;
-}
-.btn-logout:hover { color:#eb7070; border-color:rgba(231,76,60,0.4); }
-
-/* ── SHELL ── */
-.shell { display:flex; flex:1; overflow:hidden; min-height:0; }
-
-/* ── SIDEBAR ── */
-.sidebar {
-  width:290px; flex-shrink:0;
-  background:var(--deep);
-  border-right:1px solid var(--gold-line);
-  display:flex; flex-direction:column;
-  overflow:hidden;
-}
-.sidebar-header {
-  padding:1.1rem 1.25rem 0.9rem;
-  border-bottom:1px solid var(--gold-line);
-  flex-shrink:0;
-}
-.sidebar-eyebrow {
-  font-size:0.6rem; font-weight:600;
-  letter-spacing:0.14em; text-transform:uppercase;
-  color:var(--gold); margin-bottom:0.85rem;
-}
-
-/* Installer display (single — logged-in installer) */
-.inst-display {
-  display:flex; align-items:center; gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--gold-line);
-  border-radius:7px;
-  background:rgba(184,150,46,0.08);
-}
-.inst-avatar {
-  width:34px; height:34px; border-radius:6px;
-  background:var(--card2); display:grid; place-items:center;
-  font-weight:700; font-size:13px; color:var(--muted);
-  flex-shrink:0; overflow:hidden;
-}
-.inst-avatar img { width:100%; height:100%; object-fit:cover; }
-.inst-name  { font-size:13px; font-weight:500; color:rgba(255,255,255,0.85); }
-.inst-email { font-size:10px; color:var(--muted); margin-top:1px; }
-
-/* Client panel */
-.client-panel { flex:1; overflow-y:auto; padding:0.9rem 1.1rem; min-height:0; }
-.client-panel::-webkit-scrollbar { width:3px; }
-.client-panel::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
-.panel-label {
-  font-size:0.58rem; font-weight:600;
-  letter-spacing:0.12em; text-transform:uppercase;
-  color:rgba(255,255,255,0.22); margin-bottom:0.75rem;
-}
-.search-box {
-  width:100%; padding:0.55rem 0.85rem;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.07);
-  border-radius:6px; font-family:'DM Sans',sans-serif;
-  font-size:12px; color:rgba(255,255,255,0.8);
-  outline:none; margin-bottom:0.85rem; transition:border-color 0.2s;
-}
-.search-box::placeholder { color:rgba(255,255,255,0.22); }
-.search-box:focus { border-color:rgba(184,150,46,0.4); }
-.client-rows { display:flex; flex-direction:column; gap:3px; }
-.client-row {
-  border-radius:6px; padding:9px 11px;
-  cursor:pointer; transition:all 0.2s;
-  display:flex; align-items:center; justify-content:space-between; gap:8px;
-  border:1px solid transparent;
-}
-.client-row:hover  { background:rgba(255,255,255,0.04); }
-.client-row.active { background:rgba(184,150,46,0.09); border-color:rgba(184,150,46,0.25); }
-.client-info { flex:1; min-width:0; }
-.client-name-text  { font-size:12px; font-weight:500; color:rgba(255,255,255,0.82); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.client-email-text { font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
-.badge { flex-shrink:0; font-size:9px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; padding:2px 7px; border-radius:10px; }
-.badge-ready { background:rgba(29,138,94,0.15); color:#4eca9a; border:1px solid rgba(29,138,94,0.3); }
-.badge-none  { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid rgba(255,255,255,0.08); }
-.empty-msg   { font-size:12px; color:rgba(255,255,255,0.22); text-align:center; padding:2rem 1rem; line-height:1.6; }
-.skel { height:42px; border-radius:6px; margin-bottom:3px; background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-
-.sidebar-footer { padding:0.85rem 1.1rem; border-top:1px solid var(--gold-line); flex-shrink:0; }
-.add-client-link {
-  display:flex; align-items:center; gap:8px;
-  font-size:11px; color:var(--gold-l); text-decoration:none;
-  font-weight:500; letter-spacing:0.04em;
-  padding:0.55rem 0.75rem;
-  border:1px solid var(--gold-line); border-radius:4px;
-  transition:background 0.2s;
-}
-.add-client-link:hover { background:var(--gold-dim); }
-.add-client-link::before { content:'+'; font-size:14px; font-weight:300; color:var(--gold); }
-
-/* ── PREVIEW AREA ── */
-.preview-area { flex:1; display:flex; flex-direction:column; background:var(--card); min-width:0; position:relative; }
-
-/* Login gate */
-.login-gate {
-  position:absolute; inset:0; background:var(--night);
-  display:flex; align-items:center; justify-content:center;
-  z-index:20; padding:2rem;
-}
-.login-card {
-  background:var(--card); border:1px solid var(--gold-line);
-  border-radius:3px; width:100%; max-width:400px;
-  padding:2.5rem 2.5rem 2rem; position:relative;
-  animation:rise 0.7s cubic-bezier(0.22,1,0.36,1) both;
-}
-@keyframes rise { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
-.login-card::before { content:''; position:absolute; top:0; left:0; width:40px; height:40px; border-top:2px solid var(--gold); border-left:2px solid var(--gold); border-radius:3px 0 0 0; }
-.login-card::after  { content:''; position:absolute; bottom:0; right:0; width:40px; height:40px; border-bottom:2px solid var(--gold); border-right:2px solid var(--gold); border-radius:0 0 3px 0; }
-.lc-logo  { margin-bottom:1.75rem; }
-.lc-logo img { height:34px; width:auto; object-fit:contain; }
-.lc-title { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.65rem; color:#fff; margin-bottom:0.35rem; }
-.lc-title em { font-style:italic; color:var(--gold); }
-.lc-sub   { font-size:0.68rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1.5rem; }
-.lc-divider { width:100%; height:1px; background:linear-gradient(to right,rgba(184,150,46,0.5),transparent); margin-bottom:1.5rem; }
-.lc-field { margin-bottom:1.2rem; }
-.lc-field label { display:block; font-size:0.62rem; letter-spacing:0.11em; text-transform:uppercase; color:var(--muted); margin-bottom:0.4rem; font-weight:500; }
-.lc-field input {
-  width:100%; background:transparent; border:none;
-  border-bottom:1px solid rgba(184,150,46,0.22);
-  padding:0.5rem 0; font-family:'DM Sans',sans-serif;
-  font-size:0.9rem; font-weight:300; color:#fff; outline:none;
-  transition:border-color 0.25s; caret-color:var(--gold);
-}
-.lc-field input::placeholder { color:rgba(255,255,255,0.18); }
-.lc-field input:focus { border-bottom-color:var(--gold); }
-.lc-btn {
-  width:100%; padding:0.85rem; background:var(--gold); color:var(--night);
-  border:none; border-radius:2px; font-family:'DM Sans',sans-serif;
-  font-size:0.7rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase;
-  cursor:pointer; margin-top:1.5rem; transition:opacity 0.2s;
-}
-.lc-btn:hover { opacity:0.88; }
-.lc-btn:disabled { opacity:0.4; cursor:not-allowed; }
-.lc-msg { margin-top:0.8rem; font-size:0.75rem; text-align:center; min-height:1rem; }
-.lc-msg.error   { color:#eb7070; }
-.lc-msg.loading { color:var(--muted); }
-
-/* States */
-.state-box {
-  position:absolute; inset:0;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:1rem; text-align:center; padding:2rem;
-  background:var(--night);
-}
-.state-icon { width:60px; height:60px; border-radius:50%; background:var(--gold-dim); border:1px solid var(--gold-line); display:grid; place-items:center; font-size:1.6rem; margin-bottom:0.5rem; }
-.state-title { font-size:15px; font-weight:500; color:rgba(255,255,255,0.6); }
-.state-sub   { font-size:12px; color:rgba(255,255,255,0.28); max-width:280px; line-height:1.65; }
-.spinner { width:36px; height:36px; border:2px solid rgba(184,150,46,0.2); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; }
-@keyframes spin { to{transform:rotate(360deg)} }
-.pulse-dot { width:12px; height:12px; border-radius:50%; background:var(--gold); animation:pulse 1.8s ease-in-out infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-.retry-btn {
-  font-size:11px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase;
-  background:none; border:1px solid var(--gold-line); color:var(--gold-l);
-  border-radius:2px; padding:0.45rem 1rem; cursor:pointer;
-  font-family:'DM Sans',sans-serif; margin-top:0.5rem; transition:background 0.2s;
-}
-.retry-btn:hover { background:var(--gold-dim); }
-.preview-iframe { position:absolute; inset:0; width:100%; height:100%; border:none; display:none; }
-.hidden { display:none !important; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255,255,0.88);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.topbar{height:58px;flex-shrink:0;background:rgba(7,14,28,0.96);border-bottom:1px solid var(--gold-line);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;backdrop-filter:blur(12px);position:relative;z-index:10}
+.topbar-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.topbar-mark{width:30px;height:30px;border-radius:5px;background:var(--gold);display:grid;place-items:center;font-family:'DM Serif Display',serif;font-size:14px;color:var(--night)}
+.topbar-name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.88)}
+.topbar-sub{font-size:9px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-top:1px}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.topbar-label{font-size:11px;color:var(--muted);letter-spacing:0.06em}
+.topbar-user{font-size:11px;color:var(--gold-l)}
+.btn-logout{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1px solid var(--gold-line);color:var(--muted);border-radius:2px;padding:0.3rem 0.7rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color 0.2s,border-color 0.2s}
+.btn-logout:hover{color:#eb7070;border-color:rgba(231,76,60,0.4)}
+.shell{display:flex;flex:1;overflow:hidden;min-height:0}
+.sidebar{width:290px;flex-shrink:0;background:var(--deep);border-right:1px solid var(--gold-line);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:1.1rem 1.25rem 0.9rem;border-bottom:1px solid var(--gold-line);flex-shrink:0}
+.sidebar-eyebrow{font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:0.85rem}
+.inst-display{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gold-line);border-radius:7px;background:rgba(184,150,46,0.08)}
+.inst-avatar{width:34px;height:34px;border-radius:6px;background:var(--card2);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--muted);flex-shrink:0;overflow:hidden}
+.inst-avatar img{width:100%;height:100%;object-fit:cover}
+.inst-name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.85)}
+.inst-email{font-size:10px;color:var(--muted);margin-top:1px}
+.client-panel{flex:1;overflow-y:auto;padding:0.9rem 1.1rem;min-height:0}
+.client-panel::-webkit-scrollbar{width:3px}
+.client-panel::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.panel-label{font-size:0.58rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.22);margin-bottom:0.75rem}
+.search-box{width:100%;padding:0.55rem 0.85rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.8);outline:none;margin-bottom:0.85rem;transition:border-color 0.2s}
+.search-box::placeholder{color:rgba(255,255,255,0.22)}
+.search-box:focus{border-color:rgba(184,150,46,0.4)}
+.client-rows{display:flex;flex-direction:column;gap:3px}
+.client-row{border-radius:6px;padding:9px 11px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid transparent}
+.client-row:hover{background:rgba(255,255,255,0.04)}
+.client-row.active{background:rgba(184,150,46,0.09);border-color:rgba(184,150,46,0.25)}
+.client-info{flex:1;min-width:0}
+.client-name-text{font-size:12px;font-weight:500;color:rgba(255,255,255,0.82);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.client-email-text{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.badge{flex-shrink:0;font-size:9px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:10px}
+.badge-ready{background:rgba(29,138,94,0.15);color:#4eca9a;border:1px solid rgba(29,138,94,0.3)}
+.badge-none{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid rgba(255,255,255,0.08)}
+.empty-msg{font-size:12px;color:rgba(255,255,255,0.22);text-align:center;padding:2rem 1rem;line-height:1.6}
+.skel{height:42px;border-radius:6px;margin-bottom:3px;background:linear-gradient(90deg,rgba(255,255,255,0.03) 25%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.03) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sidebar-footer{padding:0.85rem 1.1rem;border-top:1px solid var(--gold-line);flex-shrink:0}
+.add-client-link{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gold-l);text-decoration:none;font-weight:500;letter-spacing:0.04em;padding:0.55rem 0.75rem;border:1px solid var(--gold-line);border-radius:4px;transition:background 0.2s}
+.add-client-link:hover{background:var(--gold-dim)}
+.add-client-link::before{content:'+';font-size:14px;font-weight:300;color:var(--gold)}
+.preview-area{flex:1;display:flex;flex-direction:column;background:var(--card);min-width:0;position:relative}
+.login-gate{position:absolute;inset:0;background:var(--night);display:flex;align-items:center;justify-content:center;z-index:20;padding:2rem}
+.login-card{background:var(--card);border:1px solid var(--gold-line);border-radius:3px;width:100%;max-width:400px;padding:2.5rem 2.5rem 2rem;position:relative;animation:rise 0.7s cubic-bezier(0.22,1,0.36,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.login-card::before{content:'';position:absolute;top:0;left:0;width:40px;height:40px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);border-radius:3px 0 0 0}
+.login-card::after{content:'';position:absolute;bottom:0;right:0;width:40px;height:40px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);border-radius:0 0 3px 0}
+.lc-logo{margin-bottom:1.75rem}
+.lc-logo img{height:34px;width:auto;object-fit:contain}
+.lc-title{font-family:'DM Serif Display',serif;font-weight:400;font-size:1.65rem;color:#fff;margin-bottom:0.35rem}
+.lc-title em{font-style:italic;color:var(--gold)}
+.lc-sub{font-size:0.68rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.5rem}
+.lc-divider{width:100%;height:1px;background:linear-gradient(to right,rgba(184,150,46,0.5),transparent);margin-bottom:1.5rem}
+.lc-field{margin-bottom:1.2rem}
+.lc-field label{display:block;font-size:0.62rem;letter-spacing:0.11em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;font-weight:500}
+.lc-field input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(184,150,46,0.22);padding:0.5rem 0;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:300;color:#fff;outline:none;transition:border-color 0.25s;caret-color:var(--gold)}
+.lc-field input::placeholder{color:rgba(255,255,255,0.18)}
+.lc-field input:focus{border-bottom-color:var(--gold)}
+.lc-btn{width:100%;padding:0.85rem;background:var(--gold);color:var(--night);border:none;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;margin-top:1.5rem;transition:opacity 0.2s}
+.lc-btn:hover{opacity:0.88}
+.lc-btn:disabled{opacity:0.4;cursor:not-allowed}
+.lc-msg{margin-top:0.8rem;font-size:0.75rem;text-align:center;min-height:1rem}
+.lc-msg.error{color:#eb7070}
+.lc-msg.loading{color:var(--muted)}
+.state-box{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem;background:var(--night)}
+.state-icon{width:60px;height:60px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-line);display:grid;place-items:center;font-size:1.6rem;margin-bottom:0.5rem}
+.state-title{font-size:15px;font-weight:500;color:rgba(255,255,255,0.6)}
+.state-sub{font-size:12px;color:rgba(255,255,255,0.28);max-width:280px;line-height:1.65}
+.spinner{width:36px;height:36px;border:2px solid rgba(184,150,46,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse-dot{width:12px;height:12px;border-radius:50%;background:var(--gold);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+.retry-btn{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1px solid var(--gold-line);color:var(--gold-l);border-radius:2px;padding:0.45rem 1rem;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:0.5rem;transition:background 0.2s}
+.retry-btn:hover{background:var(--gold-dim)}
+.preview-iframe{position:absolute;inset:0;width:100%;height:100%;border:none;display:none}
+.hidden{display:none !important}
 </style>
 </head>
 <body>
@@ -223,10 +100,7 @@ body {
 <div class="topbar">
   <a href="nova-metrics_1.html" class="topbar-brand">
     <div class="topbar-mark">N</div>
-    <div>
-      <div class="topbar-name">Nova Metrics</div>
-      <div class="topbar-sub">Solar Intelligence</div>
-    </div>
+    <div><div class="topbar-name">Nova Metrics</div><div class="topbar-sub">Solar Intelligence</div></div>
   </a>
   <div class="topbar-right">
     <span class="topbar-label">Proposal Portal</span>
@@ -236,13 +110,10 @@ body {
 </div>
 
 <div class="shell">
-
   <div class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-eyebrow">Installer account</div>
-      <div id="instDisplay">
-        <div class="skel" style="height:52px;border-radius:7px;"></div>
-      </div>
+      <div id="instDisplay"><div class="skel" style="height:52px;border-radius:7px"></div></div>
     </div>
     <div class="client-panel" id="clientPanel">
       <div class="panel-label" id="panelLabel">Loading clients…</div>
@@ -257,24 +128,15 @@ body {
   </div>
 
   <div class="preview-area" id="previewArea">
-
     <!-- LOGIN GATE -->
     <div class="login-gate" id="loginGate">
       <div class="login-card">
-        <div class="lc-logo">
-          <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
-        </div>
+        <div class="lc-logo"><img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" /></div>
         <div class="lc-title">Proposal <em>portal</em></div>
         <div class="lc-sub">Authorised access only</div>
         <div class="lc-divider"></div>
-        <div class="lc-field">
-          <label>Email address</label>
-          <input type="email" id="gateEmail" placeholder="your@email.com" autocomplete="email" />
-        </div>
-        <div class="lc-field">
-          <label>Password</label>
-          <input type="password" id="gatePassword" placeholder="••••••••" autocomplete="current-password" />
-        </div>
+        <div class="lc-field"><label>Email address</label><input type="email" id="gateEmail" placeholder="your@email.com" autocomplete="email" /></div>
+        <div class="lc-field"><label>Password</label><input type="password" id="gatePassword" placeholder="••••••••" autocomplete="current-password" /></div>
         <button class="lc-btn" id="gateBtn" onclick="handleGateLogin()">Sign in</button>
         <div class="lc-msg" id="gateMsg"></div>
       </div>
@@ -297,65 +159,57 @@ body {
     <div class="state-box hidden" id="statePending">
       <div class="pulse-dot"></div>
       <div class="state-title">Proposal in progress</div>
-      <div class="state-sub">This proposal is still being generated. Return to Power BI, complete the system design, and generate the proposal. Then come back here to preview it.</div>
+      <div class="state-sub">This proposal is still being generated. Return to the system, complete the design, and generate the proposal. Then come back here to preview it.</div>
       <button class="retry-btn" onclick="retrySelected()">↻ Check again</button>
     </div>
 
     <!-- PDF IFRAME -->
     <iframe class="preview-iframe" id="previewFrame" title="Proposal Preview" allowfullscreen></iframe>
-
   </div>
 </div>
 
 <script>
   const SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
   const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-  const REVIEW_BASE   = `${SUPABASE_URL}/functions/v1/installer-review/`;
-  const ANON_HDR      = { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` };
+  const REVIEW_BASE   = SUPABASE_URL + '/functions/v1/installer-review/';
+  const ANON_HDR      = { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON };
   const SESSION_KEY   = 'nm_installer_session'; // shared with nova-metrics_1.html
 
   let currentInstaller  = null;
   let allClients        = [];
-  let proposalMap       = {};
+  let proposalMap       = {}; // client_email -> { ai_id, ready }
   let selectedAiId      = null;
   let pendingRetryTimer = null;
 
-  // ── Boot ───────────────────────────────────────────────────────────────────
-  window.addEventListener('DOMContentLoaded', () => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
+  // ── Boot ───────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', function() {
+    var saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
-      try {
-        currentInstaller = JSON.parse(saved);
-        activatePortal();
-      } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
+      try { currentInstaller = JSON.parse(saved); activatePortal(); } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
     }
-    ['gateEmail','gatePassword'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => {
-        if (e.key === 'Enter') handleGateLogin();
-      });
+    ['gateEmail','gatePassword'].forEach(function(id) {
+      document.getElementById(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleGateLogin(); });
     });
   });
 
-  // ── Login gate ─────────────────────────────────────────────────────────────
+  // ── Login gate ──────────────────────────────────────────────────
   async function handleGateLogin() {
-    const email    = document.getElementById('gateEmail').value.trim().toLowerCase();
-    const password = document.getElementById('gatePassword').value;
-    const btn      = document.getElementById('gateBtn');
-    const msg      = document.getElementById('gateMsg');
-
-    if (!email || !password) { showLcMsg('error', 'Enter your email and password.'); return; }
+    var email    = document.getElementById('gateEmail').value.trim().toLowerCase();
+    var password = document.getElementById('gatePassword').value;
+    var btn      = document.getElementById('gateBtn');
+    var msg      = document.getElementById('gateMsg');
+    if (!email || !password) { showLcMsg('error','Enter your email and password.'); return; }
     btn.disabled = true;
-    showLcMsg('loading', 'Verifying…');
-
+    showLcMsg('loading','Verifying…');
     try {
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1`,
+      var res = await fetch(
+        SUPABASE_URL + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email) + '&password=eq.' + encodeURIComponent(password) + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
         { headers: ANON_HDR }
       );
       if (!res.ok) throw new Error('Connection error. Please try again.');
-      const rows = await res.json();
-      if (!rows?.length) {
-        showLcMsg('error', 'Invalid email or password. Contact Nova Metrics to request access.');
+      var rows = await res.json();
+      if (!rows || !rows.length) {
+        showLcMsg('error','Invalid email or password. Contact Nova Metrics to request access.');
         btn.disabled = false;
         return;
       }
@@ -368,76 +222,62 @@ body {
     }
   }
 
-  function handleLogout() {
-    sessionStorage.removeItem(SESSION_KEY);
-    location.reload();
-  }
+  function handleLogout() { sessionStorage.removeItem(SESSION_KEY); location.reload(); }
 
-  // ── Activate portal after login ────────────────────────────────────────────
+  // ── Activate portal ─────────────────────────────────────────────
   function activatePortal() {
-    // Hide gate
     document.getElementById('loginGate').classList.add('hidden');
-    // Show user in topbar
     document.getElementById('topbarUser').textContent = '● ' + (currentInstaller.installer_name || currentInstaller.contact_email);
     document.getElementById('topbarUser').classList.remove('hidden');
     document.getElementById('logoutBtn').classList.remove('hidden');
-
-    // Render installer card in sidebar
     renderInstallerCard();
-
-    // Show empty state
     showState('empty');
-
-    // Load this installer's clients
     loadClients(currentInstaller.installer_id);
 
-    // Auto-open proposal from URL param
-    const params   = new URLSearchParams(window.location.search);
-    const paramAiId = params.get('ai_id');
-    if (paramAiId) {
-      setTimeout(() => openProposalById(paramAiId), 600);
-    }
+    // Auto-open from URL param
+    var params = new URLSearchParams(window.location.search);
+    var paramAiId = params.get('ai_id');
+    if (paramAiId) { setTimeout(function(){ openProposalById(paramAiId); }, 600); }
   }
 
   function renderInstallerCard() {
-    const inst = currentInstaller;
-    const bg   = inst.primary_color || '#0F2347';
-    const ini  = (inst.installer_name || inst.contact_email || '?').split(' ').map(w => w[0] || '').join('').slice(0,2).toUpperCase();
-    const lum  = bg.length >= 7 ? (0.299*parseInt(bg.slice(1,3),16) + 0.587*parseInt(bg.slice(3,5),16) + 0.114*parseInt(bg.slice(5,7),16)) : 80;
-    const fg   = lum < 145 ? '#fff' : '#1a1a1a';
-    const av   = inst.logo_url ? `<img src="${inst.logo_url}" alt="${ini}" onerror="this.style.display='none'">` : ini;
+    var inst = currentInstaller;
+    var bg   = inst.primary_color || '#0F2347';
+    var ini  = (inst.installer_name || inst.contact_email || '?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+    var lum  = bg.length >= 7 ? (0.299*parseInt(bg.slice(1,3),16) + 0.587*parseInt(bg.slice(3,5),16) + 0.114*parseInt(bg.slice(5,7),16)) : 80;
+    var fg   = lum < 145 ? '#fff' : '#1a1a1a';
+    var av   = inst.logo_url ? '<img src="' + inst.logo_url + '" alt="' + ini + '" onerror="this.style.display=\'none\'">' : ini;
     document.getElementById('instDisplay').innerHTML =
-      `<div class="inst-display">
-        <div class="inst-avatar" style="background:${bg};color:${fg}">${av}</div>
-        <div>
-          <div class="inst-name">${inst.installer_name || '—'}</div>
-          <div class="inst-email">${inst.contact_email || ''}</div>
-        </div>
-      </div>`;
+      '<div class="inst-display"><div class="inst-avatar" style="background:' + bg + ';color:' + fg + '">' + av + '</div>'
+      + '<div><div class="inst-name">' + (inst.installer_name || '—') + '</div><div class="inst-email">' + (inst.contact_email || '') + '</div></div></div>';
   }
 
-  // ── Load clients + proposals ───────────────────────────────────────────────
+  // ── Load clients + proposals ─────────────────────────────────────
   async function loadClients(installerId) {
     document.getElementById('panelLabel').textContent = 'Loading…';
     document.getElementById('clientRows').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
-
     try {
-      const [clients, proposals] = await Promise.all([
-        fetch(`${SUPABASE_URL}/rest/v1/clients?select=id,client_name,client_email&installer_id=eq.${installerId}&order=client_name.asc`, { headers: ANON_HDR }).then(r => r.json()),
-        fetch(`${SUPABASE_URL}/rest/v1/ai_results?select=ai_id,client_email,pdf_url&installer_id=eq.${installerId}&order=ai_id.desc`, { headers: ANON_HDR }).then(r => r.json())
+      // FIX 3: fetch proposals WITHOUT installer_id filter — match by client email instead
+      // This handles proposals generated before installer_id was captured
+      var results = await Promise.all([
+        fetch(SUPABASE_URL + '/rest/v1/clients?select=id,client_name,client_email&installer_id=eq.' + installerId + '&order=client_name.asc', { headers: ANON_HDR }).then(function(r){return r.json();}),
+        fetch(SUPABASE_URL + '/rest/v1/ai_results?select=ai_id,client_email,pdf_url&order=ai_id.desc', { headers: ANON_HDR }).then(function(r){return r.json();})
       ]);
 
-      // latest proposal per client email
+      var clients   = results[0] || [];
+      var proposals = results[1] || [];
+
+      // Build email → latest proposal map (first hit per email = most recent due to desc order)
       proposalMap = {};
-      (proposals || []).forEach(p => {
+      proposals.forEach(function(p) {
         if (p.client_email && !proposalMap[p.client_email]) {
           proposalMap[p.client_email] = { ai_id: p.ai_id, ready: !!p.pdf_url };
         }
       });
 
-      allClients = clients || [];
-      const count = allClients.length;
-      document.getElementById('panelLabel').textContent = `${count} client${count !== 1 ? 's' : ''}`;
+      allClients = clients;
+      var count = allClients.length;
+      document.getElementById('panelLabel').textContent = count + ' client' + (count !== 1 ? 's' : '');
       document.getElementById('searchBox').classList.toggle('hidden', count <= 4);
       renderClients(allClients);
     } catch(e) {
@@ -446,42 +286,37 @@ body {
   }
 
   function renderClients(list) {
-    const el = document.getElementById('clientRows');
-    if (!list?.length) {
+    var el = document.getElementById('clientRows');
+    if (!list || !list.length) {
       el.innerHTML = '<div class="empty-msg">No clients yet.<br>Add one from the portal.</div>';
       return;
     }
-    el.innerHTML = list.map(c => {
-      const prop  = proposalMap[c.client_email];
-      const ready = prop?.ready;
-      const badge = prop
+    el.innerHTML = list.map(function(c) {
+      var prop  = proposalMap[c.client_email];
+      var ready = prop && prop.ready;
+      var badge = prop
         ? (ready ? '<span class="badge badge-ready">Proposal ready</span>' : '<span class="badge badge-none">Generating…</span>')
         : '<span class="badge badge-none">No proposal</span>';
-      return `<div class="client-row" data-email="${c.client_email}" data-ai="${prop?.ai_id || ''}" data-ready="${ready ? '1' : '0'}" onclick="selectClient(this)">
-        <div class="client-info">
-          <div class="client-name-text">${c.client_name}</div>
-          <div class="client-email-text">${c.client_email}</div>
-        </div>
-        ${badge}
-      </div>`;
+      return '<div class="client-row" data-email="' + c.client_email + '" data-ai="' + (prop ? prop.ai_id : '') + '" data-ready="' + (ready ? '1' : '0') + '" onclick="selectClient(this)">'
+        + '<div class="client-info"><div class="client-name-text">' + c.client_name + '</div><div class="client-email-text">' + c.client_email + '</div></div>'
+        + badge + '</div>';
     }).join('');
   }
 
   function filterClients() {
-    const q = document.getElementById('searchBox').value.toLowerCase();
-    renderClients(allClients.filter(c =>
-      c.client_name.toLowerCase().includes(q) || c.client_email.toLowerCase().includes(q)
-    ));
+    var q = document.getElementById('searchBox').value.toLowerCase();
+    renderClients(allClients.filter(function(c) {
+      return c.client_name.toLowerCase().includes(q) || c.client_email.toLowerCase().includes(q);
+    }));
   }
 
-  // ── Select client ──────────────────────────────────────────────────────────
+  // ── Select client ────────────────────────────────────────────────
   function selectClient(el) {
-    document.querySelectorAll('.client-row').forEach(r => r.classList.remove('active'));
+    document.querySelectorAll('.client-row').forEach(function(r){r.classList.remove('active');});
     el.classList.add('active');
-    const aiId  = el.dataset.ai;
-    const ready = el.dataset.ready === '1';
+    var aiId  = el.dataset.ai;
+    var ready = el.dataset.ready === '1';
     clearRetryTimer();
-
     if (!aiId) {
       showState('empty');
       document.getElementById('stateEmptySub').textContent = 'No proposal yet for this client. Generate one in the system, then return here to preview and send it.';
@@ -499,60 +334,43 @@ body {
   function openProposalById(aiId) {
     selectedAiId = aiId;
     showState('loading');
-    const frame = document.getElementById('previewFrame');
+    var frame = document.getElementById('previewFrame');
     frame.style.display = 'none';
-    frame.onload = () => { showState('none'); frame.style.display = 'block'; frame.onload = null; };
-    setTimeout(() => { frame.src = REVIEW_BASE + aiId; }, 80);
-
-    // Highlight row if visible
-    document.querySelectorAll('.client-row').forEach(r => {
-      if (r.dataset.ai == aiId) r.classList.add('active');
-    });
+    frame.onload = function() { showState('none'); frame.style.display = 'block'; frame.onload = null; };
+    setTimeout(function(){ frame.src = REVIEW_BASE + aiId; }, 80);
+    document.querySelectorAll('.client-row').forEach(function(r) { if (r.dataset.ai == aiId) r.classList.add('active'); });
   }
 
-  // ── Pending polling ────────────────────────────────────────────────────────
-  function schedulePendingRetry(aiId) {
-    clearRetryTimer();
-    pendingRetryTimer = setTimeout(() => pollProposal(aiId), 8000);
-  }
+  // ── Pending polling ──────────────────────────────────────────────
+  function schedulePendingRetry(aiId) { clearRetryTimer(); pendingRetryTimer = setTimeout(function(){ pollProposal(aiId); }, 8000); }
   function retrySelected() { if (selectedAiId) pollProposal(selectedAiId); }
   async function pollProposal(aiId) {
     try {
-      const res  = await fetch(`${SUPABASE_URL}/rest/v1/ai_results?select=ai_id,pdf_url&ai_id=eq.${aiId}`, { headers: ANON_HDR });
-      const rows = await res.json();
-      if (rows?.[0]?.pdf_url) {
-        document.querySelectorAll('.client-row').forEach(r => {
+      var res  = await fetch(SUPABASE_URL + '/rest/v1/ai_results?select=ai_id,pdf_url&ai_id=eq.' + aiId, { headers: ANON_HDR });
+      var rows = await res.json();
+      if (rows && rows[0] && rows[0].pdf_url) {
+        document.querySelectorAll('.client-row').forEach(function(r) {
           if (r.dataset.ai == aiId) {
             r.dataset.ready = '1';
-            const b = r.querySelector('.badge');
+            var b = r.querySelector('.badge');
             if (b) { b.className = 'badge badge-ready'; b.textContent = 'Proposal ready'; }
           }
         });
         openProposalById(aiId);
-      } else {
-        schedulePendingRetry(aiId);
-      }
+      } else { schedulePendingRetry(aiId); }
     } catch(e) { schedulePendingRetry(aiId); }
   }
   function clearRetryTimer() { if (pendingRetryTimer) { clearTimeout(pendingRetryTimer); pendingRetryTimer = null; } }
 
-  // ── State management ───────────────────────────────────────────────────────
+  // ── States ───────────────────────────────────────────────────────
   function showState(state) {
     document.getElementById('stateEmpty').classList.toggle('hidden',   state !== 'empty');
     document.getElementById('stateLoading').classList.toggle('hidden', state !== 'loading');
     document.getElementById('statePending').classList.toggle('hidden', state !== 'pending');
-    if (state !== 'none') {
-      const frame = document.getElementById('previewFrame');
-      frame.style.display = 'none';
-      frame.src = '';
-    }
+    if (state !== 'none') { var f = document.getElementById('previewFrame'); f.style.display = 'none'; f.src = ''; }
   }
 
-  function showLcMsg(type, text) {
-    const el = document.getElementById('gateMsg');
-    el.className = 'lc-msg ' + type;
-    el.textContent = text;
-  }
+  function showLcMsg(type, text) { var el = document.getElementById('gateMsg'); el.className = 'lc-msg ' + type; el.textContent = text; }
 </script>
 </body>
 </html>
