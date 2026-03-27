@@ -8,141 +8,80 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --gold:     #B8962E;
-      --gold-l:   #D4B870;
-      --midnight: #0A1628;
-      --card:     #0D1E3A;
-      --line:     rgba(184,150,46,0.20);
-      --muted:    rgba(255,255,255,0.38);
+      --gold: #B8962E; --gold-l: #D4B870; --midnight: #0A1628;
+      --card: #0D1E3A; --line: rgba(184,150,46,0.20); --muted: rgba(255,255,255,0.38);
     }
     body {
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      background: var(--midnight);
-      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif; font-weight: 300;
+      background: var(--midnight); min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
       padding: 2rem; color: #fff; overflow: hidden; position: relative;
     }
     .ring { position: fixed; border-radius: 50%; border: 1px solid rgba(184,150,46,0.06); pointer-events: none; }
-    .r1 { width: 700px; height: 700px; top: -250px; right: -250px; }
-    .r2 { width: 460px; height: 460px; top: -150px; right: -150px; border-color: rgba(184,150,46,0.04); }
-    .r3 { width: 380px; height: 380px; bottom: -140px; left: -140px; }
-    .r4 { width: 220px; height: 220px; bottom: -60px; left: -60px; border-color: rgba(184,150,46,0.04); }
+    .r1 { width:700px; height:700px; top:-250px; right:-250px; }
+    .r2 { width:460px; height:460px; top:-150px; right:-150px; border-color:rgba(184,150,46,0.04); }
+    .r3 { width:380px; height:380px; bottom:-140px; left:-140px; }
+    .r4 { width:220px; height:220px; bottom:-60px; left:-60px; border-color:rgba(184,150,46,0.04); }
     body::after {
-      content: ''; position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.025; pointer-events: none; z-index: 9999;
+      content:''; position:fixed; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:0.025; pointer-events:none; z-index:9999;
     }
-
     .card {
-      background: var(--card); border: 1px solid var(--line); border-radius: 3px;
-      width: 100%; max-width: 460px; padding: 3rem 3rem 2.5rem;
-      position: relative; animation: rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
+      background:var(--card); border:1px solid var(--line); border-radius:3px;
+      width:100%; max-width:460px; padding:3rem 3rem 2.5rem;
+      position:relative; animation:rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
     }
-    @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes rise { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     .card::before { content:''; position:absolute; top:0; left:0; width:44px; height:44px; border-top:2px solid var(--gold); border-left:2px solid var(--gold); border-radius:3px 0 0 0; }
     .card::after  { content:''; position:absolute; bottom:0; right:0; width:44px; height:44px; border-bottom:2px solid var(--gold); border-right:2px solid var(--gold); border-radius:0 0 3px 0; }
-
-    .logo { margin-bottom: 2.25rem; }
-    .logo img { height: 38px; width: auto; object-fit: contain; display: block; }
-
-    h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1.9rem; line-height: 1.15; color: #fff; letter-spacing: -0.01em; }
-    h1 em { font-style: italic; color: var(--gold); }
-    .subhead { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.45rem; margin-bottom: 1.75rem; }
-    .divider { width:100%; height:1px; background:linear-gradient(to right, rgba(184,150,46,0.55), transparent); margin-bottom:1.9rem; }
-
-    .field { margin-bottom: 1.4rem; }
+    .logo { margin-bottom:2.25rem; }
+    .logo img { height:38px; width:auto; object-fit:contain; display:block; }
+    h1 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.9rem; line-height:1.15; color:#fff; letter-spacing:-0.01em; }
+    h1 em { font-style:italic; color:var(--gold); }
+    .subhead { font-size:0.72rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-top:0.45rem; margin-bottom:1.75rem; }
+    .divider { width:100%; height:1px; background:linear-gradient(to right,rgba(184,150,46,0.55),transparent); margin-bottom:1.9rem; }
+    .field { margin-bottom:1.4rem; }
     .field label { display:block; font-size:0.66rem; letter-spacing:0.11em; text-transform:uppercase; color:var(--muted); margin-bottom:0.45rem; font-weight:500; }
-    .field label .req { color: var(--gold); margin-left: 2px; }
-    .field input {
-      width:100%; background:transparent; border:none;
-      border-bottom:1px solid rgba(184,150,46,0.22);
-      padding:0.55rem 0; font-family:'DM Sans',sans-serif; font-size:0.93rem;
-      font-weight:300; color:#fff; outline:none; transition:border-color 0.25s;
-      border-radius:0; caret-color:var(--gold);
-    }
-    .field input::placeholder { color: rgba(255,255,255,0.18); }
-    .field input:focus { border-bottom-color: var(--gold); }
-
-    .btn-primary {
-      width:100%; padding:0.9rem 1rem; background:var(--gold); color:#0A1628;
-      border:none; border-radius:2px; font-family:'DM Sans',sans-serif;
-      font-size:0.72rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase;
-      cursor:pointer; position:relative; overflow:hidden; transition:opacity 0.25s, transform 0.15s;
-    }
+    .field label .req { color:var(--gold); margin-left:2px; }
+    .field input { width:100%; background:transparent; border:none; border-bottom:1px solid rgba(184,150,46,0.22); padding:0.55rem 0; font-family:'DM Sans',sans-serif; font-size:0.93rem; font-weight:300; color:#fff; outline:none; transition:border-color 0.25s; caret-color:var(--gold); }
+    .field input::placeholder { color:rgba(255,255,255,0.18); }
+    .field input:focus { border-bottom-color:var(--gold); }
+    .btn-primary { width:100%; padding:0.9rem 1rem; background:var(--gold); color:#0A1628; border:none; border-radius:2px; font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer; position:relative; overflow:hidden; transition:opacity 0.25s,transform 0.15s; }
     .btn-primary::after { content:''; position:absolute; inset:0; background:#fff; opacity:0; transition:opacity 0.25s; }
     .btn-primary:hover::after { opacity:0.09; }
     .btn-primary span { position:relative; z-index:1; }
     .btn-primary:active { transform:scale(0.99); }
     .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-
-    .btn-secondary {
-      width:100%; padding:0.75rem 1rem; background:transparent; color:var(--gold-l);
-      border:1px solid var(--line); border-radius:2px; font-family:'DM Sans',sans-serif;
-      font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase;
-      cursor:pointer; text-decoration:none; display:block; text-align:center;
-      transition:background 0.2s, border-color 0.2s; margin-top:0.75rem;
-    }
+    .btn-secondary { width:100%; padding:0.75rem 1rem; background:transparent; color:var(--gold-l); border:1px solid var(--line); border-radius:2px; font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; text-decoration:none; display:block; text-align:center; transition:background 0.2s,border-color 0.2s; margin-top:0.75rem; }
     .btn-secondary:hover { background:rgba(184,150,46,0.08); border-color:var(--gold); }
-
     .msg { margin-top:1rem; font-size:0.79rem; min-height:1.1rem; letter-spacing:0.03em; text-align:center; }
-    .msg.success { color:#72d4a0; }
-    .msg.error   { color:#eb7070; }
-    .msg.loading { color:var(--muted); }
-
-    .session-bar {
-      display:none; align-items:center; justify-content:space-between;
-      margin-bottom:1.75rem; padding:0.6rem 0.9rem;
-      border:1px solid rgba(184,150,46,0.18); border-radius:2px;
-      background:rgba(184,150,46,0.06);
-    }
+    .msg.success { color:#72d4a0; } .msg.error { color:#eb7070; } .msg.loading { color:var(--muted); }
+    .session-bar { display:none; align-items:center; justify-content:space-between; margin-bottom:1.75rem; padding:0.6rem 0.9rem; border:1px solid rgba(184,150,46,0.18); border-radius:2px; background:rgba(184,150,46,0.06); }
     .session-bar .su { font-size:0.72rem; color:var(--gold-l); letter-spacing:0.06em; }
-    .session-bar button {
-      background:none; border:none; cursor:pointer; font-size:0.65rem;
-      letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);
-      transition:color 0.2s; font-family:'DM Sans',sans-serif;
-    }
+    .session-bar button { background:none; border:none; cursor:pointer; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); transition:color 0.2s; font-family:'DM Sans',sans-serif; }
     .session-bar button:hover { color:#eb7070; }
-
-    .card-footer {
-      margin-top:2rem; padding-top:1.25rem;
-      border-top:1px solid rgba(184,150,46,0.14);
-      display:flex; align-items:center; justify-content:space-between;
-    }
+    .card-footer { margin-top:2rem; padding-top:1.25rem; border-top:1px solid rgba(184,150,46,0.14); display:flex; align-items:center; justify-content:space-between; }
     .card-footer span { font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.22); }
     .secure { display:flex; align-items:center; gap:5px; font-size:0.67rem; letter-spacing:0.06em; color:rgba(255,255,255,0.22); }
-
-    /* Success state */
-    .success-state { text-align:center; padding:1rem 0; }
-    .success-icon {
-      width:56px; height:56px; border-radius:50%;
-      background:rgba(114,212,160,0.12); border:1px solid rgba(114,212,160,0.3);
-      display:grid; place-items:center; margin:0 auto 1.25rem; font-size:1.4rem;
-    }
+    .success-state { text-align:center; padding:0.5rem 0; }
+    .success-icon { width:56px; height:56px; border-radius:50%; background:rgba(114,212,160,0.12); border:1px solid rgba(114,212,160,0.3); display:grid; place-items:center; margin:0 auto 1.25rem; font-size:1.4rem; }
     .success-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
     .success-state h2 em { font-style:italic; color:#72d4a0; }
     .success-state p { font-size:0.85rem; color:var(--muted); line-height:1.7; margin-bottom:1.75rem; }
-    .client-chip {
-      display:inline-block; background:rgba(184,150,46,0.1); border:1px solid var(--line);
-      border-radius:100px; padding:0.35rem 0.9rem; font-size:0.78rem;
-      color:var(--gold-l); margin-bottom:1.75rem;
-    }
-
+    .client-chip { display:inline-block; background:rgba(184,150,46,0.1); border:1px solid var(--line); border-radius:100px; padding:0.35rem 0.9rem; font-size:0.78rem; color:var(--gold-l); margin-bottom:1.75rem; }
     .hidden { display:none !important; }
   </style>
 </head>
 <body>
-  <div class="ring r1"></div>
-  <div class="ring r2"></div>
-  <div class="ring r3"></div>
-  <div class="ring r4"></div>
+  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div>
 
   <div class="card">
     <div class="logo">
       <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
     </div>
 
-    <!-- ══════════ LOGIN ══════════ -->
+    <!-- ══ LOGIN ══ -->
     <div id="loginScreen">
       <h1>Installer <em>portal</em></h1>
       <p class="subhead">Authorised access only</p>
@@ -161,21 +100,18 @@
       </div>
       <div class="card-footer">
         <span>Nova Metrics &copy; 2026</span>
-        <div class="secure">
-          <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
-          Secured
-        </div>
+        <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
       </div>
     </div>
 
-    <!-- ══════════ ADD CLIENT ══════════ -->
+    <!-- ══ ADD CLIENT ══ -->
     <div id="clientScreen" class="hidden">
       <div class="session-bar" id="sessionBar">
         <span class="su" id="sessionUser"></span>
         <button onclick="handleLogout()">Sign out</button>
       </div>
 
-      <!-- Add client form -->
+      <!-- Form -->
       <div id="addClientForm">
         <h1>Add a <em>new</em> client</h1>
         <p class="subhead">Client onboarding</p>
@@ -202,13 +138,11 @@
             <div class="msg" id="clientMsg"></div>
           </div>
         </form>
-        <a href="proposal_portal.html" class="btn-secondary">View proposal portal →</a>
+        <!-- FIX 1: correct filename prposal_portal.html -->
+        <a href="prposal_portal.html" class="btn-secondary">View proposal portal →</a>
         <div class="card-footer">
           <span>Nova Metrics &copy; 2026</span>
-          <div class="secure">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
-            Secured
-          </div>
+          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
         </div>
       </div>
 
@@ -217,17 +151,15 @@
         <div class="success-icon">✓</div>
         <h2>Client <em>registered</em></h2>
         <div class="client-chip" id="successClientName"></div>
-        <p>The client has been saved and a proposal has been started. Open the proposal portal to review and send it.</p>
-        <a id="openPortalBtn" href="proposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
+        <p>The client has been saved to your pipeline. Head to the proposal portal to preview and send proposals.</p>
+        <!-- FIX 1: correct filename prposal_portal.html -->
+        <a href="prposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
           <span>Open proposal portal →</span>
         </a>
         <button onclick="resetForm()" class="btn-secondary" style="margin-top:0.75rem;">Add another client</button>
         <div class="card-footer" style="margin-top:1.75rem;">
           <span>Nova Metrics &copy; 2026</span>
-          <div class="secure">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
-            Secured
-          </div>
+          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
         </div>
       </div>
     </div>
@@ -237,61 +169,43 @@
     const SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
     const SESSION_KEY   = 'nm_installer_session';
+    let currentInstaller = null;
 
-    let currentInstaller = null; // full installer row from Supabase
-
-    // ── Boot ──────────────────────────────────────────────────
-    window.addEventListener('DOMContentLoaded', () => {
-      const saved = sessionStorage.getItem(SESSION_KEY);
+    window.addEventListener('DOMContentLoaded', function() {
+      var saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
-        try {
-          currentInstaller = JSON.parse(saved);
-          showClientScreen();
-        } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
+        try { currentInstaller = JSON.parse(saved); showClientScreen(); } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
       }
-      ['loginEmail','loginPassword'].forEach(id => {
-        document.getElementById(id).addEventListener('keydown', e => {
-          if (e.key === 'Enter') handleLogin();
-        });
+      ['loginEmail','loginPassword'].forEach(function(id) {
+        document.getElementById(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleLogin(); });
       });
     });
 
-    // ── Login — looks up installer by email + password in Supabase ──
     async function handleLogin() {
-      const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
-      const password = document.getElementById('loginPassword').value;
-      const btn      = document.getElementById('loginBtn');
-      const msg      = document.getElementById('loginMsg');
-
-      if (!email || !password) {
-        showMsg(msg, 'error', 'Please enter your email and password.');
-        return;
-      }
-
+      var email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+      var password = document.getElementById('loginPassword').value;
+      var btn      = document.getElementById('loginBtn');
+      var msg      = document.getElementById('loginMsg');
+      if (!email || !password) { showMsg(msg,'error','Please enter your email and password.'); return; }
       btn.disabled = true;
-      showMsg(msg, 'loading', 'Verifying…');
-
+      showMsg(msg,'loading','Verifying…');
       try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1`,
-          { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` } }
+        var res = await fetch(
+          SUPABASE_URL + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email) + '&password=eq.' + encodeURIComponent(password) + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+          { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }
         );
-
         if (!res.ok) throw new Error('Connection error. Please try again.');
-        const rows = await res.json();
-
-        if (!rows || rows.length === 0) {
-          showMsg(msg, 'error', 'Invalid email or password. Contact Nova Metrics to request access.');
+        var rows = await res.json();
+        if (!rows || !rows.length) {
+          showMsg(msg,'error','Invalid email or password. Contact Nova Metrics to request access.');
           btn.disabled = false;
           return;
         }
-
         currentInstaller = rows[0];
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentInstaller));
         showClientScreen();
-
       } catch(err) {
-        showMsg(msg, 'error', err.message || 'Something went wrong. Please try again.');
+        showMsg(msg,'error', err.message || 'Something went wrong.');
         btn.disabled = false;
       }
     }
@@ -314,64 +228,50 @@
       document.getElementById('sessionUser').textContent = '● ' + (currentInstaller.installer_name || currentInstaller.contact_email);
     }
 
-    // ── Client form ────────────────────────────────────────────
-    document.getElementById('clientForm').addEventListener('submit', async (e) => {
+    document.getElementById('clientForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const name    = document.getElementById('client_name').value.trim();
-      const email   = document.getElementById('client_email').value.trim();
-      const phone   = document.getElementById('client_phone').value.trim();
-      const address = document.getElementById('client_address').value.trim();
-      const btn     = document.getElementById('submitBtn');
-      const msg     = document.getElementById('clientMsg');
-
-      if (!name)  { showMsg(msg, 'error', 'Please enter the client name.'); return; }
-      if (!email) { showMsg(msg, 'error', 'Please enter an email address.'); return; }
-      if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) {
-        showMsg(msg, 'error', 'Please enter a valid phone number.'); return;
-      }
-
-      showMsg(msg, 'loading', 'Saving client…');
+      var name    = document.getElementById('client_name').value.trim();
+      var email   = document.getElementById('client_email').value.trim();
+      var phone   = document.getElementById('client_phone').value.trim();
+      var address = document.getElementById('client_address').value.trim();
+      var btn     = document.getElementById('submitBtn');
+      var msg     = document.getElementById('clientMsg');
+      if (!name)  { showMsg(msg,'error','Please enter the client name.'); return; }
+      if (!email) { showMsg(msg,'error','Please enter an email address.'); return; }
+      if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
+      showMsg(msg,'loading','Saving client…');
       btn.disabled = true;
-
       try {
-        const res = await fetch(
-          `${SUPABASE_URL}/functions/v1/create-client`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              installer_id:   currentInstaller.installer_id,
-              client_name:    name,
-              client_email:   email,
-              client_phone:   phone,
-              client_address: address
-            })
-          }
-        );
-
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        const data = await res.json();
-
-        if (data.success && data.ai_id) {
-          showSuccessState(name, data.ai_id);
-        } else if (data.success) {
-          showMsg(msg, 'success', data.message || 'Client registered.');
-          document.getElementById('clientForm').reset();
+        var res = await fetch(SUPABASE_URL + '/functions/v1/create-client', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            installer_id:   currentInstaller.installer_id,
+            client_name:    name,
+            client_email:   email,
+            client_phone:   phone   || null,
+            client_address: address || null
+          })
+        });
+        if (!res.ok) throw new Error('Server error ' + res.status);
+        var data = await res.json();
+        // FIX 2: check data.success only — create-client returns client_id, not ai_id
+        if (data.success) {
+          showSuccessState(name);
         } else {
-          showMsg(msg, 'error', data.error || 'Something went wrong. Please try again.');
+          showMsg(msg,'error', data.error || 'Something went wrong. Please try again.');
         }
-      } catch (err) {
-        showMsg(msg, 'error', 'Connection error: ' + err.message);
+      } catch(err) {
+        showMsg(msg,'error','Connection error: ' + err.message);
       } finally {
         btn.disabled = false;
       }
     });
 
-    function showSuccessState(clientName, aiId) {
+    function showSuccessState(clientName) {
       document.getElementById('addClientForm').classList.add('hidden');
       document.getElementById('successState').classList.remove('hidden');
       document.getElementById('successClientName').textContent = clientName;
-      document.getElementById('openPortalBtn').href = 'proposal_portal.html?ai_id=' + aiId;
     }
 
     function resetForm() {
@@ -381,10 +281,7 @@
       document.getElementById('clientMsg').textContent = '';
     }
 
-    function showMsg(el, type, text) {
-      el.className = 'msg ' + type;
-      el.textContent = text;
-    }
+    function showMsg(el, type, text) { el.className = 'msg ' + type; el.textContent = text; }
   </script>
 </body>
 </html>
