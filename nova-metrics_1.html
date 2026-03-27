@@ -8,12 +8,12 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --gold:      #B8962E;
-      --gold-l:    #D4B870;
-      --midnight:  #0A1628;
-      --card:      #0D1E3A;
-      --line:      rgba(184,150,46,0.20);
-      --muted:     rgba(255,255,255,0.38);
+      --gold:     #B8962E;
+      --gold-l:   #D4B870;
+      --midnight: #0A1628;
+      --card:     #0D1E3A;
+      --line:     rgba(184,150,46,0.20);
+      --muted:    rgba(255,255,255,0.38);
     }
     body {
       font-family: 'DM Sans', sans-serif;
@@ -34,7 +34,6 @@
       opacity: 0.025; pointer-events: none; z-index: 9999;
     }
 
-    /* ── Card ── */
     .card {
       background: var(--card); border: 1px solid var(--line); border-radius: 3px;
       width: 100%; max-width: 460px; padding: 3rem 3rem 2.5rem;
@@ -49,9 +48,8 @@
 
     h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1.9rem; line-height: 1.15; color: #fff; letter-spacing: -0.01em; }
     h1 em { font-style: italic; color: var(--gold); }
-
     .subhead { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.45rem; margin-bottom: 1.75rem; }
-    .divider  { width:100%; height:1px; background:linear-gradient(to right, rgba(184,150,46,0.55), transparent); margin-bottom:1.9rem; }
+    .divider { width:100%; height:1px; background:linear-gradient(to right, rgba(184,150,46,0.55), transparent); margin-bottom:1.9rem; }
 
     .field { margin-bottom: 1.4rem; }
     .field label { display:block; font-size:0.66rem; letter-spacing:0.11em; text-transform:uppercase; color:var(--muted); margin-bottom:0.45rem; font-weight:500; }
@@ -78,14 +76,11 @@
     .btn-primary:active { transform:scale(0.99); }
     .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
 
-    /* Portal link button */
     .btn-secondary {
-      width:100%; padding:0.75rem 1rem;
-      background:transparent; color:var(--gold-l);
-      border:1px solid var(--line); border-radius:2px;
-      font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500;
-      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
-      text-decoration:none; display:block; text-align:center;
+      width:100%; padding:0.75rem 1rem; background:transparent; color:var(--gold-l);
+      border:1px solid var(--line); border-radius:2px; font-family:'DM Sans',sans-serif;
+      font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase;
+      cursor:pointer; text-decoration:none; display:block; text-align:center;
       transition:background 0.2s, border-color 0.2s; margin-top:0.75rem;
     }
     .btn-secondary:hover { background:rgba(184,150,46,0.08); border-color:var(--gold); }
@@ -117,22 +112,17 @@
     .card-footer span { font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.22); }
     .secure { display:flex; align-items:center; gap:5px; font-size:0.67rem; letter-spacing:0.06em; color:rgba(255,255,255,0.22); }
 
-    /* Success state overlay */
-    .success-state {
-      text-align:center; padding:1.5rem 0;
-    }
+    /* Success state */
+    .success-state { text-align:center; padding:1rem 0; }
     .success-icon {
       width:56px; height:56px; border-radius:50%;
-      background:rgba(114,212,160,0.12);
-      border:1px solid rgba(114,212,160,0.3);
-      display:grid; place-items:center;
-      margin:0 auto 1.25rem;
-      font-size:1.4rem;
+      background:rgba(114,212,160,0.12); border:1px solid rgba(114,212,160,0.3);
+      display:grid; place-items:center; margin:0 auto 1.25rem; font-size:1.4rem;
     }
     .success-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
     .success-state h2 em { font-style:italic; color:#72d4a0; }
     .success-state p { font-size:0.85rem; color:var(--muted); line-height:1.7; margin-bottom:1.75rem; }
-    .success-state .client-chip {
+    .client-chip {
       display:inline-block; background:rgba(184,150,46,0.1); border:1px solid var(--line);
       border-radius:100px; padding:0.35rem 0.9rem; font-size:0.78rem;
       color:var(--gold-l); margin-bottom:1.75rem;
@@ -158,8 +148,8 @@
       <p class="subhead">Authorised access only</p>
       <div class="divider"></div>
       <div class="field">
-        <label>Username <span class="req">*</span></label>
-        <input type="text" id="loginUsername" placeholder="Your username" autocomplete="username" />
+        <label>Email address <span class="req">*</span></label>
+        <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email" />
       </div>
       <div class="field">
         <label>Password <span class="req">*</span></label>
@@ -212,10 +202,7 @@
             <div class="msg" id="clientMsg"></div>
           </div>
         </form>
-
-        <!-- Link to portal -->
         <a href="proposal_portal.html" class="btn-secondary">View proposal portal →</a>
-
         <div class="card-footer">
           <span>Nova Metrics &copy; 2026</span>
           <div class="secure">
@@ -225,12 +212,12 @@
         </div>
       </div>
 
-      <!-- Success state (shown after client saved) -->
+      <!-- Success state -->
       <div id="successState" class="success-state hidden">
         <div class="success-icon">✓</div>
         <h2>Client <em>registered</em></h2>
         <div class="client-chip" id="successClientName"></div>
-        <p>The client has been saved. A proposal has been started and is ready to preview — open the proposal portal to review, complete, and send it.</p>
+        <p>The client has been saved and a proposal has been started. Open the proposal portal to review and send it.</p>
         <a id="openPortalBtn" href="proposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
           <span>Open proposal portal →</span>
         </a>
@@ -247,77 +234,87 @@
   </div>
 
   <script>
-    // ══════════════════════════════════════════════
-    // CONFIG — authorised users
-    // Format: 'username': { password, installer_id }
-    // installer_id must match your Supabase installers table
-    // ══════════════════════════════════════════════
-    const USERS = {
-      'nova_admin':   { password: 'NM@2026!secure',    installer_id: 1 },
-      'installer_01': { password: 'Solar#Installer1',  installer_id: 2 },
-      'installer_02': { password: 'Solar#Installer2',  installer_id: 3 },
-    };
+    const SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+    const SESSION_KEY   = 'nm_installer_session';
 
-    const SESSION_KEY = 'nm_session';
-    let currentInstallerId = null;
+    let currentInstaller = null; // full installer row from Supabase
 
-    // ── Boot ──────────────────────────────────────
+    // ── Boot ──────────────────────────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
         try {
-          const s = JSON.parse(saved);
-          showClientScreen(s.username, s.installer_id);
+          currentInstaller = JSON.parse(saved);
+          showClientScreen();
         } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
       }
-      ['loginUsername','loginPassword'].forEach(id => {
+      ['loginEmail','loginPassword'].forEach(id => {
         document.getElementById(id).addEventListener('keydown', e => {
           if (e.key === 'Enter') handleLogin();
         });
       });
     });
 
-    // ── Login ──────────────────────────────────────
-    function handleLogin() {
-      const u   = document.getElementById('loginUsername').value.trim();
-      const p   = document.getElementById('loginPassword').value;
-      const btn = document.getElementById('loginBtn');
-      const msg = document.getElementById('loginMsg');
-      if (!u || !p) { showMsg(msg, 'error', 'Please enter your username and password.'); return; }
+    // ── Login — looks up installer by email + password in Supabase ──
+    async function handleLogin() {
+      const email    = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const btn      = document.getElementById('loginBtn');
+      const msg      = document.getElementById('loginMsg');
+
+      if (!email || !password) {
+        showMsg(msg, 'error', 'Please enter your email and password.');
+        return;
+      }
+
       btn.disabled = true;
       showMsg(msg, 'loading', 'Verifying…');
-      setTimeout(() => {
-        const user = USERS[u];
-        if (user && user.password === p) {
-          sessionStorage.setItem(SESSION_KEY, JSON.stringify({ username: u, installer_id: user.installer_id }));
-          showClientScreen(u, user.installer_id);
-        } else {
-          showMsg(msg, 'error', 'Invalid credentials. Contact Nova Metrics to request access.');
+
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(password)}&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1`,
+          { headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` } }
+        );
+
+        if (!res.ok) throw new Error('Connection error. Please try again.');
+        const rows = await res.json();
+
+        if (!rows || rows.length === 0) {
+          showMsg(msg, 'error', 'Invalid email or password. Contact Nova Metrics to request access.');
           btn.disabled = false;
+          return;
         }
-      }, 600);
+
+        currentInstaller = rows[0];
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentInstaller));
+        showClientScreen();
+
+      } catch(err) {
+        showMsg(msg, 'error', err.message || 'Something went wrong. Please try again.');
+        btn.disabled = false;
+      }
     }
 
     function handleLogout() {
       sessionStorage.removeItem(SESSION_KEY);
-      currentInstallerId = null;
+      currentInstaller = null;
       document.getElementById('clientScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginEmail').value = '';
       document.getElementById('loginPassword').value = '';
       document.getElementById('loginMsg').textContent = '';
       document.getElementById('loginBtn').disabled = false;
     }
 
-    function showClientScreen(username, installer_id) {
-      currentInstallerId = installer_id;
+    function showClientScreen() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('clientScreen').classList.remove('hidden');
       document.getElementById('sessionBar').style.display = 'flex';
-      document.getElementById('sessionUser').textContent = '● ' + username;
+      document.getElementById('sessionUser').textContent = '● ' + (currentInstaller.installer_name || currentInstaller.contact_email);
     }
 
-    // ── Client form ────────────────────────────────
+    // ── Client form ────────────────────────────────────────────
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name    = document.getElementById('client_name').value.trim();
@@ -337,23 +334,25 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/create-client', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            installer_id:   currentInstallerId,
-            client_name:    name,
-            client_email:   email,
-            client_phone:   phone,
-            client_address: address
-          })
-        });
+        const res = await fetch(
+          `${SUPABASE_URL}/functions/v1/create-client`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              installer_id:   currentInstaller.installer_id,
+              client_name:    name,
+              client_email:   email,
+              client_phone:   phone,
+              client_address: address
+            })
+          }
+        );
 
         if (!res.ok) throw new Error(`Server error ${res.status}`);
         const data = await res.json();
 
         if (data.success && data.ai_id) {
-          // ✅ Got ai_id back — show success state and link to portal with ai_id
           showSuccessState(name, data.ai_id);
         } else if (data.success) {
           showMsg(msg, 'success', data.message || 'Client registered.');
@@ -372,7 +371,6 @@
       document.getElementById('addClientForm').classList.add('hidden');
       document.getElementById('successState').classList.remove('hidden');
       document.getElementById('successClientName').textContent = clientName;
-      // Point the portal button directly to this proposal
       document.getElementById('openPortalBtn').href = 'proposal_portal.html?ai_id=' + aiId;
     }
 
