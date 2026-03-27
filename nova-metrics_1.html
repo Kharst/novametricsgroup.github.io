@@ -3,274 +3,160 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nova Metrics — Portal</title>
+  <title>Nova Metrics — Installer Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --gold:       #B8962E;
-      --gold-light: #D4B870;
-      --gold-dim:   rgba(184,150,46,0.12);
-      --midnight:   #0A1628;
-      --card-bg:    #0D1E3A;
-      --line:       rgba(184,150,46,0.20);
+      --gold:      #B8962E;
+      --gold-l:    #D4B870;
+      --midnight:  #0A1628;
+      --card:      #0D1E3A;
+      --line:      rgba(184,150,46,0.20);
+      --muted:     rgba(255,255,255,0.38);
     }
-
     body {
       font-family: 'DM Sans', sans-serif;
       font-weight: 300;
       background: var(--midnight);
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-      overflow: hidden;
-      color: #fff;
-      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem; color: #fff; overflow: hidden; position: relative;
     }
-
-    /* Ambient rings */
-    .ring {
-      position: fixed;
-      border-radius: 50%;
-      border: 1px solid rgba(184,150,46,0.06);
-      pointer-events: none;
-    }
-    .ring-1 { width: 700px; height: 700px; top: -250px; right: -250px; }
-    .ring-2 { width: 460px; height: 460px; top: -150px; right: -150px; border-color: rgba(184,150,46,0.04); }
-    .ring-3 { width: 380px; height: 380px; bottom: -140px; left: -140px; }
-    .ring-4 { width: 220px; height: 220px; bottom: -60px;  left: -60px;  border-color: rgba(184,150,46,0.04); }
-
-    /* Grain */
+    .ring { position: fixed; border-radius: 50%; border: 1px solid rgba(184,150,46,0.06); pointer-events: none; }
+    .r1 { width: 700px; height: 700px; top: -250px; right: -250px; }
+    .r2 { width: 460px; height: 460px; top: -150px; right: -150px; border-color: rgba(184,150,46,0.04); }
+    .r3 { width: 380px; height: 380px; bottom: -140px; left: -140px; }
+    .r4 { width: 220px; height: 220px; bottom: -60px; left: -60px; border-color: rgba(184,150,46,0.04); }
     body::after {
-      content: '';
-      position: fixed; inset: 0;
+      content: ''; position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.025;
-      pointer-events: none;
-      z-index: 9999;
+      opacity: 0.025; pointer-events: none; z-index: 9999;
     }
 
-    /* ── Card shell ── */
+    /* ── Card ── */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      width: 100%;
-      max-width: 460px;
-      padding: 3rem 3rem 2.5rem;
-      position: relative;
-      animation: rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
+      background: var(--card); border: 1px solid var(--line); border-radius: 3px;
+      width: 100%; max-width: 460px; padding: 3rem 3rem 2.5rem;
+      position: relative; animation: rise 0.75s cubic-bezier(0.22,1,0.36,1) both;
     }
-
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Corner accents */
-    .card::before {
-      content: '';
-      position: absolute; top: 0; left: 0;
-      width: 44px; height: 44px;
-      border-top: 2px solid var(--gold);
-      border-left: 2px solid var(--gold);
-      border-radius: 3px 0 0 0;
-    }
-    .card::after {
-      content: '';
-      position: absolute; bottom: 0; right: 0;
-      width: 44px; height: 44px;
-      border-bottom: 2px solid var(--gold);
-      border-right: 2px solid var(--gold);
-      border-radius: 0 0 3px 0;
-    }
+    @keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .card::before { content:''; position:absolute; top:0; left:0; width:44px; height:44px; border-top:2px solid var(--gold); border-left:2px solid var(--gold); border-radius:3px 0 0 0; }
+    .card::after  { content:''; position:absolute; bottom:0; right:0; width:44px; height:44px; border-bottom:2px solid var(--gold); border-right:2px solid var(--gold); border-radius:0 0 3px 0; }
 
     .logo { margin-bottom: 2.25rem; }
     .logo img { height: 38px; width: auto; object-fit: contain; display: block; }
 
-    .heading h1 {
-      font-family: 'DM Serif Display', serif;
-      font-weight: 400;
-      font-size: 1.9rem;
-      line-height: 1.15;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-    .heading h1 em { font-style: italic; color: var(--gold); }
+    h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 1.9rem; line-height: 1.15; color: #fff; letter-spacing: -0.01em; }
+    h1 em { font-style: italic; color: var(--gold); }
 
-    .subhead {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.38);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-top: 0.45rem;
-      margin-bottom: 1.75rem;
-    }
+    .subhead { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.45rem; margin-bottom: 1.75rem; }
+    .divider  { width:100%; height:1px; background:linear-gradient(to right, rgba(184,150,46,0.55), transparent); margin-bottom:1.9rem; }
 
-    .divider {
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(to right, rgba(184,150,46,0.55), transparent);
-      margin-bottom: 1.9rem;
-    }
-
-    /* ── Fields ── */
-    .field { margin-bottom: 1.4rem; position: relative; }
-
-    .field label {
-      display: block;
-      font-size: 0.66rem;
-      letter-spacing: 0.11em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 0.45rem;
-      font-weight: 500;
-    }
+    .field { margin-bottom: 1.4rem; }
+    .field label { display:block; font-size:0.66rem; letter-spacing:0.11em; text-transform:uppercase; color:var(--muted); margin-bottom:0.45rem; font-weight:500; }
     .field label .req { color: var(--gold); margin-left: 2px; }
-
     .field input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid rgba(184,150,46,0.22);
-      padding: 0.55rem 0;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.93rem;
-      font-weight: 300;
-      color: #fff;
-      outline: none;
-      transition: border-color 0.25s;
-      border-radius: 0;
-      caret-color: var(--gold);
+      width:100%; background:transparent; border:none;
+      border-bottom:1px solid rgba(184,150,46,0.22);
+      padding:0.55rem 0; font-family:'DM Sans',sans-serif; font-size:0.93rem;
+      font-weight:300; color:#fff; outline:none; transition:border-color 0.25s;
+      border-radius:0; caret-color:var(--gold);
     }
     .field input::placeholder { color: rgba(255,255,255,0.18); }
     .field input:focus { border-bottom-color: var(--gold); }
 
-    /* ── Buttons ── */
-    .submit-wrap { margin-top: 2rem; }
-
     .btn-primary {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      background: var(--gold);
-      color: #0A1628;
-      border: none;
-      border-radius: 2px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: opacity 0.25s, transform 0.15s;
+      width:100%; padding:0.9rem 1rem; background:var(--gold); color:#0A1628;
+      border:none; border-radius:2px; font-family:'DM Sans',sans-serif;
+      font-size:0.72rem; font-weight:500; letter-spacing:0.16em; text-transform:uppercase;
+      cursor:pointer; position:relative; overflow:hidden; transition:opacity 0.25s, transform 0.15s;
     }
-    .btn-primary::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: #fff; opacity: 0;
-      transition: opacity 0.25s;
-    }
-    .btn-primary:hover::after { opacity: 0.09; }
-    .btn-primary span { position: relative; z-index: 1; }
-    .btn-primary:active { transform: scale(0.99); }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary::after { content:''; position:absolute; inset:0; background:#fff; opacity:0; transition:opacity 0.25s; }
+    .btn-primary:hover::after { opacity:0.09; }
+    .btn-primary span { position:relative; z-index:1; }
+    .btn-primary:active { transform:scale(0.99); }
+    .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
 
-    /* ── Messages ── */
-    .message {
-      margin-top: 1rem;
-      font-size: 0.79rem;
-      min-height: 1.2rem;
-      letter-spacing: 0.03em;
-      text-align: center;
+    /* Portal link button */
+    .btn-secondary {
+      width:100%; padding:0.75rem 1rem;
+      background:transparent; color:var(--gold-l);
+      border:1px solid var(--line); border-radius:2px;
+      font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+      text-decoration:none; display:block; text-align:center;
+      transition:background 0.2s, border-color 0.2s; margin-top:0.75rem;
     }
-    .message.success { color: #72d4a0; }
-    .message.error   { color: #eb7070; }
-    .message.loading { color: rgba(255,255,255,0.38); }
+    .btn-secondary:hover { background:rgba(184,150,46,0.08); border-color:var(--gold); }
 
-    /* ── Card footer ── */
-    .card-footer {
-      margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid rgba(184,150,46,0.14);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .card-footer span {
-      font-size: 0.68rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.22);
-    }
-    .secure-badge {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 0.67rem; letter-spacing: 0.06em;
-      color: rgba(255,255,255,0.22);
-    }
+    .msg { margin-top:1rem; font-size:0.79rem; min-height:1.1rem; letter-spacing:0.03em; text-align:center; }
+    .msg.success { color:#72d4a0; }
+    .msg.error   { color:#eb7070; }
+    .msg.loading { color:var(--muted); }
 
-    /* ── Session bar (shown when logged in) ── */
     .session-bar {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.75rem;
-      padding: 0.6rem 0.9rem;
-      border: 1px solid rgba(184,150,46,0.18);
-      border-radius: 2px;
-      background: rgba(184,150,46,0.06);
+      display:none; align-items:center; justify-content:space-between;
+      margin-bottom:1.75rem; padding:0.6rem 0.9rem;
+      border:1px solid rgba(184,150,46,0.18); border-radius:2px;
+      background:rgba(184,150,46,0.06);
     }
-    .session-bar .session-user {
-      font-size: 0.72rem;
-      color: var(--gold-light);
-      letter-spacing: 0.06em;
-    }
+    .session-bar .su { font-size:0.72rem; color:var(--gold-l); letter-spacing:0.06em; }
     .session-bar button {
-      background: none; border: none; cursor: pointer;
-      font-size: 0.65rem; letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
-      transition: color 0.2s;
-      font-family: 'DM Sans', sans-serif;
+      background:none; border:none; cursor:pointer; font-size:0.65rem;
+      letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);
+      transition:color 0.2s; font-family:'DM Sans',sans-serif;
     }
-    .session-bar button:hover { color: #eb7070; }
+    .session-bar button:hover { color:#eb7070; }
 
-    /* ── Screen transitions ── */
-    .screen {
-      transition: opacity 0.35s ease, transform 0.35s ease;
+    .card-footer {
+      margin-top:2rem; padding-top:1.25rem;
+      border-top:1px solid rgba(184,150,46,0.14);
+      display:flex; align-items:center; justify-content:space-between;
     }
-    .screen.hidden {
-      display: none;
+    .card-footer span { font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.22); }
+    .secure { display:flex; align-items:center; gap:5px; font-size:0.67rem; letter-spacing:0.06em; color:rgba(255,255,255,0.22); }
+
+    /* Success state overlay */
+    .success-state {
+      text-align:center; padding:1.5rem 0;
     }
+    .success-icon {
+      width:56px; height:56px; border-radius:50%;
+      background:rgba(114,212,160,0.12);
+      border:1px solid rgba(114,212,160,0.3);
+      display:grid; place-items:center;
+      margin:0 auto 1.25rem;
+      font-size:1.4rem;
+    }
+    .success-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
+    .success-state h2 em { font-style:italic; color:#72d4a0; }
+    .success-state p { font-size:0.85rem; color:var(--muted); line-height:1.7; margin-bottom:1.75rem; }
+    .success-state .client-chip {
+      display:inline-block; background:rgba(184,150,46,0.1); border:1px solid var(--line);
+      border-radius:100px; padding:0.35rem 0.9rem; font-size:0.78rem;
+      color:var(--gold-l); margin-bottom:1.75rem;
+    }
+
+    .hidden { display:none !important; }
   </style>
 </head>
 <body>
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+  <div class="ring r4"></div>
 
-  <div class="ring ring-1"></div>
-  <div class="ring ring-2"></div>
-  <div class="ring ring-3"></div>
-  <div class="ring ring-4"></div>
-
-  <div class="card" id="mainCard">
-
+  <div class="card">
     <div class="logo">
       <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
     </div>
 
-    <!-- ══════════════════════════════
-         SCREEN 1 — LOGIN
-    ══════════════════════════════ -->
-    <div id="loginScreen" class="screen">
-      <div class="heading">
-        <h1>Installer <em>portal</em></h1>
-      </div>
+    <!-- ══════════ LOGIN ══════════ -->
+    <div id="loginScreen">
+      <h1>Installer <em>portal</em></h1>
       <p class="subhead">Authorised access only</p>
       <div class="divider"></div>
-
       <div class="field">
         <label>Username <span class="req">*</span></label>
         <input type="text" id="loginUsername" placeholder="Your username" autocomplete="username" />
@@ -279,101 +165,111 @@
         <label>Password <span class="req">*</span></label>
         <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
       </div>
-
-      <div class="submit-wrap">
-        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
-          <span>Sign in</span>
-        </button>
-        <div class="message" id="loginMsg"></div>
+      <div style="margin-top:1.5rem;">
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()"><span>Sign in</span></button>
+        <div class="msg" id="loginMsg"></div>
       </div>
-
       <div class="card-footer">
         <span>Nova Metrics &copy; 2026</span>
-        <div class="secure-badge">
-          <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-            <path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.35)"/>
-          </svg>
+        <div class="secure">
+          <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
           Secured
         </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════
-         SCREEN 2 — ADD CLIENT
-    ══════════════════════════════ -->
-    <div id="clientScreen" class="screen hidden">
-
-      <!-- Session bar -->
+    <!-- ══════════ ADD CLIENT ══════════ -->
+    <div id="clientScreen" class="hidden">
       <div class="session-bar" id="sessionBar">
-        <span class="session-user" id="sessionUser"></span>
+        <span class="su" id="sessionUser"></span>
         <button onclick="handleLogout()">Sign out</button>
       </div>
 
-      <div class="heading">
+      <!-- Add client form -->
+      <div id="addClientForm">
         <h1>Add a <em>new</em> client</h1>
+        <p class="subhead">Client onboarding</p>
+        <div class="divider"></div>
+        <form id="clientForm" novalidate>
+          <div class="field">
+            <label>Client name <span class="req">*</span></label>
+            <input type="text" id="client_name" placeholder="Full name" required autocomplete="name" />
+          </div>
+          <div class="field">
+            <label>Email address <span class="req">*</span></label>
+            <input type="email" id="client_email" placeholder="client@example.com" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label>Phone number</label>
+            <input type="tel" id="client_phone" placeholder="+27 00 000 0000" autocomplete="tel" />
+          </div>
+          <div class="field">
+            <label>Address</label>
+            <input type="text" id="client_address" placeholder="Street, City, Province" autocomplete="street-address" />
+          </div>
+          <div style="margin-top:1.75rem;">
+            <button type="submit" class="btn-primary" id="submitBtn"><span>Register client</span></button>
+            <div class="msg" id="clientMsg"></div>
+          </div>
+        </form>
+
+        <!-- Link to portal -->
+        <a href="proposal_portal.html" class="btn-secondary">View proposal portal →</a>
+
+        <div class="card-footer">
+          <span>Nova Metrics &copy; 2026</span>
+          <div class="secure">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
+            Secured
+          </div>
+        </div>
       </div>
-      <p class="subhead">Client onboarding</p>
-      <div class="divider"></div>
 
-      <form id="clientForm" novalidate>
-        <div class="field">
-          <label>Client name <span class="req">*</span></label>
-          <input type="text" id="client_name" placeholder="Full name" required autocomplete="name" />
-        </div>
-        <div class="field">
-          <label>Email address <span class="req">*</span></label>
-          <input type="email" id="client_email" placeholder="client@example.com" required autocomplete="email" />
-        </div>
-        <div class="field">
-          <label>Phone number</label>
-          <input type="tel" id="client_phone" placeholder="+27 00 000 0000" autocomplete="tel" />
-        </div>
-        <div class="field">
-          <label>Address</label>
-          <input type="text" id="client_address" placeholder="Street, City, Province" autocomplete="street-address" />
-        </div>
-
-        <div class="submit-wrap">
-          <button type="submit" class="btn-primary" id="submitBtn"><span>Register client</span></button>
-          <div class="message" id="clientMsg"></div>
-        </div>
-      </form>
-
-      <div class="card-footer">
-        <span>Nova Metrics &copy; 2026</span>
-        <div class="secure-badge">
-          <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-            <path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.35)"/>
-          </svg>
-          Secured
+      <!-- Success state (shown after client saved) -->
+      <div id="successState" class="success-state hidden">
+        <div class="success-icon">✓</div>
+        <h2>Client <em>registered</em></h2>
+        <div class="client-chip" id="successClientName"></div>
+        <p>The client has been saved. A proposal has been started and is ready to preview — open the proposal portal to review, complete, and send it.</p>
+        <a id="openPortalBtn" href="proposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
+          <span>Open proposal portal →</span>
+        </a>
+        <button onclick="resetForm()" class="btn-secondary" style="margin-top:0.75rem;">Add another client</button>
+        <div class="card-footer" style="margin-top:1.75rem;">
+          <span>Nova Metrics &copy; 2026</span>
+          <div class="secure">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>
+            Secured
+          </div>
         </div>
       </div>
     </div>
-
-  </div><!-- /card -->
+  </div>
 
   <script>
-    // ══════════════════════════════════════════════════════════
-    // APPROVED USERS — add/remove entries here as needed.
-    // Format:  'username': 'password'
-    // Replace these with your real credentials before deploying.
-    // ══════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════
+    // CONFIG — authorised users
+    // Format: 'username': { password, installer_id }
+    // installer_id must match your Supabase installers table
+    // ══════════════════════════════════════════════
     const USERS = {
-      'nova_admin':    'NM@2026!secure',
-      'installer_01':  'Solar#Installer1',
-      'installer_02':  'Solar#Installer2',
+      'nova_admin':   { password: 'NM@2026!secure',    installer_id: 1 },
+      'installer_01': { password: 'Solar#Installer1',  installer_id: 2 },
+      'installer_02': { password: 'Solar#Installer2',  installer_id: 3 },
     };
 
     const SESSION_KEY = 'nm_session';
+    let currentInstallerId = null;
 
-    // ── Boot: check existing session ──────────────────────────
+    // ── Boot ──────────────────────────────────────
     window.addEventListener('DOMContentLoaded', () => {
       const saved = sessionStorage.getItem(SESSION_KEY);
       if (saved) {
-        showClientScreen(saved);
+        try {
+          const s = JSON.parse(saved);
+          showClientScreen(s.username, s.installer_id);
+        } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
       }
-
-      // Allow Enter key on login fields
       ['loginUsername','loginPassword'].forEach(id => {
         document.getElementById(id).addEventListener('keydown', e => {
           if (e.key === 'Enter') handleLogin();
@@ -381,26 +277,20 @@
       });
     });
 
-    // ── Login handler ─────────────────────────────────────────
+    // ── Login ──────────────────────────────────────
     function handleLogin() {
-      const username = document.getElementById('loginUsername').value.trim();
-      const password = document.getElementById('loginPassword').value;
-      const btn      = document.getElementById('loginBtn');
-      const msg      = document.getElementById('loginMsg');
-
-      if (!username || !password) {
-        showMsg(msg, 'error', 'Please enter your username and password.');
-        return;
-      }
-
+      const u   = document.getElementById('loginUsername').value.trim();
+      const p   = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const msg = document.getElementById('loginMsg');
+      if (!u || !p) { showMsg(msg, 'error', 'Please enter your username and password.'); return; }
       btn.disabled = true;
       showMsg(msg, 'loading', 'Verifying…');
-
-      // Slight delay so it doesn't feel instant (UX)
       setTimeout(() => {
-        if (USERS[username] && USERS[username] === password) {
-          sessionStorage.setItem(SESSION_KEY, username);
-          showClientScreen(username);
+        const user = USERS[u];
+        if (user && user.password === p) {
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({ username: u, installer_id: user.installer_id }));
+          showClientScreen(u, user.installer_id);
         } else {
           showMsg(msg, 'error', 'Invalid credentials. Contact Nova Metrics to request access.');
           btn.disabled = false;
@@ -408,9 +298,9 @@
       }, 600);
     }
 
-    // ── Logout handler ────────────────────────────────────────
     function handleLogout() {
       sessionStorage.removeItem(SESSION_KEY);
+      currentInstallerId = null;
       document.getElementById('clientScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('loginUsername').value = '';
@@ -419,18 +309,17 @@
       document.getElementById('loginBtn').disabled = false;
     }
 
-    // ── Show client screen ────────────────────────────────────
-    function showClientScreen(username) {
+    function showClientScreen(username, installer_id) {
+      currentInstallerId = installer_id;
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('clientScreen').classList.remove('hidden');
       document.getElementById('sessionBar').style.display = 'flex';
       document.getElementById('sessionUser').textContent = '● ' + username;
     }
 
-    // ── Client form submit ────────────────────────────────────
+    // ── Client form ────────────────────────────────
     document.getElementById('clientForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const name    = document.getElementById('client_name').value.trim();
       const email   = document.getElementById('client_email').value.trim();
       const phone   = document.getElementById('client_phone').value.trim();
@@ -438,28 +327,36 @@
       const btn     = document.getElementById('submitBtn');
       const msg     = document.getElementById('clientMsg');
 
-      if (!name)  { showMsg(msg, 'error', 'Please enter the client name.');     return; }
-      if (!email) { showMsg(msg, 'error', 'Please enter an email address.');    return; }
+      if (!name)  { showMsg(msg, 'error', 'Please enter the client name.'); return; }
+      if (!email) { showMsg(msg, 'error', 'Please enter an email address.'); return; }
       if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) {
-        showMsg(msg, 'error', 'Please enter a valid phone number.');
-        return;
+        showMsg(msg, 'error', 'Please enter a valid phone number.'); return;
       }
 
-      showMsg(msg, 'loading', 'Submitting…');
+      showMsg(msg, 'loading', 'Saving client…');
       btn.disabled = true;
 
       try {
         const res = await fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/create-client', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_name: name, client_email: email, client_phone: phone, client_address: address })
+          body: JSON.stringify({
+            installer_id:   currentInstallerId,
+            client_name:    name,
+            client_email:   email,
+            client_phone:   phone,
+            client_address: address
+          })
         });
 
         if (!res.ok) throw new Error(`Server error ${res.status}`);
         const data = await res.json();
 
-        if (data.success) {
-          showMsg(msg, 'success', data.message || `Client registered — ID: ${data.client_id}`);
+        if (data.success && data.ai_id) {
+          // ✅ Got ai_id back — show success state and link to portal with ai_id
+          showSuccessState(name, data.ai_id);
+        } else if (data.success) {
+          showMsg(msg, 'success', data.message || 'Client registered.');
           document.getElementById('clientForm').reset();
         } else {
           showMsg(msg, 'error', data.error || 'Something went wrong. Please try again.');
@@ -471,8 +368,23 @@
       }
     });
 
+    function showSuccessState(clientName, aiId) {
+      document.getElementById('addClientForm').classList.add('hidden');
+      document.getElementById('successState').classList.remove('hidden');
+      document.getElementById('successClientName').textContent = clientName;
+      // Point the portal button directly to this proposal
+      document.getElementById('openPortalBtn').href = 'proposal_portal.html?ai_id=' + aiId;
+    }
+
+    function resetForm() {
+      document.getElementById('successState').classList.add('hidden');
+      document.getElementById('addClientForm').classList.remove('hidden');
+      document.getElementById('clientForm').reset();
+      document.getElementById('clientMsg').textContent = '';
+    }
+
     function showMsg(el, type, text) {
-      el.className = 'message ' + type;
+      el.className = 'msg ' + type;
       el.textContent = text;
     }
   </script>
