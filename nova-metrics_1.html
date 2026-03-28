@@ -138,7 +138,6 @@
             <div class="msg" id="clientMsg"></div>
           </div>
         </form>
-        <!-- FIX 1: correct filename prposal_portal.html -->
         <a href="prposal_portal.html" class="btn-secondary">View proposal portal →</a>
         <div class="card-footer">
           <span>Nova Metrics &copy; 2026</span>
@@ -152,8 +151,7 @@
         <h2>Client <em>registered</em></h2>
         <div class="client-chip" id="successClientName"></div>
         <p>The client has been saved to your pipeline. Head to the proposal portal to preview and send proposals.</p>
-        <!-- FIX 1: correct filename prposal_portal.html -->
-        <a href="prposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
+        <a id="portalBtn" href="prposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
           <span>Open proposal portal →</span>
         </a>
         <button onclick="resetForm()" class="btn-secondary" style="margin-top:0.75rem;">Add another client</button>
@@ -166,10 +164,10 @@
   </div>
 
   <script>
-    const SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-    const SESSION_KEY   = 'nm_installer_session';
-    let currentInstaller = null;
+    var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+    var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+    var SESSION_KEY   = 'nm_installer_session';
+    var currentInstaller = null;
 
     window.addEventListener('DOMContentLoaded', function() {
       var saved = sessionStorage.getItem(SESSION_KEY);
@@ -191,7 +189,9 @@
       showMsg(msg,'loading','Verifying…');
       try {
         var res = await fetch(
-          SUPABASE_URL + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email) + '&password=eq.' + encodeURIComponent(password) + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+          SUPABASE_URL + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email)
+          + '&password=eq.' + encodeURIComponent(password)
+          + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
           { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }
         );
         if (!res.ok) throw new Error('Connection error. Please try again.');
@@ -205,7 +205,7 @@
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentInstaller));
         showClientScreen();
       } catch(err) {
-        showMsg(msg,'error', err.message || 'Something went wrong.');
+        showMsg(msg,'error', err.message || 'Something went wrong. Please try again.');
         btn.disabled = false;
       }
     }
@@ -236,11 +236,14 @@
       var address = document.getElementById('client_address').value.trim();
       var btn     = document.getElementById('submitBtn');
       var msg     = document.getElementById('clientMsg');
+
       if (!name)  { showMsg(msg,'error','Please enter the client name.'); return; }
       if (!email) { showMsg(msg,'error','Please enter an email address.'); return; }
       if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
+
       showMsg(msg,'loading','Saving client…');
       btn.disabled = true;
+
       try {
         var res = await fetch(SUPABASE_URL + '/functions/v1/create-client', {
           method: 'POST',
@@ -255,9 +258,10 @@
         });
         if (!res.ok) throw new Error('Server error ' + res.status);
         var data = await res.json();
-        // FIX 2: check data.success only — create-client returns client_id, not ai_id
+
         if (data.success) {
-          showSuccessState(name);
+          // Pass ai_id to success state so portal button deep-links to the new proposal
+          showSuccessState(name, data.ai_id || null);
         } else {
           showMsg(msg,'error', data.error || 'Something went wrong. Please try again.');
         }
@@ -268,10 +272,15 @@
       }
     });
 
-    function showSuccessState(clientName) {
+    function showSuccessState(clientName, aiId) {
       document.getElementById('addClientForm').classList.add('hidden');
       document.getElementById('successState').classList.remove('hidden');
       document.getElementById('successClientName').textContent = clientName;
+      // Deep-link to the specific proposal if we have the ai_id
+      var portalHref = aiId
+        ? 'prposal_portal.html?ai_id=' + aiId
+        : 'prposal_portal.html';
+      document.getElementById('portalBtn').href = portalHref;
     }
 
     function resetForm() {
