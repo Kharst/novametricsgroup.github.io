@@ -305,9 +305,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
     document.getElementById('clientRows').innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
     try {
       var results = await Promise.all([
-        fetch(SUPABASE_URL+'/rest/v1/clients?select=id,client_name,client_email&installer_id=eq.'+installerId+'&order=client_name.asc', {headers:ANON_HDR}).then(function(r){return r.json();}),
-        fetch(SUPABASE_URL+'/rest/v1/ai_results?select=ai_id,client_email,pdf_url,status,total_cost,annual_savings,payback_years,system_size_kw,location,generated_at&installer_id=eq.'+installerId+'&order=ai_id.desc')
-      ]);
+  fetch(
+    SUPABASE_URL + '/rest/v1/clients?select=id,client_name,client_email&installer_id=eq.' + installerId + '&order=client_name.asc',
+    { headers: ANON_HDR }
+  ).then(function(r){ return r.json(); }),
+
+  fetch(
+    SUPABASE_URL + '/rest/v1/ai_results?select=ai_id,client_email,pdf_url,status,total_cost,annual_savings,payback_years,system_size_kw,location,generated_at&installer_id=eq.' + installerId + '&order=ai_id.desc',
+    { headers: ANON_HDR } // ✅ THIS WAS MISSING
+  ).then(function(r){ return r.json(); })
+]);
       var clients   = results[0] || [];
       var proposals = results[1] || [];
 
