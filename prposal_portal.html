@@ -320,15 +320,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
 
       proposalMap = {};
 
-// Always keep latest proposal per client (by ai_id)
+// Normalize emails to lowercase + trim
 proposals.forEach(function(p) {
   if (!p.client_email) return;
 
+  var email = p.client_email.trim().toLowerCase();
+
   if (
-    !proposalMap[p.client_email] ||
-    Number(p.ai_id) > Number(proposalMap[p.client_email].ai_id)
+    !proposalMap[email] ||
+    Number(p.ai_id) > Number(proposalMap[email].ai_id)
   ) {
-    proposalMap[p.client_email] = p;
+    proposalMap[email] = p;
   }
 });
 
@@ -373,7 +375,7 @@ if (window.__autoSelectAiId) {
     var el = document.getElementById('clientRows');
     if (!list||!list.length) { el.innerHTML = '<div class="empty-msg">No clients yet.<br>Add one from the portal.</div>'; return; }
     el.innerHTML = list.map(function(c) {
-      var prop  = proposalMap[c.client_email];
+      var prop = proposalMap[(c.client_email || '').trim().toLowerCase()];
       var ready = prop && (prop.pdf_url || prop.status === 'completed');
       var badge = prop
         ? (ready ? '<span class="badge badge-ready">Proposal ready</span>' : '<span class="badge badge-none">Processing…</span>')
@@ -402,7 +404,7 @@ if (window.__autoSelectAiId) {
   }
 
   function showProposalCard(clientEmail) {
-    var prop  = proposalMap[clientEmail];
+    var prop = proposalMap[(clientEmail || '').trim().toLowerCase()];
     var row   = document.querySelector('.client-row[data-email="'+clientEmail+'"]');
     var name  = row ? row.dataset.name : clientEmail;
     var card  = document.getElementById('proposalCard');
