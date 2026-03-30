@@ -1,3 +1,5 @@
+replace prposal_portal.html with this: 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -310,17 +312,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
       var proposals = results[1] || [];
 
       proposalMap = {};
-      proposals.forEach(function(p) {
-        if (p.client_email && !proposalMap[p.client_email]) {
-          proposalMap[p.client_email] = p; // store full row
-        }
-      });
+
+proposals.forEach(function(p) {
+  if (!p.client_email) return;
+
+  if (
+    !proposalMap[p.client_email] ||
+    Number(p.ai_id) > Number(proposalMap[p.client_email].ai_id)
+  ) {
+    proposalMap[p.client_email] = p;
+  }
+});
 
       allClients = clients;
       var count = allClients.length;
       document.getElementById('panelLabel').textContent = count + ' client' + (count!==1?'s':'');
       document.getElementById('searchBox').classList.toggle('hidden', count <= 4);
       renderClients(allClients);
+
+      setInterval(function() {
+  if (currentInstaller) {
+    loadClients(currentInstaller.installer_id);
+  }
+}, 15000); // every 15 sec
 
       // Auto-select if we had a param
       if (window.__autoSelectAiId) {
@@ -339,9 +353,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
     if (!list||!list.length) { el.innerHTML = '<div class="empty-msg">No clients yet.<br>Add one from the portal.</div>'; return; }
     el.innerHTML = list.map(function(c) {
       var prop  = proposalMap[c.client_email];
-      var ready = prop && !!prop.pdf_url;
+      var ready = prop && (prop.pdf_url || prop.status === 'completed');
       var badge = prop
-        ? (ready ? '<span class="badge badge-ready">Proposal ready</span>' : '<span class="badge badge-none">Generating…</span>')
+        ? (ready ? '<span class="badge badge-ready">Proposal ready</span>' : '<span class="badge badge-none">Processing…</span>')
         : '<span class="badge badge-none">No proposal</span>';
       return '<div class="client-row" data-email="'+c.client_email+'" data-name="'+escHtml(c.client_name)+'" data-ai="'+(prop?prop.ai_id:'')+'" data-ready="'+(ready?'1':'0')+'" onclick="selectClient(this)">'
         +'<div class="client-info"><div class="client-name-text">'+escHtml(c.client_name)+'</div><div class="client-email-text">'+escHtml(c.client_email)+'</div></div>'
