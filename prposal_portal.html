@@ -217,6 +217,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
   var proposalMap       = {};
   var selectedAiId      = null;
   var pendingRetryTimer = null;
+  var refreshInterval = null;
 
   // ── Boot ──────────────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', function() {
@@ -305,13 +306,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
     try {
       var results = await Promise.all([
         fetch(SUPABASE_URL+'/rest/v1/clients?select=id,client_name,client_email&installer_id=eq.'+installerId+'&order=client_name.asc', {headers:ANON_HDR}).then(function(r){return r.json();}),
-        fetch(SUPABASE_URL+'/rest/v1/ai_results?select=ai_id,client_email,pdf_url,total_cost,annual_savings,payback_years,system_size_kw,location,generated_at&installer_id=eq.'+installerId+'&order=ai_id.desc', {headers:ANON_HDR}).then(function(r){return r.json();})
+        fetch(SUPABASE_URL+'/rest/v1/ai_results?select=ai_id,client_email,pdf_url,status,total_cost,annual_savings,payback_years,system_size_kw,location,generated_at&installer_id=eq.'+installerId+'&order=ai_id.desc')
       ]);
       var clients   = results[0] || [];
       var proposals = results[1] || [];
 
       proposalMap = {};
 
+// Always keep latest proposal per client (by ai_id)
 proposals.forEach(function(p) {
   if (!p.client_email) return;
 
@@ -323,25 +325,38 @@ proposals.forEach(function(p) {
   }
 });
 
-      allClients = clients;
-      var count = allClients.length;
-      document.getElementById('panelLabel').textContent = count + ' client' + (count!==1?'s':'');
-      document.getElementById('searchBox').classList.toggle('hidden', count <= 4);
-      renderClients(allClients);
+allClients = clients;
 
-      setInterval(function() {
-  if (currentInstaller) {
-    loadClients(currentInstaller.installer_id);
+var count = allClients.length;
+document.getElementById('panelLabel').textContent =
+  count + ' client' + (count !== 1 ? 's' : '');
+
+document.getElementById('searchBox')
+  .classList.toggle('hidden', count <= 4);
+
+renderClients(allClients);
+
+// ✅ FIXED: Only create ONE interval (no duplicates)
+if (!refreshInterval) {
+  refreshInterval = setInterval(function() {
+    if (currentInstaller) {
+      loadClients(currentInstaller.installer_id);
+    }
+  }, 15000); // every 15 sec
+}
+
+// Auto-select if we had a param
+if (window.__autoSelectAiId) {
+  var target = window.__autoSelectAiId;
+  delete window.__autoSelectAiId;
+
+  var row = document.querySelector('.client-row[data-ai="' + target + '"]');
+
+  if (row) {
+    row.classList.add('active');
+    showProposalCard(row.dataset.email);
   }
-}, 15000); // every 15 sec
-
-      // Auto-select if we had a param
-      if (window.__autoSelectAiId) {
-        var target = window.__autoSelectAiId;
-        delete window.__autoSelectAiId;
-        var row = document.querySelector('.client-row[data-ai="'+target+'"]');
-        if (row) { row.classList.add('active'); showProposalCard(row.dataset.email); }
-      }
+}
     } catch(e) {
       document.getElementById('clientRows').innerHTML = '<div class="empty-msg">Failed to load clients.</div>';
     }
