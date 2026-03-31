@@ -341,11 +341,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
       return;
     }
 
-    frame.onload = function () {
-      showState('none');
-      frame.style.display = 'block';
-      frame.onload = null;
-    };
+    setTimeout(function () {
+  showState('none');
+  frame.style.display = 'block';
+}, 300);
 
     // 🔥 Load PDF directly (NO tracking triggered)
     frame.srcdoc = `
