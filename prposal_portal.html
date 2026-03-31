@@ -318,15 +318,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--night);color:rgba(255,255
     openProposalById(aiId);
   }
 
-  function openProposalById(aiId) {
-    selectedAiId = aiId;
-    showState('loading');
-    var frame = document.getElementById('previewFrame');
-    frame.style.display = 'none';
-    frame.onload = function() { showState('none'); frame.style.display = 'block'; frame.onload = null; };
-    setTimeout(function(){ frame.src = REVIEW_BASE + aiId; }, 80);
-    document.querySelectorAll('.client-row').forEach(function(r) { if (r.dataset.ai == aiId) r.classList.add('active'); });
+  async function openProposalById(aiId) {
+  selectedAiId = aiId;
+  showState('loading');
+
+  var frame = document.getElementById('previewFrame');
+  frame.style.display = 'none';
+
+  try {
+    // ✅ Get PDF URL directly (NO tracking)
+    var res = await fetch(
+      SUPABASE_URL + '/rest/v1/ai_results?select=pdf_url&ai_id=eq.' + aiId,
+      { headers: ANON_HDR }
+    );
+
+    var rows = await res.json();
+    var pdfUrl = rows && rows[0] ? rows[0].pdf_url : null;
+
+    if (!pdfUrl) {
+      showState('empty');
+      document.getElementById('stateEmptySub').textContent = 'PDF not found.';
+      return;
+    }
+
+    frame.onload = function () {
+      showState('none');
+      frame.style.display = 'block';
+      frame.onload = null;
+    };
+
+    // 🔥 Load PDF directly (NO tracking triggered)
+    frame.src = pdfUrl + "#toolbar=0&navpanes=0&scrollbar=1";
+
+  } catch (e) {
+    showState('empty');
+    document.getElementById('stateEmptySub').textContent = 'Failed to load PDF.';
   }
+
+  // keep row highlighted
+  document.querySelectorAll('.client-row').forEach(function(r) {
+    if (r.dataset.ai == aiId) r.classList.add('active');
+  });
+}
 
   function schedulePendingRetry(aiId) { clearRetryTimer(); pendingRetryTimer = setTimeout(function(){ pollProposal(aiId); }, 8000); }
   function retrySelected() { if (selectedAiId) pollProposal(selectedAiId); }
