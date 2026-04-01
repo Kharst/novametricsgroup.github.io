@@ -2,10 +2,13 @@
 <!--
   Nova Metrics — Proposal Portal
   ─────────────────────────────────────────────────────────────────────
-  • Auth:        reads nm_installer_session from sessionStorage (set by nova-metrics_1.html)
-  • Client list: fetches live from Supabase leads + ai_results per installer
-  • PDF URL:     /functions/v1/proposal-view/{ai_id}  (never the /storage URL)
-  • Add Client:  calls /functions/v1/create-client (same as nova-metrics_1.html)
+  AUTH FLOW:
+    1. Power BI passes ?ai_id=XXXX&email=installer@domain.com in URL
+    2. If ?email= matches a known installer → auto-auth silently (no login)
+    3. If session already exists → use it directly
+    4. Only if neither → redirect to nova-metrics_1.html for manual login
+  This means clicking "View Proposal" in Power BI opens the portal
+  instantly — no login screen, no wrong tab, straight to the proposal.
   ─────────────────────────────────────────────────────────────────────
 -->
 <html lang="en">
@@ -19,6 +22,14 @@
 :root{--navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden;}
+
+/* ── BOOT SCREEN (shown while auto-auth resolves) ── */
+.boot{position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;}
+.boot.hidden{display:none;}
+.boot-icon{width:48px;height:48px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--navy);}
+.boot-msg{font-size:13px;color:var(--muted);}
+.boot-spinner{width:20px;height:20px;border:2px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── SIDEBAR ── */
 .sidebar{width:260px;min-width:260px;background:var(--navy);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
@@ -51,7 +62,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sign-out-btn{font-size:12px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sign-out-btn:hover{color:#ef4444;}
 
-/* ── EMPTY / LOADING ── */
+/* ── EMPTY ── */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
 .e-icon{width:64px;height:64px;background:#f0f2f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;}
 .e-title{font-size:16px;font-weight:500;color:#374151;}.e-sub{font-size:13px;color:#9ca3af;}
@@ -61,7 +72,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-/* client header */
 .ch{background:var(--navy);border-radius:16px;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
 .ch::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.07) 0%,transparent 60%);pointer-events:none;}
 .ch-l{display:flex;align-items:center;gap:16px;}
@@ -75,7 +85,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .pill.r{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
 .pill.p{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
 
-/* stat cards */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
 .s-card{background:#fff;border-radius:13px;padding:17px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .s-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,37,64,.08);}
@@ -86,7 +95,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .s-unit{font-size:13px;font-weight:400;color:#6b7280;margin-left:1px;}
 .s-sub2{font-size:11px;color:#9ca3af;margin-top:4px;}
 
-/* spec cards */
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .sp-card{background:#fff;border-radius:13px;padding:18px 20px;border:1px solid #e8ecf0;}
 .sp-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
@@ -95,12 +103,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sp-row:last-child{border-bottom:none;}
 .sk{color:#6b7280;}.sv{color:var(--navy);font-weight:500;text-align:right;max-width:58%;}
 
-/* no proposal */
 .no-prop{background:#fff;border-radius:13px;padding:20px 22px;border:1.5px dashed #d1d5db;display:flex;align-items:center;gap:14px;}
 .np-ic{width:38px;height:38px;background:#f3f4f6;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
 .np-t{font-size:14px;font-weight:500;color:#374151;}.np-s{font-size:12px;color:#9ca3af;margin-top:2px;}
 
-/* download CTA */
 .dl{background:var(--navy);border-radius:16px;padding:24px 26px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;}
 .dl::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
 .dl-ey{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
@@ -133,8 +139,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .m-submit:not(:disabled):hover{opacity:.88;}
 .m-msg{margin-top:10px;font-size:12px;min-height:18px;text-align:center;}
 .m-msg.err{color:#eb7070;}.m-msg.ok{color:#72d4a0;}.m-msg.loading{color:var(--muted);}
-
-/* ── SUCCESS STATE in modal ── */
 .modal-success{display:none;text-align:center;padding:8px 0;}
 .modal-success.on{display:block;}
 .ms-icon{width:52px;height:52px;border-radius:50%;background:rgba(114,212,160,.12);border:1px solid rgba(114,212,160,.3);display:grid;place-items:center;margin:0 auto 16px;font-size:22px;}
@@ -150,6 +154,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 </style>
 </head>
 <body>
+
+<!-- Boot/loading screen — visible only during auto-auth -->
+<div class="boot" id="bootScreen">
+  <div class="boot-icon">N</div>
+  <div class="boot-spinner"></div>
+  <div class="boot-msg" id="bootMsg">Opening proposal…</div>
+</div>
 
 <!-- ── SIDEBAR ── -->
 <aside class="sidebar">
@@ -187,8 +198,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 
   <div class="empty" id="emptyState">
     <div class="e-icon">☀️</div>
-    <div class="e-title" id="emptyTitle">Select a client to view their proposal</div>
-    <div class="e-sub" id="emptySub">Click any client from the left panel to get started</div>
+    <div class="e-title">Select a client to view their proposal</div>
+    <div class="e-sub">Click any client from the left panel to get started</div>
   </div>
 
   <div class="detail" id="detailPanel">
@@ -265,8 +276,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 <div class="overlay" id="overlay">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
-
-    <!-- Form -->
     <div id="modalForm">
       <h2>Add a <em>new</em> client</h2>
       <p class="modal-sub">Client onboarding</p>
@@ -278,8 +287,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       <button class="m-submit" id="m_submit">Register client</button>
       <div class="m-msg" id="m_msg"></div>
     </div>
-
-    <!-- Success -->
     <div class="modal-success" id="modalSuccess">
       <div class="ms-icon">✓</div>
       <h2 class="ms-title">Client <em>registered</em></h2>
@@ -291,61 +298,108 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 </div>
 
 <script>
-var SUPA    = 'https://zloxcqrhkcohheeixfns.supabase.co';
-var ANON    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-var PDF_FN  = SUPA + '/functions/v1/proposal-view/';
+var SUPA        = 'https://zloxcqrhkcohheeixfns.supabase.co';
+var ANON        = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+var PDF_FN      = SUPA + '/functions/v1/proposal-view/';
 var SESSION_KEY = 'nm_installer_session';
 
-var installer = null;
+var installer  = null;
 var allClients = [];
+var params     = new URLSearchParams(window.location.search);
+var urlAiId    = params.get('ai_id');
+var urlEmail   = (params.get('email') || '').toLowerCase().trim();
 
-// ── AUTH ─────────────────────────────────────────────────────────────────
+// ── BOOT: resolve auth, then load portal ─────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
+  boot();
+});
+
+async function boot() {
+  // 1. Try existing session first
   var saved = sessionStorage.getItem(SESSION_KEY);
   if (saved) {
-    try { installer = JSON.parse(saved); } catch(e) {}
+    try {
+      installer = JSON.parse(saved);
+      // If URL email differs from session (different installer opened link), re-auth
+      if (urlEmail && installer.contact_email &&
+          installer.contact_email.toLowerCase() !== urlEmail) {
+        installer = null;
+      }
+    } catch(e) { installer = null; }
   }
+
+  // 2. If no valid session but URL has ?email= — auto-auth silently
+  //    This is the Power BI → portal flow. Email was generated inside
+  //    the authenticated Power BI session so we trust it to look up
+  //    the installer record (email only, no password needed here).
+  if (!installer && urlEmail) {
+    setBootMsg('Verifying access…');
+    try {
+      var res = await fetch(
+        SUPA + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(urlEmail)
+          + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
+      );
+      var rows = await res.json();
+      if (rows && rows.length) {
+        installer = rows[0];
+        // Store session so refreshes also skip login
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(installer));
+      }
+    } catch(e) { /* fall through to login redirect */ }
+  }
+
+  // 3. Still no session → go to login, preserving URL params so
+  //    after login the portal re-opens at the right proposal
   if (!installer) {
-    // not logged in — redirect to login
-    window.location.href = 'nova-metrics_1.html';
+    var returnUrl = encodeURIComponent(window.location.href);
+    window.location.href = 'nova-metrics_1.html?return=' + returnUrl;
     return;
   }
 
-  // show installer info
+  // 4. Auth resolved — populate UI and load clients
+  showPortal();
+}
+
+function showPortal() {
+  document.getElementById('bootScreen').classList.add('hidden');
   var av = (installer.installer_name || 'N').charAt(0).toUpperCase();
-  document.getElementById('instAv').textContent   = av;
-  document.getElementById('instName').textContent = installer.installer_name || 'Installer';
-  document.getElementById('instEmail').textContent = installer.contact_email || '';
-
+  document.getElementById('instAv').textContent    = av;
+  document.getElementById('instName').textContent  = installer.installer_name || 'Installer';
+  document.getElementById('instEmail').textContent = installer.contact_email  || '';
   loadClients();
-});
+}
 
+function setBootMsg(msg) {
+  document.getElementById('bootMsg').textContent = msg;
+}
+
+// ── SIGN OUT ──────────────────────────────────────────────────────────────
 document.getElementById('signOutBtn').addEventListener('click', function() {
   sessionStorage.removeItem(SESSION_KEY);
   window.location.href = 'nova-metrics_1.html';
 });
 
 // ── LOAD CLIENTS ─────────────────────────────────────────────────────────
-// Fetches unique leads for this installer, then latest ai_result per email
 async function loadClients() {
   var instId = installer.installer_id;
   try {
-    // 1. Get all leads for this installer
+    // Leads for this installer
     var leadsRes = await fetch(
-      SUPA + '/rest/v1/leads?installer_id=eq.' + instId + '&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',
+      SUPA + '/rest/v1/leads?installer_id=eq.' + instId
+        + '&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',
       { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
     );
     var leads = await leadsRes.json();
 
-    // Deduplicate by email, keep first occurrence
-    var seen = {};
-    var unique = [];
+    // Deduplicate by email
+    var seen = {}, unique = [];
     (leads || []).forEach(function(l) {
-      var key = (l.client_email || '').toLowerCase().trim();
-      if (key && !seen[key]) { seen[key] = true; unique.push(l); }
+      var k = (l.client_email || '').toLowerCase().trim();
+      if (k && !seen[k]) { seen[k] = true; unique.push(l); }
     });
 
-    // 2. Get latest ai_result per client email for this installer
+    // Latest ai_result per client email
     var aiRes = await fetch(
       SUPA + '/rest/v1/ai_results?installer_id=eq.' + instId
         + '&select=ai_id,client_email,client_name,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at'
@@ -354,42 +408,47 @@ async function loadClients() {
     );
     var aiRows = await aiRes.json();
 
-    // Index latest ai_result per email
     var aiByEmail = {};
     (aiRows || []).forEach(function(r) {
-      var key = (r.client_email || '').toLowerCase().trim();
-      if (key && !aiByEmail[key]) aiByEmail[key] = r; // already sorted desc, first = latest
+      var k = (r.client_email || '').toLowerCase().trim();
+      if (k && !aiByEmail[k]) aiByEmail[k] = r;
     });
 
-    // Merge
     allClients = unique.map(function(l) {
-      var key = (l.client_email || '').toLowerCase().trim();
-      var ai  = aiByEmail[key] || null;
-      return { lead: l, ai: ai };
+      var k = (l.client_email || '').toLowerCase().trim();
+      return { lead: l, ai: aiByEmail[k] || null };
     });
 
-    // Also add any clients in ai_results NOT in leads (edge case)
-    Object.keys(aiByEmail).forEach(function(key) {
-      var exists = unique.some(function(l) { return (l.client_email||'').toLowerCase().trim() === key; });
-      if (!exists) allClients.push({ lead: null, ai: aiByEmail[key] });
+    // Any ai_results not in leads
+    Object.keys(aiByEmail).forEach(function(k) {
+      var exists = unique.some(function(l) {
+        return (l.client_email || '').toLowerCase().trim() === k;
+      });
+      if (!exists) allClients.push({ lead: null, ai: aiByEmail[k] });
     });
 
     renderClientList();
 
-    // If deep-linked via ai_id param from nova-metrics_1.html
-    var params = new URLSearchParams(window.location.search);
-    var deepAiId = params.get('ai_id');
-    if (deepAiId) {
-      var idx = allClients.findIndex(function(c) { return c.ai && String(c.ai.ai_id) === String(deepAiId); });
+    // Auto-open proposal if ai_id was in URL
+    if (urlAiId) {
+      var idx = allClients.findIndex(function(c) {
+        return c.ai && String(c.ai.ai_id) === String(urlAiId);
+      });
       if (idx >= 0) {
         var rows = document.querySelectorAll('.c-row');
         if (rows[idx]) pick(idx, rows[idx]);
+        return;
       }
     }
 
+    // No specific proposal — just show the list
+    document.getElementById('emptyState').style.display = 'flex';
+
   } catch(err) {
-    document.getElementById('clientList').innerHTML = '<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
+    document.getElementById('clientList').innerHTML =
+      '<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
     document.getElementById('clientCount').textContent = 'Error';
+    document.getElementById('emptyState').style.display = 'flex';
   }
 }
 
@@ -400,12 +459,11 @@ function renderClientList() {
   document.getElementById('clientCount').textContent = count + ' Client' + (count !== 1 ? 's' : '');
 
   allClients.forEach(function(c, i) {
-    var name  = (c.ai && c.ai.client_name) || (c.lead && c.lead.client_name) || 'Unknown';
+    var name  = (c.ai && c.ai.client_name)  || (c.lead && c.lead.client_name)  || 'Unknown';
     var email = (c.ai && c.ai.client_email) || (c.lead && c.lead.client_email) || '';
     var has   = !!c.ai;
     var row   = document.createElement('div');
-    row.className   = 'c-row';
-    row.dataset.idx = i;
+    row.className = 'c-row'; row.dataset.idx = i;
     var shortEmail = email.length > 30 ? email.slice(0,28) + '…' : email;
     row.innerHTML =
       '<div><div class="c-name">' + esc(name) + '</div><div class="c-email">' + esc(shortEmail) + '</div></div>' +
@@ -424,20 +482,20 @@ function pick(idx, rowEl) {
   document.querySelectorAll('.c-row').forEach(function(r) { r.classList.remove('active'); });
   rowEl.classList.add('active');
 
-  var c     = allClients[idx];
-  var name  = (c.ai && c.ai.client_name)  || (c.lead && c.lead.client_name)  || 'Unknown';
-  var email = (c.ai && c.ai.client_email) || (c.lead && c.lead.client_email) || '—';
-  var has   = !!c.ai;
-  var ai    = c.ai;
+  var c    = allClients[idx];
+  var name = (c.ai && c.ai.client_name)  || (c.lead && c.lead.client_name)  || 'Unknown';
+  var email= (c.ai && c.ai.client_email) || (c.lead && c.lead.client_email) || '—';
+  var has  = !!c.ai;
+  var ai   = c.ai;
 
   document.getElementById('emptyState').style.display = 'none';
   var panel = document.getElementById('detailPanel');
   panel.classList.remove('on'); void panel.offsetWidth; panel.classList.add('on');
 
-  s('chAv', init(name));
-  s('chNm', name);
-  s('chEm', email);
-  s('chLoc', has ? (ai.location || c.lead && c.lead.address || '—') : (c.lead && c.lead.address || '—'));
+  s('chAv',  init(name));
+  s('chNm',  name);
+  s('chEm',  email);
+  s('chLoc', has ? (ai.location || (c.lead && c.lead.address) || '—') : ((c.lead && c.lead.address) || '—'));
   s('chSeg', has ? (ai.client_segment || '—') : '—');
   s('chDt',  has ? fmtDate(ai.created_at) : '—');
 
@@ -451,7 +509,6 @@ function pick(idx, rowEl) {
   vis('dlRow',      has, 'flex');
   if (!has) return;
 
-  // stat cards
   s('stKw',         round(ai.system_size_kw, 2));
   s('stPanels',     (ai.panel_number || '—') + ' × ' + (ai.panel_model || '—'));
   s('stAnnual',     fmt(ai.annual_savings));
@@ -459,27 +516,24 @@ function pick(idx, rowEl) {
   s('stMonthlySub', 'R ' + fmt(ai.monthly_savings) + ' / month saving');
   s('stPayback',    ai.payback_years || '—');
 
-  // spec — system
-  s('spPanel', ai.panel_model   || '—');
-  s('spCount', (ai.panel_number || '—') + ' units');
+  s('spPanel', ai.panel_model    || '—');
+  s('spCount', (ai.panel_number  || '—') + ' units');
   s('spKw',    round(ai.system_size_kw, 2) + ' kW DC');
   s('spInv',   ai.inverter_model || '—');
   s('spBatt',  ai.battery_model  || '—');
   s('spBkwh',  (ai.battery_capacity_kwh || '—') + ' kWh');
-  s('spLoad',  (ai.required_load_kw  || '—') + ' kW');
-  s('spAuto',  (ai.required_autonomy_hrs || '—') + ' hours');
+  s('spLoad',  (ai.required_load_kw     || '—') + ' kW');
+  s('spAuto',  (ai.required_autonomy_hrs|| '—') + ' hours');
 
-  // spec — financial & environmental
   s('spCost',  'R ' + fmt(ai.total_cost));
   s('spMon',   'R ' + fmt(ai.monthly_savings) + ' / month');
   s('spAnn',   'R ' + fmt(ai.annual_savings)  + ' / year');
   s('spLife',  'R ' + fmt(ai.lifetime_savings));
-  s('spSol',   fmt(Math.round(ai.annual_solar_kwh || 0)) + ' kWh / year');
-  s('spCO2',   round(ai.annual_co2_saved,  1) + ' tons / year');
-  s('spCoal',  round(ai.coal_avoided_tons, 1) + ' tons / year');
+  s('spSol',   fmt(Math.round(ai.annual_solar_kwh  || 0)) + ' kWh / year');
+  s('spCO2',   round(ai.annual_co2_saved,   1) + ' tons / year');
+  s('spCoal',  round(ai.coal_avoided_tons,  1) + ' tons / year');
   s('spTree',  fmt(Math.round(ai.trees_equivalent || 0)) + ' trees');
 
-  // download — ALWAYS uses the edge function with the latest ai_id
   s('dlTitle', 'Ready to send to ' + name.split(' ')[0]);
   s('dlSub',   'Generated ' + fmtDate(ai.created_at) + ' · AI-powered PDF');
   document.getElementById('dlBtn').onclick = function() {
@@ -490,15 +544,16 @@ function pick(idx, rowEl) {
 // ── ADD CLIENT MODAL ──────────────────────────────────────────────────────
 document.getElementById('addClientBtn').addEventListener('click', openModal);
 document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 
 function openModal() {
   document.getElementById('modalForm').style.display = 'block';
   document.getElementById('modalSuccess').classList.remove('on');
-  document.getElementById('m_name').value    = '';
-  document.getElementById('m_email').value   = '';
-  document.getElementById('m_phone').value   = '';
-  document.getElementById('m_address').value = '';
+  ['m_name','m_email','m_phone','m_address'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
   document.getElementById('m_msg').className = 'm-msg';
   document.getElementById('m_msg').textContent = '';
   document.getElementById('m_submit').disabled = false;
@@ -518,11 +573,11 @@ document.getElementById('m_submit').addEventListener('click', async function() {
   var btn     = document.getElementById('m_submit');
   var msg     = document.getElementById('m_msg');
 
-  if (!name)  { setMsg(msg, 'err', 'Please enter the client name.'); return; }
-  if (!email) { setMsg(msg, 'err', 'Please enter an email address.'); return; }
+  if (!name)  { setMsg(msg,'err','Please enter the client name.'); return; }
+  if (!email) { setMsg(msg,'err','Please enter an email address.'); return; }
 
   btn.disabled = true;
-  setMsg(msg, 'loading', 'Saving client…');
+  setMsg(msg,'loading','Saving client…');
 
   try {
     var res = await fetch(SUPA + '/functions/v1/create-client', {
@@ -539,17 +594,16 @@ document.getElementById('m_submit').addEventListener('click', async function() {
     if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
     if (data && data.success !== false) {
-      // Show success, then reload client list
       document.getElementById('modalForm').style.display = 'none';
       document.getElementById('msChip').textContent = name;
       document.getElementById('modalSuccess').classList.add('on');
-      loadClients(); // refresh the sidebar list
+      loadClients();
     } else {
-      setMsg(msg, 'err', (data && data.error) || 'Something went wrong.');
+      setMsg(msg,'err',(data && data.error) || 'Something went wrong.');
       btn.disabled = false;
     }
   } catch(err) {
-    setMsg(msg, 'err', 'Connection error: ' + err.message);
+    setMsg(msg,'err','Connection error: ' + err.message);
     btn.disabled = false;
   }
 });
@@ -558,23 +612,20 @@ document.getElementById('msClose').addEventListener('click', closeModal);
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function init(n){ return (n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase(); }
-function s(id,v){ var e=document.getElementById(id); if(e) e.textContent = (v===null||v===undefined) ? '—' : v; }
-function vis(id, show, d){ var e=document.getElementById(id); if(e) e.style.display = show ? (d||'block') : 'none'; }
+function s(id,v){ var e=document.getElementById(id); if(e) e.textContent=(v===null||v===undefined)?'—':v; }
+function vis(id,show,d){ var e=document.getElementById(id); if(e) e.style.display=show?(d||'block'):'none'; }
 function esc(t){ return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmt(v){
-  var n = parseFloat(String(v||0).replace(/[\s,]/g,''));
-  return isNaN(n) ? (v||'—') : n.toLocaleString('en-ZA');
+  var n=parseFloat(String(v||0).replace(/[\s,]/g,''));
+  return isNaN(n)?(v||'—'):n.toLocaleString('en-ZA');
 }
-function round(v, dp){
-  var n = parseFloat(v);
-  return isNaN(n) ? '—' : n.toFixed(dp||0);
-}
+function round(v,dp){ var n=parseFloat(v); return isNaN(n)?'—':n.toFixed(dp||0); }
 function fmtDate(iso){
-  if (!iso) return '—';
-  var d = new Date(iso);
-  return isNaN(d) ? '—' : d.toLocaleDateString('en-ZA', { day:'numeric', month:'short', year:'numeric' });
+  if(!iso) return '—';
+  var d=new Date(iso);
+  return isNaN(d)?'—':d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
 }
-function setMsg(el, type, text){ el.className='m-msg '+type; el.textContent=text; }
+function setMsg(el,type,text){ el.className='m-msg '+type; el.textContent=text; }
 </script>
 </body>
 </html>
