@@ -537,10 +537,9 @@ function pick(idx, rowEl) {
   s('dlTitle', 'Ready to send to ' + name.split(' ')[0]);
   s('dlSub',   'Generated ' + fmtDate(ai.created_at) + ' · AI-powered PDF');
   document.getElementById('dlBtn').onclick = async function() {
-
   try {
-    // 1. Send email FIRST
-    await fetch(SUPA + '/functions/v1/send-proposal-email', {
+    // Send email (non-blocking safe)
+    fetch(SUPA + '/functions/v1/send-proposal-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -552,17 +551,13 @@ function pick(idx, rowEl) {
       })
     });
 
-    // 2. Then open PDF (this tracks view/download)
+    // Open PDF immediately (DO NOT WAIT)
     window.open(PDF_FN + ai.ai_id, '_blank');
 
   } catch (err) {
-    console.error('Email send failed:', err);
-    alert('Failed to send email');
+    console.error('Error:', err);
   }
-
 };
-  };
-}
 
 // ── ADD CLIENT MODAL ──────────────────────────────────────────────────────
 document.getElementById('addClientBtn').addEventListener('click', openModal);
