@@ -7,8 +7,11 @@
     2. If ?email= matches a known installer → auto-auth silently (no login)
     3. If session already exists → use it directly
     4. Only if neither → redirect to nova-metrics_1.html for manual login
-  This means clicking "View Proposal" in Power BI opens the portal
-  instantly — no login screen, no wrong tab, straight to the proposal.
+  ─────────────────────────────────────────────────────────────────────
+  DASHBOARD TAB:
+    - "Analytics" tab now embeds the PowerBI app directly in the portal
+    - Uses the public PowerBI app embed URL (no Azure token needed)
+    - Installer never leaves the portal — one unified experience
   ─────────────────────────────────────────────────────────────────────
 -->
 <html lang="en">
@@ -23,7 +26,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden;}
 
-/* ── BOOT SCREEN (shown while auto-auth resolves) ── */
+/* ── BOOT SCREEN ── */
 .boot{position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;}
 .boot.hidden{display:none;}
 .boot-icon{width:48px;height:48px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--navy);}
@@ -61,6 +64,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .nav-a{font-size:12px;color:#6b7280;text-decoration:none;}.nav-a.hi{color:var(--navy);font-weight:500;}
 .sign-out-btn{font-size:12px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sign-out-btn:hover{color:#ef4444;}
+
+/* ── PROPOSALS TAB CONTENT ── */
+.tab-content{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.tab-content.on{display:flex;}
+
+/* ── ANALYTICS / POWERBI EMBED ── */
+#analyticsTab{background:#f4f6f9;position:relative;}
+.pbi-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+.pbi-frame{flex:1;width:100%;border:none;background:#f4f6f9;min-height:0;}
+.pbi-loading{position:absolute;inset:0;background:#f4f6f9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:10;transition:opacity .4s;}
+.pbi-loading.gone{opacity:0;pointer-events:none;}
+.pbi-spin{width:36px;height:36px;border:3px solid rgba(11,31,58,.1);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;}
+.pbi-load-txt{font-size:13px;color:#6b7280;font-weight:500;}
+.pbi-load-sub{font-size:11px;color:#9ca3af;}
+.pbi-error{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#6b7280;padding:40px;}
+.pbi-error.on{display:flex;}
+.pbi-err-icon{width:56px;height:56px;background:#fee2e2;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.pbi-err-title{font-size:16px;font-weight:600;color:#374151;}
+.pbi-err-sub{font-size:13px;color:#9ca3af;text-align:center;max-width:360px;line-height:1.6;}
+.pbi-open-btn{padding:10px 22px;background:var(--navy);color:#fff;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:4px;}
+.pbi-open-btn:hover{opacity:.85;}
 
 /* ── EMPTY ── */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
@@ -155,7 +179,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 </head>
 <body>
 
-<!-- Boot/loading screen — visible only during auto-auth -->
+<!-- Boot/loading screen -->
 <div class="boot" id="bootScreen">
   <div class="boot-icon">N</div>
   <div class="boot-spinner"></div>
@@ -186,98 +210,131 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 <main class="main">
   <div class="topbar">
     <div class="t-tabs">
-      <button class="t-btn on">Proposals</button>
-      <button class="t-btn">Analytics</button>
+      <button class="t-btn on" id="tabProposals" onclick="switchTab('proposals')">Proposals</button>
+      <button class="t-btn" id="tabAnalytics" onclick="switchTab('analytics')">Analytics</button>
     </div>
     <div class="t-right">
       <a href="nova-metrics_1.html" class="nav-a">Add Client</a>
-      <a href="#" class="nav-a hi">Nova Metrics</a>
+      <a href="#" class="nav-a hi" id="navInstallerName">Nova Metrics</a>
       <button class="sign-out-btn" id="signOutBtn">Sign out</button>
     </div>
   </div>
 
-  <div class="empty" id="emptyState">
-    <div class="e-icon">☀️</div>
-    <div class="e-title">Select a client to view their proposal</div>
-    <div class="e-sub">Click any client from the left panel to get started</div>
-  </div>
+  <!-- ── PROPOSALS TAB ── -->
+  <div class="tab-content on" id="proposalsTab">
+    <div class="empty" id="emptyState">
+      <div class="e-icon">☀️</div>
+      <div class="e-title">Select a client to view their proposal</div>
+      <div class="e-sub">Click any client from the left panel to get started</div>
+    </div>
 
-  <div class="detail" id="detailPanel">
-    <div class="ch">
-      <div class="ch-l">
-        <div class="ch-av" id="chAv">?</div>
-        <div>
-          <div class="ch-nm" id="chNm">—</div>
-          <div class="ch-sub" id="chEm">—</div>
-          <div class="ch-meta">
-            <div class="ch-mi">📍 <strong id="chLoc">—</strong></div>
-            <div class="ch-mi">⚡ <strong id="chSeg">—</strong></div>
-            <div class="ch-mi">📅 <strong id="chDt">—</strong></div>
+    <div class="detail" id="detailPanel">
+      <div class="ch">
+        <div class="ch-l">
+          <div class="ch-av" id="chAv">?</div>
+          <div>
+            <div class="ch-nm" id="chNm">—</div>
+            <div class="ch-sub" id="chEm">—</div>
+            <div class="ch-meta">
+              <div class="ch-mi">📍 <strong id="chLoc">—</strong></div>
+              <div class="ch-mi">⚡ <strong id="chSeg">—</strong></div>
+              <div class="ch-mi">📅 <strong id="chDt">—</strong></div>
+            </div>
           </div>
         </div>
+        <div class="pill p" id="chPill">No Proposal</div>
       </div>
-      <div class="pill p" id="chPill">No Proposal</div>
-    </div>
 
-    <div class="no-prop" id="noPropRow">
-      <div class="np-ic">📋</div>
-      <div><div class="np-t">No proposal generated yet</div><div class="np-s">Open Solar Intelligence to design and generate a proposal for this client.</div></div>
-    </div>
-
-    <div class="stats" id="statsRow" style="display:none">
-      <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div><div class="s-sub2" id="stPanels">—</div></div>
-      <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom bill</div></div>
-      <div class="s-card cbl"><div class="s-lbl2">System Cost</div><div class="s-val">R <span id="stCost">—</span></div><div class="s-sub2" id="stMonthlySub">—</div></div>
-      <div class="s-card ctl"><div class="s-lbl2">Payback Period</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
-    </div>
-
-    <div class="specs" id="specsRow" style="display:none">
-      <div class="sp-card">
-        <div class="sp-title"><div class="dot g"></div>System Design</div>
-        <div class="sp-row"><span class="sk">Panel Model</span><span class="sv" id="spPanel">—</span></div>
-        <div class="sp-row"><span class="sk">Panel Count</span><span class="sv" id="spCount">—</span></div>
-        <div class="sp-row"><span class="sk">System Size (DC)</span><span class="sv" id="spKw">—</span></div>
-        <div class="sp-row"><span class="sk">Inverter</span><span class="sv" id="spInv">—</span></div>
-        <div class="sp-row"><span class="sk">Battery Model</span><span class="sv" id="spBatt">—</span></div>
-        <div class="sp-row"><span class="sk">Battery Capacity</span><span class="sv" id="spBkwh">—</span></div>
-        <div class="sp-row"><span class="sk">Peak Load</span><span class="sv" id="spLoad">—</span></div>
-        <div class="sp-row"><span class="sk">Backup Target</span><span class="sv" id="spAuto">—</span></div>
+      <div class="no-prop" id="noPropRow">
+        <div class="np-ic">📋</div>
+        <div><div class="np-t">No proposal generated yet</div><div class="np-s">Open Solar Intelligence to design and generate a proposal for this client.</div></div>
       </div>
-      <div class="sp-card">
-        <div class="sp-title"><div class="dot gn"></div>Financial &amp; Environmental</div>
-        <div class="sp-row"><span class="sk">Total System Cost</span><span class="sv" id="spCost">—</span></div>
-        <div class="sp-row"><span class="sk">Monthly Saving</span><span class="sv" id="spMon">—</span></div>
-        <div class="sp-row"><span class="sk">Annual Saving</span><span class="sv" id="spAnn">—</span></div>
-        <div class="sp-row"><span class="sk">25-yr Lifetime Saving</span><span class="sv" id="spLife">—</span></div>
-        <div class="sp-row"><span class="sk">Annual Solar Yield</span><span class="sv" id="spSol">—</span></div>
-        <div class="sp-row"><span class="sk">CO₂ Avoided</span><span class="sv" id="spCO2">—</span></div>
-        <div class="sp-row"><span class="sk">Coal Avoided</span><span class="sv" id="spCoal">—</span></div>
-        <div class="sp-row"><span class="sk">Trees Equivalent</span><span class="sv" id="spTree">—</span></div>
-      </div>
-    </div>
 
-    <div class="dl" id="dlRow" style="display:none">
-      <div>
-        <div class="dl-ey">Proposal Document</div>
-        <div class="dl-ti" id="dlTitle">Ready to send</div>
-        <div class="dl-su" id="dlSub">—</div>
+      <div class="stats" id="statsRow" style="display:none">
+        <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div><div class="s-sub2" id="stPanels">—</div></div>
+        <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom bill</div></div>
+        <div class="s-card cbl"><div class="s-lbl2">System Cost</div><div class="s-val">R <span id="stCost">—</span></div><div class="s-sub2" id="stMonthlySub">—</div></div>
+        <div class="s-card ctl"><div class="s-lbl2">Payback Period</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
       </div>
-      <div style="display:flex; gap:10px;">
-  <button class="dl-btn" id="dlBtn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-      <polyline points="7 10 12 15 17 10"/>
-      <line x1="12" y1="15" x2="12" y2="3"/>
-    </svg>
-    Download Proposal
-  </button>
 
-  <button class="dl-btn" id="sendBtn" style="background:#22c55e; color:#fff;">
-    Email to Client
-  </button>
-</div>
+      <div class="specs" id="specsRow" style="display:none">
+        <div class="sp-card">
+          <div class="sp-title"><div class="dot g"></div>System Design</div>
+          <div class="sp-row"><span class="sk">Panel Model</span><span class="sv" id="spPanel">—</span></div>
+          <div class="sp-row"><span class="sk">Panel Count</span><span class="sv" id="spCount">—</span></div>
+          <div class="sp-row"><span class="sk">System Size (DC)</span><span class="sv" id="spKw">—</span></div>
+          <div class="sp-row"><span class="sk">Inverter</span><span class="sv" id="spInv">—</span></div>
+          <div class="sp-row"><span class="sk">Battery Model</span><span class="sv" id="spBatt">—</span></div>
+          <div class="sp-row"><span class="sk">Battery Capacity</span><span class="sv" id="spBkwh">—</span></div>
+          <div class="sp-row"><span class="sk">Peak Load</span><span class="sv" id="spLoad">—</span></div>
+          <div class="sp-row"><span class="sk">Backup Target</span><span class="sv" id="spAuto">—</span></div>
+        </div>
+        <div class="sp-card">
+          <div class="sp-title"><div class="dot gn"></div>Financial &amp; Environmental</div>
+          <div class="sp-row"><span class="sk">Total System Cost</span><span class="sv" id="spCost">—</span></div>
+          <div class="sp-row"><span class="sk">Monthly Saving</span><span class="sv" id="spMon">—</span></div>
+          <div class="sp-row"><span class="sk">Annual Saving</span><span class="sv" id="spAnn">—</span></div>
+          <div class="sp-row"><span class="sk">25-yr Lifetime Saving</span><span class="sv" id="spLife">—</span></div>
+          <div class="sp-row"><span class="sk">Annual Solar Yield</span><span class="sv" id="spSol">—</span></div>
+          <div class="sp-row"><span class="sk">CO₂ Avoided</span><span class="sv" id="spCO2">—</span></div>
+          <div class="sp-row"><span class="sk">Coal Avoided</span><span class="sv" id="spCoal">—</span></div>
+          <div class="sp-row"><span class="sk">Trees Equivalent</span><span class="sv" id="spTree">—</span></div>
+        </div>
+      </div>
+
+      <div class="dl" id="dlRow" style="display:none">
+        <div>
+          <div class="dl-ey">Proposal Document</div>
+          <div class="dl-ti" id="dlTitle">Ready to send</div>
+          <div class="dl-su" id="dlSub">—</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="dl-btn" id="dlBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download Proposal
+          </button>
+          <button class="dl-btn" id="sendBtn" style="background:#22c55e; color:#fff;">
+            Email to Client
+          </button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- ── ANALYTICS TAB (PowerBI embedded) ── -->
+  <div class="tab-content" id="analyticsTab">
+    <div class="pbi-wrap">
+      <!-- Loading overlay — fades out once iframe reports load -->
+      <div class="pbi-loading" id="pbiLoading">
+        <div class="pbi-spin"></div>
+        <div class="pbi-load-txt">Loading Solar Intelligence Dashboard</div>
+        <div class="pbi-load-sub">This may take a few seconds…</div>
+      </div>
+
+      <!-- PowerBI App embedded iframe -->
+      <iframe
+        id="pbiFrame"
+        class="pbi-frame"
+        allowfullscreen="true"
+        src=""
+        title="Solar Intelligence Dashboard"
+        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
+      ></iframe>
+
+      <!-- Fallback shown if iframe is blocked (e.g. browser privacy settings) -->
+      <div class="pbi-error" id="pbiError">
+        <div class="pbi-err-icon">📊</div>
+        <div class="pbi-err-title">Dashboard blocked by browser</div>
+        <div class="pbi-err-sub">Your browser is preventing the dashboard from embedding here. Click below to open it in a new tab — you'll still be logged in here when you return.</div>
+        <button class="pbi-open-btn" id="pbiOpenBtn">Open Dashboard in New Tab</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- ── ADD CLIENT MODAL ── -->
@@ -311,11 +368,74 @@ var ANON        = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var PDF_FN      = SUPA + '/functions/v1/proposal-view/';
 var SESSION_KEY = 'nm_installer_session';
 
+// PowerBI App URL — embed directly, installer stays in portal
+var PBI_EMBED_URL = 'https://app.powerbi.com/Redirect?action=OpenApp&appId=691e58bd-3622-4cc6-9f49-d74337a610a7&ctid=c551f4fd-a647-4c1a-b83e-be31dbea4377&experience=power-bi&clientSideAuth=0&refreshAccessToken=true';
+
 var installer  = null;
 var allClients = [];
 var params     = new URLSearchParams(window.location.search);
 var urlAiId    = params.get('ai_id');
 var urlEmail   = (params.get('email') || '').toLowerCase().trim();
+var pbiLoaded  = false;
+
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────
+function switchTab(tab) {
+  var proposalsTab  = document.getElementById('proposalsTab');
+  var analyticsTab  = document.getElementById('analyticsTab');
+  var btnProposals  = document.getElementById('tabProposals');
+  var btnAnalytics  = document.getElementById('tabAnalytics');
+
+  if (tab === 'analytics') {
+    proposalsTab.classList.remove('on');
+    analyticsTab.classList.add('on');
+    btnProposals.classList.remove('on');
+    btnAnalytics.classList.add('on');
+    loadPBI();
+  } else {
+    analyticsTab.classList.remove('on');
+    proposalsTab.classList.add('on');
+    btnAnalytics.classList.remove('on');
+    btnProposals.classList.add('on');
+  }
+}
+
+// ── POWERBI EMBED ──────────────────────────────────────────────────────────
+function loadPBI() {
+  if (pbiLoaded) return; // only load once
+  pbiLoaded = true;
+
+  var frame    = document.getElementById('pbiFrame');
+  var loading  = document.getElementById('pbiLoading');
+  var errorDiv = document.getElementById('pbiError');
+  var openBtn  = document.getElementById('pbiOpenBtn');
+
+  // Set the iframe src — this triggers the load
+  frame.src = PBI_EMBED_URL;
+
+  // Hide loading spinner once iframe fires load event
+  frame.addEventListener('load', function() {
+    setTimeout(function() {
+      loading.classList.add('gone');
+    }, 800); // small delay so content renders before spinner disappears
+  });
+
+  // If iframe fails to load within 15s, show the fallback open-in-tab button
+  var timeout = setTimeout(function() {
+    if (!loading.classList.contains('gone')) {
+      loading.style.display = 'none';
+      errorDiv.classList.add('on');
+    }
+  }, 15000);
+
+  frame.addEventListener('load', function() {
+    clearTimeout(timeout);
+  });
+
+  // Fallback button — opens in new tab if embed is blocked
+  openBtn.addEventListener('click', function() {
+    window.open(PBI_EMBED_URL, '_blank');
+  });
+}
 
 // ── BOOT: resolve auth, then load portal ─────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
@@ -323,12 +443,10 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 async function boot() {
-  // 1. Try existing session first
   var saved = sessionStorage.getItem(SESSION_KEY);
   if (saved) {
     try {
       installer = JSON.parse(saved);
-      // If URL email differs from session (different installer opened link), re-auth
       if (urlEmail && installer.contact_email &&
           installer.contact_email.toLowerCase() !== urlEmail) {
         installer = null;
@@ -336,10 +454,6 @@ async function boot() {
     } catch(e) { installer = null; }
   }
 
-  // 2. If no valid session but URL has ?email= — auto-auth silently
-  //    This is the Power BI → portal flow. Email was generated inside
-  //    the authenticated Power BI session so we trust it to look up
-  //    the installer record (email only, no password needed here).
   if (!installer && urlEmail) {
     setBootMsg('Verifying access…');
     try {
@@ -351,30 +465,34 @@ async function boot() {
       var rows = await res.json();
       if (rows && rows.length) {
         installer = rows[0];
-        // Store session so refreshes also skip login
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(installer));
       }
-    } catch(e) { /* fall through to login redirect */ }
+    } catch(e) { /* fall through */ }
   }
 
-  // 3. Still no session → go to login, preserving URL params so
-  //    after login the portal re-opens at the right proposal
   if (!installer) {
     var returnUrl = encodeURIComponent(window.location.href);
     window.location.href = 'nova-metrics_1.html?return=' + returnUrl;
     return;
   }
 
-  // 4. Auth resolved — populate UI and load clients
   showPortal();
 }
 
 function showPortal() {
   document.getElementById('bootScreen').classList.add('hidden');
   var av = (installer.installer_name || 'N').charAt(0).toUpperCase();
-  document.getElementById('instAv').textContent    = av;
-  document.getElementById('instName').textContent  = installer.installer_name || 'Installer';
-  document.getElementById('instEmail').textContent = installer.contact_email  || '';
+  document.getElementById('instAv').textContent          = av;
+  document.getElementById('instName').textContent        = installer.installer_name || 'Installer';
+  document.getElementById('instEmail').textContent       = installer.contact_email  || '';
+  document.getElementById('navInstallerName').textContent= installer.installer_name || 'Nova Metrics';
+
+  // If URL has ?tab=analytics, go straight to dashboard
+  var tabParam = params.get('tab');
+  if (tabParam === 'analytics') {
+    switchTab('analytics');
+  }
+
   loadClients();
 }
 
@@ -392,7 +510,6 @@ document.getElementById('signOutBtn').addEventListener('click', function() {
 async function loadClients() {
   var instId = installer.installer_id;
   try {
-    // Leads for this installer
     var leadsRes = await fetch(
       SUPA + '/rest/v1/leads?installer_id=eq.' + instId
         + '&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',
@@ -400,14 +517,12 @@ async function loadClients() {
     );
     var leads = await leadsRes.json();
 
-    // Deduplicate by email
     var seen = {}, unique = [];
     (leads || []).forEach(function(l) {
       var k = (l.client_email || '').toLowerCase().trim();
       if (k && !seen[k]) { seen[k] = true; unique.push(l); }
     });
 
-    // Latest ai_result per client email
     var aiRes = await fetch(
       SUPA + '/rest/v1/ai_results?installer_id=eq.' + instId
         + '&select=ai_id,client_email,client_name,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at'
@@ -427,7 +542,6 @@ async function loadClients() {
       return { lead: l, ai: aiByEmail[k] || null };
     });
 
-    // Any ai_results not in leads
     Object.keys(aiByEmail).forEach(function(k) {
       var exists = unique.some(function(l) {
         return (l.client_email || '').toLowerCase().trim() === k;
@@ -437,7 +551,6 @@ async function loadClients() {
 
     renderClientList();
 
-    // Auto-open proposal if ai_id was in URL
     if (urlAiId) {
       var idx = allClients.findIndex(function(c) {
         return c.ai && String(c.ai.ai_id) === String(urlAiId);
@@ -449,7 +562,6 @@ async function loadClients() {
       }
     }
 
-    // No specific proposal — just show the list
     document.getElementById('emptyState').style.display = 'flex';
 
   } catch(err) {
@@ -487,6 +599,11 @@ function renderClientList() {
 
 // ── SELECT CLIENT ─────────────────────────────────────────────────────────
 function pick(idx, rowEl) {
+  // Switch to proposals tab if on analytics
+  if (!document.getElementById('proposalsTab').classList.contains('on')) {
+    switchTab('proposals');
+  }
+
   document.querySelectorAll('.c-row').forEach(function(r) { r.classList.remove('active'); });
   rowEl.classList.add('active');
 
@@ -544,37 +661,27 @@ function pick(idx, rowEl) {
 
   s('dlTitle', 'Ready to send to ' + name.split(' ')[0]);
   s('dlSub',   'Generated ' + fmtDate(ai.created_at) + ' · AI-powered PDF');
+
   document.getElementById('dlBtn').onclick = function() {
-  window.open(PDF_FN + ai.ai_id, '_blank');
-};
+    window.open(PDF_FN + ai.ai_id, '_blank');
+  };
 
-document.getElementById('sendBtn').onclick = async function() {
-  try {
-    const res = await fetch(SUPA + '/functions/v1/send-proposal-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': ANON
-      },
-      body: JSON.stringify({
-        to: ai.client_email,
-        ai_id: ai.ai_id
-      })
-    });
-
-    if (res.ok) {
-      alert('Proposal sent to client ✅');
-    } else {
-      alert('Failed to send email ❌');
+  document.getElementById('sendBtn').onclick = async function() {
+    try {
+      var res = await fetch(SUPA + '/functions/v1/send-proposal-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': ANON },
+        body: JSON.stringify({ to: ai.client_email, ai_id: ai.ai_id })
+      });
+      if (res.ok) { alert('Proposal sent to client ✅'); }
+      else { alert('Failed to send email ❌'); }
+    } catch (err) {
+      console.error(err);
+      alert('Error sending email');
     }
+  };
+}
 
-  } catch (err) {
-    console.error(err);
-    alert('Error sending email');
-  }
-};
-
-} 
 // ── ADD CLIENT MODAL ──────────────────────────────────────────────────────
 document.getElementById('addClientBtn').addEventListener('click', openModal);
 document.getElementById('modalClose').addEventListener('click', closeModal);
