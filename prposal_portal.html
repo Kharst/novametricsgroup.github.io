@@ -536,27 +536,8 @@ function pick(idx, rowEl) {
 
   s('dlTitle', 'Ready to send to ' + name.split(' ')[0]);
   s('dlSub',   'Generated ' + fmtDate(ai.created_at) + ' · AI-powered PDF');
-  document.getElementById('dlBtn').onclick = async function() {
-  try {
-    // Send email (non-blocking safe)
-    fetch(SUPA + '/functions/v1/send-proposal-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': ANON
-      },
-      body: JSON.stringify({
-        to: ai.client_email,
-        ai_id: ai.ai_id
-      })
-    });
-
-    // Open PDF immediately (DO NOT WAIT)
-    window.open(PDF_FN + ai.ai_id, '_blank');
-
-  } catch (err) {
-    console.error('Error:', err);
-  }
+  document.getElementById('dlBtn').onclick = function() {
+  window.open(PDF_FN + ai.ai_id, '_blank');
 };
 }
 // ── ADD CLIENT MODAL ──────────────────────────────────────────────────────
