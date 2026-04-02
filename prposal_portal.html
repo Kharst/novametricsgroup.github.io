@@ -2,7 +2,8 @@
 <!--
   Nova Metrics — Proposal Portal
   AUTH: PowerBI passes ?ai_id=XXXX&email=installer@domain.com → auto-auth
-  ANALYTICS: Native dashboard built from Supabase ai_results (no PowerBI iframe)
+  ANALYTICS: 6-tab native dashboard matching Solar Intelligence PowerBI tabs exactly:
+    System Size · Battery · Financials · Environmental · Summary/Inverter · Pipeline
 -->
 <html lang="en">
 <head>
@@ -96,68 +97,80 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.3);}
 .dl-btn svg{width:16px;height:16px;flex-shrink:0;}
 
-/* ── ANALYTICS DASHBOARD ── */
-#analyticsTab{overflow-y:auto;}
-.dash{padding:24px 28px;display:flex;flex-direction:column;gap:20px;}
-.dash-header{display:flex;align-items:center;justify-content:space-between;}
-.dash-title{font-size:18px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;}
-.dash-sub{font-size:12px;color:#9ca3af;margin-top:2px;}
-.dash-refresh{padding:7px 14px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .15s;}
-.dash-refresh:hover{opacity:.8;}
-.dash-refresh svg{width:13px;height:13px;}
-.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
-.dash-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;}
-.dash-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
-.d-card{background:#fff;border-radius:13px;padding:18px 20px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
-.d-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,37,64,.07);}
-.d-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 13px 13px;}
-.d-gold::after{background:var(--gold);}
-.d-green::after{background:#22c55e;}
-.d-blue::after{background:#3b82f6;}
-.d-teal::after{background:#14b8a6;}
-.d-purple::after{background:#8b5cf6;}
-.d-orange::after{background:#f97316;}
-.d-lbl{font-size:11px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:8px;}
-.d-val{font-size:26px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1;}
-.d-unit{font-size:13px;font-weight:400;color:#6b7280;margin-left:2px;}
-.d-sub{font-size:11px;color:#9ca3af;margin-top:5px;}
-.d-icon{position:absolute;top:16px;right:16px;font-size:22px;opacity:.18;}
-.section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#9ca3af;margin-bottom:2px;margin-top:4px;}
-
-/* pipeline bar */
-.pipe-card{background:#fff;border-radius:13px;padding:20px 22px;border:1px solid #e8ecf0;}
-.pipe-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:7px;}
-.pipe-row{display:flex;align-items:center;gap:12px;margin-bottom:11px;}
-.pipe-row:last-child{margin-bottom:0;}
-.pipe-lbl{font-size:12px;color:#6b7280;width:130px;flex-shrink:0;}
-.pipe-bar-wrap{flex:1;height:8px;background:#f3f4f6;border-radius:4px;overflow:hidden;}
-.pipe-bar{height:100%;border-radius:4px;transition:width .6s ease;}
-.pipe-num{font-size:12px;font-weight:600;color:var(--navy);width:28px;text-align:right;}
-
-/* recent table */
-.rec-card{background:#fff;border-radius:13px;border:1px solid #e8ecf0;overflow:hidden;}
-.rec-head{padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;}
-.rec-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);}
-.rec-table{width:100%;border-collapse:collapse;}
-.rec-table th{font-size:10px;color:#9ca3af;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:10px 20px;text-align:left;border-bottom:1px solid #f3f4f6;}
-.rec-table td{font-size:12.5px;padding:11px 20px;border-bottom:1px solid #f9fafb;color:#374151;}
-.rec-table tr:last-child td{border-bottom:none;}
-.rec-table tr:hover td{background:#fafbfc;}
-.rec-badge{font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
-.rb-ready{background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.2);}
-.rb-pending{background:rgba(251,191,36,.1);color:#b45309;border:1px solid rgba(251,191,36,.2);}
-
-/* env card */
-.env-card{background:linear-gradient(135deg,#0B1F3A 0%,#1a3a5c 100%);border-radius:13px;padding:20px 22px;color:#fff;position:relative;overflow:hidden;}
-.env-card::before{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,215,0,.06);}
-.env-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
-.env-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.env-item{text-align:center;}
-.env-val{font-size:22px;font-weight:600;font-family:'DM Serif Display',serif;color:#fff;}
-.env-lbl{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;}
-
-.dash-loading{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#9ca3af;}
+/* ── ANALYTICS SHELL ── */
+#analyticsTab{overflow:hidden;flex-direction:column;}
+.dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.dash-stabs{display:flex;gap:3px;overflow-x:auto;}
+.dash-stab{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.dash-stab.on{background:#0B1F3A;color:#fff;}
+.dash-stab:hover:not(.on){background:#f3f4f6;}
+.dash-refresh{padding:6px 12px;background:#f3f4f6;color:#374151;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.dash-refresh:hover{background:#e5e7eb;}
+.dash-updated{font-size:10px;color:#9ca3af;margin-left:8px;}
+.dash-body{flex:1;overflow-y:auto;padding:20px 24px;}
+.dash-loading{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 .dash-spin{width:28px;height:28px;border:2px solid rgba(11,31,58,.1);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+.stab-pane{display:none;flex-direction:column;gap:16px;}
+.stab-pane.on{display:flex;}
+
+/* cards */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g2r{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;}
+.kpi{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px;}
+.kpi.gold::after{background:#FFD700;}.kpi.green::after{background:#22c55e;}.kpi.blue::after{background:#3b82f6;}
+.kpi.teal::after{background:#14b8a6;}.kpi.purple::after{background:#8b5cf6;}.kpi.orange::after{background:#f97316;}
+.kpi.red::after{background:#ef4444;}
+.kpi-lbl{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;}
+.kpi-val{font-size:24px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1;}
+.kpi-sub{font-size:11px;color:#9ca3af;margin-top:4px;}
+.kpi-status{font-size:11px;font-weight:600;margin-top:5px;padding:2px 8px;border-radius:20px;display:inline-block;}
+.st-green{background:rgba(34,197,94,.1);color:#16a34a;}
+.st-amber{background:rgba(245,158,11,.12);color:#b45309;}
+.st-red{background:rgba(239,68,68,.1);color:#b91c1c;}
+.st-grey{background:#f3f4f6;color:#6b7280;}
+
+.white-card{background:#fff;border-radius:12px;padding:18px 20px;border:1px solid #e8ecf0;}
+.wc-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.wc-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:12.5px;}
+.wc-row:last-child{border-bottom:none;}
+.wc-k{color:#6b7280;}.wc-v{color:var(--navy);font-weight:500;text-align:right;max-width:55%;}
+
+.dark-card{background:linear-gradient(135deg,#0B1F3A 0%,#14294a 100%);border-radius:12px;padding:18px 20px;color:#fff;position:relative;overflow:hidden;}
+.dark-card::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,215,0,.06);}
+.dc-title{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.dc-item{text-align:center;}
+.dc-val{font-size:20px;font-weight:600;font-family:'DM Serif Display',serif;color:#fff;}
+.dc-lbl{font-size:9px;color:rgba(255,255,255,.45);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;}
+
+/* pipe funnel */
+.pipe-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.pipe-row:last-child{margin-bottom:0;}
+.pipe-lbl{font-size:11.5px;color:#6b7280;width:140px;flex-shrink:0;}
+.pipe-bar-wrap{flex:1;height:7px;background:#f3f4f6;border-radius:4px;overflow:hidden;}
+.pipe-bar{height:100%;border-radius:4px;transition:width .6s ease;}
+.pipe-num{font-size:11.5px;font-weight:600;color:var(--navy);width:30px;text-align:right;}
+.pipe-pct{font-size:10px;color:#9ca3af;width:36px;text-align:right;}
+
+/* rate pills row */
+.rate-row{display:flex;gap:10px;flex-wrap:wrap;}
+.rate-pill{background:#f9fafb;border:1px solid #e8ecf0;border-radius:9px;padding:10px 14px;flex:1;min-width:120px;}
+.rp-lbl{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+.rp-val{font-size:18px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;margin-top:3px;}
+
+/* follow-up table */
+.ft{width:100%;border-collapse:collapse;}
+.ft th{font-size:10px;color:#9ca3af;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:9px 16px;text-align:left;border-bottom:1px solid #f3f4f6;}
+.ft td{font-size:12px;padding:10px 16px;border-bottom:1px solid #f9fafb;color:#374151;}
+.ft tr:last-child td{border-bottom:none;}
+.ft tr:hover td{background:#fafbfc;}
+.fp-hot{color:#dc2626;font-weight:600;}.fp-warm{color:#d97706;font-weight:600;}
+.fp-cold{color:#2563eb;font-weight:600;}.fp-wait{color:#6b7280;}
+.fp-closed{color:#16a34a;font-weight:600;}
 
 /* modal */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px);}
@@ -309,102 +322,197 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
   </div>
 
-  <!-- ── ANALYTICS TAB (native Supabase dashboard) ── -->
+  <!-- ── ANALYTICS TAB ── -->
   <div class="tab-content" id="analyticsTab">
-    <div class="dash-loading" id="dashLoading">
-      <div class="dash-spin"></div>
-      <div style="font-size:13px;color:#6b7280">Loading analytics…</div>
-    </div>
-    <div class="dash" id="dashContent" style="display:none">
-      <div class="dash-header">
-        <div>
-          <div class="dash-title">Solar Intelligence Analytics</div>
-          <div class="dash-sub" id="dashUpdated">Live from Supabase · updated just now</div>
+    <div class="dash-shell">
+      <div class="dash-topbar">
+        <div class="dash-stabs">
+          <button class="dash-stab on" onclick="switchDashTab('system')">☀️ System Size</button>
+          <button class="dash-stab" onclick="switchDashTab('battery')">🔋 Battery</button>
+          <button class="dash-stab" onclick="switchDashTab('financials')">💰 Financials</button>
+          <button class="dash-stab" onclick="switchDashTab('environmental')">🌱 Environmental</button>
+          <button class="dash-stab" onclick="switchDashTab('inverter')">⚡ Inverter</button>
+          <button class="dash-stab" onclick="switchDashTab('pipeline')">📊 Pipeline</button>
         </div>
-        <button class="dash-refresh" onclick="loadAnalytics(true)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Refresh
-        </button>
-      </div>
-
-      <!-- KPI Row 1 -->
-      <div>
-        <div class="section-title">Pipeline Overview</div>
-        <div class="dash-grid" style="margin-top:10px">
-          <div class="d-card d-gold"><div class="d-icon">📋</div><div class="d-lbl">Total Proposals</div><div class="d-val" id="dTotal">—</div><div class="d-sub">All time</div></div>
-          <div class="d-card d-green"><div class="d-icon">✅</div><div class="d-lbl">Proposals Ready</div><div class="d-val" id="dReady">—</div><div class="d-sub">PDF generated</div></div>
-          <div class="d-card d-blue"><div class="d-icon">📧</div><div class="d-lbl">Emails Sent</div><div class="d-val" id="dSent">—</div><div class="d-sub">To clients</div></div>
-          <div class="d-card d-teal"><div class="d-icon">👁</div><div class="d-lbl">Proposals Viewed</div><div class="d-val" id="dViewed">—</div><div class="d-sub">By client</div></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <button class="dash-refresh" onclick="loadAnalytics(true)">↻ Refresh</button>
+          <span class="dash-updated" id="dashUpdated"></span>
         </div>
       </div>
 
-      <!-- KPI Row 2 -->
-      <div>
-        <div class="section-title">Financial Averages</div>
-        <div class="dash-grid-3" style="margin-top:10px">
-          <div class="d-card d-gold"><div class="d-icon">💰</div><div class="d-lbl">Avg System Cost</div><div class="d-val" id="dAvgCost">—</div><div class="d-sub">Per proposal</div></div>
-          <div class="d-card d-green"><div class="d-icon">📈</div><div class="d-lbl">Avg Annual Saving</div><div class="d-val" id="dAvgSaving">—</div><div class="d-sub">vs. Eskom bill</div></div>
-          <div class="d-card d-blue"><div class="d-icon">⏱</div><div class="d-lbl">Avg Payback</div><div class="d-val" id="dAvgPayback">—<span class="d-unit">yrs</span></div><div class="d-sub">Escalating tariff</div></div>
-        </div>
+      <div class="dash-loading" id="dashLoading">
+        <div class="dash-spin"></div>
+        <div style="font-size:13px;color:#6b7280">Loading analytics…</div>
       </div>
 
-      <div class="dash-grid-2">
-        <!-- Pipeline funnel -->
-        <div class="pipe-card">
-          <div class="pipe-title"><div class="dot g"></div>Proposal Pipeline Funnel</div>
-          <div id="pipeFunnel">
-            <div class="pipe-row"><span class="pipe-lbl">Proposals Created</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar0" style="background:var(--gold);width:0%"></div></div><span class="pipe-num" id="pNum0">0</span></div>
-            <div class="pipe-row"><span class="pipe-lbl">PDFs Ready</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar1" style="background:#22c55e;width:0%"></div></div><span class="pipe-num" id="pNum1">0</span></div>
-            <div class="pipe-row"><span class="pipe-lbl">Emails Sent</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar2" style="background:#3b82f6;width:0%"></div></div><span class="pipe-num" id="pNum2">0</span></div>
-            <div class="pipe-row"><span class="pipe-lbl">Client Viewed</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar3" style="background:#14b8a6;width:0%"></div></div><span class="pipe-num" id="pNum3">0</span></div>
-            <div class="pipe-row"><span class="pipe-lbl">PDF Downloaded</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar4" style="background:#8b5cf6;width:0%"></div></div><span class="pipe-num" id="pNum4">0</span></div>
-            <div class="pipe-row"><span class="pipe-lbl">Client Engaged</span><div class="pipe-bar-wrap"><div class="pipe-bar" id="pBar5" style="background:#f97316;width:0%"></div></div><span class="pipe-num" id="pNum5">0</span></div>
+      <div class="dash-body" id="dashBody" style="display:none">
+
+        <!-- ── SYSTEM SIZE TAB ── -->
+        <div class="stab-pane on" id="pane-system">
+          <div class="g4">
+            <div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels per system</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day est.</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div>
           </div>
-        </div>
-
-        <!-- Environmental impact -->
-        <div class="env-card">
-          <div class="env-title">🌱 Environmental Impact</div>
-          <div class="env-grid">
-            <div class="env-item"><div class="env-val" id="eCo2">—</div><div class="env-lbl">Tons CO₂ Avoided</div></div>
-            <div class="env-item"><div class="env-val" id="eCoal">—</div><div class="env-lbl">Tons Coal Saved</div></div>
-            <div class="env-item"><div class="env-val" id="eTrees">—</div><div class="env-lbl">Trees Equivalent</div></div>
-          </div>
-          <div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)">
-            <div class="env-grid">
-              <div class="env-item"><div class="env-val" id="ePipelineVal">—</div><div class="env-lbl">Total Pipeline (R)</div></div>
-              <div class="env-item"><div class="env-val" id="eAvgKw">—</div><div class="env-lbl">Avg System kW</div></div>
-              <div class="env-item"><div class="env-val" id="eDownloads">—</div><div class="env-lbl">PDFs Downloaded</div></div>
+          <div class="g2">
+            <div class="white-card">
+              <div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div>
+              <div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div>
+              <div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div>
+              <div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div>
+              <div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div>
+              <div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div>
+            </div>
+            <div class="white-card">
+              <div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div>
+              <div id="sDistBody" style="font-size:12.5px;color:#374151"></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Recent proposals table -->
-      <div class="rec-card">
-        <div class="rec-head">
-          <div class="rec-title">Recent Proposals</div>
-          <div style="font-size:11px;color:#9ca3af" id="recCount">—</div>
+        <!-- ── BATTERY TAB ── -->
+        <div class="stab-pane" id="pane-battery">
+          <div class="g4">
+            <div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div>
+          </div>
+          <div class="g2">
+            <div class="white-card">
+              <div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div>
+              <div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div>
+              <div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div>
+              <div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div>
+              <div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div>
+              <div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div>
+            </div>
+            <div class="dark-card">
+              <div class="dc-title">🔋 Battery Portfolio Summary</div>
+              <div class="dc-grid">
+                <div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div>
+                <div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div>
+                <div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div>
+              </div>
+            </div>
+          </div>
         </div>
-        <table class="rec-table">
-          <thead>
-            <tr>
-              <th>Client</th>
-              <th>Location</th>
-              <th>System</th>
-              <th>Cost</th>
-              <th>Annual Saving</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody id="recBody">
-            <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px">Loading…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+
+        <!-- ── FINANCIALS TAB ── -->
+        <div class="stab-pane" id="pane-financials">
+          <div class="g4">
+            <div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div>
+          </div>
+          <div class="g2">
+            <div class="white-card">
+              <div class="wc-title"><div class="dot g"></div>Financial Averages</div>
+              <div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div>
+            </div>
+            <div class="dark-card">
+              <div class="dc-title">💰 Revenue Summary</div>
+              <div class="dc-grid">
+                <div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div>
+                <div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div>
+                <div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ENVIRONMENTAL TAB ── -->
+        <div class="stab-pane" id="pane-environmental">
+          <div class="g4">
+            <div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div>
+            <div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div>
+          </div>
+          <div class="g2">
+            <div class="white-card">
+              <div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div>
+              <div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div>
+              <div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div>
+              <div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div>
+              <div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div>
+              <div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div>
+            </div>
+            <div class="dark-card">
+              <div class="dc-title">🌍 Total Portfolio Impact</div>
+              <div class="dc-grid">
+                <div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div>
+                <div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div>
+                <div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── INVERTER TAB ── -->
+        <div class="stab-pane" id="pane-inverter">
+          <div class="g4">
+            <div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95–1.35</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div>
+          </div>
+          <div class="g2">
+            <div class="white-card">
+              <div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div>
+              <div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div>
+              <div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div>
+            </div>
+            <div class="white-card">
+              <div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div>
+              <div id="iRatioStatus" style="font-size:12.5px;color:#374151"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PIPELINE TAB ── -->
+        <div class="stab-pane" id="pane-pipeline">
+          <div class="g4">
+            <div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div>
+            <div class="kpi teal"><div class="kpi-lbl">Clients Engaged</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">responded / converted</div></div>
+          </div>
+          <!-- Conversion rates -->
+          <div class="rate-row" id="pRateRow"></div>
+          <!-- Funnel -->
+          <div class="white-card">
+            <div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div>
+            <div id="pFunnel"></div>
+          </div>
+          <!-- Follow-up table -->
+          <div class="white-card" style="padding:0;overflow:hidden;">
+            <div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div>
+              <div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div>
+            </div>
+            <table class="ft">
+              <thead><tr>
+                <th>Client</th><th>Location</th><th>Proposal Status</th><th>Follow-Up</th><th>Days Since Sent</th><th>System Cost</th>
+              </tr></thead>
+              <tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /dash-body -->
+    </div><!-- /dash-shell -->
+  </div><!-- /analyticsTab -->
+
 </main>
 
 <!-- ADD CLIENT MODAL -->
@@ -440,18 +548,31 @@ var SESSION_KEY = 'nm_installer_session';
 var installer   = null;
 var allClients  = [];
 var dashLoaded  = false;
+var dashData    = null;
 var params      = new URLSearchParams(window.location.search);
 var urlAiId     = params.get('ai_id');
 var urlEmail    = (params.get('email') || '').toLowerCase().trim();
+var activeDashTab = 'system';
 
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────
 function switchTab(tab) {
-  var isAnalytics = tab === 'analytics';
-  document.getElementById('proposalsTab').classList.toggle('on', !isAnalytics);
-  document.getElementById('analyticsTab').classList.toggle('on', isAnalytics);
-  document.getElementById('tabProposals').classList.toggle('on', !isAnalytics);
-  document.getElementById('tabAnalytics').classList.toggle('on', isAnalytics);
-  if (isAnalytics && !dashLoaded) loadAnalytics();
+  var isA = tab === 'analytics';
+  document.getElementById('proposalsTab').classList.toggle('on', !isA);
+  document.getElementById('analyticsTab').classList.toggle('on', isA);
+  document.getElementById('tabProposals').classList.toggle('on', !isA);
+  document.getElementById('tabAnalytics').classList.toggle('on', isA);
+  if (isA && !dashLoaded) loadAnalytics();
+}
+
+function switchDashTab(name) {
+  activeDashTab = name;
+  document.querySelectorAll('.dash-stab').forEach(function(b, i) {
+    var tabs = ['system','battery','financials','environmental','inverter','pipeline'];
+    b.classList.toggle('on', tabs[i] === name);
+  });
+  document.querySelectorAll('.stab-pane').forEach(function(p) { p.classList.remove('on'); });
+  var pane = document.getElementById('pane-' + name);
+  if (pane) pane.classList.add('on');
 }
 
 // ── ANALYTICS: load from Supabase ────────────────────────────────────────
@@ -459,157 +580,273 @@ async function loadAnalytics(forceRefresh) {
   if (dashLoaded && !forceRefresh) return;
   dashLoaded = true;
   document.getElementById('dashLoading').style.display = 'flex';
-  document.getElementById('dashContent').style.display = 'none';
+  document.getElementById('dashBody').style.display = 'none';
 
   try {
-    var instId = installer.installer_id;
     var res = await fetch(
-      SUPA + '/rest/v1/ai_results?installer_id=eq.' + instId +
-      '&select=ai_id,client_name,client_email,location,client_segment,system_size_kw,' +
-      'total_cost,annual_savings,monthly_savings,payback_years,lifetime_savings,' +
-      'annual_co2_saved,coal_avoided_tons,trees_equivalent,annual_solar_kwh,' +
-      'proposal_generated,email_sent_at,proposal_viewed_at,pdf_downloaded_at,' +
-      'download_count,view_count,client_engaged,whatsapp_sent_at,created_at,pdf_url' +
+      SUPA + '/rest/v1/ai_results?installer_id=eq.' + installer.installer_id +
+      '&select=ai_id,client_name,client_email,location,client_segment,' +
+      'system_size_kw,panel_model,panel_number,inverter_model,battery_model,' +
+      'battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,' +
+      'lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,' +
+      'trees_equivalent,required_load_kw,required_autonomy_hrs,annual_consumption_kwh,' +
+      'proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,' +
+      'pdf_downloaded_at,client_engaged,created_at,pdf_url,status' +
       '&order=created_at.desc',
       { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
     );
     var rows = await res.json();
     if (!Array.isArray(rows)) rows = [];
-
-    var total      = rows.length;
-    var ready      = rows.filter(function(r){ return r.proposal_generated; }).length;
-    var sent       = rows.filter(function(r){ return r.email_sent_at; }).length;
-    var viewed     = rows.filter(function(r){ return r.proposal_viewed_at; }).length;
-    var downloaded = rows.filter(function(r){ return r.pdf_downloaded_at; }).length;
-    var engaged    = rows.filter(function(r){ return r.client_engaged; }).length;
-
-    var avgCost    = avg(rows, 'total_cost');
-    var avgSaving  = avg(rows, 'annual_savings');
-    var avgPayback = avg(rows, 'payback_years');
-    var avgKw      = avg(rows, 'system_size_kw');
-    var totalCo2   = sum(rows, 'annual_co2_saved');
-    var totalCoal  = sum(rows, 'coal_avoided_tons');
-    var totalTrees = sum(rows, 'trees_equivalent');
-    var pipelineVal= sum(rows, 'total_cost');
-
-    // KPI cards
-    d('dTotal',   total);
-    d('dReady',   ready);
-    d('dSent',    sent);
-    d('dViewed',  viewed);
-    d('dAvgCost', total ? 'R ' + fmtK(avgCost) : '—');
-    d('dAvgSaving', total ? 'R ' + fmtK(avgSaving) : '—');
-    d('dAvgPayback', total ? avgPayback.toFixed(1) : '—');
-
-    // Funnel bars
-    var base = Math.max(total, 1);
-    setBar(0, total,      base);
-    setBar(1, ready,      base);
-    setBar(2, sent,       base);
-    setBar(3, viewed,     base);
-    setBar(4, downloaded, base);
-    setBar(5, engaged,    base);
-
-    // Environmental
-    d('eCo2',         totalCo2.toFixed(1));
-    d('eCoal',        totalCoal.toFixed(1));
-    d('eTrees',       Math.round(totalTrees).toLocaleString('en-ZA'));
-    d('ePipelineVal', 'R ' + fmtK(pipelineVal));
-    d('eAvgKw',       total ? avgKw.toFixed(2) + ' kW' : '—');
-    d('eDownloads',   downloaded);
-
-    // Recent table
-    d('recCount', total + ' proposal' + (total !== 1 ? 's' : ''));
-    var tbody = document.getElementById('recBody');
-    if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px">No proposals yet</td></tr>';
-    } else {
-      tbody.innerHTML = rows.slice(0, 20).map(function(r) {
-        var hasReady = r.proposal_generated || r.pdf_url;
-        return '<tr>' +
-          '<td><strong>' + esc(r.client_name || '—') + '</strong><br><span style="font-size:11px;color:#9ca3af">' + esc(r.client_email || '') + '</span></td>' +
-          '<td>' + esc(r.location || '—') + '</td>' +
-          '<td>' + (r.system_size_kw ? r.system_size_kw + ' kW' : '—') + '</td>' +
-          '<td>R ' + fmt(r.total_cost) + '</td>' +
-          '<td>R ' + fmt(r.annual_savings) + '/yr</td>' +
-          '<td><span class="rec-badge ' + (hasReady ? 'rb-ready' : 'rb-pending') + '">' + (hasReady ? 'Ready' : 'Pending') + '</span></td>' +
-          '<td>' + fmtDate(r.created_at) + '</td>' +
-        '</tr>';
-      }).join('');
-    }
-
-    document.getElementById('dashUpdated').textContent = 'Live from Supabase · updated ' + new Date().toLocaleTimeString('en-ZA', {hour:'2-digit',minute:'2-digit'});
+    dashData = rows;
+    renderAllDashTabs(rows);
+    document.getElementById('dashUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-ZA', {hour:'2-digit',minute:'2-digit'});
     document.getElementById('dashLoading').style.display = 'none';
-    document.getElementById('dashContent').style.display = 'flex';
-    if (forceRefresh) dashLoaded = false; // allow next refresh
-
+    document.getElementById('dashBody').style.display = 'block';
+    if (forceRefresh) dashLoaded = false;
   } catch(err) {
     document.getElementById('dashLoading').innerHTML = '<div style="color:#eb7070;font-size:13px">Failed to load analytics</div>';
   }
 }
 
-function setBar(idx, val, base) {
-  var pct = base > 0 ? Math.round((val / base) * 100) : 0;
-  document.getElementById('pBar' + idx).style.width = pct + '%';
-  document.getElementById('pNum' + idx).textContent = val;
+function renderAllDashTabs(rows) {
+  var completed = rows.filter(function(r){ return r.status === 'completed' || r.pdf_url; });
+
+  // ── SYSTEM SIZE ──
+  var avgKw     = avg(completed, 'system_size_kw');
+  var avgPanels = avg(completed, 'panel_number');
+  var avgYield  = avg(completed, 'annual_solar_kwh');
+  var avgDailySolar = avgYield / 365;
+  d('sAvgKw',     completed.length ? avgKw.toFixed(2) + ' kW' : '—');
+  d('sAvgPanels', completed.length ? Math.round(avgPanels) + ' panels' : '—');
+  d('sAvgSolar',  completed.length ? avgDailySolar.toFixed(1) + ' kWh' : '—');
+  d('sAvgYield',  completed.length ? Math.round(avgYield).toLocaleString('en-ZA') + ' kWh' : '—');
+  d('sKwDC',      completed.length ? avgKw.toFixed(2) + ' kW DC' : '—');
+  var topPanel = mode(completed, 'panel_model');
+  d('sPanelModel', topPanel || '—');
+  d('sPanelCount', completed.length ? Math.round(avgPanels) + ' units' : '—');
+  d('sPeakLoad',  completed.length ? avg(completed,'required_load_kw').toFixed(1) + ' kW' : '—');
+  d('sAutonomy',  completed.length ? avg(completed,'required_autonomy_hrs').toFixed(0) + ' hours' : '—');
+  // size distribution
+  var distBuckets = {'< 5 kW': 0, '5–10 kW': 0, '10–15 kW': 0, '> 15 kW': 0};
+  completed.forEach(function(r){ var kw=parseFloat(r.system_size_kw)||0; if(kw<5)distBuckets['< 5 kW']++;else if(kw<=10)distBuckets['5–10 kW']++;else if(kw<=15)distBuckets['10–15 kW']++;else distBuckets['> 15 kW']++; });
+  var distHtml = Object.keys(distBuckets).map(function(k){ return '<div class="wc-row"><span class="wc-k">'+k+'</span><span class="wc-v">'+distBuckets[k]+' proposals</span></div>'; }).join('');
+  document.getElementById('sDistBody').innerHTML = distHtml || '<div style="color:#9ca3af;font-size:12px;padding:8px 0">No data yet</div>';
+
+  // ── BATTERY ──
+  var avgBkwh    = avg(completed, 'battery_capacity_kwh');
+  var avgBhours  = avg(completed, 'required_autonomy_hrs');
+  var topBatt    = mode(completed, 'battery_model');
+  var totalBkwh  = sum(completed, 'battery_capacity_kwh');
+  var totalBcost = completed.reduce(function(a,r){ var tot=parseFloat(r.total_cost)||0, hw=(parseFloat(r.system_size_kw)||0)*1000*(parseFloat(r.total_cost)||0)/Math.max(parseFloat(r.system_size_kw)||1,1); return a+(parseFloat(r.battery_capacity_kwh)||0)*4000; }, 0);
+  d('bAvgKwh',   completed.length ? avgBkwh.toFixed(1) + ' kWh' : '—');
+  d('bAvgHours', completed.length ? avgBhours.toFixed(0) + ' hrs' : '—');
+  d('bTopModel', topBatt || '—');
+  d('bAvgCost',  '—');
+  d('bModel',    topBatt || '—');
+  d('bInstKwh',  completed.length ? avgBkwh.toFixed(1) + ' kWh avg' : '—');
+  d('bHours',    completed.length ? avgBhours.toFixed(0) + ' hrs avg' : '—');
+  d('bPeakLoad', completed.length ? avg(completed,'required_load_kw').toFixed(1) + ' kW avg' : '—');
+  d('bSegment',  mode(completed,'client_segment') || '—');
+  d('bTotalKwh', totalBkwh.toFixed(0) + ' kWh');
+  d('bTotalUnits', completed.length + ' systems');
+  d('bTotalCost', 'R ' + fmtK(sum(completed,'total_cost')));
+
+  // ── FINANCIALS ──
+  var totalPipe   = sum(completed, 'total_cost');
+  var avgAnnual   = avg(completed, 'annual_savings');
+  var avgCost     = avg(completed, 'total_cost');
+  var avgPayback  = avg(completed, 'payback_years');
+  var avgMonthly  = avg(completed, 'monthly_savings');
+  var avgLifetime = avg(completed, 'lifetime_savings');
+  d('fPipelineVal', 'R ' + fmtK(totalPipe));
+  d('fAvgAnnual',   'R ' + fmtK(avgAnnual));
+  d('fAvgCost',     'R ' + fmtK(avgCost));
+  d('fAvgPayback',  completed.length ? avgPayback.toFixed(1) + ' yrs' : '—');
+  d('fAvgMonthly',  'R ' + fmtK(avgMonthly) + ' / mo');
+  d('fAvgAnnual2',  'R ' + fmtK(avgAnnual) + ' / yr');
+  d('fAvgLifetime', 'R ' + fmtK(avgLifetime));
+  d('fAvgPayback2', completed.length ? avgPayback.toFixed(1) + ' years' : '—');
+  d('fAvgCost2',    'R ' + fmtK(avgCost));
+  d('fTotalPipeline', 'R ' + fmtK(totalPipe));
+  d('fTotalSavings',  'R ' + fmtK(sum(completed,'annual_savings')));
+  d('fProposalCount', completed.length);
+
+  // ── ENVIRONMENTAL ──
+  var totCo2   = sum(completed, 'annual_co2_saved');
+  var totCoal  = sum(completed, 'coal_avoided_tons');
+  var totTrees = sum(completed, 'trees_equivalent');
+  var totYield = sum(completed, 'annual_solar_kwh');
+  d('eTotalCo2',  totCo2.toFixed(1) + ' t');
+  d('eTotalCoal', totCoal.toFixed(1) + ' t');
+  d('eTotalTrees', Math.round(totTrees).toLocaleString('en-ZA'));
+  d('eTotalYield', Math.round(totYield/1000) + ' MWh');
+  d('eAvgCo2',    completed.length ? (totCo2/completed.length).toFixed(1) + ' t / yr' : '—');
+  d('eAvgCoal',   completed.length ? (totCoal/completed.length).toFixed(1) + ' t / yr' : '—');
+  d('eAvgTrees',  completed.length ? Math.round(totTrees/completed.length) + ' trees' : '—');
+  d('eAvgYield',  completed.length ? Math.round(totYield/completed.length).toLocaleString('en-ZA') + ' kWh' : '—');
+  d('eAvgConsumption', completed.length ? Math.round(avg(completed,'annual_consumption_kwh')).toLocaleString('en-ZA') + ' kWh' : '—');
+  d('eTotalCo2b',   totCo2.toFixed(1));
+  d('eTotalTreesb', Math.round(totTrees).toLocaleString('en-ZA'));
+  d('eTotalYieldb', (totYield/1000).toFixed(1) + ' MWh');
+
+  // ── INVERTER ──
+  var topInv = mode(completed, 'inverter_model');
+  var avgDCkW = avg(completed, 'system_size_kw');
+  var avgPeakLoad = avg(completed, 'required_load_kw');
+  // DC/AC ratio: DC / (peak * 1.3) approximation since portal doesn't have inverter AC kW
+  var avgRatio = avgPeakLoad > 0 ? avgDCkW / (avgPeakLoad * 1.3) : 0;
+  var ratioStatus = avgRatio < 0.95 ? 'Under-Utilised' : avgRatio <= 1.35 ? 'Balanced' : avgRatio <= 1.5 ? 'Pushing Limits' : 'Too Large (Clipping)';
+  var ratioColor = avgRatio <= 1.35 ? '#16a34a' : avgRatio <= 1.5 ? '#d97706' : '#dc2626';
+  d('iTopModel', topInv || '—');
+  d('iAvgRatio', completed.length ? avgRatio.toFixed(2) : '—');
+  d('iAvgDC',    completed.length ? avgDCkW.toFixed(2) + ' kW' : '—');
+  d('iAvgPeak',  completed.length ? avgPeakLoad.toFixed(1) + ' kW' : '—');
+  d('iModel',    topInv || '—');
+  d('iRatio',    completed.length ? avgRatio.toFixed(2) : '—');
+  d('iReqAC',    completed.length ? (avgPeakLoad * 1.3).toFixed(1) + ' kW' : '—');
+  d('iDC',       completed.length ? avgDCkW.toFixed(2) + ' kW' : '—');
+  d('iPeak',     completed.length ? avgPeakLoad.toFixed(1) + ' kW' : '—');
+  document.getElementById('iRatioStatus').innerHTML = completed.length
+    ? '<div class="wc-row"><span class="wc-k">Avg Ratio</span><span class="wc-v"><strong style="color:' + ratioColor + '">' + avgRatio.toFixed(2) + '</strong></span></div>' +
+      '<div class="wc-row"><span class="wc-k">Status</span><span class="wc-v"><span style="color:' + ratioColor + ';font-weight:600">' + ratioStatus + '</span></span></div>' +
+      '<div class="wc-row"><span class="wc-k">NRS 097-2-3 Margin</span><span class="wc-v">30% applied</span></div>' +
+      '<div class="wc-row"><span class="wc-k">SANS 10142-1</span><span class="wc-v">Balanced: 0.95–1.35</span></div>' +
+      '<div style="margin-top:10px;font-size:11.5px;color:#6b7280;line-height:1.6">' +
+      (ratioStatus === 'Balanced' ? 'DC array and inverter are well matched. System will run efficiently with minimal clipping risk.' :
+       ratioStatus === 'Pushing Limits' ? 'DC array is larger than inverter rating. Some power clipping may occur during peak sun hours.' :
+       ratioStatus === 'Under-Utilised' ? 'Inverter capacity is higher than needed. System is safe but inverter is not fully utilised.' :
+       'DC array significantly exceeds inverter capacity. Frequent clipping and energy loss expected.') + '</div>'
+    : '<div style="color:#9ca3af;font-size:12px;padding:8px 0">No data yet</div>';
+
+  // ── PIPELINE ──
+  var total      = rows.length;
+  var generated  = rows.filter(function(r){ return r.status==='completed'||r.pdf_url; }).length;
+  var sent       = rows.filter(function(r){ return r.email_sent_at; }).length;
+  var opened     = rows.filter(function(r){ return r.email_opened_at; }).length;
+  var viewed     = rows.filter(function(r){ return r.proposal_viewed_at; }).length;
+  var downloaded = rows.filter(function(r){ return r.pdf_downloaded_at; }).length;
+  var engaged    = rows.filter(function(r){ return r.client_engaged; }).length;
+  d('pTotal',     total);
+  d('pGenerated', generated);
+  d('pSent',      sent);
+  d('pEngaged',   engaged);
+
+  // rate pills
+  var rates = [
+    {lbl:'Lead → Proposal', val: pct(generated, total)},
+    {lbl:'Email Open Rate', val: pct(opened, sent)},
+    {lbl:'View Rate', val: pct(viewed, sent)},
+    {lbl:'PDF Download Rate', val: pct(downloaded, sent)},
+    {lbl:'Engagement Rate', val: pct(engaged, sent)}
+  ];
+  document.getElementById('pRateRow').innerHTML = rates.map(function(r){
+    return '<div class="rate-pill"><div class="rp-lbl">'+r.lbl+'</div><div class="rp-val">'+r.val+'</div></div>';
+  }).join('');
+
+  // funnel
+  var funnelSteps = [
+    {lbl:'Clients in Pipeline', n:total, color:'#FFD700'},
+    {lbl:'Proposals Generated', n:generated, color:'#22c55e'},
+    {lbl:'Emails Sent', n:sent, color:'#3b82f6'},
+    {lbl:'Emails Opened', n:opened, color:'#14b8a6'},
+    {lbl:'Proposals Viewed', n:viewed, color:'#8b5cf6'},
+    {lbl:'PDFs Downloaded', n:downloaded, color:'#f97316'},
+    {lbl:'Clients Engaged', n:engaged, color:'#ef4444'}
+  ];
+  var base = Math.max(total, 1);
+  document.getElementById('pFunnel').innerHTML = funnelSteps.map(function(s){
+    var p = Math.round((s.n/base)*100);
+    return '<div class="pipe-row">' +
+      '<span class="pipe-lbl">'+s.lbl+'</span>' +
+      '<div class="pipe-bar-wrap"><div class="pipe-bar" style="background:'+s.color+';width:'+p+'%"></div></div>' +
+      '<span class="pipe-num">'+s.n+'</span>' +
+      '<span class="pipe-pct">'+p+'%</span>' +
+    '</div>';
+  }).join('');
+
+  // follow-up table (latest 20 with email_sent_at)
+  var sentRows = rows.filter(function(r){ return r.email_sent_at; }).slice(0,20);
+  d('pTableCount', sentRows.length + ' sent proposals');
+  if (!sentRows.length) {
+    document.getElementById('pFollowTable').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">No proposals sent yet</td></tr>';
+  } else {
+    document.getElementById('pFollowTable').innerHTML = sentRows.map(function(r) {
+      var daysSince = r.email_sent_at ? Math.floor((Date.now() - new Date(r.email_sent_at)) / 86400000) : null;
+      var status, fup, fupClass;
+      if (r.client_engaged) { status='🟢 Engaged'; fup='Closed'; fupClass='fp-closed'; }
+      else if (r.pdf_downloaded_at) { status='📥 Downloaded'; fup='🔴 Hot — follow up now'; fupClass='fp-hot'; }
+      else if (r.proposal_viewed_at && daysSince >= 2) { status='👁 Viewed'; fup='🔴 Hot — follow up now'; fupClass='fp-hot'; }
+      else if (r.email_opened_at && daysSince >= 3) { status='✉ Opened'; fup='🟠 Warm — follow up soon'; fupClass='fp-warm'; }
+      else if (daysSince >= 7) { status='📤 Sent'; fup='🔵 Cold — resend or call'; fupClass='fp-cold'; }
+      else { status='📤 Sent'; fup='🟡 Waiting'; fupClass='fp-wait'; }
+      return '<tr>' +
+        '<td><strong>'+esc(r.client_name||'—')+'</strong><br><span style="font-size:11px;color:#9ca3af">'+esc(r.client_email||'')+'</span></td>' +
+        '<td>'+esc(r.location||'—')+'</td>' +
+        '<td>'+status+'</td>' +
+        '<td class="'+fupClass+'">'+fup+'</td>' +
+        '<td>'+(daysSince !== null ? daysSince + 'd ago' : '—')+'</td>' +
+        '<td>R '+fmt(r.total_cost)+'</td>' +
+      '</tr>';
+    }).join('');
+  }
 }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
 function avg(arr, key) {
-  if (!arr.length) return 0;
-  var vals = arr.map(function(r){ return parseFloat(r[key]) || 0; });
-  return vals.reduce(function(a,b){ return a+b; }, 0) / arr.length;
+  var vals = arr.map(function(r){ return parseFloat(r[key])||0; });
+  return vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : 0;
 }
-function sum(arr, key) {
-  return arr.reduce(function(a,r){ return a + (parseFloat(r[key]) || 0); }, 0);
+function sum(arr, key) { return arr.reduce(function(a,r){return a+(parseFloat(r[key])||0);},0); }
+function mode(arr, key) {
+  var counts = {}; arr.forEach(function(r){ var v=r[key]; if(v) counts[v]=(counts[v]||0)+1; });
+  var best=null,best_n=0; Object.keys(counts).forEach(function(k){ if(counts[k]>best_n){best_n=counts[k];best=k;} });
+  return best;
 }
+function pct(n, d) { return d > 0 ? ((n/d)*100).toFixed(1)+'%' : '—'; }
 function fmtK(v) {
-  if (v >= 1000000) return (v/1000000).toFixed(1) + 'M';
-  if (v >= 1000)    return Math.round(v/1000) + 'k';
+  if (!v || isNaN(v)) return '—';
+  if (v >= 1000000) return (v/1000000).toFixed(1)+'M';
+  if (v >= 1000) return Math.round(v/1000)+'k';
   return Math.round(v).toString();
 }
-function d(id, v) { var e = document.getElementById(id); if(e) e.textContent = (v === null || v === undefined) ? '—' : v; }
+function d(id, v) { var e=document.getElementById(id); if(e) e.textContent=(v===null||v===undefined)?'—':v; }
+function esc(t) { return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmt(v) { var n=parseFloat(String(v||0).replace(/[\s,]/g,'')); return isNaN(n)?(v||'—'):n.toLocaleString('en-ZA'); }
+function round(v,dp) { var n=parseFloat(v); return isNaN(n)?'—':n.toFixed(dp||0); }
+function fmtDate(iso) { if(!iso)return '—'; var dt=new Date(iso); return isNaN(dt)?'—':dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}); }
+function s(id,v) { var e=document.getElementById(id); if(e) e.textContent=(v===null||v===undefined)?'—':v; }
+function vis(id,show,dv) { var e=document.getElementById(id); if(e) e.style.display=show?(dv||'block'):'none'; }
+function setMsg(el,type,text) { el.className='m-msg '+type; el.textContent=text; }
+function init(n) { return (n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase(); }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', boot);
-
 async function boot() {
   var saved = sessionStorage.getItem(SESSION_KEY);
-  if (saved) {
-    try {
-      installer = JSON.parse(saved);
-      if (urlEmail && installer.contact_email && installer.contact_email.toLowerCase() !== urlEmail) installer = null;
-    } catch(e) { installer = null; }
-  }
+  if (saved) { try { installer=JSON.parse(saved); if(urlEmail&&installer.contact_email&&installer.contact_email.toLowerCase()!==urlEmail) installer=null; } catch(e){installer=null;} }
   if (!installer && urlEmail) {
-    setBootMsg('Verifying access…');
+    document.getElementById('bootMsg').textContent = 'Verifying access…';
     try {
-      var res = await fetch(
-        SUPA + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(urlEmail) +
-        '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
-        { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
-      );
+      var res = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
       var rows = await res.json();
-      if (rows && rows.length) { installer = rows[0]; sessionStorage.setItem(SESSION_KEY, JSON.stringify(installer)); }
+      if (rows&&rows.length) { installer=rows[0]; sessionStorage.setItem(SESSION_KEY,JSON.stringify(installer)); }
     } catch(e) {}
   }
-  if (!installer) {
-    window.location.href = 'nova-metrics_1.html?return=' + encodeURIComponent(window.location.href);
-    return;
-  }
+  if (!installer) { window.location.href='nova-metrics_1.html?return='+encodeURIComponent(window.location.href); return; }
   showPortal();
 }
-
 function showPortal() {
   document.getElementById('bootScreen').classList.add('hidden');
-  var av = (installer.installer_name || 'N').charAt(0).toUpperCase();
+  var av=(installer.installer_name||'N').charAt(0).toUpperCase();
   document.getElementById('instAv').textContent           = av;
-  document.getElementById('instName').textContent         = installer.installer_name || 'Installer';
-  document.getElementById('instEmail').textContent        = installer.contact_email  || '';
-  document.getElementById('navInstallerName').textContent = installer.installer_name || 'Nova Metrics';
-  if (params.get('tab') === 'analytics') switchTab('analytics');
+  document.getElementById('instName').textContent         = installer.installer_name||'Installer';
+  document.getElementById('instEmail').textContent        = installer.contact_email||'';
+  document.getElementById('navInstallerName').textContent = installer.installer_name||'Nova Metrics';
+  if (params.get('tab')==='analytics') switchTab('analytics');
   loadClients();
 }
-function setBootMsg(m) { document.getElementById('bootMsg').textContent = m; }
 
+// ── SIGN OUT ──────────────────────────────────────────────────────────────
 document.getElementById('signOutBtn').addEventListener('click', function() {
   sessionStorage.removeItem(SESSION_KEY);
   window.location.href = 'nova-metrics_1.html';
@@ -619,67 +856,46 @@ document.getElementById('signOutBtn').addEventListener('click', function() {
 async function loadClients() {
   var instId = installer.installer_id;
   try {
-    var leadsRes = await fetch(
-      SUPA + '/rest/v1/leads?installer_id=eq.' + instId +
-      '&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',
-      { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
-    );
+    var leadsRes = await fetch(SUPA+'/rest/v1/leads?installer_id=eq.'+instId+'&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var leads = await leadsRes.json();
-    var seen = {}, unique = [];
-    (leads||[]).forEach(function(l){ var k=(l.client_email||'').toLowerCase().trim(); if(k&&!seen[k]){seen[k]=true;unique.push(l);} });
-
-    var aiRes = await fetch(
-      SUPA + '/rest/v1/ai_results?installer_id=eq.' + instId +
-      '&select=ai_id,client_email,client_name,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at' +
-      '&order=created_at.desc',
-      { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
-    );
+    var seen={},unique=[];
+    (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
+    var aiRes = await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows = await aiRes.json();
-    var aiByEmail = {};
-    (aiRows||[]).forEach(function(r){ var k=(r.client_email||'').toLowerCase().trim(); if(k&&!aiByEmail[k]) aiByEmail[k]=r; });
-
-    allClients = unique.map(function(l){ var k=(l.client_email||'').toLowerCase().trim(); return {lead:l,ai:aiByEmail[k]||null}; });
-    Object.keys(aiByEmail).forEach(function(k){
-      var exists = unique.some(function(l){ return (l.client_email||'').toLowerCase().trim()===k; });
-      if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});
-    });
-
+    var aiByEmail={};
+    (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(k&&!aiByEmail[k]) aiByEmail[k]=r;});
+    allClients = unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
+    Object.keys(aiByEmail).forEach(function(k){var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});});
     renderClientList();
-    if (urlAiId) {
-      var idx = allClients.findIndex(function(c){ return c.ai && String(c.ai.ai_id)===String(urlAiId); });
-      if (idx>=0) { var rows=document.querySelectorAll('.c-row'); if(rows[idx]) pick(idx,rows[idx]); return; }
-    }
-    document.getElementById('emptyState').style.display = 'flex';
+    if (urlAiId) { var idx=allClients.findIndex(function(c){return c.ai&&String(c.ai.ai_id)===String(urlAiId);}); if(idx>=0){var rows=document.querySelectorAll('.c-row');if(rows[idx])pick(idx,rows[idx]);return;} }
+    document.getElementById('emptyState').style.display='flex';
   } catch(err) {
-    document.getElementById('clientList').innerHTML = '<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
-    document.getElementById('clientCount').textContent = 'Error';
-    document.getElementById('emptyState').style.display = 'flex';
+    document.getElementById('clientList').innerHTML='<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
+    document.getElementById('clientCount').textContent='Error';
+    document.getElementById('emptyState').style.display='flex';
   }
 }
-
 function renderClientList() {
-  var list = document.getElementById('clientList');
-  list.innerHTML = '';
-  var count = allClients.length;
-  document.getElementById('clientCount').textContent = count + ' Client' + (count!==1?'s':'');
+  var list=document.getElementById('clientList'); list.innerHTML='';
+  var count=allClients.length;
+  document.getElementById('clientCount').textContent=count+' Client'+(count!==1?'s':'');
   allClients.forEach(function(c,i){
-    var name  = (c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
-    var email = (c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'';
-    var has   = !!c.ai;
-    var row   = document.createElement('div');
+    var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
+    var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'';
+    var has=!!c.ai; var row=document.createElement('div');
     row.className='c-row'; row.dataset.idx=i;
-    var shortEmail = email.length>30 ? email.slice(0,28)+'…' : email;
-    row.innerHTML='<div><div class="c-name">'+esc(name)+'</div><div class="c-email">'+esc(shortEmail)+'</div></div><span class="badge '+(has?'b-ready':'b-none')+'">'+(has?'Proposal Ready':'No Proposal')+'</span>';
-    row.addEventListener('click', function(){ pick(i,row); });
+    var se=email.length>30?email.slice(0,28)+'…':email;
+    row.innerHTML='<div><div class="c-name">'+esc(name)+'</div><div class="c-email">'+esc(se)+'</div></div><span class="badge '+(has?'b-ready':'b-none')+'">'+(has?'Proposal Ready':'No Proposal')+'</span>';
+    row.addEventListener('click',function(){pick(i,row);});
     list.appendChild(row);
   });
-  if(count===0) list.innerHTML='<div class="loading-row">No clients yet — add your first client</div>';
+  if(count===0) list.innerHTML='<div class="loading-row">No clients yet</div>';
 }
 
 // ── SELECT CLIENT ─────────────────────────────────────────────────────────
 function pick(idx, rowEl) {
   if(!document.getElementById('proposalsTab').classList.contains('on')) switchTab('proposals');
-  document.querySelectorAll('.c-row').forEach(function(r){ r.classList.remove('active'); });
+  document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
   rowEl.classList.add('active');
   var c=allClients[idx], name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
   var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—', has=!!c.ai, ai=c.ai;
@@ -708,19 +924,16 @@ function pick(idx, rowEl) {
   s('spTree',fmt(Math.round(ai.trees_equivalent||0))+' trees');
   s('dlTitle','Ready to send to '+name.split(' ')[0]);
   s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF');
-  document.getElementById('dlBtn').onclick = function(){ window.open(PDF_FN+ai.ai_id,'_blank'); };
-  document.getElementById('sendBtn').onclick = async function(){
-    try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});
-      alert(res.ok?'Proposal sent to client ✅':'Failed to send email ❌');
-    }catch(err){alert('Error sending email');}
+  document.getElementById('dlBtn').onclick=function(){window.open(PDF_FN+ai.ai_id,'_blank');};
+  document.getElementById('sendBtn').onclick=async function(){
+    try{var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});alert(res.ok?'Proposal sent to client ✅':'Failed to send email ❌');}catch(err){alert('Error sending email');}
   };
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────
-document.getElementById('addClientBtn').addEventListener('click', openModal);
-document.getElementById('modalClose').addEventListener('click', closeModal);
-document.getElementById('overlay').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('addClientBtn').addEventListener('click',openModal);
+document.getElementById('modalClose').addEventListener('click',closeModal);
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 function openModal(){
   document.getElementById('modalForm').style.display='block';
   document.getElementById('modalSuccess').classList.remove('on');
@@ -729,11 +942,11 @@ function openModal(){
   document.getElementById('m_submit').disabled=false;
   document.getElementById('overlay').classList.add('on'); document.getElementById('m_name').focus();
 }
-function closeModal(){ document.getElementById('overlay').classList.remove('on'); }
-document.getElementById('m_submit').addEventListener('click', async function(){
-  var name=document.getElementById('m_name').value.trim(), email=document.getElementById('m_email').value.trim();
-  var phone=document.getElementById('m_phone').value.trim(), address=document.getElementById('m_address').value.trim();
-  var btn=document.getElementById('m_submit'), msg=document.getElementById('m_msg');
+function closeModal(){document.getElementById('overlay').classList.remove('on');}
+document.getElementById('m_submit').addEventListener('click',async function(){
+  var name=document.getElementById('m_name').value.trim(),email=document.getElementById('m_email').value.trim();
+  var phone=document.getElementById('m_phone').value.trim(),address=document.getElementById('m_address').value.trim();
+  var btn=document.getElementById('m_submit'),msg=document.getElementById('m_msg');
   if(!name){setMsg(msg,'err','Please enter the client name.');return;}
   if(!email){setMsg(msg,'err','Please enter an email address.');return;}
   btn.disabled=true; setMsg(msg,'loading','Saving client…');
@@ -741,24 +954,11 @@ document.getElementById('m_submit').addEventListener('click', async function(){
     var res=await fetch(SUPA+'/functions/v1/create-client',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({installer_id:installer.installer_id,client_name:name,client_email:email,client_phone:phone||null,client_address:address||null})});
     if(!res.ok) throw new Error('Server error '+res.status);
     var data=await res.json();
-    if(data&&data.success!==false){
-      document.getElementById('modalForm').style.display='none';
-      document.getElementById('msChip').textContent=name;
-      document.getElementById('modalSuccess').classList.add('on'); loadClients();
-    }else{setMsg(msg,'err',(data&&data.error)||'Something went wrong.');btn.disabled=false;}
+    if(data&&data.success!==false){document.getElementById('modalForm').style.display='none';document.getElementById('msChip').textContent=name;document.getElementById('modalSuccess').classList.add('on');loadClients();}
+    else{setMsg(msg,'err',(data&&data.error)||'Something went wrong.');btn.disabled=false;}
   }catch(err){setMsg(msg,'err','Connection error: '+err.message);btn.disabled=false;}
 });
-document.getElementById('msClose').addEventListener('click', closeModal);
-
-// ── HELPERS ───────────────────────────────────────────────────────────────
-function init(n){return (n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
-function s(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===null||v===undefined)?'—':v;}
-function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=show?(dv||'block'):'none';}
-function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmt(v){var n=parseFloat(String(v||0).replace(/[\s,]/g,''));return isNaN(n)?(v||'—'):n.toLocaleString('en-ZA');}
-function round(v,dp){var n=parseFloat(v);return isNaN(n)?'—':n.toFixed(dp||0);}
-function fmtDate(iso){if(!iso)return '—';var dt=new Date(iso);return isNaN(dt)?'—':dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
-function setMsg(el,type,text){el.className='m-msg '+type;el.textContent=text;}
+document.getElementById('msClose').addEventListener('click',closeModal);
 </script>
 </body>
 </html>
