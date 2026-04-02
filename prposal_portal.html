@@ -730,17 +730,45 @@ function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).jo
 window.addEventListener('DOMContentLoaded', boot);
 async function boot() {
   var saved = sessionStorage.getItem(SESSION_KEY);
-  if (saved) { try { installer=JSON.parse(saved); if(urlEmail&&installer.contact_email&&installer.contact_email.toLowerCase()!==urlEmail) installer=null; } catch(e){installer=null;} }
-  if (!installer && urlEmail) {
-    document.getElementById('bootMsg').textContent = 'Verifying access…';
-    try {
-      var res = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-      var rows = await res.json();
-      if (rows&&rows.length) { installer=rows[0]; sessionStorage.setItem(SESSION_KEY,JSON.stringify(installer)); }
-    } catch(e) {}
+
+if (saved) {
+  try {
+    installer = JSON.parse(saved);
+  } catch(e) {
+    installer = null;
   }
-  if (!installer) { window.location.href='nova-metrics_1.html?return='+encodeURIComponent(window.location.href); return; }
-  showPortal();
+}
+
+if (!installer && urlEmail) {
+  document.getElementById('bootMsg').textContent = 'Verifying access…';
+
+  try {
+    var res = await fetch(
+      SUPA + '/rest/v1/installers?contact_email=eq.' +
+      encodeURIComponent(urlEmail) +
+      '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+      {
+        headers: {
+          apikey: ANON,
+          Authorization: 'Bearer ' + ANON
+        }
+      }
+    );
+
+    var rows = await res.json();
+
+    if (rows && rows.length) {
+      installer = rows[0];
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(installer));
+    }
+  } catch(e) {}
+}
+
+if (!installer) {
+  window.location.href =
+    'nova-metrics_1.html?return=' +
+    encodeURIComponent(window.location.href);
+  return;
 }
 function showPortal() {
   document.getElementById('bootScreen').classList.add('hidden');
