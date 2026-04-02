@@ -4,92 +4,357 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solar Intelligence — Nova Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
+:root{
+  --navy:#0B1F3A;
+  --gold:#FFD700;
+  --gold-dim:rgba(255,215,0,.10);
+  --gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;
+  --muted:#7a95af;
+  --border:rgba(255,255,255,.07);
+  --card:rgba(255,255,255,.04);
+  --surface:#112840;
+  --surface2:#0e2035;
+  --green:#34d399;
+  --red:#f87171;
+  --amber:#fbbf24;
+  --blue:#7ac8f8;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;min-height:100vh}
-.top-bar{background:#0B1F3A;border-bottom:2px solid #1e3a5f;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-.top-bar-title{font-size:1.15rem;font-weight:700;color:#F0B429;letter-spacing:.04em}
-.top-bar .sub{font-size:.75rem;color:#7a9cbf;margin-top:2px}
-.installer-tag{font-size:.75rem;background:#1e3a5f;color:#7ac8f8;padding:4px 12px;border-radius:20px;display:none}
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:20px}
-.login-box{background:#112840;border:1px solid #1e3a5f;border-radius:12px;padding:36px;width:100%;max-width:400px;text-align:center}
-.login-box h2{color:#F0B429;margin-bottom:8px;font-size:1.4rem}
-.login-box p{color:#7a9cbf;font-size:.85rem;margin-bottom:24px}
-.login-box input{width:100%;background:#0B1F3A;border:1px solid #2d5070;color:#e8edf5;padding:11px 14px;border-radius:7px;font-size:.92rem;margin-bottom:12px;display:block}
-.login-box input:focus{outline:none;border-color:#F0B429}
-.btn-primary{background:#F0B429;color:#0B1F3A;border:none;padding:12px 24px;border-radius:7px;font-weight:700;font-size:.95rem;cursor:pointer;width:100%;transition:.2s;margin-top:4px}
-.btn-primary:hover:not(:disabled){background:#d9a020}
-.btn-primary:disabled{background:#555;color:#999;cursor:not-allowed}
-.error-msg{color:#f87171;font-size:.83rem;margin-top:8px;min-height:20px;text-align:left;padding:0 2px}
-.login-spinner{display:inline-block;width:14px;height:14px;border:2px solid #0B1F3A;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-#app-screen{display:none;padding:20px 24px}
-.input-strip{background:#112840;border:1px solid #1e3a5f;border-radius:10px;padding:16px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end}
-.inp-group{display:flex;flex-direction:column;gap:5px;min-width:160px}
-.inp-group label{font-size:.75rem;color:#7a9cbf;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.inp-group select,.inp-group input{background:#0B1F3A;border:1px solid #2d5070;color:#e8edf5;padding:9px 12px;border-radius:7px;font-size:.88rem}
-.inp-group select:focus,.inp-group input:focus{outline:none;border-color:#F0B429}
-.btn-calc{background:#F0B429;color:#0B1F3A;border:none;padding:10px 26px;border-radius:7px;font-weight:700;font-size:.9rem;cursor:pointer;height:38px;white-space:nowrap}
-.btn-calc:hover{background:#d9a020}
-.tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
-.tab{padding:8px 16px;border-radius:7px 7px 0 0;font-size:.82rem;font-weight:600;cursor:pointer;border:1px solid #1e3a5f;border-bottom:none;background:#112840;color:#7a9cbf;transition:.15s}
-.tab.active{background:#1e3a5f;color:#F0B429;border-color:#2d5070}
-.tab:hover:not(.active){color:#e8edf5}
-.tab-panel{display:none;background:#112840;border:1px solid #1e3a5f;border-radius:0 10px 10px 10px;padding:20px}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+
+/* ── TOP NAV ── */
+.top-nav{
+  background:var(--navy);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(12px);
+}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.nav-icon{
+  width:34px;height:34px;
+  background:var(--gold);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:var(--navy);
+  font-family:'DM Serif Display',serif;
+  flex-shrink:0;
+}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}
+.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-center{display:flex;align-items:center;gap:6px}
+.nav-chip{
+  font-size:11px;font-weight:500;
+  padding:5px 12px;border-radius:20px;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--muted);
+  display:flex;align-items:center;gap:5px;
+}
+.nav-chip.active{background:rgba(255,215,0,.12);border-color:var(--gold-border);color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.portal-link{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:9px;
+  background:var(--gold);color:var(--navy);
+  font-size:12px;font-weight:700;
+  text-decoration:none;
+  transition:all .2s;
+  letter-spacing:.02em;
+}
+.portal-link:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,215,0,.25)}
+.installer-badge{
+  font-size:11px;font-weight:500;
+  padding:5px 12px;border-radius:20px;
+  background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);
+  color:var(--blue);
+  display:none;
+}
+
+/* ── LOGIN ── */
+#login-screen{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:calc(100vh - 58px);
+  padding:32px 20px;
+}
+.login-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:40px;
+  width:100%;max-width:420px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.login-box::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+}
+.login-logo{
+  width:52px;height:52px;
+  background:var(--gold);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;
+  font-size:22px;color:var(--navy);
+  margin:0 auto 18px;
+}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.02em}
+.login-box input{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text);
+  padding:12px 16px;
+  border-radius:9px;
+  font-size:14px;
+  font-family:'DM Sans',sans-serif;
+  margin-bottom:12px;
+  display:block;
+  transition:border-color .2s;
+}
+.login-box input:focus{outline:none;border-color:var(--gold)}
+.login-box input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primary{
+  background:var(--gold);color:var(--navy);
+  border:none;padding:13px 24px;
+  border-radius:9px;font-weight:700;font-size:14px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;width:100%;transition:all .2s;margin-top:4px;
+}
+.btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}
+.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
+.error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+/* ── MAIN APP ── */
+#app-screen{display:none;padding:24px 28px}
+
+.input-strip{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:18px 22px;
+  margin-bottom:20px;
+  display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;
+}
+.inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
+.inp-group label{
+  font-size:10px;color:var(--muted);
+  font-weight:600;text-transform:uppercase;letter-spacing:.08em;
+}
+.inp-group select,.inp-group input{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text);
+  padding:9px 12px;
+  border-radius:8px;
+  font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+}
+.inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
+.btn-calc{
+  background:var(--gold);color:var(--navy);
+  border:none;padding:10px 26px;
+  border-radius:8px;font-weight:700;font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;height:38px;white-space:nowrap;
+  transition:all .2s;
+}
+.btn-calc:hover{background:#fff}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
+.tab{
+  padding:8px 17px;border-radius:8px 8px 0 0;
+  font-size:12px;font-weight:500;
+  cursor:pointer;
+  border:1px solid var(--border);border-bottom:none;
+  background:var(--surface);color:var(--muted);
+  transition:.15s;font-family:'DM Sans',sans-serif;
+}
+.tab.active{background:var(--surface2);color:var(--gold);border-color:rgba(255,215,0,.2)}
+.tab:hover:not(.active){color:var(--text)}
+.tab-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:0 13px 13px 13px;padding:22px}
 .tab-panel.active{display:block}
+
+/* ── KPI CARDS ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#0B1F3A;border:1px solid #1e3a5f;border-radius:9px;padding:14px 16px}
-.kpi .label{font-size:.72rem;color:#7a9cbf;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-.kpi .value{font-size:1.5rem;font-weight:700;color:#F0B429;line-height:1.1}
-.kpi .sub{font-size:.75rem;color:#7a9cbf;margin-top:4px}
-.kpi.green .value{color:#34d399}
-.kpi.red .value{color:#f87171}
-.kpi.amber .value{color:#fbbf24}
-.kpi.white .value{color:#e8edf5}
-.status-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1e3a5f;font-size:.88rem}
+.kpi{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;
+  position:relative;overflow:hidden;
+}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 10px 10px;background:var(--gold)}
+.kpi.green::after{background:var(--green)}
+.kpi.red::after{background:var(--red)}
+.kpi.amber::after{background:var(--amber)}
+.kpi.white::after{background:rgba(255,255,255,.2)}
+.kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:500}
+.kpi .value{font-size:1.5rem;font-weight:600;color:var(--gold);line-height:1.1;font-family:'DM Serif Display',serif}
+.kpi.green .value{color:var(--green)}
+.kpi.red .value{color:var(--red)}
+.kpi.amber .value{color:var(--amber)}
+.kpi.white .value{color:var(--text)}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ── STATUS ROWS ── */
+.status-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
 .status-row:last-child{border-bottom:none}
-.status-row .lbl{color:#7a9cbf}
-.status-row .val{font-weight:600;color:#e8edf5}
-.bar-wrap{background:#1e3a5f;border-radius:6px;height:10px;margin-top:6px;overflow:hidden}
+.status-row .lbl{color:var(--muted)}
+.status-row .val{font-weight:500;color:var(--text);text-align:right;max-width:60%}
+
+.bar-wrap{background:rgba(255,255,255,.06);border-radius:6px;height:10px;margin-top:6px;overflow:hidden}
 .bar-fill{height:100%;border-radius:6px;transition:width .4s}
-.section-title{font-size:.9rem;font-weight:700;color:#F0B429;margin:18px 0 10px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
-.section-title::after{content:'';flex:1;height:1px;background:#1e3a5f}
-.proposal-strip{background:#0B1F3A;border:1px solid #1e3a5f;border-radius:9px;padding:16px 20px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.proposal-strip .info{font-size:.82rem;color:#7a9cbf}
-.proposal-strip .info b{color:#e8edf5}
-.btn-generate{background:#34d399;color:#064e3b;border:none;padding:11px 28px;border-radius:7px;font-weight:700;font-size:.9rem;cursor:pointer;transition:.2s}
-.btn-generate:hover{background:#10b981}
-.btn-generate:disabled{background:#1e3a5f;color:#7a9cbf;cursor:not-allowed}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid #064e3b;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.client-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.client-form input{width:100%;background:#0B1F3A;border:1px solid #2d5070;color:#e8edf5;padding:10px 12px;border-radius:7px;font-size:.88rem}
-.client-form label{font-size:.75rem;color:#7a9cbf;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-.tip{font-size:.74rem;color:#7a9cbf;font-style:italic;margin-top:4px}
-.chart-wrap{width:100%;margin-top:12px;padding:14px;background:#0B1F3A;border-radius:9px;border:1px solid #1e3a5f}
+
+.section-title{
+  font-size:10px;font-weight:600;color:var(--gold);
+  margin:18px 0 10px;
+  text-transform:uppercase;letter-spacing:.1em;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── CHARTS ── */
+.chart-wrap{width:100%;margin-top:12px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid var(--border)}
 .chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.chart-label{font-size:.75rem;color:#7a9cbf;min-width:50px;text-align:right}
-.chart-bar-outer{flex:1;background:#1e3a5f;border-radius:4px;height:22px;overflow:hidden}
+.chart-label{font-size:11px;color:var(--muted);min-width:52px;text-align:right}
+.chart-bar-outer{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden}
 .chart-bar-inner{height:100%;border-radius:4px;transition:width .5s}
-.chart-val{font-size:.75rem;color:#e8edf5;min-width:80px}
-#toast{position:fixed;bottom:20px;right:20px;background:#112840;border:1px solid #34d399;color:#34d399;padding:12px 20px;border-radius:8px;font-size:.85rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.chart-val{font-size:11px;color:var(--text);min-width:80px}
+
+/* ── CLIENT FORM ── */
+.client-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.client-form input{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text);
+  padding:10px 13px;border-radius:8px;font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+}
+.client-form input:focus{outline:none;border-color:var(--gold)}
+.client-form label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:5px}
+
+/* ── PROPOSAL STRIP ── */
+.proposal-strip{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:18px 22px;
+  margin-top:18px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+}
+.proposal-strip .info{font-size:12px;color:var(--muted);line-height:1.6}
+.proposal-strip .info b{color:var(--text)}
+.btn-generate{
+  background:var(--green);color:#064e3b;
+  border:none;padding:12px 30px;
+  border-radius:9px;font-weight:700;font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:all .2s;
+}
+.btn-generate:hover{background:#10b981;transform:translateY(-1px)}
+.btn-generate:disabled{background:rgba(255,255,255,.08);color:var(--muted);cursor:not-allowed;transform:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #064e3b;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SUCCESS CARD ── */
+.success-card{
+  display:none;
+  margin-top:18px;
+  background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));
+  border:1px solid rgba(52,211,153,.25);
+  border-radius:13px;
+  padding:24px;
+  animation:up .3s ease;
+}
+.success-card.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.success-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.success-icon{width:38px;height:38px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.success-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text)}
+.success-title em{font-style:italic;color:var(--green)}
+.success-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.action-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:10px 20px;border-radius:9px;
+  font-size:13px;font-weight:600;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;border:none;transition:all .2s;
+  text-decoration:none;
+}
+.action-btn.primary{background:var(--gold);color:var(--navy)}
+.action-btn.primary:hover{background:#fff;transform:translateY(-1px)}
+.action-btn.secondary{background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue)}
+.action-btn.secondary:hover{background:rgba(122,200,248,.18)}
+.action-btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}
+.action-btn.ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.action-btn svg{width:14px;height:14px;flex-shrink:0}
+.ai-id-tag{display:inline-block;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-left:6px}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:22px;right:22px;
+  background:var(--surface);border:1px solid rgba(52,211,153,.35);
+  color:var(--green);padding:12px 20px;
+  border-radius:10px;font-size:13px;font-weight:500;
+  opacity:0;transition:opacity .3s;
+  pointer-events:none;z-index:999;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div>
-    <div class="top-bar-title">⚡ Solar Intelligence</div>
-    <div class="sub">System Sizing &amp; Proposal Engine</div>
+<!-- ══ TOP NAVIGATION ══ -->
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-icon">N</div>
+    <div>
+      <div class="nav-brand-name">Nova Metrics</div>
+      <div class="nav-brand-sub">Solar Intelligence</div>
+    </div>
   </div>
-  <div id="installer-badge" class="installer-tag"></div>
-</div>
+  <div class="nav-center">
+    <div class="nav-chip active">⚡ System Sizing Engine</div>
+    <div class="nav-chip">🤖 AI Proposals</div>
+    <div class="nav-chip">📊 Analytics</div>
+  </div>
+  <div class="nav-right">
+    <div id="installer-badge" class="installer-badge"></div>
+    <a href="prposal_portal.html" class="portal-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Proposal Portal
+    </a>
+  </div>
+</nav>
 
-<!-- LOGIN -->
+<!-- ══ LOGIN ══ -->
 <div id="login-screen">
   <div class="login-box">
-    <h2>Installer Login</h2>
-    <p>Sign in with your Nova Metrics installer account.</p>
+    <div class="login-logo">N</div>
+    <div class="login-title">Installer <em style="font-style:italic;color:var(--gold)">Login</em></div>
+    <div class="login-sub">Sign in with your Nova Metrics installer account</div>
     <input type="email" id="login-email" placeholder="Installer email address" autocomplete="email" />
     <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
     <div id="login-error" class="error-msg"></div>
@@ -97,8 +362,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ══ MAIN APP ══ -->
 <div id="app-screen">
+
+  <!-- Input controls -->
   <div class="input-strip">
     <div class="inp-group">
       <label>Location</label>
@@ -164,6 +431,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     <button class="btn-calc" onclick="calculate()">⚡ Calculate</button>
   </div>
 
+  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="showTab('tab-solar')">☀️ Solar Array</div>
     <div class="tab" onclick="showTab('tab-battery')">🔋 Battery</div>
@@ -195,10 +463,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
   <!-- TAB 2: BATTERY -->
   <div id="tab-battery" class="tab-panel">
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.95rem">—</div></div>
-      <div class="kpi"><div class="label">Battery Stress Level</div><div class="value" id="b-stress" style="font-size:.95rem">—</div></div>
-      <div class="kpi"><div class="label">Design Risk</div><div class="value" id="b-risk" style="font-size:.95rem">—</div></div>
-      <div class="kpi"><div class="label">Battery Power Adequacy During Outage</div><div class="value" id="b-coverage" style="font-size:.95rem">—</div></div>
+      <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">—</div></div>
+      <div class="kpi"><div class="label">Battery Stress Level</div><div class="value" id="b-stress" style="font-size:.9rem">—</div></div>
+      <div class="kpi"><div class="label">Design Risk</div><div class="value" id="b-risk" style="font-size:.9rem">—</div></div>
+      <div class="kpi"><div class="label">Battery Power Adequacy During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">—</div></div>
     </div>
     <div class="kpi-grid" style="margin-top:0">
       <div class="kpi white"><div class="label">Battery Needed</div><div class="value" id="b-needed">—</div></div>
@@ -211,14 +479,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     <div class="status-row"><span class="lbl">Capacity per Unit (Usable)</span><span class="val" id="b-usable-per">—</span></div>
     <div class="status-row"><span class="lbl">Capacity Ratio (Installed / Required)</span><span class="val" id="b-cap-ratio">—</span></div>
     <div class="section-title">Capacity Headroom</div>
-    <div class="bar-wrap"><div class="bar-fill" id="b-bar" style="width:0%;background:#34d399"></div></div>
+    <div class="bar-wrap"><div class="bar-fill" id="b-bar" style="width:0%;background:var(--green)"></div></div>
     <p class="tip" id="b-bar-tip"></p>
   </div>
 
   <!-- TAB 3: INVERTER -->
   <div id="tab-inverter" class="tab-panel">
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:1rem">—</div></div>
+      <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:.95rem">—</div></div>
       <div class="kpi"><div class="label">Battery → Inverter Power Support</div><div class="value" id="i-batt-support">—</div></div>
       <div class="kpi"><div class="label">DC / AC Ratio</div><div class="value" id="i-dcac">—</div><div class="sub" id="i-dcac-sub"></div></div>
       <div class="kpi"><div class="label">Inverter Load Handling</div><div class="value" id="i-load-ok">—</div><div class="sub" id="i-load-sub"></div></div>
@@ -234,8 +502,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">—</span></div>
     <div class="section-title">DC / AC Visual</div>
     <div class="chart-wrap">
-      <div class="chart-row"><div class="chart-label">DC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-dc" style="width:0%;background:#F0B429"></div></div><div class="chart-val" id="bar-dc-val">—</div></div>
-      <div class="chart-row"><div class="chart-label">AC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-ac" style="width:0%;background:#34d399"></div></div><div class="chart-val" id="bar-ac-val">—</div></div>
+      <div class="chart-row"><div class="chart-label">DC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-dc" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="bar-dc-val">—</div></div>
+      <div class="chart-row"><div class="chart-label">AC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-ac" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="bar-ac-val">—</div></div>
     </div>
   </div>
 
@@ -255,9 +523,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     </div>
     <div class="section-title">Cost Breakdown</div>
     <div class="chart-wrap">
-      <div class="chart-row"><div class="chart-label">Panels</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-panels" style="width:0%;background:#F0B429"></div></div><div class="chart-val" id="cb-panels-v">—</div></div>
-      <div class="chart-row"><div class="chart-label">BOS</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-bos" style="width:0%;background:#7ac8f8"></div></div><div class="chart-val" id="cb-bos-v">—</div></div>
-      <div class="chart-row"><div class="chart-label">Battery</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-batt" style="width:0%;background:#34d399"></div></div><div class="chart-val" id="cb-batt-v">—</div></div>
+      <div class="chart-row"><div class="chart-label">Panels</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-panels" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="cb-panels-v">—</div></div>
+      <div class="chart-row"><div class="chart-label">BOS</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-bos" style="width:0%;background:var(--blue)"></div></div><div class="chart-val" id="cb-bos-v">—</div></div>
+      <div class="chart-row"><div class="chart-label">Battery</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-batt" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="cb-batt-v">—</div></div>
       <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa"></div></div><div class="chart-val" id="cb-inv-v">—</div></div>
     </div>
     <div class="section-title">Financial Metrics</div>
@@ -281,7 +549,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     <div class="status-row"><span class="lbl">Annual Consumption</span><span class="val" id="e-consumption">—</span></div>
     <div class="status-row"><span class="lbl">Client Segment</span><span class="val" id="e-segment">—</span></div>
     <div class="section-title">Solar Independence</div>
-    <div class="bar-wrap" style="height:16px"><div class="bar-fill" id="e-indep-bar" style="width:0%;background:#34d399"></div></div>
+    <div class="bar-wrap" style="height:16px"><div class="bar-fill" id="e-indep-bar" style="width:0%;background:var(--green)"></div></div>
     <p class="tip" id="e-indep-tip" style="margin-top:8px"></p>
   </div>
 
@@ -299,13 +567,41 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
     <div class="status-row"><span class="lbl">Total Cost</span><span class="val" id="ps-cost">—</span></div>
     <div class="status-row"><span class="lbl">Annual Savings</span><span class="val" id="ps-savings">—</span></div>
     <div class="status-row"><span class="lbl">Payback</span><span class="val" id="ps-payback">—</span></div>
+
     <div class="proposal-strip">
-      <div class="info">AI proposal generated via your Supabase pipeline.<br><b>PDF + email delivery handled automatically.</b></div>
+      <div class="info">
+        AI-powered proposal via Nova Metrics pipeline.<br>
+        <b>PDF generated &amp; delivered automatically — then view in Proposal Portal.</b>
+      </div>
       <button class="btn-generate" id="btn-gen" onclick="generateProposal()" disabled>Generate Proposal</button>
     </div>
-    <div id="proposal-result" style="display:none;margin-top:16px;background:#0B1F3A;border:1px solid #34d399;border-radius:9px;padding:16px">
-      <div style="color:#34d399;font-weight:700;margin-bottom:8px">✓ Proposal created successfully!</div>
-      <div id="proposal-links"></div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-card" id="success-card">
+      <div class="success-header">
+        <div class="success-icon">✓</div>
+        <div>
+          <div class="success-title">Proposal <em>created</em> successfully</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px" id="success-ai-label"></div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">
+        The proposal has been generated and saved. You can now open it directly in the <strong style="color:var(--text)">Proposal Portal</strong> to review, send, or download the PDF.
+      </div>
+      <div class="success-actions">
+        <a href="#" id="btn-open-portal" class="action-btn primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Open in Proposal Portal
+        </a>
+        <a href="#" id="btn-download-pdf" class="action-btn secondary" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </a>
+        <button class="action-btn ghost" onclick="newCalculation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          New Calculation
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -313,7 +609,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#0B1F3A;color:#e8edf5;mi
 <div id="toast"></div>
 
 <script>
-const SUPA_URL = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 
 const PANELS = [
@@ -351,90 +647,58 @@ const BATTERIES = [
 ];
 const GTI = {JHB:5.10,CPT:4.60,DBN:4.90,UP:5.80};
 
-let installer = null;
+let installer  = null;
 let calcResult = null;
 
-// ===== LOGIN =====
+// ── LOGIN ────────────────────────────────────────────────────────────────
 async function doLogin() {
   const emailEl = document.getElementById('login-email');
   const passEl  = document.getElementById('login-password');
   const errEl   = document.getElementById('login-error');
   const btn     = document.getElementById('login-btn');
-
-  const email = emailEl.value.trim().toLowerCase();
-  const pass  = passEl.value.trim();
-
+  const email   = emailEl.value.trim().toLowerCase();
+  const pass    = passEl.value.trim();
   errEl.textContent = '';
   if (!email) { errEl.textContent = 'Please enter your email address.'; emailEl.focus(); return; }
   if (!pass)  { errEl.textContent = 'Please enter your password.'; passEl.focus(); return; }
-
   btn.disabled = true;
   btn.innerHTML = '<span class="login-spinner"></span>Signing in…';
-
   try {
-    // Fetch by email only — we check password in JS to handle null passwords
     const url = `${SUPA_URL}/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=*&limit=1`;
-    const res = await fetch(url, {
-      headers: {
-        'apikey': SUPA_ANON,
-        'Authorization': 'Bearer ' + SUPA_ANON,
-        'Accept': 'application/json'
-      }
-    });
-
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error('Server error ' + res.status + ': ' + txt.slice(0,120));
-    }
-
+    const res = await fetch(url, { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('Server error ' + res.status);
     const data = await res.json();
-
-    if (!data || data.length === 0) {
-      errEl.textContent = 'No account found for this email address.';
-      btn.disabled = false; btn.textContent = 'Sign In'; return;
-    }
-
+    if (!data || data.length === 0) { errEl.textContent = 'No account found for this email address.'; btn.disabled=false; btn.textContent='Sign In'; return; }
     const row = data[0];
-
-    // Password check: if DB password is null/empty accept any password,
-    // otherwise require an exact match
     if (row.password && row.password.trim() !== '' && row.password.trim() !== pass) {
       errEl.textContent = 'Incorrect password. Please try again.';
-      passEl.value = '';
-      passEl.focus();
-      btn.disabled = false; btn.textContent = 'Sign In'; return;
+      passEl.value = ''; passEl.focus();
+      btn.disabled=false; btn.textContent='Sign In'; return;
     }
-
-    // Success
     installer = row;
+    sessionStorage.setItem('nm_installer_session', JSON.stringify({ installer_id:row.installer_id, installer_name:row.installer_name, contact_email:row.contact_email, logo_url:row.logo_url, primary_color:row.primary_color }));
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
     const badge = document.getElementById('installer-badge');
     badge.textContent = installer.installer_name;
     badge.style.display = 'inline-block';
-
   } catch(e) {
     errEl.textContent = 'Login error: ' + e.message;
-    btn.disabled = false; btn.textContent = 'Sign In';
+    btn.disabled=false; btn.textContent='Sign In';
   }
 }
 
-// Enter key triggers login
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const ls = document.getElementById('login-screen');
-    if (ls && ls.style.display !== 'none') doLogin();
-  }
+  if (e.key === 'Enter') { const ls = document.getElementById('login-screen'); if (ls && ls.style.display !== 'none') doLogin(); }
 });
 
-// Custom load toggle
 document.getElementById('sel-load').addEventListener('change', function() {
   const c = this.value === 'custom';
   document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
   document.getElementById('custom-daily-wrap').style.display = c ? 'flex' : 'none';
 });
 
-// ===== TABS =====
+// ── TABS ─────────────────────────────────────────────────────────────────
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -443,110 +707,101 @@ function showTab(id) {
   document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
 }
 
-// ===== CALCULATION ENGINE =====
+// ── CALCULATION ENGINE ────────────────────────────────────────────────────
 function calculate() {
-  const locSel = document.getElementById('sel-location');
-  const locKey = locSel.value;
+  const locSel  = document.getElementById('sel-location');
+  const locKey  = locSel.value;
   const locName = locSel.options[locSel.selectedIndex].text;
-  const psh = GTI[locKey];
-
+  const psh     = GTI[locKey];
   const loadSel = document.getElementById('sel-load');
   let peakLoad, dailyUsage;
   if (loadSel.value === 'custom') {
-    peakLoad  = parseFloat(document.getElementById('custom-peak').value) || 3;
+    peakLoad   = parseFloat(document.getElementById('custom-peak').value) || 3;
     dailyUsage = parseFloat(document.getElementById('custom-daily').value) || 20;
   } else {
-    peakLoad  = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.peak);
+    peakLoad   = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.peak);
     dailyUsage = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.daily);
   }
   const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
 
-  // SOLAR
-  const daytimeLoadEnergy  = peakLoad * psh;
-  const battRechargeEnergy = (peakLoad * autonomy) / 0.90;
+  const daytimeLoadEnergy   = peakLoad * psh;
+  const battRechargeEnergy  = (peakLoad * autonomy) / 0.90;
   const requiredSolarEnergy = daytimeLoadEnergy + battRechargeEnergy;
-  const requiredSolarKW = requiredSolarEnergy / (psh * 0.85);
+  const requiredSolarKW     = requiredSolarEnergy / (psh * 0.85);
 
   let bestPanel = null, bestOversize = Infinity;
   PANELS.forEach(p => {
     const n = Math.ceil(requiredSolarKW * 1000 / p.watts);
     const dc = n * p.watts / 1000;
     const os = dc - requiredSolarKW;
-    if (os >= 0 && os < bestOversize) { bestOversize = os; bestPanel = {...p, panelsNeeded:n, dcKW:dc}; }
+    if (os >= 0 && os < bestOversize) { bestOversize=os; bestPanel={...p,panelsNeeded:n,dcKW:dc}; }
   });
-  if (!bestPanel) { bestPanel = {...PANELS[PANELS.length-1]}; bestPanel.panelsNeeded = Math.ceil(requiredSolarKW*1000/bestPanel.watts); bestPanel.dcKW = bestPanel.panelsNeeded*bestPanel.watts/1000; }
+  if (!bestPanel) { bestPanel={...PANELS[PANELS.length-1]}; bestPanel.panelsNeeded=Math.ceil(requiredSolarKW*1000/bestPanel.watts); bestPanel.dcKW=bestPanel.panelsNeeded*bestPanel.watts/1000; }
 
-  const systemDC = bestPanel.dcKW;
+  const systemDC          = bestPanel.dcKW;
   const expectedDailySolar = systemDC * psh * 0.85;
-  const oversizePct = (systemDC - requiredSolarKW) / requiredSolarKW;
-  const annualSolar = expectedDailySolar * 30 * 12;
-  const annualConsumption = peakLoad * 24 * 365;
-  const panelCount = bestPanel.panelsNeeded;
-  const footprint = panelCount * 2.2;
-  const roofFitData = panelCount<=14 ? ['Easy Fit','Fits a single roof plane. Quick installation.']
-    : panelCount<=20 ? ['Standard Fit','May use multiple roof sections. Common setup.']
-    : panelCount<=30 ? ['Complex Layout','East/West layout recommended for optimal production.']
-    : ['Large System Layout','Carport or ground mount may be considered.'];
+  const oversizePct        = (systemDC - requiredSolarKW) / requiredSolarKW;
+  const annualSolar        = expectedDailySolar * 30 * 12;
+  const annualConsumption  = peakLoad * 24 * 365;
+  const panelCount         = bestPanel.panelsNeeded;
+  const footprint          = panelCount * 2.2;
+  const roofFitData        = panelCount<=14?['Easy Fit','Fits a single roof plane. Quick installation.']:panelCount<=20?['Standard Fit','May use multiple roof sections. Common setup.']:panelCount<=30?['Complex Layout','East/West layout recommended for optimal production.']:['Large System Layout','Carport or ground mount may be considered.'];
 
-  // BATTERY
-  const requiredUsableKWh = peakLoad * autonomy;
+  const requiredUsableKWh   = peakLoad * autonomy;
   const batteryEnergyAdjusted = requiredUsableKWh * 1.10;
-  let bestBatt = null, minUnits = Infinity, minCost = Infinity;
-  [...BATTERIES].sort((a,b)=>a.usable-b.usable).forEach(b => {
-    const u = Math.ceil(requiredUsableKWh / b.usable);
-    const c = u * b.price;
-    if (u < minUnits || (u===minUnits && c<minCost)) { minUnits=u; minCost=c; bestBatt={...b,units:u,totalCost:c}; }
+  let bestBatt=null, minUnits=Infinity, minCost=Infinity;
+  [...BATTERIES].sort((a,b)=>a.usable-b.usable).forEach(b=>{
+    const u=Math.ceil(requiredUsableKWh/b.usable), c=u*b.price;
+    if(u<minUnits||(u===minUnits&&c<minCost)){minUnits=u;minCost=c;bestBatt={...b,units:u,totalCost:c};}
   });
 
-  const installedBattKWh = bestBatt.units * bestBatt.usable;
-  const battRuntime = installedBattKWh / peakLoad;
-  const battCapRatio = installedBattKWh / batteryEnergyAdjusted;
-  const battRuntimeRatio = battRuntime / autonomy;
-  const battDailyUtil = dailyUsage / installedBattKWh;
-  const battStress = battDailyUtil>1.0?'Heavy Daily Cycling':battDailyUtil>0.8?'Moderate Daily Cycling':battDailyUtil>0.5?'Normal Daily Use':'Low stress: long battery life';
-  const battRisk = battRuntimeRatio<1?'High risk – autonomy not met':battRuntimeRatio<1.2?'Tight design – minimal reserve':'Low risk – sufficient reserve';
-  const battTotalKW = bestBatt.kw * bestBatt.units;
-  const backupCovRatio = battTotalKW / peakLoad;
-  const coverage = backupCovRatio<1?'Only Essential Loads Supported':backupCovRatio<1.15?'Essential + Some Comfort Loads':backupCovRatio<=1.40?'Most Loads Covered':'Safe power headroom';
-  const battSizeStatus = battCapRatio<1?'Battery Undersized':battCapRatio<=1.2?'Battery Tightly Sized':battCapRatio<=1.4?'Battery Well Sized':'Battery Over-Sized';
+  const installedBattKWh = bestBatt.units*bestBatt.usable;
+  const battRuntime      = installedBattKWh/peakLoad;
+  const battCapRatio     = installedBattKWh/batteryEnergyAdjusted;
+  const battRuntimeRatio = battRuntime/autonomy;
+  const battDailyUtil    = dailyUsage/installedBattKWh;
+  const battStress       = battDailyUtil>1.0?'Heavy Daily Cycling':battDailyUtil>0.8?'Moderate Daily Cycling':battDailyUtil>0.5?'Normal Daily Use':'Low stress: long battery life';
+  const battRisk         = battRuntimeRatio<1?'High risk – autonomy not met':battRuntimeRatio<1.2?'Tight design – minimal reserve':'Low risk – sufficient reserve';
+  const battTotalKW      = bestBatt.kw*bestBatt.units;
+  const backupCovRatio   = battTotalKW/peakLoad;
+  const coverage         = backupCovRatio<1?'Only Essential Loads Supported':backupCovRatio<1.15?'Essential + Some Comfort Loads':backupCovRatio<=1.40?'Most Loads Covered':'Safe power headroom';
+  const battSizeStatus   = battCapRatio<1?'Battery Undersized':battCapRatio<=1.2?'Battery Tightly Sized':battCapRatio<=1.4?'Battery Well Sized':'Battery Over-Sized';
   const issues=[];
   if(battSizeStatus==='Battery Undersized') issues.push('Add battery capacity (kWh)');
   if(battRuntime<autonomy) issues.push('Increase backup runtime');
   if(battStress==='Heavy Daily Cycling') issues.push('Reduce battery stress (add capacity)');
   const battVerdict = issues.length>0?'Design Action Required: '+issues.join(' | '):battSizeStatus==='Battery Tightly Sized'||battRuntimeRatio<1.2?'Acceptable Design: Limited safety margin':'Well Designed: Balanced and reliable';
 
-  // INVERTER
-  const requiredAC = peakLoad * 1.3;
-  let bestInv = null;
-  INVERTERS.forEach(inv => { if(inv.ac>=requiredAC && inv.dc>=systemDC) { if(!bestInv||inv.ac<bestInv.ac) bestInv=inv; } });
-  if (!bestInv) bestInv = INVERTERS[INVERTERS.length-1];
+  const requiredAC = peakLoad*1.3;
+  let bestInv=null;
+  INVERTERS.forEach(inv=>{if(inv.ac>=requiredAC&&inv.dc>=systemDC){if(!bestInv||inv.ac<bestInv.ac)bestInv=inv;}});
+  if(!bestInv) bestInv=INVERTERS[INVERTERS.length-1];
 
-  const dcAcRatio = systemDC / bestInv.ac;
-  const dcAcStatus = dcAcRatio<0.95?'Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping)';
-  const invHeadroom = bestInv.ac - peakLoad;
-  const invLoadOK = bestInv.ac >= peakLoad * 1.3;
-  const battPowerOK = battTotalKW >= bestInv.ac;
-  const stringsNeeded = Math.ceil(panelCount / 12);
-  const mpptRequired = Math.ceil(stringsNeeded / 2);
-  const mpptAvailable = bestInv.mppt;
-  const mpptStatus = mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
+  const dcAcRatio    = systemDC/bestInv.ac;
+  const dcAcStatus   = dcAcRatio<0.95?'Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping)';
+  const invHeadroom  = bestInv.ac-peakLoad;
+  const invLoadOK    = bestInv.ac>=peakLoad*1.3;
+  const battPowerOK  = battTotalKW>=bestInv.ac;
+  const stringsNeeded  = Math.ceil(panelCount/12);
+  const mpptRequired   = Math.ceil(stringsNeeded/2);
+  const mpptAvailable  = bestInv.mppt;
+  const mpptStatus     = mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
 
-  // FINANCIALS
-  const panelCost = panelCount * bestPanel.price;
-  const bosCost = systemDC * 3000;
-  const hwCost = panelCost + bosCost;
-  const totalCost = hwCost + bestBatt.totalCost + bestInv.price;
-  const sellPrice = totalCost * (1 + markup);
-  const profit = sellPrice - totalCost;
-  const costPerKW = totalCost / systemDC;
-  const dailyOffset = Math.min(expectedDailySolar, dailyUsage);
-  const monthlySavings = dailyOffset * tariff * 30;
-  const annualSavings = dailyOffset * tariff * 365;
-  const simplePayback = totalCost / (annualSavings * 1.1274);
-  const lifetimeSavings = annualSavings * 25;
-  const annualROI = (annualSavings / totalCost) * 100;
+  const panelCost     = panelCount*bestPanel.price;
+  const bosCost       = systemDC*3000;
+  const hwCost        = panelCost+bosCost;
+  const totalCost     = hwCost+bestBatt.totalCost+bestInv.price;
+  const sellPrice     = totalCost*(1+markup);
+  const profit        = sellPrice-totalCost;
+  const costPerKW     = totalCost/systemDC;
+  const dailyOffset   = Math.min(expectedDailySolar,dailyUsage);
+  const monthlySavings = dailyOffset*tariff*30;
+  const annualSavings  = dailyOffset*tariff*365;
+  const simplePayback  = totalCost/(annualSavings*1.1274);
+  const lifetimeSavings = annualSavings*25;
+  const annualROI      = (annualSavings/totalCost)*100;
   let cumS=0, realPayback=25;
   for(let yr=1;yr<=25;yr++){
     const f=yr<=3?Math.pow(1.1274,yr-1):Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
@@ -554,13 +809,12 @@ function calculate() {
     if(cumS>=totalCost&&realPayback===25) realPayback=yr;
   }
 
-  // ENVIRONMENT
-  const co2KG = annualSolar * 0.895;
-  const co2Tons = co2KG / 1000;
-  const trees = co2KG / 21;
-  const coal = annualSolar / 2460;
-  const water = annualSolar * 1.8;
-  const monthlyKWh = expectedDailySolar * 30;
+  const co2KG  = annualSolar*0.895;
+  const co2Tons = co2KG/1000;
+  const trees   = co2KG/21;
+  const coal    = annualSolar/2460;
+  const water   = annualSolar*1.8;
+  const monthlyKWh = expectedDailySolar*30;
   const segment = monthlyKWh<=1500?'Low Residential':monthlyKWh<=3000?'High Residential':monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial';
   const indepPct = Math.min(annualSolar/annualConsumption,1)*100;
 
@@ -611,7 +865,7 @@ function renderAll(r) {
   set('b-runtime',fmtN(r.battRuntime,1)+' hrs');
   set('b-model',r.battModel); set('b-usable-per',fmtN(r.battUsable,2)+' kWh'); set('b-cap-ratio',fmtN(r.battCapRatio,2)+'x');
   document.getElementById('b-bar').style.width=Math.min(r.battCapRatio/1.5,1)*100+'%';
-  document.getElementById('b-bar').style.background=r.battCapRatio>=1.1?'#34d399':r.battCapRatio>=1?'#fbbf24':'#f87171';
+  document.getElementById('b-bar').style.background=r.battCapRatio>=1.1?'var(--green)':r.battCapRatio>=1?'var(--amber)':'var(--red)';
   set('b-bar-tip',fmtN(r.battCapRatio,2)+'x ratio — '+(r.battCapRatio>=1.1?'healthy headroom':r.battCapRatio>=1?'tight but meets requirement':'UNDERSIZED — review required'));
 
   set('i-model',r.invModel);
@@ -627,10 +881,8 @@ function renderAll(r) {
   set('i-headroom',(r.invHeadroom>0?'+':'')+fmtN(r.invHeadroom,1)+' kW');
   set('i-eff',fmtN(r.invEff,1)+'%');
   const mx=Math.max(r.systemDC,r.invAC)*1.1;
-  document.getElementById('bar-dc').style.width=(r.systemDC/mx*100)+'%';
-  set('bar-dc-val',fmtN(r.systemDC,2)+' kW');
-  document.getElementById('bar-ac').style.width=(r.invAC/mx*100)+'%';
-  set('bar-ac-val',fmtN(r.invAC,1)+' kW');
+  document.getElementById('bar-dc').style.width=(r.systemDC/mx*100)+'%'; set('bar-dc-val',fmtN(r.systemDC,2)+' kW');
+  document.getElementById('bar-ac').style.width=(r.invAC/mx*100)+'%'; set('bar-ac-val',fmtN(r.invAC,1)+' kW');
 
   set('f-total-cost',fmtR(r.totalCost)); set('f-cost-per-kw',fmtR(r.costPerKW));
   set('f-sell-price',fmtR(r.sellPrice)); set('f-annual-savings',fmtR(r.annualSavings));
@@ -665,11 +917,12 @@ function set(id,val){const el=document.getElementById(id);if(el)el.textContent=v
 function setKpi(id,val,color){const el=document.getElementById(id);if(!el)return;el.textContent=val;const k=el.closest('.kpi');if(k)k.className='kpi '+color;}
 function setBar(bid,pct,vid,val){const b=document.getElementById(bid);if(b)b.style.width=Math.max(pct,2)+'%';set(vid,val);}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function newCalculation(){document.getElementById('success-card').classList.remove('on');document.getElementById('btn-gen').disabled=false;showTab('tab-solar');}
 
-// ===== GENERATE PROPOSAL =====
+// ── GENERATE PROPOSAL ─────────────────────────────────────────────────────
 async function generateProposal() {
   if (!calcResult || !installer) return;
-  const r = calcResult;
+  const r   = calcResult;
   const btn = document.getElementById('btn-gen');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Generating…';
@@ -679,9 +932,7 @@ async function generateProposal() {
   const clientPhone   = document.getElementById('p-phone').value.trim();
   const clientAddress = document.getElementById('p-address').value.trim();
 
-  if (!clientEmail) {
-    toast('⚠ Please enter client email'); btn.disabled=false; btn.textContent='Generate Proposal'; return;
-  }
+  if (!clientEmail) { toast('⚠ Please enter client email'); btn.disabled=false; btn.textContent='Generate Proposal'; return; }
 
   const payload = {record:{
     contact_email: clientEmail, installer_id: installer.installer_id,
@@ -701,24 +952,36 @@ async function generateProposal() {
   }};
 
   try {
-    const res = await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`, {
+    const res  = await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`, {
       method:'POST', headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
       body: JSON.stringify(payload)
     });
     const data = await res.json();
+
     if (data.success) {
-      document.getElementById('proposal-result').style.display = 'block';
-      document.getElementById('proposal-links').innerHTML =
-        `<div style="margin-bottom:8px"><a href="${data.pdf_url}" target="_blank" style="color:#7ac8f8;text-decoration:underline">📄 Download PDF Proposal</a></div>
-         <div><a href="${data.review_url}" target="_blank" style="color:#7ac8f8;text-decoration:underline">👁 Installer Review Page</a></div>
-         <div style="margin-top:8px;font-size:.8rem;color:#7a9cbf">AI ID: ${data.ai_id}</div>`;
-      toast('✓ Proposal generated successfully!');
+      // ── BUILD PORTAL DEEP-LINK ──
+      const portalUrl = `prposal_portal.html?ai_id=${encodeURIComponent(data.ai_id)}&email=${encodeURIComponent(installer.contact_email)}`;
+
+      // ── UPDATE SUCCESS CARD ──
+      document.getElementById('success-ai-label').innerHTML =
+        'AI Proposal ID <span class="ai-id-tag">' + data.ai_id + '</span>';
+      document.getElementById('btn-open-portal').href = portalUrl;
+      const pdfBtn = document.getElementById('btn-download-pdf');
+      if (data.pdf_url) { pdfBtn.href = data.pdf_url; pdfBtn.style.display='flex'; }
+      else pdfBtn.style.display = 'none';
+      document.getElementById('success-card').classList.add('on');
+      toast('✓ Proposal generated — opening portal');
+
+      // ── AUTO REDIRECT AFTER SHORT DELAY ──
+      setTimeout(() => { window.location.href = portalUrl; }, 2800);
     } else {
       toast('⚠ Error: ' + (data.error||'Unknown error'));
+      btn.disabled=false; btn.textContent='Generate Proposal';
     }
-  } catch(e) { toast('⚠ Network error: ' + e.message); }
-
-  btn.disabled = false; btn.textContent = 'Generate Proposal';
+  } catch(e) {
+    toast('⚠ Network error: ' + e.message);
+    btn.disabled=false; btn.textContent='Generate Proposal';
+  }
 }
 </script>
 </body>
