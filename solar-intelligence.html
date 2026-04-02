@@ -8,337 +8,120 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy:#0B1F3A;
-  --gold:#FFD700;
-  --gold-dim:rgba(255,215,0,.10);
-  --gold-border:rgba(255,215,0,.22);
-  --text:#f0f4f8;
-  --muted:#7a95af;
-  --border:rgba(255,255,255,.07);
-  --card:rgba(255,255,255,.04);
-  --surface:#112840;
-  --surface2:#0e2035;
-  --green:#34d399;
-  --red:#f87171;
-  --amber:#fbbf24;
-  --blue:#7ac8f8;
+  --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --surface:#112840;--surface2:#0e2035;--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
-
-/* ── TOP NAV ── */
-.top-nav{
-  background:var(--navy);
-  border-bottom:1px solid var(--border);
-  padding:0 28px;
-  height:58px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  position:sticky;
-  top:0;
-  z-index:100;
-  backdrop-filter:blur(12px);
-}
+.top-nav{background:var(--navy);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
 .nav-brand{display:flex;align-items:center;gap:11px}
-.nav-icon{
-  width:34px;height:34px;
-  background:var(--gold);
-  border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:700;color:var(--navy);
-  font-family:'DM Serif Display',serif;
-  flex-shrink:0;
-}
-.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}
-.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-icon{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
 .nav-center{display:flex;align-items:center;gap:6px}
-.nav-chip{
-  font-size:11px;font-weight:500;
-  padding:5px 12px;border-radius:20px;
-  background:var(--card);border:1px solid var(--border);
-  color:var(--muted);
-  display:flex;align-items:center;gap:5px;
-}
+.nav-chip{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:5px;}
 .nav-chip.active{background:rgba(255,215,0,.12);border-color:var(--gold-border);color:var(--gold)}
 .nav-right{display:flex;align-items:center;gap:12px}
-.portal-link{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 16px;border-radius:9px;
-  background:var(--gold);color:var(--navy);
-  font-size:12px;font-weight:700;
-  text-decoration:none;
-  transition:all .2s;
-  letter-spacing:.02em;
-}
+.portal-link{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.02em;}
 .portal-link:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,215,0,.25)}
-.installer-badge{
-  font-size:11px;font-weight:500;
-  padding:5px 12px;border-radius:20px;
-  background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);
-  color:var(--blue);
-  display:none;
-}
-.sign-out-link{
-  font-size:11px;color:var(--muted);background:none;border:none;
-  cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;
-}
+.installer-badge{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue);display:none;}
+.sign-out-link{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;}
 .sign-out-link:hover{color:var(--red)}
-
-/* ── LOGIN ── */
-#login-screen{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:calc(100vh - 58px);
-  padding:32px 20px;
-}
-.login-box{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:40px;
-  width:100%;max-width:420px;
-  text-align:center;
-  position:relative;
-  overflow:hidden;
-}
-.login-box::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--gold),transparent);
-}
-.login-logo{
-  width:52px;height:52px;
-  background:var(--gold);
-  border-radius:14px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'DM Serif Display',serif;
-  font-size:22px;color:var(--navy);
-  margin:0 auto 18px;
-}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:32px 20px;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent);}
+.login-logo{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin:0 auto 18px;}
 .login-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:4px}
 .login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.02em}
-.login-box input{
-  width:100%;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.1);
-  color:var(--text);
-  padding:12px 16px;
-  border-radius:9px;
-  font-size:14px;
-  font-family:'DM Sans',sans-serif;
-  margin-bottom:12px;
-  display:block;
-  transition:border-color .2s;
-}
-.login-box input:focus{outline:none;border-color:var(--gold)}
-.login-box input::placeholder{color:rgba(255,255,255,.2)}
-.btn-primary{
-  background:var(--gold);color:var(--navy);
-  border:none;padding:13px 24px;
-  border-radius:9px;font-weight:700;font-size:14px;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;width:100%;transition:all .2s;margin-top:4px;
-}
-.btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}
-.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
+.login-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 16px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:12px;display:block;transition:border-color .2s;}
+.login-box input:focus{outline:none;border-color:var(--gold)}.login-box input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primary{background:var(--gold);color:var(--navy);border:none;padding:13px 24px;border-radius:9px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;margin-top:4px;}
+.btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
 .error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
 .login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 
-/* ── MAIN APP ── */
+/* ── LOADING OVERLAY ── */
+.data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.data-loading.on{display:flex;}
+.dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+.dl-msg{font-size:13px;color:var(--muted)}.dl-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+
 #app-screen{display:none;padding:24px 28px}
-
-.input-strip{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:13px;
-  padding:18px 22px;
-  margin-bottom:20px;
-  display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;
-}
+.input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
 .inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
-.inp-group label{
-  font-size:10px;color:var(--muted);
-  font-weight:600;text-transform:uppercase;letter-spacing:.08em;
-}
-.inp-group select,.inp-group input{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.1);
-  color:var(--text);
-  padding:9px 12px;
-  border-radius:8px;
-  font-size:13px;
-  font-family:'DM Sans',sans-serif;
-  transition:border-color .2s;
-}
+.inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+.inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
-.btn-calc{
-  background:var(--gold);color:var(--navy);
-  border:none;padding:10px 26px;
-  border-radius:8px;font-weight:700;font-size:13px;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;height:38px;white-space:nowrap;
-  transition:all .2s;
-}
+.btn-calc{background:var(--gold);color:var(--navy);border:none;padding:10px 26px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;white-space:nowrap;transition:all .2s;}
 .btn-calc:hover{background:#fff}
-
-/* ── TABS ── */
 .tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
-.tab{
-  padding:8px 17px;border-radius:8px 8px 0 0;
-  font-size:12px;font-weight:500;
-  cursor:pointer;
-  border:1px solid var(--border);border-bottom:none;
-  background:var(--surface);color:var(--muted);
-  transition:.15s;font-family:'DM Sans',sans-serif;
-}
-.tab.active{background:var(--surface2);color:var(--gold);border-color:rgba(255,215,0,.2)}
-.tab:hover:not(.active){color:var(--text)}
-.tab-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:0 13px 13px 13px;padding:22px}
-.tab-panel.active{display:block}
-
-/* ── KPI CARDS ── */
+.tab{padding:8px 17px;border-radius:8px 8px 0 0;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--surface);color:var(--muted);transition:.15s;font-family:'DM Sans',sans-serif;}
+.tab.active{background:var(--surface2);color:var(--gold);border-color:rgba(255,215,0,.2)}.tab:hover:not(.active){color:var(--text)}
+.tab-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:0 13px 13px 13px;padding:22px}.tab-panel.active{display:block}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
-.kpi{
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--border);
-  border-radius:10px;padding:14px 16px;
-  position:relative;overflow:hidden;
-}
+.kpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;}
 .kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 10px 10px;background:var(--gold)}
-.kpi.green::after{background:var(--green)}
-.kpi.red::after{background:var(--red)}
-.kpi.amber::after{background:var(--amber)}
-.kpi.white::after{background:rgba(255,255,255,.2)}
+.kpi.green::after{background:var(--green)}.kpi.red::after{background:var(--red)}.kpi.amber::after{background:var(--amber)}.kpi.white::after{background:rgba(255,255,255,.2)}
 .kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:500}
 .kpi .value{font-size:1.5rem;font-weight:600;color:var(--gold);line-height:1.1;font-family:'DM Serif Display',serif}
-.kpi.green .value{color:var(--green)}
-.kpi.red .value{color:var(--red)}
-.kpi.amber .value{color:var(--amber)}
-.kpi.white .value{color:var(--text)}
+.kpi.green .value{color:var(--green)}.kpi.red .value{color:var(--red)}.kpi.amber .value{color:var(--amber)}.kpi.white .value{color:var(--text)}
 .kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
-
-/* ── STATUS ROWS ── */
 .status-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
-.status-row:last-child{border-bottom:none}
-.status-row .lbl{color:var(--muted)}
-.status-row .val{font-weight:500;color:var(--text);text-align:right;max-width:60%}
-
+.status-row:last-child{border-bottom:none}.status-row .lbl{color:var(--muted)}.status-row .val{font-weight:500;color:var(--text);text-align:right;max-width:60%}
 .bar-wrap{background:rgba(255,255,255,.06);border-radius:6px;height:10px;margin-top:6px;overflow:hidden}
 .bar-fill{height:100%;border-radius:6px;transition:width .4s}
-
-.section-title{
-  font-size:10px;font-weight:600;color:var(--gold);
-  margin:18px 0 10px;
-  text-transform:uppercase;letter-spacing:.1em;
-  display:flex;align-items:center;gap:8px;
-}
+.section-title{font-size:10px;font-weight:600;color:var(--gold);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
 .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ── CHARTS ── */
 .chart-wrap{width:100%;margin-top:12px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid var(--border)}
 .chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .chart-label{font-size:11px;color:var(--muted);min-width:52px;text-align:right}
 .chart-bar-outer{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden}
 .chart-bar-inner{height:100%;border-radius:4px;transition:width .5s}
 .chart-val{font-size:11px;color:var(--text);min-width:80px}
-
-/* ── CLIENT FORM ── */
 .client-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.client-form input{
-  width:100%;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.1);
-  color:var(--text);
-  padding:10px 13px;border-radius:8px;font-size:13px;
-  font-family:'DM Sans',sans-serif;
-  transition:border-color .2s;
-}
+.client-form input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .client-form input:focus{outline:none;border-color:var(--gold)}
 .client-form label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
 .tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:5px}
-
-/* ── PROPOSAL STRIP ── */
-.proposal-strip{
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:18px 22px;
-  margin-top:18px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
-}
-.proposal-strip .info{font-size:12px;color:var(--muted);line-height:1.6}
-.proposal-strip .info b{color:var(--text)}
-.btn-generate{
-  background:var(--green);color:#064e3b;
-  border:none;padding:12px 30px;
-  border-radius:9px;font-weight:700;font-size:13px;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;transition:all .2s;
-}
+.proposal-strip{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-top:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.proposal-strip .info{font-size:12px;color:var(--muted);line-height:1.6}.proposal-strip .info b{color:var(--text)}
+.btn-generate{background:var(--green);color:#064e3b;border:none;padding:12px 30px;border-radius:9px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
 .btn-generate:hover{background:#10b981;transform:translateY(-1px)}
 .btn-generate:disabled{background:rgba(255,255,255,.08);color:var(--muted);cursor:not-allowed;transform:none}
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid #064e3b;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── SUCCESS CARD ── */
-.success-card{
-  display:none;
-  margin-top:18px;
-  background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));
-  border:1px solid rgba(52,211,153,.25);
-  border-radius:13px;
-  padding:24px;
-  animation:up .3s ease;
-}
+.success-card{display:none;margin-top:18px;background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border:1px solid rgba(52,211,153,.25);border-radius:13px;padding:24px;animation:up .3s ease;}
 .success-card.on{display:block}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .success-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
 .success-icon{width:38px;height:38px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.success-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text)}
-.success-title em{font-style:italic;color:var(--green)}
+.success-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text)}.success-title em{font-style:italic;color:var(--green)}
 .success-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-.action-btn{
-  display:flex;align-items:center;gap:7px;
-  padding:10px 20px;border-radius:9px;
-  font-size:13px;font-weight:600;
-  font-family:'DM Sans',sans-serif;
-  cursor:pointer;border:none;transition:all .2s;
-  text-decoration:none;
-}
-.action-btn.primary{background:var(--gold);color:var(--navy)}
-.action-btn.primary:hover{background:#fff;transform:translateY(-1px)}
-.action-btn.secondary{background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue)}
-.action-btn.secondary:hover{background:rgba(122,200,248,.18)}
-.action-btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}
-.action-btn.ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.action-btn{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+.action-btn.primary{background:var(--gold);color:var(--navy)}.action-btn.primary:hover{background:#fff;transform:translateY(-1px)}
+.action-btn.secondary{background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue)}.action-btn.secondary:hover{background:rgba(122,200,248,.18)}
+.action-btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}.action-btn.ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
 .action-btn svg{width:14px;height:14px;flex-shrink:0}
 .ai-id-tag{display:inline-block;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-left:6px}
-
-/* ── TOAST ── */
-#toast{
-  position:fixed;bottom:22px;right:22px;
-  background:var(--surface);border:1px solid rgba(52,211,153,.35);
-  color:var(--green);padding:12px 20px;
-  border-radius:10px;font-size:13px;font-weight:500;
-  opacity:0;transition:opacity .3s;
-  pointer-events:none;z-index:999;
-  box-shadow:0 8px 24px rgba(0,0,0,.3);
-}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 
+<!-- ══ LOADING OVERLAY ══ -->
+<div class="data-loading" id="dataLoading">
+  <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
+  <div class="dl-spinner"></div>
+  <div class="dl-msg" id="dlMsg">Loading your workspace…</div>
+  <div class="dl-err" id="dlErr"></div>
+</div>
+
 <!-- ══ TOP NAVIGATION ══ -->
 <nav class="top-nav">
   <div class="nav-brand">
     <div class="nav-icon">N</div>
-    <div>
-      <div class="nav-brand-name">Nova Metrics</div>
-      <div class="nav-brand-sub">Solar Intelligence</div>
-    </div>
+    <div><div class="nav-brand-name">Nova Metrics</div><div class="nav-brand-sub">Solar Intelligence</div></div>
   </div>
   <div class="nav-center">
     <div class="nav-chip active">⚡ System Sizing Engine</div>
@@ -370,29 +153,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 
 <!-- ══ MAIN APP ══ -->
 <div id="app-screen">
-
-  <!-- Input controls -->
   <div class="input-strip">
     <div class="inp-group">
       <label>Location</label>
-      <select id="sel-location">
-        <option value="JHB">Johannesburg</option>
-        <option value="CPT">Cape Town</option>
-        <option value="DBN">Durban</option>
-        <option value="UP">Upington</option>
-      </select>
+      <select id="sel-location"><option value="">Loading…</option></select>
     </div>
     <div class="inp-group">
       <label>Load Profile</label>
-      <select id="sel-load">
-        <option value="lights-geyser" data-peak="3" data-daily="20">Lights + Geyser</option>
-        <option value="lights-geyser-ac" data-peak="5" data-daily="35">Lights + Geyser + AC</option>
-        <option value="essential" data-peak="1.5" data-daily="8">Essential Only</option>
-        <option value="full-house" data-peak="6" data-daily="45">Full House</option>
-        <option value="small-office" data-peak="8" data-daily="60">Small Office</option>
-        <option value="large-office" data-peak="15" data-daily="120">Large Office / Commercial</option>
-        <option value="custom" data-peak="0" data-daily="0">Custom…</option>
-      </select>
+      <select id="sel-load"><option value="">Loading…</option></select>
     </div>
     <div class="inp-group" id="custom-peak-wrap" style="display:none">
       <label>Peak Load (kW)</label>
@@ -405,39 +173,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="inp-group">
       <label>Autonomy Hours</label>
       <select id="sel-autonomy">
-        <option value="4">4 hrs</option>
-        <option value="8">8 hrs</option>
-        <option value="12" selected>12 hrs</option>
-        <option value="16">16 hrs</option>
-        <option value="24">24 hrs</option>
+        <option value="4">4 hrs</option><option value="8">8 hrs</option>
+        <option value="12" selected>12 hrs</option><option value="16">16 hrs</option><option value="24">24 hrs</option>
       </select>
     </div>
     <div class="inp-group">
       <label>Tariff (R/kWh)</label>
       <select id="sel-tariff">
-        <option value="2.15">R2.15</option>
-        <option value="2.50">R2.50</option>
-        <option value="2.75" selected>R2.75</option>
-        <option value="3.00">R3.00</option>
-        <option value="3.50">R3.50</option>
-        <option value="4.00">R4.00</option>
+        <option value="2.15">R2.15</option><option value="2.50">R2.50</option>
+        <option value="2.75" selected>R2.75</option><option value="3.00">R3.00</option>
+        <option value="3.50">R3.50</option><option value="4.00">R4.00</option>
       </select>
     </div>
     <div class="inp-group">
       <label>Markup %</label>
       <select id="sel-markup">
-        <option value="0">0%</option>
-        <option value="10" selected>10%</option>
-        <option value="15">15%</option>
-        <option value="20">20%</option>
-        <option value="25">25%</option>
-        <option value="30">30%</option>
+        <option value="0">0%</option><option value="10" selected>10%</option>
+        <option value="15">15%</option><option value="20">20%</option>
+        <option value="25">25%</option><option value="30">30%</option>
       </select>
     </div>
-    <button class="btn-calc" onclick="calculate()">⚡ Recommend</button>
+    <button class="btn-calc" onclick="calculate()">⚡ Calculate</button>
   </div>
 
-  <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="showTab('tab-solar')">☀️ Solar Array</div>
     <div class="tab" onclick="showTab('tab-battery')">🔋 Battery</div>
@@ -447,7 +205,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="tab" onclick="showTab('tab-proposal')">📋 Generate Proposal</div>
   </div>
 
-  <!-- TAB 1: SOLAR ARRAY -->
   <div id="tab-solar" class="tab-panel active">
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Recommended Panel</div><div class="value" id="r-panel-model">—</div></div>
@@ -466,7 +223,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Annual Solar Production</span><span class="val" id="r-annual-solar">—</span></div>
   </div>
 
-  <!-- TAB 2: BATTERY -->
   <div id="tab-battery" class="tab-panel">
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">—</div></div>
@@ -489,7 +245,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <p class="tip" id="b-bar-tip"></p>
   </div>
 
-  <!-- TAB 3: INVERTER -->
   <div id="tab-inverter" class="tab-panel">
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:.95rem">—</div></div>
@@ -513,7 +268,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     </div>
   </div>
 
-  <!-- TAB 4: FINANCIALS -->
   <div id="tab-financials" class="tab-panel">
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Recommended Total System Cost</div><div class="value" id="f-total-cost">—</div></div>
@@ -542,7 +296,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Annual Consumption (kWh)</span><span class="val" id="f-consumption">—</span></div>
   </div>
 
-  <!-- TAB 5: ENVIRONMENT -->
   <div id="tab-enviro" class="tab-panel">
     <div class="kpi-grid">
       <div class="kpi green"><div class="label">Annual CO₂ Saved</div><div class="value" id="e-co2">—</div><div class="sub">tonnes</div></div>
@@ -559,7 +312,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <p class="tip" id="e-indep-tip" style="margin-top:8px"></p>
   </div>
 
-  <!-- TAB 6: PROPOSAL -->
   <div id="tab-proposal" class="tab-panel">
     <div class="section-title">Client Details</div>
     <div class="client-form">
@@ -573,16 +325,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Total Cost</span><span class="val" id="ps-cost">—</span></div>
     <div class="status-row"><span class="lbl">Annual Savings</span><span class="val" id="ps-savings">—</span></div>
     <div class="status-row"><span class="lbl">Payback</span><span class="val" id="ps-payback">—</span></div>
-
     <div class="proposal-strip">
-      <div class="info">
-        AI-powered proposal via Nova Metrics pipeline.<br>
-        <b>PDF generated &amp; delivered automatically — then view in Proposal Portal.</b>
-      </div>
+      <div class="info">AI-powered proposal via Nova Metrics pipeline.<br><b>PDF generated &amp; delivered — then view in Proposal Portal.</b></div>
       <button class="btn-generate" id="btn-gen" onclick="generateProposal()" disabled>Generate Proposal</button>
     </div>
-
-    <!-- SUCCESS STATE -->
     <div class="success-card" id="success-card">
       <div class="success-header">
         <div class="success-icon">✓</div>
@@ -591,9 +337,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
           <div style="font-size:12px;color:var(--muted);margin-top:3px" id="success-ai-label"></div>
         </div>
       </div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6">
-        The proposal has been generated and saved. You can now open it directly in the <strong style="color:var(--text)">Proposal Portal</strong> to review, send, or download the PDF.
-      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">The proposal has been generated and saved. Open the <strong style="color:var(--text)">Proposal Portal</strong> to review, send, or download the PDF.</div>
       <div class="success-actions">
         <a href="#" id="btn-open-portal" class="action-btn primary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -619,62 +363,149 @@ const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const SESSION_KEY = 'nm_installer_session';
 
-const PANELS = [
-  {id:6,model:'REC Alpha 405W',watts:405,area:1.78,price:3300},
-  {id:5,model:'Longi 450W',watts:450,area:1.90,price:2900},
-  {id:4,model:'Trina Vertex 540W',watts:540,area:2.38,price:4050},
-  {id:7,model:'Qcells 540W G10',watts:540,area:2.36,price:4150},
-  {id:3,model:'HiKu 545W',watts:545,area:2.40,price:4100},
-  {id:1,model:'JA Solar 550W N-Type',watts:550,area:2.35,price:4200},
-  {id:2,model:'Jinko Tiger 575W',watts:575,area:2.42,price:4350}
-];
-const INVERTERS = [
-  {id:7,model:'Growatt SPF 5000ES',ac:5,dc:6.0,mppt:1,eff:96.5,price:13500},
-  {id:4,model:'Deye 5kW',ac:5,dc:6.5,mppt:2,eff:97.3,price:18500},
-  {id:1,model:'Sunsynk 5kW',ac:5,dc:6.5,mppt:2,eff:97.6,price:19000},
-  {id:8,model:'Huawei SUN2000 5kW',ac:5,dc:7.5,mppt:2,eff:98.6,price:22000},
-  {id:10,model:'Fronius Primo 6.0',ac:6,dc:9.0,mppt:2,eff:98.0,price:31000},
-  {id:5,model:'Deye 8kW',ac:8,dc:10.4,mppt:2,eff:97.3,price:27000},
-  {id:2,model:'Sunsynk 8kW',ac:8,dc:10.4,mppt:2,eff:97.6,price:29000},
-  {id:9,model:'Huawei SUN2000 10kW',ac:10,dc:15.0,mppt:3,eff:98.6,price:33000},
-  {id:11,model:'Fronius Symo 10.0',ac:10,dc:15.0,mppt:3,eff:98.1,price:47000},
-  {id:6,model:'Deye 12kW',ac:12,dc:15.6,mppt:3,eff:97.3,price:35000},
-  {id:3,model:'Sunsynk 12kW',ac:12,dc:15.6,mppt:3,eff:97.6,price:37000}
-];
-const BATTERIES = [
-  {id:3,model:'Pylontech US3000C',brand:'Pylontech',usable:2.80,kw:3.0,price:46000},
-  {id:13,model:'US5000',brand:'Pylontech',usable:4.32,kw:5.0,price:27000},
-  {id:12,model:'Dyness DL5.0C',brand:'Dyness',usable:4.60,kw:5.0,price:28000},
-  {id:10,model:'Hubble AM-5',brand:'Hubble',usable:4.60,kw:5.0,price:28500},
-  {id:11,model:'Hubble AM-10',brand:'Hubble',usable:9.00,kw:5.0,price:56000},
-  {id:14,model:'Sunsynk 10.65kWh',brand:'Sunsynk',usable:9.58,kw:5.0,price:50000},
-  {id:16,model:'BYD B-Box 13.8',brand:'BYD',usable:12.42,kw:5.0,price:65000},
-  {id:15,model:'PowerGem 14.3kWh',brand:'PowerGem',usable:12.87,kw:5.0,price:31500},
-  {id:17,model:'BSLBATT 15kWh',brand:'BSLBATT',usable:13.82,kw:5.0,price:46000}
-];
-const GTI = {JHB:5.10,CPT:4.60,DBN:4.90,UP:5.80};
-
+// ── Runtime data (loaded from Supabase) ───────────────────────────────────
+let DB = { locations: [], panels: [], inverters: [], batteries: [], loadProfiles: [] };
 let installer  = null;
 let calcResult = null;
 
-// ── BOOT: check shared localStorage session first ─────────────────────────
+// ── API helper ────────────────────────────────────────────────────────────
+async function sbFetch(path) {
+  const res = await fetch(SUPA_URL + path, {
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Accept': 'application/json' }
+  });
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
 (function boot() {
   const saved = localStorage.getItem(SESSION_KEY);
   if (saved) {
-    try {
-      installer = JSON.parse(saved);
-      showApp();
-    } catch(e) {
-      localStorage.removeItem(SESSION_KEY);
-    }
+    try { installer = JSON.parse(saved); } catch(e) { localStorage.removeItem(SESSION_KEY); }
+  }
+  if (installer) {
+    showLoadingOverlay('Loading your workspace…');
+    loadAllData().then(() => { hideLoadingOverlay(); showApp(); }).catch(showDataError);
   }
 })();
 
+function showLoadingOverlay(msg) {
+  document.getElementById('dlMsg').textContent = msg || 'Loading…';
+  document.getElementById('dlErr').style.display = 'none';
+  document.getElementById('dataLoading').classList.add('on');
+}
+function hideLoadingOverlay() { document.getElementById('dataLoading').classList.remove('on'); }
+function showDataError(err) {
+  document.getElementById('dlMsg').textContent = 'Failed to load data';
+  document.getElementById('dlErr').textContent = String(err);
+  document.getElementById('dlErr').style.display = 'block';
+}
+
+// ── LOAD ALL DYNAMIC DATA IN PARALLEL ─────────────────────────────────────
+async function loadAllData() {
+  const instId = installer.installer_id;
+
+  const [locRows, panelRows, invRows, battRows, loadRows] = await Promise.all([
+    // Locations: fetch only the ones assigned to this installer via installer_locations
+    // Falls back to all locations if no installer_locations rows exist
+    sbFetch(`/rest/v1/solar_locations?id=in.(${await getInstallerLocationIds(instId)})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
+    // All panels, sorted by wattage ascending
+    sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
+    // All inverters, sorted by AC capacity ascending
+    sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
+    // All batteries, sorted by usable kWh ascending
+    sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`),
+    // Load profiles
+    sbFetch(`/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc`)
+  ]);
+
+  // Normalise locations
+  DB.locations = (locRows || []).map(r => ({
+    id:    r.id,
+    city:  r.city,
+    name:  r.location_name || r.city,
+    gti:   parseFloat(r.design_gti_kwh_m2_day) || 4.80
+  }));
+
+  // Normalise panels
+  DB.panels = (panelRows || []).map(r => ({
+    id:    r.id,
+    model: r['PanelModel'],
+    watts: parseInt(r['Watts']) || 0,
+    area:  parseFloat(r['Area_sqm']) || 2.0,
+    price: parseFloat(r['UnitPrice_R']) || 0
+  })).filter(p => p.watts > 0 && p.price > 0);
+
+  // Normalise inverters
+  DB.inverters = (invRows || []).map(r => ({
+    id:    r.id,
+    model: r['InverterModel'],
+    ac:    parseFloat(r['ACContinuous_kW']) || 0,
+    dc:    parseFloat(r['DCMax_kW']) || 0,
+    mppt:  parseInt(r['MPPT_count']) || 1,
+    eff:   parseFloat(r['Efficiency_pct']) || 97,
+    price: parseFloat(r['UnitPrice_R']) || 0
+  })).filter(i => i.ac > 0 && i.price > 0);
+
+  // Normalise batteries
+  DB.batteries = (battRows || []).map(r => ({
+    id:     r.id,
+    model:  r['BatteryModel'],
+    usable: parseFloat(r['Usable_kWh']) || 0,
+    kw:     parseFloat(r['Nominal_kW']) || 5,
+    price:  parseFloat(r['UnitPrice_R']) || 0
+  })).filter(b => b.usable > 0 && b.price > 0);
+
+  // Normalise load profiles
+  DB.loadProfiles = (loadRows || []).map(r => ({
+    id:    r.id,
+    name:  r.profile_name,
+    peak:  parseFloat(r.peak_load_kw) || 0,
+    daily: parseFloat(r.daily_usage_kwh) || 0
+  }));
+
+  populateDropdowns();
+}
+
+// ── Get installer location IDs (with fallback to all) ─────────────────────
+async function getInstallerLocationIds(instId) {
+  try {
+    const rows = await sbFetch(`/rest/v1/installer_locations?installer_id=eq.${instId}&select=location_id`);
+    if (rows && rows.length > 0) return rows.map(r => r.location_id).join(',');
+  } catch(e) {}
+  // Fallback: return all location IDs
+  const all = await sbFetch('/rest/v1/solar_locations?select=id');
+  return (all || []).map(r => r.id).join(',') || '0';
+}
+
+// ── POPULATE DROPDOWNS ────────────────────────────────────────────────────
+function populateDropdowns() {
+  // Locations
+  const locSel = document.getElementById('sel-location');
+  locSel.innerHTML = DB.locations.length
+    ? DB.locations.map(l => `<option value="${l.id}" data-gti="${l.gti}">${l.city}${l.name && l.name !== l.city ? ' – ' + l.name : ''}</option>`).join('')
+    : '<option value="">No locations assigned</option>';
+
+  // Load profiles + custom option
+  const loadSel = document.getElementById('sel-load');
+  loadSel.innerHTML = DB.loadProfiles.map(p =>
+    `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
+  ).join('') + '<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
+
+  // Re-attach custom toggle
+  loadSel.onchange = function() {
+    const c = this.value === 'custom';
+    document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
+    document.getElementById('custom-daily-wrap').style.display = c ? 'flex' : 'none';
+  };
+}
+
+// ── SHOW APP (after data loads) ───────────────────────────────────────────
 function showApp() {
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('app-screen').style.display   = 'block';
   const badge = document.getElementById('installer-badge');
-  badge.textContent = installer.installer_name;
+  badge.textContent   = installer.installer_name;
   badge.style.display = 'inline-block';
 }
 
@@ -684,7 +515,7 @@ document.getElementById('sign-out-btn').addEventListener('click', function() {
   window.location.href = 'nova-metrics_1.html';
 });
 
-// ── LOGIN ────────────────────────────────────────────────────────────────
+// ── LOGIN ─────────────────────────────────────────────────────────────────
 async function doLogin() {
   const emailEl = document.getElementById('login-email');
   const passEl  = document.getElementById('login-password');
@@ -698,26 +529,21 @@ async function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="login-spinner"></span>Signing in…';
   try {
-    const url = `${SUPA_URL}/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=*&limit=1`;
-    const res = await fetch(url, { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Accept': 'application/json' } });
-    if (!res.ok) throw new Error('Server error ' + res.status);
-    const data = await res.json();
+    const data = await sbFetch(`/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=*&limit=1`);
     if (!data || data.length === 0) { errEl.textContent = 'No account found for this email address.'; btn.disabled=false; btn.textContent='Sign In'; return; }
     const row = data[0];
     if (row.password && row.password.trim() !== '' && row.password.trim() !== pass) {
       errEl.textContent = 'Incorrect password. Please try again.';
-      passEl.value = ''; passEl.focus();
-      btn.disabled=false; btn.textContent='Sign In'; return;
+      passEl.value = ''; passEl.focus(); btn.disabled=false; btn.textContent='Sign In'; return;
     }
     installer = row;
-    // Save to localStorage so the Proposal Portal can read it without re-login
     localStorage.setItem(SESSION_KEY, JSON.stringify({
-      installer_id:   row.installer_id,
-      installer_name: row.installer_name,
-      contact_email:  row.contact_email,
-      logo_url:       row.logo_url,
-      primary_color:  row.primary_color
+      installer_id: row.installer_id, installer_name: row.installer_name,
+      contact_email: row.contact_email, logo_url: row.logo_url, primary_color: row.primary_color
     }));
+    showLoadingOverlay('Loading your workspace…');
+    await loadAllData();
+    hideLoadingOverlay();
     showApp();
   } catch(e) {
     errEl.textContent = 'Login error: ' + e.message;
@@ -729,13 +555,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter') { const ls = document.getElementById('login-screen'); if (ls && ls.style.display !== 'none') doLogin(); }
 });
 
-document.getElementById('sel-load').addEventListener('change', function() {
-  const c = this.value === 'custom';
-  document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
-  document.getElementById('custom-daily-wrap').style.display = c ? 'flex' : 'none';
-});
-
-// ── TABS ─────────────────────────────────────────────────────────────────
+// ── TABS ──────────────────────────────────────────────────────────────────
 function showTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -746,10 +566,16 @@ function showTab(id) {
 
 // ── CALCULATION ENGINE ────────────────────────────────────────────────────
 function calculate() {
+  if (!DB.panels.length || !DB.inverters.length || !DB.batteries.length) {
+    toast('⚠ Data still loading — please wait'); return;
+  }
+
   const locSel  = document.getElementById('sel-location');
-  const locKey  = locSel.value;
-  const locName = locSel.options[locSel.selectedIndex].text;
-  const psh     = GTI[locKey];
+  const locId   = locSel.value;
+  const locOpt  = locSel.options[locSel.selectedIndex];
+  const locName = locOpt ? locOpt.text : 'Unknown';
+  const psh     = locOpt ? parseFloat(locOpt.dataset.gti) || 4.80 : 4.80;
+
   const loadSel = document.getElementById('sel-load');
   let peakLoad, dailyUsage;
   if (loadSel.value === 'custom') {
@@ -759,113 +585,136 @@ function calculate() {
     peakLoad   = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.peak);
     dailyUsage = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.daily);
   }
+
   const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
 
+  // ── SOLAR SIZING ──
   const daytimeLoadEnergy   = peakLoad * psh;
   const battRechargeEnergy  = (peakLoad * autonomy) / 0.90;
   const requiredSolarEnergy = daytimeLoadEnergy + battRechargeEnergy;
   const requiredSolarKW     = requiredSolarEnergy / (psh * 0.85);
 
+  // Best panel: minimum oversize ≥ 0
   let bestPanel = null, bestOversize = Infinity;
-  PANELS.forEach(p => {
+  DB.panels.forEach(p => {
     const n = Math.ceil(requiredSolarKW * 1000 / p.watts);
     const dc = n * p.watts / 1000;
     const os = dc - requiredSolarKW;
     if (os >= 0 && os < bestOversize) { bestOversize=os; bestPanel={...p,panelsNeeded:n,dcKW:dc}; }
   });
-  if (!bestPanel) { bestPanel={...PANELS[PANELS.length-1]}; bestPanel.panelsNeeded=Math.ceil(requiredSolarKW*1000/bestPanel.watts); bestPanel.dcKW=bestPanel.panelsNeeded*bestPanel.watts/1000; }
+  if (!bestPanel) {
+    const p = DB.panels[DB.panels.length-1];
+    bestPanel = {...p};
+    bestPanel.panelsNeeded = Math.ceil(requiredSolarKW*1000/p.watts);
+    bestPanel.dcKW = bestPanel.panelsNeeded * p.watts / 1000;
+  }
 
-  const systemDC          = bestPanel.dcKW;
+  const systemDC           = bestPanel.dcKW;
   const expectedDailySolar = systemDC * psh * 0.85;
   const oversizePct        = (systemDC - requiredSolarKW) / requiredSolarKW;
   const annualSolar        = expectedDailySolar * 30 * 12;
   const annualConsumption  = peakLoad * 24 * 365;
   const panelCount         = bestPanel.panelsNeeded;
   const footprint          = panelCount * 2.2;
-  const roofFitData        = panelCount<=14?['Easy Fit','Fits a single roof plane. Quick installation.']:panelCount<=20?['Standard Fit','May use multiple roof sections. Common setup.']:panelCount<=30?['Complex Layout','East/West layout recommended for optimal production.']:['Large System Layout','Carport or ground mount may be considered.'];
+  const roofFitData = panelCount<=14 ? ['Easy Fit','Fits a single roof plane. Quick installation.']
+    : panelCount<=20 ? ['Standard Fit','May use multiple roof sections. Common setup.']
+    : panelCount<=30 ? ['Complex Layout','East/West layout recommended for optimal production.']
+    : ['Large System Layout','Carport or ground mount may be considered.'];
 
-  const requiredUsableKWh   = peakLoad * autonomy;
+  // ── BATTERY SIZING ──
+  const requiredUsableKWh     = peakLoad * autonomy;
   const batteryEnergyAdjusted = requiredUsableKWh * 1.10;
   let bestBatt=null, minUnits=Infinity, minCost=Infinity;
-  [...BATTERIES].sort((a,b)=>a.usable-b.usable).forEach(b=>{
-    const u=Math.ceil(requiredUsableKWh/b.usable), c=u*b.price;
-    if(u<minUnits||(u===minUnits&&c<minCost)){minUnits=u;minCost=c;bestBatt={...b,units:u,totalCost:c};}
+  [...DB.batteries].sort((a,b)=>a.usable-b.usable).forEach(b => {
+    const u = Math.ceil(requiredUsableKWh / b.usable);
+    const c = u * b.price;
+    if (u < minUnits || (u===minUnits && c<minCost)) { minUnits=u; minCost=c; bestBatt={...b,units:u,totalCost:c}; }
   });
 
-  const installedBattKWh = bestBatt.units*bestBatt.usable;
-  const battRuntime      = installedBattKWh/peakLoad;
-  const battCapRatio     = installedBattKWh/batteryEnergyAdjusted;
-  const battRuntimeRatio = battRuntime/autonomy;
-  const battDailyUtil    = dailyUsage/installedBattKWh;
+  const installedBattKWh = bestBatt.units * bestBatt.usable;
+  const battRuntime      = installedBattKWh / peakLoad;
+  const battCapRatio     = installedBattKWh / batteryEnergyAdjusted;
+  const battRuntimeRatio = battRuntime / autonomy;
+  const battDailyUtil    = dailyUsage / installedBattKWh;
   const battStress       = battDailyUtil>1.0?'Heavy Daily Cycling':battDailyUtil>0.8?'Moderate Daily Cycling':battDailyUtil>0.5?'Normal Daily Use':'Low stress: long battery life';
   const battRisk         = battRuntimeRatio<1?'High risk – autonomy not met':battRuntimeRatio<1.2?'Tight design – minimal reserve':'Low risk – sufficient reserve';
-  const battTotalKW      = bestBatt.kw*bestBatt.units;
-  const backupCovRatio   = battTotalKW/peakLoad;
+  const battTotalKW      = bestBatt.kw * bestBatt.units;
+  const backupCovRatio   = battTotalKW / peakLoad;
   const coverage         = backupCovRatio<1?'Only Essential Loads Supported':backupCovRatio<1.15?'Essential + Some Comfort Loads':backupCovRatio<=1.40?'Most Loads Covered':'Safe power headroom';
   const battSizeStatus   = battCapRatio<1?'Battery Undersized':battCapRatio<=1.2?'Battery Tightly Sized':battCapRatio<=1.4?'Battery Well Sized':'Battery Over-Sized';
-  const issues=[];
-  if(battSizeStatus==='Battery Undersized') issues.push('Add battery capacity (kWh)');
-  if(battRuntime<autonomy) issues.push('Increase backup runtime');
-  if(battStress==='Heavy Daily Cycling') issues.push('Reduce battery stress (add capacity)');
-  const battVerdict = issues.length>0?'Design Action Required: '+issues.join(' | '):battSizeStatus==='Battery Tightly Sized'||battRuntimeRatio<1.2?'Acceptable Design: Limited safety margin':'Well Designed: Balanced and reliable';
+  const issues = [];
+  if (battSizeStatus==='Battery Undersized') issues.push('Add battery capacity (kWh)');
+  if (battRuntime<autonomy) issues.push('Increase backup runtime');
+  if (battStress==='Heavy Daily Cycling') issues.push('Reduce battery stress (add capacity)');
+  const battVerdict = issues.length>0 ? 'Design Action Required: '+issues.join(' | ')
+    : battSizeStatus==='Battery Tightly Sized'||battRuntimeRatio<1.2 ? 'Acceptable Design: Limited safety margin'
+    : 'Well Designed: Balanced and reliable';
 
-  const requiredAC = peakLoad*1.3;
-  let bestInv=null;
-  INVERTERS.forEach(inv=>{if(inv.ac>=requiredAC&&inv.dc>=systemDC){if(!bestInv||inv.ac<bestInv.ac)bestInv=inv;}});
-  if(!bestInv) bestInv=INVERTERS[INVERTERS.length-1];
+  // ── INVERTER SELECTION ──
+  const requiredAC = peakLoad * 1.3;
+  let bestInv = null;
+  DB.inverters.forEach(inv => {
+    if (inv.ac >= requiredAC && inv.dc >= systemDC) { if (!bestInv || inv.ac < bestInv.ac) bestInv = inv; }
+  });
+  if (!bestInv) bestInv = DB.inverters[DB.inverters.length-1];
 
-  const dcAcRatio    = systemDC/bestInv.ac;
-  const dcAcStatus   = dcAcRatio<0.95?'Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping)';
-  const invHeadroom  = bestInv.ac-peakLoad;
-  const invLoadOK    = bestInv.ac>=peakLoad*1.3;
-  const battPowerOK  = battTotalKW>=bestInv.ac;
-  const stringsNeeded  = Math.ceil(panelCount/12);
-  const mpptRequired   = Math.ceil(stringsNeeded/2);
-  const mpptAvailable  = bestInv.mppt;
-  const mpptStatus     = mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
+  const dcAcRatio   = systemDC / bestInv.ac;
+  const dcAcStatus  = dcAcRatio<0.95?'Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping)';
+  const invHeadroom = bestInv.ac - peakLoad;
+  const invLoadOK   = bestInv.ac >= peakLoad * 1.3;
+  const battPowerOK = battTotalKW >= bestInv.ac;
+  const stringsNeeded = Math.ceil(panelCount / 12);
+  const mpptRequired  = Math.ceil(stringsNeeded / 2);
+  const mpptAvailable = bestInv.mppt;
+  const mpptStatus    = mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
 
-  const panelCost     = panelCount*bestPanel.price;
-  const bosCost       = systemDC*3000;
-  const hwCost        = panelCost+bosCost;
-  const totalCost     = hwCost+bestBatt.totalCost+bestInv.price;
-  const sellPrice     = totalCost*(1+markup);
-  const profit        = sellPrice-totalCost;
-  const costPerKW     = totalCost/systemDC;
-  const dailyOffset   = Math.min(expectedDailySolar,dailyUsage);
-  const monthlySavings = dailyOffset*tariff*30;
-  const annualSavings  = dailyOffset*tariff*365;
-  const simplePayback  = totalCost/(annualSavings*1.1274);
-  const lifetimeSavings = annualSavings*25;
-  const annualROI      = (annualSavings/totalCost)*100;
+  // ── FINANCIALS ──
+  const panelCost      = panelCount * bestPanel.price;
+  const bosCost        = systemDC * 3000;
+  const hwCost         = panelCost + bosCost;
+  const totalCost      = hwCost + bestBatt.totalCost + bestInv.price;
+  const sellPrice      = totalCost * (1 + markup);
+  const profit         = sellPrice - totalCost;
+  const costPerKW      = totalCost / systemDC;
+  const dailyOffset    = Math.min(expectedDailySolar, dailyUsage);
+  const monthlySavings = dailyOffset * tariff * 30;
+  const annualSavings  = dailyOffset * tariff * 365;
+  const simplePayback  = totalCost / (annualSavings * 1.1274);
+  const lifetimeSavings = annualSavings * 25;
+  const annualROI      = (annualSavings / totalCost) * 100;
   let cumS=0, realPayback=25;
-  for(let yr=1;yr<=25;yr++){
-    const f=yr<=3?Math.pow(1.1274,yr-1):Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
-    cumS+=annualSavings*f;
-    if(cumS>=totalCost&&realPayback===25) realPayback=yr;
+  for (let yr=1; yr<=25; yr++) {
+    const f = yr<=3 ? Math.pow(1.1274,yr-1) : Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
+    cumS += annualSavings * f;
+    if (cumS >= totalCost && realPayback===25) realPayback = yr;
   }
 
-  const co2KG  = annualSolar*0.895;
-  const co2Tons = co2KG/1000;
-  const trees   = co2KG/21;
-  const coal    = annualSolar/2460;
-  const water   = annualSolar*1.8;
-  const monthlyKWh = expectedDailySolar*30;
+  // ── ENVIRONMENT ──
+  const co2KG   = annualSolar * 0.895;
+  const co2Tons = co2KG / 1000;
+  const trees   = co2KG / 21;
+  const coal    = annualSolar / 2460;
+  const water   = annualSolar * 1.8;
+  const monthlyKWh = expectedDailySolar * 30;
   const segment = monthlyKWh<=1500?'Low Residential':monthlyKWh<=3000?'High Residential':monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial';
-  const indepPct = Math.min(annualSolar/annualConsumption,1)*100;
+  const indepPct = Math.min(annualSolar / annualConsumption, 1) * 100;
 
   calcResult = {
-    locKey,locName,psh,peakLoad,dailyUsage,autonomy,tariff,markup,
-    requiredSolarKW,systemDC,panelCount,panelModel:bestPanel.model,panelWatts:bestPanel.watts,
-    expectedDailySolar,oversizePct,annualSolar,footprint,roofFit:roofFitData[0],roofGuidance:roofFitData[1],requiredSolarEnergy,
-    requiredUsableKWh,installedBattKWh,battRuntime,battModel:bestBatt.model,battUnits:bestBatt.units,battUsable:bestBatt.usable,
-    battCapRatio,battRuntimeRatio,battRisk,battVerdict,battStress,coverage,battTotalCost:bestBatt.totalCost,
-    invModel:bestInv.model,invAC:bestInv.ac,invDC:bestInv.dc,invEff:bestInv.eff,
-    dcAcRatio,dcAcStatus,invHeadroom,invLoadOK,battPowerOK,mpptRequired,mpptAvailable,mpptStatus,invPrice:bestInv.price,
-    panelCost,bosCost,hwCost,totalCost,sellPrice,profit,costPerKW,
-    monthlySavings,annualSavings,lifetimeSavings,annualROI,simplePayback,realPayback,annualConsumption,
-    co2Tons,trees,coal,water,segment,indepPct
+    locId, locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
+    requiredSolarKW, systemDC, panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
+    expectedDailySolar, oversizePct, annualSolar, footprint,
+    roofFit:roofFitData[0], roofGuidance:roofFitData[1], requiredSolarEnergy,
+    requiredUsableKWh, installedBattKWh, battRuntime, battModel:bestBatt.model,
+    battUnits:bestBatt.units, battUsable:bestBatt.usable,
+    battCapRatio, battRuntimeRatio, battRisk, battVerdict, battStress, coverage, battTotalCost:bestBatt.totalCost,
+    invModel:bestInv.model, invAC:bestInv.ac, invDC:bestInv.dc, invEff:bestInv.eff,
+    dcAcRatio, dcAcStatus, invHeadroom, invLoadOK, battPowerOK,
+    mpptRequired, mpptAvailable, mpptStatus, invPrice:bestInv.price,
+    panelCost, bosCost, hwCost, totalCost, sellPrice, profit, costPerKW,
+    monthlySavings, annualSavings, lifetimeSavings, annualROI, simplePayback, realPayback, annualConsumption,
+    co2Tons, trees, coal, water, segment, indepPct
   };
 
   renderAll(calcResult);
@@ -994,22 +843,14 @@ async function generateProposal() {
       body: JSON.stringify(payload)
     });
     const data = await res.json();
-
     if (data.success) {
-      // ── BUILD PORTAL DEEP-LINK ──
       const portalUrl = `prposal_portal.html?ai_id=${encodeURIComponent(data.ai_id)}&email=${encodeURIComponent(installer.contact_email)}`;
-
-      // ── UPDATE SUCCESS CARD ──
-      document.getElementById('success-ai-label').innerHTML =
-        'AI Proposal ID <span class="ai-id-tag">' + data.ai_id + '</span>';
+      document.getElementById('success-ai-label').innerHTML = 'AI Proposal ID <span class="ai-id-tag">'+data.ai_id+'</span>';
       document.getElementById('btn-open-portal').href = portalUrl;
       const pdfBtn = document.getElementById('btn-download-pdf');
-      if (data.pdf_url) { pdfBtn.href = data.pdf_url; pdfBtn.style.display='flex'; }
-      else pdfBtn.style.display = 'none';
+      if (data.pdf_url) { pdfBtn.href=data.pdf_url; pdfBtn.style.display='flex'; } else pdfBtn.style.display='none';
       document.getElementById('success-card').classList.add('on');
       toast('✓ Proposal generated — opening portal');
-
-      // ── AUTO REDIRECT AFTER SHORT DELAY ──
       setTimeout(() => { window.location.href = portalUrl; }, 2800);
     } else {
       toast('⚠ Error: ' + (data.error||'Unknown error'));
