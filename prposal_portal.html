@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <!--
   Nova Metrics — Proposal Portal
-  AUTH: Solar Intelligence passes ?ai_id=XXXX&email=installer@domain.com → auto-auth
+  AUTH: Reads shared localStorage session (nm_installer_session) set by Solar Intelligence.
+        Falls back to URL ?email= param for direct deep-links, then redirects to login.
   FLOW: Solar Intelligence (sizing engine) → generates proposal → redirects here
 -->
 <html lang="en">
@@ -38,26 +39,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .b-ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
 .add-btn{margin:8px 16px 12px;display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;border:1px dashed rgba(255,215,0,.25);color:var(--gold);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s;background:transparent;width:calc(100% - 32px);font-family:'DM Sans',sans-serif;}
 .add-btn:hover{background:var(--gold-dim);}
-
-/* ── NEW CALCULATION BUTTON ── */
-.new-calc-btn{
-  margin:0 16px 20px;
-  display:flex;align-items:center;gap:8px;
-  padding:10px 14px;
-  border-radius:9px;
-  background:var(--gold);
-  color:var(--navy);
-  font-size:12px;font-weight:700;
-  cursor:pointer;
-  border:none;
-  text-decoration:none;
-  font-family:'DM Sans',sans-serif;
-  transition:all .2s;
-  justify-content:center;
-}
+.new-calc-btn{margin:0 16px 20px;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;font-family:'DM Sans',sans-serif;transition:all .2s;justify-content:center;}
 .new-calc-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,215,0,.25);}
 .new-calc-btn svg{width:13px;height:13px;flex-shrink:0;}
-
 .loading-row{padding:12px 16px;font-size:12px;color:var(--muted);text-align:center;}
 .main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden;}
 .topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -68,19 +52,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .nav-a{font-size:12px;color:#6b7280;text-decoration:none;white-space:nowrap;}.nav-a.hi{color:var(--navy);font-weight:500;}
 .sign-out-btn{font-size:12px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sign-out-btn:hover{color:#ef4444;}
-.new-calc-topbtn{
-  display:flex;align-items:center;gap:7px;
-  padding:7px 16px;border-radius:8px;
-  background:var(--navy);color:#fff;
-  font-size:12px;font-weight:600;
-  border:none;cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-  text-decoration:none;
-  transition:all .2s;
-}
+.new-calc-topbtn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
 .new-calc-topbtn:hover{background:#1e3a5f;}
 .new-calc-topbtn svg{width:12px;height:12px;flex-shrink:0;}
-
 .tab-content{display:none;flex:1;flex-direction:column;overflow:hidden;}
 .tab-content.on{display:flex;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
@@ -89,7 +63,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .e-cta{display:flex;align-items:center;gap:7px;padding:10px 22px;border-radius:9px;background:var(--navy);color:#fff;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:8px;border:none;cursor:pointer;}
 .e-cta:hover{background:#1e3a5f;transform:translateY(-1px);}
 .e-cta svg{width:14px;height:14px;}
-
 .detail{flex:1;overflow-y:auto;padding:24px 28px;display:none;flex-direction:column;gap:17px;animation:up .25s ease;}
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
@@ -134,8 +107,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-btn{display:flex;align-items:center;gap:9px;background:var(--gold);color:var(--navy);border:none;border-radius:12px;padding:13px 22px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.3);}
 .dl-btn svg{width:16px;height:16px;flex-shrink:0;}
-
-/* ── ANALYTICS SHELL ── */
 #analyticsTab{overflow:hidden;flex-direction:column;}
 .dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -232,19 +203,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
-
-/* ── NEW CALCULATION BANNER (shown when arrived from Solar Intelligence) ── */
-.arrival-banner{
-  background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));
-  border-bottom:1px solid rgba(52,211,153,.2);
-  padding:10px 28px;
-  display:none;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-  flex-shrink:0;
-}
+.arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:10px 28px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
 .ab-text{font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;}
 .ab-text strong{color:var(--navy);}
@@ -300,7 +259,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
   </div>
 
-  <!-- Arrival banner (shown when redirected from Solar Intelligence) -->
   <div class="arrival-banner" id="arrivalBanner">
     <div class="ab-text">
       <div class="ab-check">✓</div>
@@ -309,7 +267,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <button class="ab-close" onclick="document.getElementById('arrivalBanner').classList.remove('on')">✕</button>
   </div>
 
-  <!-- ── PROPOSALS TAB ── -->
   <div class="tab-content on" id="proposalsTab">
     <div class="empty" id="emptyState">
       <div class="e-icon">☀️</div>
@@ -391,7 +348,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
   </div>
 
-  <!-- ── ANALYTICS TAB ── -->
   <div class="tab-content" id="analyticsTab">
     <div class="dash-shell">
       <div class="dash-topbar">
@@ -408,15 +364,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <span class="dash-updated" id="dashUpdated"></span>
         </div>
       </div>
-
-      <div class="dash-loading" id="dashLoading">
-        <div class="dash-spin"></div>
-        <div style="font-size:13px;color:#6b7280">Loading analytics…</div>
-      </div>
-
+      <div class="dash-loading" id="dashLoading"><div class="dash-spin"></div><div style="font-size:13px;color:#6b7280">Loading analytics…</div></div>
       <div class="dash-body" id="dashBody" style="display:none">
-
-        <!-- SYSTEM SIZE -->
         <div class="stab-pane on" id="pane-system">
           <div class="g4">
             <div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div>
@@ -425,163 +374,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
             <div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div>
           </div>
           <div class="g2">
-            <div class="white-card">
-              <div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div>
-              <div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div>
-              <div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div>
-              <div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div>
-              <div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div>
-              <div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div>
-            </div>
-            <div class="white-card">
-              <div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div>
-              <div id="sDistBody" style="font-size:12.5px;color:#374151"></div>
-            </div>
+            <div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div></div>
+            <div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:12.5px;color:#374151"></div></div>
           </div>
         </div>
-
-        <!-- BATTERY -->
         <div class="stab-pane" id="pane-battery">
-          <div class="g4">
-            <div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div>
-            <div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div>
-          </div>
-          <div class="g2">
-            <div class="white-card">
-              <div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div>
-              <div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div>
-              <div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div>
-              <div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div>
-              <div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div>
-              <div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div>
-            </div>
-            <div class="dark-card">
-              <div class="dc-title">🔋 Battery Portfolio Summary</div>
-              <div class="dc-grid">
-                <div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div>
-                <div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div>
-                <div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div>
-              </div>
-            </div>
-          </div>
+          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div>
+          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div></div></div></div>
         </div>
-
-        <!-- FINANCIALS -->
         <div class="stab-pane" id="pane-financials">
-          <div class="g4">
-            <div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div>
-            <div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div>
-          </div>
-          <div class="g2">
-            <div class="white-card">
-              <div class="wc-title"><div class="dot g"></div>Financial Averages</div>
-              <div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div>
-            </div>
-            <div class="dark-card">
-              <div class="dc-title">💰 Revenue Summary</div>
-              <div class="dc-grid">
-                <div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div>
-                <div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div>
-                <div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div>
-              </div>
-            </div>
-          </div>
+          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div>
+          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div></div></div></div>
         </div>
-
-        <!-- ENVIRONMENTAL -->
         <div class="stab-pane" id="pane-environmental">
-          <div class="g4">
-            <div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div>
-            <div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div>
-          </div>
-          <div class="g2">
-            <div class="white-card">
-              <div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div>
-              <div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div>
-              <div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div>
-              <div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div>
-              <div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div>
-              <div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div>
-            </div>
-            <div class="dark-card">
-              <div class="dc-title">🌍 Total Portfolio Impact</div>
-              <div class="dc-grid">
-                <div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div>
-                <div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div>
-                <div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div>
-              </div>
-            </div>
-          </div>
+          <div class="g4"><div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div>
+          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Total Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div></div></div></div>
         </div>
-
-        <!-- INVERTER -->
         <div class="stab-pane" id="pane-inverter">
-          <div class="g4">
-            <div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div>
-            <div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95–1.35</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div>
-          </div>
-          <div class="g2">
-            <div class="white-card">
-              <div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div>
-              <div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div>
-              <div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div>
-            </div>
-            <div class="white-card">
-              <div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div>
-              <div id="iRatioStatus" style="font-size:12.5px;color:#374151"></div>
-            </div>
-          </div>
+          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95–1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div>
+          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div><div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:12.5px;color:#374151"></div></div></div>
         </div>
-
-        <!-- PIPELINE -->
         <div class="stab-pane" id="pane-pipeline">
-          <div class="g4">
-            <div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div>
-            <div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Clients Engaged</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">responded / converted</div></div>
-          </div>
+          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Clients Engaged</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">responded / converted</div></div></div>
           <div class="rate-row" id="pRateRow"></div>
-          <div class="white-card">
-            <div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div>
-            <div id="pFunnel"></div>
-          </div>
-          <div class="white-card" style="padding:0;overflow:hidden;">
-            <div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;">
-              <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div>
-              <div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div>
-            </div>
-            <table class="ft">
-              <thead><tr>
-                <th>Client</th><th>Location</th><th>Proposal Status</th><th>Follow-Up</th><th>Days Since Sent</th><th>System Cost</th>
-              </tr></thead>
-              <tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">Loading…</td></tr></tbody>
-            </table>
-          </div>
+          <div class="white-card"><div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div><div id="pFunnel"></div></div>
+          <div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th>Client</th><th>Location</th><th>Proposal Status</th><th>Follow-Up</th><th>Days Since Sent</th><th>System Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">Loading…</td></tr></tbody></table></div>
         </div>
-
       </div>
     </div>
   </div>
-
 </main>
 
-<!-- ADD CLIENT MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
@@ -726,52 +549,35 @@ function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=
 function setMsg(el,type,text){el.className='m-msg '+type;el.textContent=text;}
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
 
-// ── BOOT ──────────────────────────────────────────────────────────────────
+// ── BOOT: reads shared localStorage session ───────────────────────────────
 window.addEventListener('DOMContentLoaded', boot);
 async function boot() {
   var saved = localStorage.getItem(SESSION_KEY);
-
-if (saved) {
-  try {
-    installer = JSON.parse(saved);
-  } catch(e) {
-    installer = null;
+  if (saved) {
+    try { installer = JSON.parse(saved); } catch(e) { installer = null; }
   }
-}
-
-if (!installer && urlEmail) {
-  document.getElementById('bootMsg').textContent = 'Verifying access…';
-
-  try {
-    var res = await fetch(
-      SUPA + '/rest/v1/installers?contact_email=eq.' +
-      encodeURIComponent(urlEmail) +
-      '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
-      {
-        headers: {
-          apikey: ANON,
-          Authorization: 'Bearer ' + ANON
-        }
+  if (!installer && urlEmail) {
+    document.getElementById('bootMsg').textContent = 'Verifying access…';
+    try {
+      var res = await fetch(
+        SUPA + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(urlEmail) +
+        '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        { headers: { apikey: ANON, Authorization: 'Bearer ' + ANON } }
+      );
+      var rows = await res.json();
+      if (rows && rows.length) {
+        installer = rows[0];
+        localStorage.setItem(SESSION_KEY, JSON.stringify(installer));
       }
-    );
-
-    var rows = await res.json();
-
-    if (rows && rows.length) {
-      installer = rows[0];
-      localStorage.setItem(SESSION_KEY, JSON.stringify(installer));
-    }
-  } catch(e) {}
+    } catch(e) {}
+  }
+  if (!installer) {
+    window.location.href = 'nova-metrics_1.html?return=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  showPortal();
 }
 
-if (!installer) {
-  window.location.href =
-    'nova-metrics_1.html?return=' +
-    encodeURIComponent(window.location.href);
-  return;
-}
-   showPortal();
-}
 function showPortal() {
   document.getElementById('bootScreen').classList.add('hidden');
   var av=(installer.installer_name||'N').charAt(0).toUpperCase();
@@ -781,14 +587,12 @@ function showPortal() {
   document.getElementById('navInstallerName').textContent = installer.installer_name||'Nova Metrics';
   if (params.get('tab')==='analytics') switchTab('analytics');
   loadClients();
-  // Show arrival banner if coming from Solar Intelligence with an ai_id
-  if (urlAiId) {
-    document.getElementById('arrivalBanner').classList.add('on');
-  }
+  if (urlAiId) { document.getElementById('arrivalBanner').classList.add('on'); }
 }
 
+// ── SIGN OUT: clears localStorage so Solar Intelligence also sees the logout
 document.getElementById('signOutBtn').addEventListener('click', function() {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
   window.location.href = 'nova-metrics_1.html';
 });
 
@@ -811,7 +615,6 @@ async function loadClients() {
       if(idx>=0){
         var rows=document.querySelectorAll('.c-row');
         if(rows[idx]) pick(idx,rows[idx]);
-        // Update banner with client name
         var c=allClients[idx];
         var cname=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'your client';
         document.getElementById('arrivalClientName').textContent=cname;
@@ -879,7 +682,6 @@ function pick(idx, rowEl) {
   };
 }
 
-// ── MODAL ─────────────────────────────────────────────────────────────────
 document.getElementById('addClientBtn').addEventListener('click',openModal);
 document.getElementById('modalClose').addEventListener('click',closeModal);
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});

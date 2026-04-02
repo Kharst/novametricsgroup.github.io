@@ -79,6 +79,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   color:var(--blue);
   display:none;
 }
+.sign-out-link{
+  font-size:11px;color:var(--muted);background:none;border:none;
+  cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;
+}
+.sign-out-link:hover{color:var(--red)}
 
 /* ── LOGIN ── */
 #login-screen{
@@ -346,6 +351,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Proposal Portal
     </a>
+    <button class="sign-out-link" id="sign-out-btn">Sign out</button>
   </div>
 </nav>
 
@@ -611,6 +617,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <script>
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+const SESSION_KEY = 'nm_installer_session';
 
 const PANELS = [
   {id:6,model:'REC Alpha 405W',watts:405,area:1.78,price:3300},
@@ -650,6 +657,33 @@ const GTI = {JHB:5.10,CPT:4.60,DBN:4.90,UP:5.80};
 let installer  = null;
 let calcResult = null;
 
+// ── BOOT: check shared localStorage session first ─────────────────────────
+(function boot() {
+  const saved = localStorage.getItem(SESSION_KEY);
+  if (saved) {
+    try {
+      installer = JSON.parse(saved);
+      showApp();
+    } catch(e) {
+      localStorage.removeItem(SESSION_KEY);
+    }
+  }
+})();
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  const badge = document.getElementById('installer-badge');
+  badge.textContent = installer.installer_name;
+  badge.style.display = 'inline-block';
+}
+
+// ── SIGN OUT ──────────────────────────────────────────────────────────────
+document.getElementById('sign-out-btn').addEventListener('click', function() {
+  localStorage.removeItem(SESSION_KEY);
+  window.location.href = 'nova-metrics_1.html';
+});
+
 // ── LOGIN ────────────────────────────────────────────────────────────────
 async function doLogin() {
   const emailEl = document.getElementById('login-email');
@@ -676,12 +710,15 @@ async function doLogin() {
       btn.disabled=false; btn.textContent='Sign In'; return;
     }
     installer = row;
-    sessionStorage.setItem('nm_installer_session', JSON.stringify({ installer_id:row.installer_id, installer_name:row.installer_name, contact_email:row.contact_email, logo_url:row.logo_url, primary_color:row.primary_color }));
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = 'block';
-    const badge = document.getElementById('installer-badge');
-    badge.textContent = installer.installer_name;
-    badge.style.display = 'inline-block';
+    // Save to localStorage so the Proposal Portal can read it without re-login
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      installer_id:   row.installer_id,
+      installer_name: row.installer_name,
+      contact_email:  row.contact_email,
+      logo_url:       row.logo_url,
+      primary_color:  row.primary_color
+    }));
+    showApp();
   } catch(e) {
     errEl.textContent = 'Login error: ' + e.message;
     btn.disabled=false; btn.textContent='Sign In';
