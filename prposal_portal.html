@@ -729,7 +729,7 @@ function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).jo
 // ── BOOT ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', boot);
 async function boot() {
-  var saved = sessionStorage.getItem(SESSION_KEY);
+  var saved = localStorage.getItem(SESSION_KEY);
 
 if (saved) {
   try {
@@ -759,7 +759,7 @@ if (!installer && urlEmail) {
 
     if (rows && rows.length) {
       installer = rows[0];
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(installer));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(installer));
     }
   } catch(e) {}
 }
