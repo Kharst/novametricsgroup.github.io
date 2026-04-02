@@ -770,6 +770,8 @@ if (!installer) {
     encodeURIComponent(window.location.href);
   return;
 }
+   showPortal();
+}
 function showPortal() {
   document.getElementById('bootScreen').classList.add('hidden');
   var av=(installer.installer_name||'N').charAt(0).toUpperCase();
