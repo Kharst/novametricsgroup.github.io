@@ -50,10 +50,85 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
 .inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
 .inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
-.inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
-.inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
+.inp-group select,.inp-group input[type=number]{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.inp-group select:focus,.inp-group input[type=number]:focus{outline:none;border-color:var(--gold)}
 .btn-calc{background:var(--gold);color:var(--navy);border:none;padding:10px 26px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;white-space:nowrap;transition:all .2s;}
 .btn-calc:hover{background:#fff}
+
+/* ── LOCATION SEARCH ── */
+.loc-wrap{position:relative;min-width:200px;}
+.loc-input-row{display:flex;align-items:center;gap:0;position:relative;}
+.loc-input{
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--text);
+  padding:9px 34px 9px 12px;
+  border-radius:8px;
+  font-size:13px;
+  font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+  outline:none;
+}
+.loc-input:focus{border-color:var(--gold)}
+.loc-input::placeholder{color:rgba(255,255,255,.3)}
+.loc-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:14px;line-height:1;padding:2px;display:none;
+  transition:color .15s;
+}
+.loc-clear:hover{color:var(--text)}
+.loc-clear.on{display:block;}
+.loc-gti-tag{
+  display:none;
+  font-size:10px;color:var(--gold);
+  background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);
+  border-radius:20px;padding:2px 8px;margin-top:4px;
+  width:fit-content;
+}
+.loc-gti-tag.on{display:block;}
+.loc-dropdown{
+  display:none;
+  position:absolute;top:calc(100% + 6px);left:0;right:0;
+  background:#152c47;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  overflow:hidden;
+  z-index:300;
+  box-shadow:0 12px 32px rgba(0,0,0,.4);
+  max-height:240px;
+  overflow-y:auto;
+}
+.loc-dropdown.on{display:block;}
+.loc-option{
+  padding:9px 14px;
+  font-size:13px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .12s;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.loc-option:last-child{border-bottom:none;}
+.loc-option:hover,.loc-option.focused{background:rgba(255,215,0,.08);}
+.loc-option.selected{background:rgba(255,215,0,.1);}
+.loc-opt-name{color:var(--text);font-weight:500;}
+.loc-opt-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+.loc-opt-gti{font-size:10px;color:var(--gold);background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:10px;padding:2px 7px;white-space:nowrap;flex-shrink:0;}
+.loc-custom-row{
+  padding:9px 14px;
+  font-size:12px;
+  color:var(--muted);
+  cursor:pointer;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.03);
+  border-top:1px solid rgba(255,255,255,.06);
+  transition:background .12s;
+}
+.loc-custom-row:hover{background:rgba(255,215,0,.06);color:var(--text);}
+.loc-custom-row svg{flex-shrink:0;}
+.loc-empty{padding:12px 14px;font-size:12px;color:var(--muted);text-align:center;}
+
 .tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
 .tab{padding:8px 17px;border-radius:8px 8px 0 0;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--surface);color:var(--muted);transition:.15s;font-family:'DM Sans',sans-serif;}
 .tab.active{background:var(--surface2);color:var(--gold);border-color:rgba(255,215,0,.2)}.tab:hover:not(.active){color:var(--text)}
@@ -154,10 +229,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <!-- ══ MAIN APP ══ -->
 <div id="app-screen">
   <div class="input-strip">
-    <div class="inp-group">
+
+    <!-- ── LOCATION SEARCH ── -->
+    <div class="inp-group loc-wrap" id="loc-wrap">
       <label>Location</label>
-      <select id="sel-location"><option value="">Loading…</option></select>
+      <div class="loc-input-row">
+        <input
+          type="text"
+          id="loc-input"
+          class="loc-input"
+          placeholder="Search or type a location…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="loc-clear" id="loc-clear" title="Clear">✕</button>
+      </div>
+      <div class="loc-gti-tag" id="loc-gti-tag"></div>
+      <div class="loc-dropdown" id="loc-dropdown"></div>
     </div>
+
     <div class="inp-group">
       <label>Load Profile</label>
       <select id="sel-load"><option value="">Loading…</option></select>
@@ -362,11 +452,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const SESSION_KEY = 'nm_installer_session';
+const DEFAULT_GTI = 4.80; // fallback for unknown locations
 
-// ── Runtime data (loaded from Supabase) ───────────────────────────────────
+// ── Runtime data ──────────────────────────────────────────────────────────
 let DB = { locations: [], panels: [], inverters: [], batteries: [], loadProfiles: [] };
 let installer  = null;
 let calcResult = null;
+
+// ── Selected location state (set by the search widget) ────────────────────
+let selectedLocation = { name: '', gti: DEFAULT_GTI, fromDB: false };
 
 // ── API helper ────────────────────────────────────────────────────────────
 async function sbFetch(path) {
@@ -401,98 +495,64 @@ function showDataError(err) {
   document.getElementById('dlErr').style.display = 'block';
 }
 
-// ── LOAD ALL DYNAMIC DATA IN PARALLEL ─────────────────────────────────────
+// ── LOAD ALL DATA ─────────────────────────────────────────────────────────
 async function loadAllData() {
   const instId = installer.installer_id;
-
   const [locRows, panelRows, invRows, battRows, loadRows] = await Promise.all([
-    // Locations: fetch only the ones assigned to this installer via installer_locations
-    // Falls back to all locations if no installer_locations rows exist
     sbFetch(`/rest/v1/solar_locations?id=in.(${await getInstallerLocationIds(instId)})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
-    // All panels, sorted by wattage ascending
     sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
-    // All inverters, sorted by AC capacity ascending
     sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
-    // All batteries, sorted by usable kWh ascending
     sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`),
-    // Load profiles
     sbFetch(`/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc`)
   ]);
 
-  // Normalise locations
   DB.locations = (locRows || []).map(r => ({
-    id:    r.id,
-    city:  r.city,
-    name:  r.location_name || r.city,
-    gti:   parseFloat(r.design_gti_kwh_m2_day) || 4.80
+    id:   r.id,
+    city: r.city,
+    name: r.location_name && r.location_name !== r.city ? r.location_name : null,
+    gti:  parseFloat(r.design_gti_kwh_m2_day) || DEFAULT_GTI
   }));
 
-  // Normalise panels
   DB.panels = (panelRows || []).map(r => ({
-    id:    r.id,
-    model: r['PanelModel'],
-    watts: parseInt(r['Watts']) || 0,
-    area:  parseFloat(r['Area_sqm']) || 2.0,
-    price: parseFloat(r['UnitPrice_R']) || 0
+    id: r.id, model: r['PanelModel'],
+    watts: parseInt(r['Watts']) || 0, area: parseFloat(r['Area_sqm']) || 2.0, price: parseFloat(r['UnitPrice_R']) || 0
   })).filter(p => p.watts > 0 && p.price > 0);
 
-  // Normalise inverters
   DB.inverters = (invRows || []).map(r => ({
-    id:    r.id,
-    model: r['InverterModel'],
-    ac:    parseFloat(r['ACContinuous_kW']) || 0,
-    dc:    parseFloat(r['DCMax_kW']) || 0,
-    mppt:  parseInt(r['MPPT_count']) || 1,
-    eff:   parseFloat(r['Efficiency_pct']) || 97,
-    price: parseFloat(r['UnitPrice_R']) || 0
+    id: r.id, model: r['InverterModel'],
+    ac: parseFloat(r['ACContinuous_kW']) || 0, dc: parseFloat(r['DCMax_kW']) || 0,
+    mppt: parseInt(r['MPPT_count']) || 1, eff: parseFloat(r['Efficiency_pct']) || 97, price: parseFloat(r['UnitPrice_R']) || 0
   })).filter(i => i.ac > 0 && i.price > 0);
 
-  // Normalise batteries
   DB.batteries = (battRows || []).map(r => ({
-    id:     r.id,
-    model:  r['BatteryModel'],
-    usable: parseFloat(r['Usable_kWh']) || 0,
-    kw:     parseFloat(r['Nominal_kW']) || 5,
-    price:  parseFloat(r['UnitPrice_R']) || 0
+    id: r.id, model: r['BatteryModel'],
+    usable: parseFloat(r['Usable_kWh']) || 0, kw: parseFloat(r['Nominal_kW']) || 5, price: parseFloat(r['UnitPrice_R']) || 0
   })).filter(b => b.usable > 0 && b.price > 0);
 
-  // Normalise load profiles
   DB.loadProfiles = (loadRows || []).map(r => ({
-    id:    r.id,
-    name:  r.profile_name,
-    peak:  parseFloat(r.peak_load_kw) || 0,
-    daily: parseFloat(r.daily_usage_kwh) || 0
+    id: r.id, name: r.profile_name,
+    peak: parseFloat(r.peak_load_kw) || 0, daily: parseFloat(r.daily_usage_kwh) || 0
   }));
 
-  populateDropdowns();
+  populateLoadDropdown();
+  initLocationSearch();
 }
 
-// ── Get installer location IDs (with fallback to all) ─────────────────────
 async function getInstallerLocationIds(instId) {
   try {
     const rows = await sbFetch(`/rest/v1/installer_locations?installer_id=eq.${instId}&select=location_id`);
     if (rows && rows.length > 0) return rows.map(r => r.location_id).join(',');
   } catch(e) {}
-  // Fallback: return all location IDs
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
   return (all || []).map(r => r.id).join(',') || '0';
 }
 
-// ── POPULATE DROPDOWNS ────────────────────────────────────────────────────
-function populateDropdowns() {
-  // Locations
-  const locSel = document.getElementById('sel-location');
-  locSel.innerHTML = DB.locations.length
-    ? DB.locations.map(l => `<option value="${l.id}" data-gti="${l.gti}">${l.city}${l.name && l.name !== l.city ? ' – ' + l.name : ''}</option>`).join('')
-    : '<option value="">No locations assigned</option>';
-
-  // Load profiles + custom option
+// ── LOAD PROFILE DROPDOWN ─────────────────────────────────────────────────
+function populateLoadDropdown() {
   const loadSel = document.getElementById('sel-load');
   loadSel.innerHTML = DB.loadProfiles.map(p =>
     `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
   ).join('') + '<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
-
-  // Re-attach custom toggle
   loadSel.onchange = function() {
     const c = this.value === 'custom';
     document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
@@ -500,7 +560,159 @@ function populateDropdowns() {
   };
 }
 
-// ── SHOW APP (after data loads) ───────────────────────────────────────────
+// ── LOCATION SEARCH WIDGET ────────────────────────────────────────────────
+function initLocationSearch() {
+  const input    = document.getElementById('loc-input');
+  const dropdown = document.getElementById('loc-dropdown');
+  const clearBtn = document.getElementById('loc-clear');
+  const gtiTag   = document.getElementById('loc-gti-tag');
+  let focusIdx   = -1;
+
+  function getFilteredList(q) {
+    if (!q) return DB.locations.slice(0, 8);
+    const lq = q.toLowerCase();
+    return DB.locations.filter(l =>
+      l.city.toLowerCase().includes(lq) || (l.name && l.name.toLowerCase().includes(lq))
+    ).slice(0, 8);
+  }
+
+  function buildDropdown(q) {
+    const results = getFilteredList(q);
+    focusIdx = -1;
+    let html = '';
+
+    if (results.length === 0 && q) {
+      html += `<div class="loc-empty">No matching locations in database</div>`;
+    } else {
+      html += results.map((l, i) => {
+        const label = l.name ? `${l.city} <span class="loc-opt-sub">${l.name}</span>` : l.city;
+        return `<div class="loc-option" data-idx="${i}" onclick="selectLocation(${i})">
+          <div><div class="loc-opt-name">${highlight(l.city, q)}</div>${l.name ? `<div class="loc-opt-sub">${highlight(l.name, q)}</div>` : ''}</div>
+          <span class="loc-opt-gti">${l.gti} PSH</span>
+        </div>`;
+      }).join('');
+    }
+
+    // Always show custom entry row when there's text typed
+    if (q) {
+      html += `<div class="loc-custom-row" onclick="useCustomLocation()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Use "<strong style="color:var(--text)">${esc(q)}</strong>" with default GTI (${DEFAULT_GTI} PSH)
+      </div>`;
+    }
+
+    dropdown.innerHTML = html;
+  }
+
+  function highlight(text, q) {
+    if (!q) return esc(text);
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx < 0) return esc(text);
+    return esc(text.slice(0, idx)) +
+      `<mark style="background:rgba(255,215,0,.25);color:var(--gold);border-radius:2px">${esc(text.slice(idx, idx + q.length))}</mark>` +
+      esc(text.slice(idx + q.length));
+  }
+
+  function openDropdown() {
+    buildDropdown(input.value.trim());
+    dropdown.classList.add('on');
+  }
+
+  function closeDropdown() {
+    dropdown.classList.remove('on');
+    focusIdx = -1;
+  }
+
+  function updateClearBtn() {
+    clearBtn.classList.toggle('on', input.value.length > 0);
+  }
+
+  function setConfirmed(locName, gti, fromDB) {
+    selectedLocation = { name: locName, gti, fromDB };
+    input.value = locName;
+    updateClearBtn();
+    input.style.borderColor = fromDB ? 'rgba(52,211,153,.5)' : 'rgba(255,215,0,.4)';
+    gtiTag.textContent = fromDB
+      ? `✓ ${gti} PSH — matched from database`
+      : `⚡ ${gti} PSH — default GTI (location not in database)`;
+    gtiTag.classList.add('on');
+    closeDropdown();
+  }
+
+  // Expose select function globally (called from inline onclick)
+  window.selectLocation = function(idx) {
+    const results = getFilteredList(input.value.trim());
+    const loc = results[idx];
+    if (loc) setConfirmed(loc.city + (loc.name ? ` – ${loc.name}` : ''), loc.gti, true);
+  };
+
+  window.useCustomLocation = function() {
+    const q = input.value.trim();
+    if (q) setConfirmed(q, DEFAULT_GTI, false);
+  };
+
+  // Input events
+  input.addEventListener('input', function() {
+    updateClearBtn();
+    input.style.borderColor = '';
+    gtiTag.classList.remove('on');
+    selectedLocation = { name: '', gti: DEFAULT_GTI, fromDB: false };
+    openDropdown();
+  });
+
+  input.addEventListener('focus', function() {
+    openDropdown();
+  });
+
+  input.addEventListener('keydown', function(e) {
+    const items = dropdown.querySelectorAll('.loc-option, .loc-custom-row');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      focusIdx = Math.min(focusIdx + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('focused', i === focusIdx));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      focusIdx = Math.max(focusIdx - 1, 0);
+      items.forEach((el, i) => el.classList.toggle('focused', i === focusIdx));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (focusIdx >= 0 && items[focusIdx]) {
+        items[focusIdx].click();
+      } else {
+        // If user pressed Enter with text but no selection, use as custom
+        const q = input.value.trim();
+        if (q) useCustomLocation();
+      }
+    } else if (e.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+
+  clearBtn.addEventListener('click', function() {
+    input.value = '';
+    input.style.borderColor = '';
+    gtiTag.classList.remove('on');
+    selectedLocation = { name: '', gti: DEFAULT_GTI, fromDB: false };
+    updateClearBtn();
+    closeDropdown();
+    input.focus();
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('loc-wrap').contains(e.target)) closeDropdown();
+  });
+
+  // Pre-select first location if available
+  if (DB.locations.length > 0) {
+    const first = DB.locations[0];
+    setConfirmed(first.city + (first.name ? ` – ${first.name}` : ''), first.gti, true);
+  }
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── SHOW APP ──────────────────────────────────────────────────────────────
 function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display   = 'block';
@@ -570,11 +782,15 @@ function calculate() {
     toast('⚠ Data still loading — please wait'); return;
   }
 
-  const locSel  = document.getElementById('sel-location');
-  const locId   = locSel.value;
-  const locOpt  = locSel.options[locSel.selectedIndex];
-  const locName = locOpt ? locOpt.text : 'Unknown';
-  const psh     = locOpt ? parseFloat(locOpt.dataset.gti) || 4.80 : 4.80;
+  // Read from the location search widget
+  const locName = selectedLocation.name || document.getElementById('loc-input').value.trim();
+  if (!locName) { toast('⚠ Please enter or select a location'); document.getElementById('loc-input').focus(); return; }
+  const psh = selectedLocation.gti || DEFAULT_GTI;
+
+  // If user typed something but never confirmed, treat it as custom entry
+  if (!selectedLocation.name && locName) {
+    selectedLocation = { name: locName, gti: DEFAULT_GTI, fromDB: false };
+  }
 
   const loadSel = document.getElementById('sel-load');
   let peakLoad, dailyUsage;
@@ -596,7 +812,6 @@ function calculate() {
   const requiredSolarEnergy = daytimeLoadEnergy + battRechargeEnergy;
   const requiredSolarKW     = requiredSolarEnergy / (psh * 0.85);
 
-  // Best panel: minimum oversize ≥ 0
   let bestPanel = null, bestOversize = Infinity;
   DB.panels.forEach(p => {
     const n = Math.ceil(requiredSolarKW * 1000 / p.watts);
@@ -606,8 +821,7 @@ function calculate() {
   });
   if (!bestPanel) {
     const p = DB.panels[DB.panels.length-1];
-    bestPanel = {...p};
-    bestPanel.panelsNeeded = Math.ceil(requiredSolarKW*1000/p.watts);
+    bestPanel = {...p, panelsNeeded: Math.ceil(requiredSolarKW*1000/p.watts)};
     bestPanel.dcKW = bestPanel.panelsNeeded * p.watts / 1000;
   }
 
@@ -652,7 +866,7 @@ function calculate() {
     : battSizeStatus==='Battery Tightly Sized'||battRuntimeRatio<1.2 ? 'Acceptable Design: Limited safety margin'
     : 'Well Designed: Balanced and reliable';
 
-  // ── INVERTER SELECTION ──
+  // ── INVERTER ──
   const requiredAC = peakLoad * 1.3;
   let bestInv = null;
   DB.inverters.forEach(inv => {
@@ -702,7 +916,7 @@ function calculate() {
   const indepPct = Math.min(annualSolar / annualConsumption, 1) * 100;
 
   calcResult = {
-    locId, locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
+    locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
     requiredSolarKW, systemDC, panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
     expectedDailySolar, oversizePct, annualSolar, footprint,
     roofFit:roofFitData[0], roofGuidance:roofFitData[1], requiredSolarEnergy,
@@ -718,7 +932,7 @@ function calculate() {
   };
 
   renderAll(calcResult);
-  toast('✓ System calculated — check all tabs');
+  toast(`✓ System calculated for ${locName} (GTI: ${psh} PSH)`);
 }
 
 function fmtR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
@@ -802,7 +1016,7 @@ function renderAll(r) {
 function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
 function setKpi(id,val,color){const el=document.getElementById(id);if(!el)return;el.textContent=val;const k=el.closest('.kpi');if(k)k.className='kpi '+color;}
 function setBar(bid,pct,vid,val){const b=document.getElementById(bid);if(b)b.style.width=Math.max(pct,2)+'%';set(vid,val);}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
 function newCalculation(){document.getElementById('success-card').classList.remove('on');document.getElementById('btn-gen').disabled=false;showTab('tab-solar');}
 
 // ── GENERATE PROPOSAL ─────────────────────────────────────────────────────
