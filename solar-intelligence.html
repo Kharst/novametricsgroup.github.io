@@ -662,11 +662,11 @@ function calculate() {
   // requiredUsableKWh = energy battery must deliver, scaled by requested autonomy
   // autonomy/12 lets the installer request more or less buffer than a standard 12-hr night
   const autonomyScale     = autonomy / 12;
-  const requiredUsableKWh = avgNightDrawKW * autonomy;
 
-  // avgNightDrawKW = average power rate the battery sustains overnight
+   // avgNightDrawKW = average power rate the battery sustains overnight
   // This is what we use for runtime, NOT peakLoad (which is instantaneous)
   const avgNightDrawKW = nightlyDraw / autonomy;   // e.g. 27 kWh / 12 hrs = 2.25 kW average
+  const requiredUsableKWh = avgNightDrawKW * autonomy;
 
   let bestBatt;
 
