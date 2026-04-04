@@ -363,6 +363,9 @@ const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const SESSION_KEY = 'nm_installer_session';
 
+const DESIGN_EFFICIENCY = 0.80;   // conservative sizing
+const OUTPUT_EFFICIENCY = 0.85;   // realistic production  
+
 // ── Runtime data (loaded from Supabase) ───────────────────────────────────
 let DB = { locations: [], panels: [], inverters: [], batteries: [], loadProfiles: [] };
 let installer  = null;
@@ -404,11 +407,12 @@ function showDataError(err) {
 // ── LOAD ALL DYNAMIC DATA IN PARALLEL ─────────────────────────────────────
 async function loadAllData() {
   const instId = installer.installer_id;
+  const locationIds = await getInstallerLocationIds(instId);
 
   const [locRows, panelRows, invRows, battRows, loadRows] = await Promise.all([
     // Locations: fetch only the ones assigned to this installer via installer_locations
     // Falls back to all locations if no installer_locations rows exist
-    sbFetch(`/rest/v1/solar_locations?id=in.(${await getInstallerLocationIds(instId)})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
+    sbFetch(`/rest/v1/solar_locations?id=in.(${locationIds})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
     // All panels, sorted by wattage ascending
     sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
     // All inverters, sorted by AC capacity ascending
@@ -471,7 +475,7 @@ async function loadAllData() {
 async function getInstallerLocationIds(instId) {
   try {
     const rows = await sbFetch(`/rest/v1/installer_locations?installer_id=eq.${instId}&select=location_id`);
-    if (rows && rows.length > 0) return rows.map(r => r.location_id).join(',');
+    if (rows && rows.length > 0) return rows.map(r => `"${r.location_id}"`).join(',');
   } catch(e) {}
   // Fallback: return all location IDs
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
@@ -613,166 +617,10 @@ function calculate() {
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
 
-  // ── SOLAR SIZING ──
   const daytimeLoadEnergy   = peakLoad * psh;
   const battRechargeEnergy  = (peakLoad * autonomy) / 0.90;
   const requiredSolarEnergy = daytimeLoadEnergy + battRechargeEnergy;
-  const requiredSolarKW     = requiredSolarEnergy / (psh * 0.85);
-
-  // Best panel: minimum oversize ≥ 0
-  let bestPanel = null, bestOversize = Infinity;
-  DB.panels.forEach(p => {
-    const n = Math.ceil(requiredSolarKW * 1000 / p.watts);
-    const dc = n * p.watts / 1000;
-    const os = dc - requiredSolarKW;
-    if (os >= 0 && os < bestOversize) { bestOversize=os; bestPanel={...p,panelsNeeded:n,dcKW:dc}; }
-  });
-  if (!bestPanel) {
-    const p = DB.panels[DB.panels.length-1];
-    bestPanel = {...p};
-    bestPanel.panelsNeeded = Math.ceil(requiredSolarKW*1000/p.watts);
-    bestPanel.dcKW = bestPanel.panelsNeeded * p.watts / 1000;
-  }
-
-  const systemDC           = bestPanel.dcKW;
-  const expectedDailySolar = systemDC * psh * 0.85;
-  const oversizePct        = (systemDC - requiredSolarKW) / requiredSolarKW;
-  const annualSolar        = expectedDailySolar * 30 * 12;
-  const annualConsumption  = peakLoad * 24 * 365;
-  const panelCount         = bestPanel.panelsNeeded;
-  const footprint          = panelCount * 2.2;
-  const roofFitData = panelCount<=14 ? ['Easy Fit','Fits a single roof plane. Quick installation.']
-    : panelCount<=20 ? ['Standard Fit','May use multiple roof sections. Common setup.']
-    : panelCount<=30 ? ['Complex Layout','East/West layout recommended for optimal production.']
-    : ['Large System Layout','Carport or ground mount may be considered.'];
-
-  // ── BATTERY SIZING ──
-  const requiredUsableKWh     = peakLoad * autonomy;
-  const batteryEnergyAdjusted = requiredUsableKWh * 1.10;
-  let bestBatt=null, minUnits=Infinity, minCost=Infinity;
-  [...DB.batteries].sort((a,b)=>a.usable-b.usable).forEach(b => {
-    const u = Math.ceil(requiredUsableKWh / b.usable);
-    const c = u * b.price;
-    if (u < minUnits || (u===minUnits && c<minCost)) { minUnits=u; minCost=c; bestBatt={...b,units:u,totalCost:c}; }
-  });
-
-  const installedBattKWh = bestBatt.units * bestBatt.usable;
-  const battRuntime      = installedBattKWh / peakLoad;
-  const battCapRatio     = installedBattKWh / batteryEnergyAdjusted;
-  const battRuntimeRatio = battRuntime / autonomy;
-  const battDailyUtil    = dailyUsage / installedBattKWh;
-  const battStress       = battDailyUtil>1.0?'Heavy Daily Cycling':battDailyUtil>0.8?'Moderate Daily Cycling':battDailyUtil>0.5?'Normal Daily Use':'Low stress: long battery life';
-  const battRisk         = battRuntimeRatio<1?'High risk – autonomy not met':battRuntimeRatio<1.2?'Tight design – minimal reserve':'Low risk – sufficient reserve';
-  const battTotalKW      = bestBatt.kw * bestBatt.units;
-  const backupCovRatio   = battTotalKW / peakLoad;
-  const coverage         = backupCovRatio<1?'Only Essential Loads Supported':backupCovRatio<1.15?'Essential + Some Comfort Loads':backupCovRatio<=1.40?'Most Loads Covered':'Safe power headroom';
-  const battSizeStatus   = battCapRatio<1?'Battery Undersized':battCapRatio<=1.2?'Battery Tightly Sized':battCapRatio<=1.4?'Battery Well Sized':'Battery Over-Sized';
-  const issues = [];
-  if (battSizeStatus==='Battery Undersized') issues.push('Add battery capacity (kWh)');
-  if (battRuntime<autonomy) issues.push('Increase backup runtime');
-  if (battStress==='Heavy Daily Cycling') issues.push('Reduce battery stress (add capacity)');
-  const battVerdict = issues.length>0 ? 'Design Action Required: '+issues.join(' | ')
-    : battSizeStatus==='Battery Tightly Sized'||battRuntimeRatio<1.2 ? 'Acceptable Design: Limited safety margin'
-    : 'Well Designed: Balanced and reliable';
-
-  // ── INVERTER SELECTION ──
-  const requiredAC = peakLoad * 1.3;
-  let bestInv = null;
-  DB.inverters.forEach(inv => {
-    if (inv.ac >= requiredAC && inv.dc >= systemDC) { if (!bestInv || inv.ac < bestInv.ac) bestInv = inv; }
-  });
-  if (!bestInv) bestInv = DB.inverters[DB.inverters.length-1];
-
-  const dcAcRatio   = systemDC / bestInv.ac;
-  const dcAcStatus  = dcAcRatio<0.95?'Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping)';
-  const invHeadroom = bestInv.ac - peakLoad;
-  const invLoadOK   = bestInv.ac >= peakLoad * 1.3;
-  const battPowerOK = battTotalKW >= bestInv.ac;
-  const stringsNeeded = Math.ceil(panelCount / 12);
-  const mpptRequired  = Math.ceil(stringsNeeded / 2);
-  const mpptAvailable = bestInv.mppt;
-  const mpptStatus    = mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
-
-  // ── FINANCIALS ──
-  const panelCost      = panelCount * bestPanel.price;
-  const bosCost        = systemDC * 3000;
-  const hwCost         = panelCost + bosCost;
-  const totalCost      = hwCost + bestBatt.totalCost + bestInv.price;
-  const sellPrice      = totalCost * (1 + markup);
-  const profit         = sellPrice - totalCost;
-  const costPerKW      = totalCost / systemDC;
-  const dailyOffset    = Math.min(expectedDailySolar, dailyUsage);
-  const monthlySavings = dailyOffset * tariff * 30;
-  const annualSavings  = dailyOffset * tariff * 365;
-  const simplePayback  = totalCost / (annualSavings * 1.1274);
-  const lifetimeSavings = annualSavings * 25;
-  const annualROI      = (annualSavings / totalCost) * 100;
-  let cumS=0, realPayback=25;
-  for (let yr=1; yr<=25; yr++) {
-    const f = yr<=3 ? Math.pow(1.1274,yr-1) : Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
-    cumS += annualSavings * f;
-    if (cumS >= totalCost && realPayback===25) realPayback = yr;
-  }
-
-  // ── ENVIRONMENT ──
-  const co2KG   = annualSolar * 0.895;
-  const co2Tons = co2KG / 1000;
-  const trees   = co2KG / 21;
-  const coal    = annualSolar / 2460;
-  const water   = annualSolar * 1.8;
-  const monthlyKWh = expectedDailySolar * 30;
-  const segment = monthlyKWh<=1500?'Low Residential':monthlyKWh<=3000?'High Residential':monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial';
-  const indepPct = Math.min(annualSolar / annualConsumption, 1) * 100;
-
-  calcResult = {
-    locId, locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
-    requiredSolarKW, systemDC, panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
-    expectedDailySolar, oversizePct, annualSolar, footprint,
-    roofFit:roofFitData[0], roofGuidance:roofFitData[1], requiredSolarEnergy,
-    requiredUsableKWh, installedBattKWh, battRuntime, battModel:bestBatt.model,
-    battUnits:bestBatt.units, battUsable:bestBatt.usable,
-    battCapRatio, battRuntimeRatio, battRisk, battVerdict, battStress, coverage, battTotalCost:bestBatt.totalCost,
-    invModel:bestInv.model, invAC:bestInv.ac, invDC:bestInv.dc, invEff:bestInv.eff,
-    dcAcRatio, dcAcStatus, invHeadroom, invLoadOK, battPowerOK,
-    mpptRequired, mpptAvailable, mpptStatus, invPrice:bestInv.price,
-    panelCost, bosCost, hwCost, totalCost, sellPrice, profit, costPerKW,
-    monthlySavings, annualSavings, lifetimeSavings, annualROI, simplePayback, realPayback, annualConsumption,
-    co2Tons, trees, coal, water, segment, indepPct
-  };
-
-  renderAll(calcResult);
-  toast('✓ System calculated — check all tabs');
-}
-
-function calculate() {
-  if (!DB.panels.length || !DB.inverters.length || !DB.batteries.length) {
-    toast('⚠ Data still loading — please wait'); return;
-  }
-
-  const locSel  = document.getElementById('sel-location');
-  const locId   = locSel.value;
-  const locOpt  = locSel.options[locSel.selectedIndex];
-  const locName = locOpt ? locOpt.text : 'Unknown';
-  const psh     = locOpt ? parseFloat(locOpt.dataset.gti) || 4.80 : 4.80;
-
-  const loadSel = document.getElementById('sel-load');
-  let peakLoad, dailyUsage;
-  if (loadSel.value === 'custom') {
-    peakLoad   = parseFloat(document.getElementById('custom-peak').value) || 3;
-    dailyUsage = parseFloat(document.getElementById('custom-daily').value) || 20;
-  } else {
-    peakLoad   = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.peak);
-    dailyUsage = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.daily);
-  }
-
-  const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
-  const tariff   = parseFloat(document.getElementById('sel-tariff').value);
-  const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
-
-  const daytimeLoadEnergy   = peakLoad * psh;
-  const battRechargeEnergy  = (peakLoad * autonomy) / 0.90;
-  const requiredSolarEnergy = daytimeLoadEnergy + battRechargeEnergy;
-  const requiredSolarKW     = requiredSolarEnergy / (psh * 0.85);
+  const requiredSolarKW = requiredSolarEnergy / (psh * DESIGN_EFFICIENCY);
 
   let bestPanel = null, bestOversize = Infinity;
   DB.panels.forEach(p => {
@@ -789,16 +637,17 @@ function calculate() {
   }
 
   const systemDC           = bestPanel.dcKW;
-  const expectedDailySolar = systemDC * psh * 0.85;
+  expectedDailySolar = systemDC * psh * OUTPUT_EFFICIENCY;
   const oversizePct        = (systemDC - requiredSolarKW) / requiredSolarKW;
   const annualSolar        = expectedDailySolar * 30 * 12;
   const annualConsumption  = peakLoad * 24 * 365;
   const panelCount         = bestPanel.panelsNeeded;
   const footprint          = panelCount * 2.2;
-  const roofFitData = panelCount<=14 ? ['Easy Fit','Fits a single roof plane. Quick installation.']
-    : panelCount<=20 ? ['Standard Fit','May use multiple roof sections. Common setup.']
-    : panelCount<=30 ? ['Complex Layout','East/West layout recommended for optimal production.']
-    : ['Large System Layout','Carport or ground mount may be considered.'];
+  const roofFitData =
+  footprint <= 30 ? ['Easy Fit', 'Fits a single roof plane. Quick installation.'] :
+  footprint <= 45 ? ['Standard Fit', 'May use multiple roof sections. Common setup.'] :
+  footprint <= 70 ? ['Complex Layout', 'East/West layout recommended for optimal production.'] :
+  ['Large System Layout', 'Carport or ground mount may be considered.'];
 
   const requiredAC = peakLoad * 1.3;
   let bestInv = null;
@@ -904,7 +753,7 @@ function calculate() {
   };
 
   renderAll(calcResult);
-  toast('“ System calculated ” check all tabs');
+  toast('✓ System calculated — check all tabs');
 }
 
 function fmtR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
