@@ -520,7 +520,7 @@ function showTab(id){
 //   This is the average power the battery must sustain overnight.
 //   Using peakLoad here was wrong — peak is instantaneous, not sustained.
 // ════════════════════════════════════════════════════════════════════════════
-function selectBattery(nightlyDraw, requiredUsableKWh, avgNightDrawKW) {
+function selectBattery(nightlyDraw, requiredUsableKWh, avgNightDrawKW, autonomy) {
   // Three independent minimum-installed-capacity constraints:
   const minForEnergy  = requiredUsableKWh * BATT_HEADROOM;       // ≥110% of energy needed
   const minForStress  = nightlyDraw / BATT_STRESS_MAX;           // stress ≤55%
@@ -666,12 +666,12 @@ function calculate() {
    // avgNightDrawKW = average power rate the battery sustains overnight
   // This is what we use for runtime, NOT peakLoad (which is instantaneous)
   const avgNightDrawKW = nightlyDraw / autonomy;   // e.g. 27 kWh / 12 hrs = 2.25 kW average
-  const requiredUsableKWh = avgNightDrawKW * autonomy;
+  const requiredUsableKWh = nightlyDraw * (autonomy / 12);
 
   let bestBatt;
 
 try {
-  bestBatt = selectBattery(nightlyDraw, requiredUsableKWh, avgNightDrawKW);
+  bestBatt = selectBattery(nightlyDraw, requiredUsableKWh, avgNightDrawKW, autonomy);
 } catch (e) {
   toast('⚠ No compliant battery solution found — adjust inputs');
   return;
@@ -835,7 +835,7 @@ function renderAll(r) {
   set('b-model',     r.battModel);
   set('b-usable-per',fmtN(r.battUsable,2)+' kWh');
   set('b-cap-ratio', fmtN(r.battDailyUtil*100,0)+'% nightly utilisation');
-  const bBarPct = Math.min(r.battCapRatio / 1.5, 1) * 100;
+  const bBarPct = Math.min(r.battCapRatio / BATT_HEADROOM, 1) * 100;
   document.getElementById('b-bar').style.width      = bBarPct+'%';
   document.getElementById('b-bar').style.background = r.battCapRatio>=BATT_HEADROOM?'var(--green)':r.battCapRatio>=1?'var(--amber)':'var(--red)';
   set('b-bar-tip', fmtN(r.battCapRatio,2)+'x headroom — '+(r.battCapRatio>=BATT_HEADROOM?'comfortable reserve':r.battCapRatio>=1?'tight but adequate':'UNDERSIZED — add capacity'));
