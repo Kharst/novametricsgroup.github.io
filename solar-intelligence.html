@@ -475,7 +475,7 @@ async function loadAllData() {
 async function getInstallerLocationIds(instId) {
   try {
     const rows = await sbFetch(`/rest/v1/installer_locations?installer_id=eq.${instId}&select=location_id`);
-    if (rows && rows.length > 0) return rows.map(r => `"${r.location_id}"`).join(',');
+    if (rows && rows.length > 0) return rows.map(r => r.location_id).join(',');
   } catch(e) {}
   // Fallback: return all location IDs
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
