@@ -479,7 +479,7 @@ async function getInstallerLocationIds(instId) {
   } catch(e) {}
   // Fallback: return all location IDs
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
-  return (all || []).map(r => r.id).join(',') || '0';
+  return all.length ? all.map(r => r.id).join(',') : '';
 }
 
 // ── POPULATE DROPDOWNS ────────────────────────────────────────────────────
