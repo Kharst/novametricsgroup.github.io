@@ -569,7 +569,7 @@ if (!bestCandidate) {
   DB.batteries.forEach(batt => {
     let units = Math.ceil(targetInstalled / batt.usable);
 
-    while (units < 50) { // safety cap
+    while (units < 200) { // safety cap
       const installedKWh = units * batt.usable;
 
       const stress   = nightlyDraw   / installedKWh;
@@ -662,7 +662,7 @@ function calculate() {
   // requiredUsableKWh = energy battery must deliver, scaled by requested autonomy
   // autonomy/12 lets the installer request more or less buffer than a standard 12-hr night
   const autonomyScale     = autonomy / 12;
-  const requiredUsableKWh = nightlyDraw * autonomyScale;
+  const requiredUsableKWh = avgNightDrawKW * autonomy;
 
   // avgNightDrawKW = average power rate the battery sustains overnight
   // This is what we use for runtime, NOT peakLoad (which is instantaneous)
