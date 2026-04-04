@@ -588,64 +588,6 @@ function batteryStressLabel(utilisation) {
   return 'Heavy Daily Cycling';
 }
 
-function selectBestBattery(requiredUsableKWh, dailyUsage, peakLoad, autonomy, requiredBattKW) {
-  const candidates = [];
-
-  DB.batteries.forEach(batt => {
-    for (let units = 1; units <= 12; units++) {
-      const installedKWh = batt.usable * units;
-      const totalKW = batt.kw * units;
-      const runtime = installedKWh / peakLoad;
-      const headroom = installedKWh / requiredUsableKWh;
-      const dailyUtil = dailyUsage / installedKWh;
-
-      if (runtime < autonomy) continue;
-      if (headroom < BATT_HEADROOM_MIN) continue;
-      if (dailyUtil > BATT_STRESS_HARD_MAX) continue;
-      if (totalKW < requiredBattKW) continue;
-
-      const headroomScore =
-        headroom < BATT_HEADROOM_IDEAL_MIN ? (BATT_HEADROOM_IDEAL_MIN - headroom) * 10 :
-        headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom - BATT_HEADROOM_IDEAL_MAX) * 10 :
-        0;
-      const stressScore =
-        dailyUtil <= BATT_STRESS_IDEAL_MAX ? 0 : (dailyUtil - BATT_STRESS_IDEAL_MAX) * 10;
-
-      candidates.push({
-        ...batt,
-        units,
-        installedKWh,
-        totalKW,
-        runtime,
-        headroom,
-        dailyUtil,
-        totalCost: batt.price * units,
-        headroomStatus: batteryHeadroomStatus(headroom),
-        techScore: headroomScore + stressScore
-      });
-    }
-  });
-
-  if (!candidates.length) return null;
-
-  const preferred = candidates.filter(c => c.headroom <= BATT_HEADROOM_MAX);
-  const pool = preferred.length ? preferred : candidates;
-  const statusOrder = { Balanced: 0, Conservative: 1, Tight: 2, Oversized: 3, Undersized: 4 };
-
-  pool.sort((a, b) => {
-    if (a.techScore !== b.techScore) return a.techScore - b.techScore;
-    if (statusOrder[a.headroomStatus] !== statusOrder[b.headroomStatus]) {
-      return statusOrder[a.headroomStatus] - statusOrder[b.headroomStatus];
-    }
-    if (a.dailyUtil !== b.dailyUtil) return a.dailyUtil - b.dailyUtil;
-    if (a.headroom !== b.headroom) return a.headroom - b.headroom;
-    if (a.totalCost !== b.totalCost) return a.totalCost - b.totalCost;
-    return a.units - b.units;
-  });
-
-  return pool[0];
-}
-
 function calculate() {
   if (!DB.panels.length || !DB.inverters.length || !DB.batteries.length) {
     toast('⚠ Data still loading — please wait'); return;
@@ -804,7 +746,7 @@ function calculate() {
 
 function calculate() {
   if (!DB.panels.length || !DB.inverters.length || !DB.batteries.length) {
-    toast('âš  Data still loading â€” please wait'); return;
+    toast('⚠ Data still loading — please wait'); return;
   }
 
   const locSel  = document.getElementById('sel-location');
@@ -870,7 +812,7 @@ function calculate() {
   const requiredUsableKWh = peakLoad * autonomy;
   const bestBatt = selectBestBattery(requiredUsableKWh, dailyUsage, peakLoad, autonomy, bestInv.ac);
   if (!bestBatt) {
-    toast('âš  No technically compliant battery found for this inverter/load combination');
+    toast('⚠  No technically compliant battery found for this inverter/load combination');
     return;
   }
 
@@ -962,7 +904,7 @@ function calculate() {
   };
 
   renderAll(calcResult);
-  toast('âœ“ System calculated â€” check all tabs');
+  toast('“ System calculated ” check all tabs');
 }
 
 function fmtR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
