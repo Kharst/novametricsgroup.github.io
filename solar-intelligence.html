@@ -171,7 +171,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <input type="number" id="custom-daily" placeholder="e.g. 30" min="1" max="500" step="1" />
     </div>
     <div class="inp-group">
-      <label>Autonomy Hours</label>
+      <label>Evening Backup Hours</label>
       <select id="sel-autonomy">
         <option value="4">4 hrs</option><option value="8">8 hrs</option>
         <option value="12" selected>12 hrs</option><option value="16">16 hrs</option><option value="24">24 hrs</option>
@@ -224,6 +224,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 
   <div id="tab-battery" class="tab-panel">
+    <!-- ── SYSTEM RECOMMENDATION BANNER (all 3 must pass) ── -->
+    <div class="kpi-grid" style="margin-bottom:8px">
+      <div class="kpi" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
+        <div class="label">⚡ System Recommendation (Solar + Battery + Inverter)</div>
+        <div class="value" id="sys-rec-value" style="font-size:1rem">—</div>
+        <div class="sub" id="sys-rec-sub"></div>
+      </div>
+    </div>
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">—</div></div>
       <div class="kpi"><div class="label">Battery Stress Level</div><div class="value" id="b-stress" style="font-size:.9rem">—</div></div>
@@ -231,11 +239,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="kpi"><div class="label">Battery Power Adequacy During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">—</div></div>
     </div>
     <div class="kpi-grid" style="margin-top:0">
-      <div class="kpi white"><div class="label">Minimum Battery Needed</div><div class="value" id="b-needed">—</div></div>
+      <div class="kpi white"><div class="label">Evening Energy Required</div><div class="value" id="b-needed">—</div><div class="sub">Solar-off backup period only</div></div>
       <div class="kpi white"><div class="label">Selected Battery Installed</div><div class="value" id="b-installed">—</div></div>
       <div class="kpi white"><div class="label">Batteries Required</div><div class="value" id="b-units">—</div></div>
       <div class="kpi white"><div class="label">Backup During Outage</div><div class="value" id="b-runtime">—</div></div>
     </div>
+    <div class="section-title">Cross-System Compatibility</div>
+    <div class="status-row"><span class="lbl">Solar → Battery Recharge</span><span class="val" id="b-solar-compat">—</span></div>
+    <div class="status-row"><span class="lbl">Inverter → Battery Power Support</span><span class="val" id="b-inv-compat">—</span></div>
     <div class="section-title">Battery Model</div>
     <div class="status-row"><span class="lbl">Selected Battery Option</span><span class="val" id="b-model">—</span></div>
     <div class="status-row"><span class="lbl">Capacity per Unit (Usable)</span><span class="val" id="b-usable-per">—</span></div>
@@ -573,38 +584,26 @@ function selectBestBattery(requiredUsableKWh, requiredBackupKW, autonomy) {
       const headroomScore =
         headroom < BATT_HEADROOM_IDEAL_MIN ? (BATT_HEADROOM_IDEAL_MIN - headroom) * 10 :
         headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom - BATT_HEADROOM_IDEAL_MAX) * 10 : 0;
-      const stressScore =
-        dailyUtil <= BATT_STRESS_IDEAL_MAX ? 0 : (dailyUtil - BATT_STRESS_IDEAL_MAX) * 10;
 
-      // ── ADVANCED SCORING ───────────────────────────────
-let score = 0;
+      let score = 0;
+      const batteryStressPenalty =
+        dailyUtil <= BATT_STRESS_IDEAL_MAX ? 0 :
+        (dailyUtil - BATT_STRESS_IDEAL_MAX) * 20;
+      const batteryOversizePenalty =
+        headroom > BATT_HEADROOM_IDEAL_MAX ?
+        (headroom - BATT_HEADROOM_IDEAL_MAX) * 15 : 0;
+      const batteryCostWeight = (batt.price * units) * 0.001;
+      score += headroomScore;
+      score += batteryStressPenalty;
+      score += batteryOversizePenalty;
+      score += batteryCostWeight;
 
-// Battery stress penalty (prefer low utilisation)
-const batteryStressPenalty =
-  dailyUtil <= BATT_STRESS_IDEAL_MAX ? 0 :
-  (dailyUtil - BATT_STRESS_IDEAL_MAX) * 20;
-
-// Oversizing penalty (avoid too much unused capacity)
-const batteryOversizePenalty =
-  headroom > BATT_HEADROOM_IDEAL_MAX ?
-  (headroom - BATT_HEADROOM_IDEAL_MAX) * 15 : 0;
-
-// Cost weighting (lighter influence)
-const batteryCostWeight = (batt.price * units) * 0.001;
-
-// Apply scoring
-score += headroomScore;
-score += batteryStressPenalty;
-score += batteryOversizePenalty;
-score += batteryCostWeight;
-
-// Push candidate
-candidates.push({
-  ...batt, units, installedKWh, totalKW, runtime, headroom, dailyUtil,
-  totalCost: batt.price * units,
-  headroomStatus: batteryHeadroomStatus(headroom),
-  techScore: score
-});
+      candidates.push({
+        ...batt, units, installedKWh, totalKW, runtime, headroom, dailyUtil,
+        totalCost: batt.price * units,
+        headroomStatus: batteryHeadroomStatus(headroom),
+        techScore: score
+      });
     }
   });
 
@@ -654,14 +653,17 @@ function calculate() {
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
 
+  // ── BATTERY ENERGY: evening-only, not 24hrs ───────────────────────────
+  // Battery only covers the non-solar (evening) window.
+  // During the day, solar provides power directly to the load.
+  // Evening energy = proportional slice of daily usage for the backup period.
+  const batteryBackupKWh   = dailyUsage * (autonomy / 24);
+  const battRechargeEnergy = batteryBackupKWh / BATT_ROUND_TRIP_EFF;
+
   // ── SOLAR SIZING ──────────────────────────────────────────────────────
-  // Array must cover: site daily load + energy to recharge battery each day
-  // batteryBackupKWh  = energy drawn from battery during backup window
-  // battRechargeEnergy = energy array must push into battery (incl. round-trip losses)
-  // requiredSolarEnergy = total array output needed per day
-  const batteryBackupKWh    = peakLoad * autonomy;
-  const battRechargeEnergy  = batteryBackupKWh / BATT_ROUND_TRIP_EFF;
-  const requiredSolarEnergy = dailyUsage + battRechargeEnergy;
+  // Solar covers daytime direct load + energy to recharge battery for evening.
+  // Avoids double-counting: evening kWh come from battery, not directly from solar.
+  const requiredSolarEnergy = (dailyUsage - batteryBackupKWh) + battRechargeEnergy;
   const requiredSolarKW     = requiredSolarEnergy / (psh * SYSTEM_EFFICIENCY);
 
   // Pick the smallest panel that keeps DC >= required
@@ -706,8 +708,6 @@ function calculate() {
   const battStress         = batteryStressLabel(battDailyUtil);
   const battHeadroomStatus = bestBatt.headroomStatus;
   const battTotalKW        = bestBatt.totalKW;
-  const IDEAL_DC_AC_MIN    = 1.1;
-  const IDEAL_DC_AC_MAX    = 1.3;
 
   const battRisk = battCapRatio < BATT_HEADROOM_MIN       ? 'High risk – storage below requirement'
     : battCapRatio < BATT_HEADROOM_IDEAL_MIN              ? 'Tight design – minimal reserve'
@@ -728,54 +728,37 @@ function calculate() {
   if (battCapRatio  >  BATT_HEADROOM_MAX)      issues.push('Reduce battery oversizing');
   if (battTotalKW   <  peakLoad)               issues.push('Increase battery power support');
 
-  const battVerdict = issues.length > 0 ? 'Design Action Required: ' + issues.join(' | ')
+  const battVerdict = issues.length > 0 ? 'Action Required: ' + issues.join(' | ')
     : battHeadroomStatus === 'Balanced'      ? 'Well Designed: Balanced and reliable'
     : battHeadroomStatus === 'Conservative'  ? 'Acceptable Design: Conservative reserve'
     : 'Acceptable Design: Limited safety margin';
 
   // ── INVERTER SELECTION ────────────────────────────────────────────────
   const requiredAC = peakLoad * 1.3;
-  // ── INVERTER SELECTION (OPTIMISED) ─────────────────────────────────────
-let bestInv = null;
-let bestScore = Infinity;
+  let bestInv = null;
+  let bestScore = Infinity;
 
-DB.inverters.forEach(inv => {
+  DB.inverters.forEach(inv => {
+    if (inv.ac < requiredAC || inv.dc < systemDC) return;
+    const dcAc = systemDC / inv.ac;
+    const headroom = inv.ac - peakLoad;
+    let score = 0;
+    if (dcAc < 0.95) {
+      score += 80;
+    } else if (dcAc > 1.5) {
+      score += 120;
+    } else {
+      score += Math.abs(dcAc - 1.2) * 50;
+    }
+    const idealHeadroom = peakLoad * 0.3;
+    score += Math.abs(headroom - idealHeadroom) * 10;
+    score += (inv.price || 0) * 0.001;
+    if (score < bestScore) { bestScore = score; bestInv = inv; }
+  });
 
-  // Must meet minimum requirements
-  if (inv.ac < requiredAC || inv.dc < systemDC) return;
-
-  const dcAc = systemDC / inv.ac;
-  const headroom = inv.ac - peakLoad;
-
-  let score = 0;
-
-  // 🎯 DC/AC ratio scoring (ideal ~1.2)
-  if (dcAc < 0.95) {
-    score += 80; // under-utilised inverter
-  } else if (dcAc > 1.5) {
-    score += 120; // too much clipping risk
-  } else {
-    score += Math.abs(dcAc - 1.2) * 50; // reward closeness to ideal
+  if (!bestInv) {
+    bestInv = DB.inverters.reduce((a, b) => (a.ac > b.ac ? a : b));
   }
-
-  // ⚡ Headroom scoring (prefer ~20–40%)
-  const idealHeadroom = peakLoad * 0.3;
-  score += Math.abs(headroom - idealHeadroom) * 10;
-
-  // 💰 Cost factor (lighter weight so performance dominates)
-  score += (inv.price || 0) * 0.001;
-
-  // 🧠 Pick best score
-  if (score < bestScore) {
-    bestScore = score;
-    bestInv = inv;
-  }
-});
-
-// Fallback (if nothing meets strict criteria)
-if (!bestInv) {
-  bestInv = DB.inverters.reduce((a, b) => (a.ac > b.ac ? a : b));
-}
 
   const dcAcRatio  = systemDC / bestInv.ac;
   const dcAcStatus = dcAcRatio < 0.95  ? 'Under-Utilised'
@@ -785,6 +768,18 @@ if (!bestInv) {
   const invHeadroom = bestInv.ac - peakLoad;
   const invLoadOK   = bestInv.ac >= peakLoad * 1.3;
   const battPowerOK = battTotalKW >= peakLoad;
+
+  // ── CROSS-SYSTEM COMPATIBILITY (all 3 must pass for recommendation) ───
+  // Solar must produce enough to cover daytime load AND recharge battery.
+  const solarCanRechargeBatt = expectedDailySolar >= requiredSolarEnergy;
+  // Inverter AC must handle battery continuous power output.
+  const invSupportsBattPwr   = bestInv.ac >= battTotalKW;
+  // Individual pass/fail
+  const solarPasses = oversizePct >= 0 && solarCanRechargeBatt;
+  const battPasses  = issues.length === 0;
+  const invPasses   = invLoadOK && dcAcRatio >= 0.95 && dcAcRatio <= 1.5;
+  // ALL THREE must pass for a system recommendation
+  const systemRecommended = solarPasses && battPasses && invPasses && invSupportsBattPwr;
 
   const stringsNeeded = Math.ceil(panelCount / 12);
   const mpptRequired  = Math.ceil(stringsNeeded / 2);
@@ -840,6 +835,7 @@ if (!bestInv) {
     battModel: bestBatt.model, battUnits: bestBatt.units, battUsable: bestBatt.usable,
     battCapRatio, battRuntimeRatio, battRisk, battVerdict, battStress,
     battDailyUtil, battHeadroomStatus, coverage, battTotalCost: bestBatt.totalCost,
+    solarCanRechargeBatt, invSupportsBattPwr, solarPasses, battPasses, invPasses, systemRecommended,
     invModel: bestInv.model, invAC: bestInv.ac, invDC: bestInv.dc, invEff: bestInv.eff,
     dcAcRatio, dcAcStatus, invHeadroom, invLoadOK, battPowerOK,
     mpptRequired, mpptAvailable, mpptStatus, invPrice: bestInv.price,
@@ -880,6 +876,24 @@ function renderAll(r) {
   set('r-footprint',     fmtN(r.footprint, 1) + ' m²');
   set('r-annual-solar',  Math.round(r.annualSolar).toLocaleString('en-ZA') + ' kWh');
 
+  // ── System Recommendation Banner (all 3 must pass) ──
+  const sysKpi = document.getElementById('sys-rec-kpi');
+  if (r.systemRecommended) {
+    set('sys-rec-value', '✓ Recommended System');
+    set('sys-rec-sub', 'Solar array, battery and inverter are all compatible and correctly sized');
+    sysKpi.className = 'kpi green';
+  } else {
+    const failList = [];
+    if (!r.solarPasses)          failList.push('Solar array');
+    if (!r.battPasses)           failList.push('Battery');
+    if (!r.invPasses)            failList.push('Inverter');
+    if (!r.solarCanRechargeBatt) failList.push('Solar → Battery recharge');
+    if (!r.invSupportsBattPwr)   failList.push('Inverter → Battery power');
+    set('sys-rec-value', '✗ System Not Recommended');
+    set('sys-rec-sub', 'Issues with: ' + failList.join(', '));
+    sysKpi.className = 'kpi red';
+  }
+
   setKpi('b-verdict',  r.battVerdict,  r.battVerdict.includes('Action') ? 'red' : r.battVerdict.includes('Acceptable') ? 'amber' : 'green');
   setKpi('b-stress',   r.battStress,   r.battStress.includes('Low') || r.battStress.includes('Normal') ? 'green' : r.battStress.includes('Moderate') ? 'amber' : 'red');
   setKpi('b-risk',     r.battRisk,     r.battRisk.includes('Low') ? 'green' : r.battRisk.includes('Tight') || r.battRisk.includes('Oversized') ? 'amber' : 'red');
@@ -891,6 +905,15 @@ function renderAll(r) {
   set('b-model',     r.battModel);
   set('b-usable-per', fmtN(r.battUsable, 2) + ' kWh');
   set('b-cap-ratio',  fmtN(r.battCapRatio, 2) + 'x (' + r.battHeadroomStatus + ')');
+
+  // Cross-system compatibility rows
+  set('b-solar-compat', r.solarCanRechargeBatt
+    ? '✓ Solar produces ' + fmtN(r.expectedDailySolar,2) + ' kWh — covers recharge requirement (' + fmtN(r.requiredSolarEnergy,2) + ' kWh needed)'
+    : '✗ Solar output insufficient to cover load + recharge battery — increase array size');
+  set('b-inv-compat', r.invSupportsBattPwr
+    ? '✓ Inverter AC (' + fmtN(r.invAC,1) + ' kW) supports battery continuous power (' + fmtN(r.battTotalKW || r.battCapRatio,1) + ' kW)'
+    : '✗ Inverter AC rating below battery power — upgrade inverter');
+
   document.getElementById('b-bar').style.width = Math.min(r.battCapRatio / BATT_HEADROOM_MAX, 1) * 100 + '%';
   document.getElementById('b-bar').style.background =
     r.battHeadroomStatus === 'Balanced' ? 'var(--green)' :
