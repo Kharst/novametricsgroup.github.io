@@ -39,13 +39,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
 .error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
 .login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-
-/* ── LOADING OVERLAY ── */
 .data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .data-loading.on{display:flex;}
 .dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 .dl-msg{font-size:13px;color:var(--muted)}.dl-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
-
 #app-screen{display:none;padding:24px 28px}
 .input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
 .inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
@@ -109,7 +106,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </head>
 <body>
 
-<!-- ══ LOADING OVERLAY ══ -->
 <div class="data-loading" id="dataLoading">
   <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
   <div class="dl-spinner"></div>
@@ -117,7 +113,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div class="dl-err" id="dlErr"></div>
 </div>
 
-<!-- ══ TOP NAVIGATION ══ -->
 <nav class="top-nav">
   <div class="nav-brand">
     <div class="nav-icon">N</div>
@@ -138,7 +133,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </nav>
 
-<!-- ══ LOGIN ══ -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">N</div>
@@ -151,7 +145,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </div>
 
-<!-- ══ MAIN APP ══ -->
 <div id="app-screen">
   <div class="input-strip">
     <div class="inp-group">
@@ -225,10 +218,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 
   <div id="tab-battery" class="tab-panel">
-    <!-- ── SYSTEM RECOMMENDATION BANNER (all 3 must pass) ── -->
     <div class="kpi-grid" style="margin-bottom:8px">
       <div class="kpi" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
-        <div class="label">⚡ System Recommendation (Solar + Battery + Inverter — all 3 must pass)</div>
+        <div class="label">⚡ System Recommendation — Solar ✕ Battery ✕ Inverter (all 3 must pass)</div>
         <div class="value" id="sys-rec-value" style="font-size:1rem">—</div>
         <div class="sub" id="sys-rec-sub"></div>
       </div>
@@ -237,21 +229,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">—</div></div>
       <div class="kpi"><div class="label">Battery Stress Level</div><div class="value" id="b-stress" style="font-size:.9rem">—</div></div>
       <div class="kpi"><div class="label">Design Risk</div><div class="value" id="b-risk" style="font-size:.9rem">—</div></div>
-      <div class="kpi"><div class="label">Battery Power Adequacy During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">—</div></div>
+      <div class="kpi"><div class="label">Battery Power During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">—</div></div>
     </div>
     <div class="kpi-grid" style="margin-top:0">
       <div class="kpi white"><div class="label">Evening Energy Required</div><div class="value" id="b-needed">—</div><div class="sub">Solar-off backup period only</div></div>
-      <div class="kpi white"><div class="label">Selected Battery Installed</div><div class="value" id="b-installed">—</div></div>
-      <div class="kpi white"><div class="label">Batteries Required</div><div class="value" id="b-units">—</div></div>
-      <div class="kpi white"><div class="label">Backup During Outage</div><div class="value" id="b-runtime">—</div></div>
+      <div class="kpi white"><div class="label">Battery Installed Capacity</div><div class="value" id="b-installed">—</div></div>
+      <div class="kpi white"><div class="label">Battery Units</div><div class="value" id="b-units">—</div></div>
+      <div class="kpi white"><div class="label">Runtime at Average Draw</div><div class="value" id="b-runtime">—</div></div>
     </div>
     <div class="section-title">Cross-System Compatibility (Solar ✕ Battery ✕ Inverter)</div>
-    <div class="status-row"><span class="lbl">Solar → Battery Recharge</span><span class="val" id="b-solar-compat">—</span></div>
-    <div class="status-row"><span class="lbl">Inverter → Battery Power Support</span><span class="val" id="b-inv-compat">—</span></div>
+    <div class="status-row"><span class="lbl">Solar → Daytime Load + Battery Recharge</span><span class="val" id="b-solar-compat">—</span></div>
+    <div class="status-row"><span class="lbl">Inverter AC ≥ Battery Continuous Power</span><span class="val" id="b-inv-compat">—</span></div>
+    <div class="status-row"><span class="lbl">Battery Power ≥ Peak Load</span><span class="val" id="b-load-compat">—</span></div>
     <div class="section-title">Battery Model</div>
-    <div class="status-row"><span class="lbl">Selected Battery Option</span><span class="val" id="b-model">—</span></div>
-    <div class="status-row"><span class="lbl">Capacity per Unit (Usable)</span><span class="val" id="b-usable-per">—</span></div>
-    <div class="status-row"><span class="lbl">Installed / Required Headroom</span><span class="val" id="b-cap-ratio">—</span></div>
+    <div class="status-row"><span class="lbl">Selected Battery</span><span class="val" id="b-model">—</span></div>
+    <div class="status-row"><span class="lbl">Capacity per Unit (Usable kWh)</span><span class="val" id="b-usable-per">—</span></div>
+    <div class="status-row"><span class="lbl">Headroom Ratio (Installed ÷ Required)</span><span class="val" id="b-cap-ratio">—</span></div>
     <div class="section-title">Capacity Headroom</div>
     <div class="bar-wrap"><div class="bar-fill" id="b-bar" style="width:0%;background:var(--green)"></div></div>
     <p class="tip" id="b-bar-tip"></p>
@@ -260,20 +253,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div id="tab-inverter" class="tab-panel">
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:.95rem">—</div></div>
-      <div class="kpi"><div class="label">Battery → Inverter Power Support</div><div class="value" id="i-batt-support">—</div></div>
+      <div class="kpi"><div class="label">Battery Power Compatibility</div><div class="value" id="i-batt-support">—</div><div class="sub" id="i-batt-sub"></div></div>
       <div class="kpi"><div class="label">DC / AC Ratio</div><div class="value" id="i-dcac">—</div><div class="sub" id="i-dcac-sub"></div></div>
-      <div class="kpi"><div class="label">Inverter Load Handling</div><div class="value" id="i-load-ok">—</div><div class="sub" id="i-load-sub"></div></div>
+      <div class="kpi"><div class="label">Load Handling</div><div class="value" id="i-load-ok">—</div><div class="sub" id="i-load-sub"></div></div>
     </div>
     <div class="section-title">MPPT &amp; String Allocation</div>
     <div class="status-row"><span class="lbl">PV String &amp; Inverter Compatibility</span><span class="val" id="i-mppt-status">—</span></div>
     <div class="status-row"><span class="lbl">String Allocation</span><span class="val" id="i-mppt-alloc">—</span></div>
     <div class="status-row"><span class="lbl">MPPT Utilisation</span><span class="val" id="i-mppt-pct">—</span></div>
     <div class="section-title">Inverter Performance</div>
-    <div class="status-row"><span class="lbl">Inverter AC (kW)</span><span class="val" id="i-ac-kw">—</span></div>
+    <div class="status-row"><span class="lbl">Inverter AC Continuous (kW)</span><span class="val" id="i-ac-kw">—</span></div>
     <div class="status-row"><span class="lbl">Max DC Input (kW)</span><span class="val" id="i-dc-max">—</span></div>
-    <div class="status-row"><span class="lbl">Inverter Headroom</span><span class="val" id="i-headroom">—</span></div>
+    <div class="status-row"><span class="lbl">Headroom over Peak Load</span><span class="val" id="i-headroom">—</span></div>
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">—</span></div>
-    <div class="section-title">DC / AC Visual</div>
+    <div class="section-title">DC / AC Ratio Visual</div>
     <div class="chart-wrap">
       <div class="chart-row"><div class="chart-label">DC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-dc" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="bar-dc-val">—</div></div>
       <div class="chart-row"><div class="chart-label">AC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-ac" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="bar-ac-val">—</div></div>
@@ -289,8 +282,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     </div>
     <div class="kpi-grid">
       <div class="kpi white"><div class="label">Installer Profit</div><div class="value" id="f-profit">—</div></div>
-      <div class="kpi white"><div class="label">Recommended Inverter Cost</div><div class="value" id="f-inv-cost">—</div></div>
-      <div class="kpi white"><div class="label">Total Hardware (Panels &amp; BOS)</div><div class="value" id="f-hw-cost">—</div></div>
+      <div class="kpi white"><div class="label">Inverter Cost</div><div class="value" id="f-inv-cost">—</div></div>
+      <div class="kpi white"><div class="label">Total Hardware (Panels + BOS)</div><div class="value" id="f-hw-cost">—</div></div>
       <div class="kpi white"><div class="label">Simple Payback Period</div><div class="value" id="f-payback">—</div></div>
     </div>
     <div class="section-title">Cost Breakdown</div>
@@ -389,9 +382,7 @@ async function sbFetch(path) {
 
 (function boot() {
   const saved = localStorage.getItem(SESSION_KEY);
-  if (saved) {
-    try { installer = JSON.parse(saved); } catch(e) { localStorage.removeItem(SESSION_KEY); }
-  }
+  if (saved) { try { installer = JSON.parse(saved); } catch(e) { localStorage.removeItem(SESSION_KEY); } }
   if (installer) {
     showLoadingOverlay('Loading your workspace…');
     loadAllData().then(() => { hideLoadingOverlay(); showApp(); }).catch(showDataError);
@@ -412,7 +403,6 @@ function showDataError(err) {
 
 async function loadAllData() {
   const instId = installer.installer_id;
-
   const [locRows, panelRows, invRows, battRows, loadRows] = await Promise.all([
     sbFetch(`/rest/v1/solar_locations?id=in.(${await getInstallerLocationIds(instId)})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
     sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
@@ -420,34 +410,11 @@ async function loadAllData() {
     sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`),
     sbFetch(`/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc`)
   ]);
-
-  DB.locations = (locRows || []).map(r => ({
-    id: r.id, city: r.city, name: r.location_name || r.city,
-    gti: parseFloat(r.design_gti_kwh_m2_day) || 4.80
-  }));
-
-  DB.panels = (panelRows || []).map(r => ({
-    id: r.id, model: r['PanelModel'], watts: parseInt(r['Watts']) || 0,
-    area: parseFloat(r['Area_sqm']) || 2.0, price: parseFloat(r['UnitPrice_R']) || 0
-  })).filter(p => p.watts > 0 && p.price > 0);
-
-  DB.inverters = (invRows || []).map(r => ({
-    id: r.id, model: r['InverterModel'], ac: parseFloat(r['ACContinuous_kW']) || 0,
-    dc: parseFloat(r['DCMax_kW']) || 0, mppt: parseInt(r['MPPT_count']) || 1,
-    eff: parseFloat(r['Efficiency_pct']) || 97, price: parseFloat(r['UnitPrice_R']) || 0
-  })).filter(i => i.ac > 0 && i.price > 0);
-
-  DB.batteries = (battRows || []).map(r => ({
-    id: r.id, model: r['BatteryModel'], usable: parseFloat(r['Usable_kWh']) || 0,
-    kw: parseFloat(r['Nominal_kW']) || 5, price: parseFloat(r['UnitPrice_R']) || 0
-  })).filter(b => b.usable > 0 && b.price > 0);
-
-  DB.loadProfiles = (loadRows || []).map(r => ({
-    id: r.id, name: r.profile_name,
-    peak: parseFloat(r.peak_load_kw) || 0,
-    daily: parseFloat(r.daily_usage_kwh) || 0
-  }));
-
+  DB.locations = (locRows||[]).map(r => ({ id:r.id, city:r.city, name:r.location_name||r.city, gti:parseFloat(r.design_gti_kwh_m2_day)||4.80 }));
+  DB.panels    = (panelRows||[]).map(r => ({ id:r.id, model:r['PanelModel'], watts:parseInt(r['Watts'])||0, area:parseFloat(r['Area_sqm'])||2.0, price:parseFloat(r['UnitPrice_R'])||0 })).filter(p=>p.watts>0&&p.price>0);
+  DB.inverters = (invRows||[]).map(r => ({ id:r.id, model:r['InverterModel'], ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0, mppt:parseInt(r['MPPT_count'])||1, eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 })).filter(i=>i.ac>0&&i.price>0);
+  DB.batteries = (battRows||[]).map(r => ({ id:r.id, model:r['BatteryModel'], usable:parseFloat(r['Usable_kWh'])||0, kw:parseFloat(r['Nominal_kW'])||5, price:parseFloat(r['UnitPrice_R'])||0 })).filter(b=>b.usable>0&&b.price>0);
+  DB.loadProfiles = (loadRows||[]).map(r => ({ id:r.id, name:r.profile_name, peak:parseFloat(r.peak_load_kw)||0, daily:parseFloat(r.daily_usage_kwh)||0 }));
   populateDropdowns();
 }
 
@@ -457,20 +424,18 @@ async function getInstallerLocationIds(instId) {
     if (rows && rows.length > 0) return rows.map(r => r.location_id).join(',');
   } catch(e) {}
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
-  return (all || []).map(r => r.id).join(',') || '0';
+  return (all||[]).map(r=>r.id).join(',')||'0';
 }
 
 function populateDropdowns() {
   const locSel = document.getElementById('sel-location');
   locSel.innerHTML = DB.locations.length
-    ? DB.locations.map(l => `<option value="${l.id}" data-gti="${l.gti}">${l.city}${l.name && l.name !== l.city ? ' – ' + l.name : ''}</option>`).join('')
+    ? DB.locations.map(l => `<option value="${l.id}" data-gti="${l.gti}">${l.city}${l.name&&l.name!==l.city?' – '+l.name:''}</option>`).join('')
     : '<option value="">No locations assigned</option>';
-
   const loadSel = document.getElementById('sel-load');
   loadSel.innerHTML = DB.loadProfiles.map(p =>
     `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
   ).join('') + '<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
-
   loadSel.onchange = function() {
     const c = this.value === 'custom';
     document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
@@ -482,63 +447,48 @@ function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display   = 'block';
   const badge = document.getElementById('installer-badge');
-  badge.textContent   = installer.installer_name;
-  badge.style.display = 'inline-block';
+  badge.textContent = installer.installer_name; badge.style.display = 'inline-block';
 }
 
 document.getElementById('sign-out-btn').addEventListener('click', function() {
-  localStorage.removeItem(SESSION_KEY);
-  window.location.href = 'nova-metrics_1.html';
+  localStorage.removeItem(SESSION_KEY); window.location.href = 'nova-metrics_1.html';
 });
 
 async function doLogin() {
-  const emailEl = document.getElementById('login-email');
-  const passEl  = document.getElementById('login-password');
-  const errEl   = document.getElementById('login-error');
-  const btn     = document.getElementById('login-btn');
-  const email   = emailEl.value.trim().toLowerCase();
-  const pass    = passEl.value.trim();
-  errEl.textContent = '';
-  if (!email) { errEl.textContent = 'Please enter your email address.'; emailEl.focus(); return; }
-  if (!pass)  { errEl.textContent = 'Please enter your password.'; passEl.focus(); return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="login-spinner"></span>Signing in…';
+  const emailEl=document.getElementById('login-email'), passEl=document.getElementById('login-password');
+  const errEl=document.getElementById('login-error'), btn=document.getElementById('login-btn');
+  const email=emailEl.value.trim().toLowerCase(), pass=passEl.value.trim();
+  errEl.textContent='';
+  if (!email){errEl.textContent='Please enter your email address.';emailEl.focus();return;}
+  if (!pass) {errEl.textContent='Please enter your password.';passEl.focus();return;}
+  btn.disabled=true; btn.innerHTML='<span class="login-spinner"></span>Signing in…';
   try {
     const data = await sbFetch(`/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=*&limit=1`);
-    if (!data || data.length === 0) { errEl.textContent = 'No account found for this email address.'; btn.disabled=false; btn.textContent='Sign In'; return; }
-    const row = data[0];
-    if (row.password && row.password.trim() !== '' && row.password.trim() !== pass) {
-      errEl.textContent = 'Incorrect password. Please try again.';
-      passEl.value = ''; passEl.focus(); btn.disabled=false; btn.textContent='Sign In'; return;
+    if (!data||data.length===0){errEl.textContent='No account found for this email address.';btn.disabled=false;btn.textContent='Sign In';return;}
+    const row=data[0];
+    if (row.password&&row.password.trim()!==''&&row.password.trim()!==pass){
+      errEl.textContent='Incorrect password. Please try again.';passEl.value='';passEl.focus();btn.disabled=false;btn.textContent='Sign In';return;
     }
-    installer = row;
-    localStorage.setItem(SESSION_KEY, JSON.stringify({
-      installer_id: row.installer_id, installer_name: row.installer_name,
-      contact_email: row.contact_email, logo_url: row.logo_url, primary_color: row.primary_color
-    }));
+    installer=row;
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ installer_id:row.installer_id, installer_name:row.installer_name, contact_email:row.contact_email, logo_url:row.logo_url, primary_color:row.primary_color }));
     showLoadingOverlay('Loading your workspace…');
-    await loadAllData();
-    hideLoadingOverlay();
-    showApp();
-  } catch(e) {
-    errEl.textContent = 'Login error: ' + e.message;
-    btn.disabled=false; btn.textContent='Sign In';
-  }
+    await loadAllData(); hideLoadingOverlay(); showApp();
+  } catch(e) { errEl.textContent='Login error: '+e.message; btn.disabled=false; btn.textContent='Sign In'; }
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') { const ls = document.getElementById('login-screen'); if (ls && ls.style.display !== 'none') doLogin(); }
+  if (e.key==='Enter'){const ls=document.getElementById('login-screen');if(ls&&ls.style.display!=='none')doLogin();}
 });
 
 function showTab(id) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  const tabs = ['tab-solar','tab-battery','tab-inverter','tab-financials','tab-enviro','tab-proposal'];
+  const tabs=['tab-solar','tab-battery','tab-inverter','tab-financials','tab-enviro','tab-proposal'];
   document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
 }
 
-// ── CALCULATION CONSTANTS ─────────────────────────────────────────────────
+// ── CONSTANTS ─────────────────────────────────────────────────────────────
 const BATT_HEADROOM_MIN       = 1.10;
 const BATT_HEADROOM_IDEAL_MIN = 1.15;
 const BATT_HEADROOM_IDEAL_MAX = 1.35;
@@ -546,59 +496,53 @@ const BATT_HEADROOM_MAX       = 1.60;
 const BATT_STRESS_IDEAL_MAX   = 0.60;
 const BATT_STRESS_ACCEPT_MAX  = 0.75;
 const BATT_STRESS_HARD_MAX    = 0.80;
-const SYSTEM_EFFICIENCY       = 0.85; // panel derating (temp, wiring, soiling)
-const BATT_ROUND_TRIP_EFF     = 0.90; // charge + discharge losses
+const SYSTEM_EFFICIENCY       = 0.85;
+const BATT_ROUND_TRIP_EFF     = 0.90;
 
-function batteryHeadroomStatus(headroom) {
-  if (headroom < BATT_HEADROOM_MIN)        return 'Undersized';
-  if (headroom < BATT_HEADROOM_IDEAL_MIN)  return 'Tight';
-  if (headroom <= BATT_HEADROOM_IDEAL_MAX) return 'Balanced';
-  if (headroom <= BATT_HEADROOM_MAX)       return 'Conservative';
+function batteryHeadroomStatus(h) {
+  if (h < BATT_HEADROOM_MIN)        return 'Undersized';
+  if (h < BATT_HEADROOM_IDEAL_MIN)  return 'Tight';
+  if (h <= BATT_HEADROOM_IDEAL_MAX) return 'Balanced';
+  if (h <= BATT_HEADROOM_MAX)       return 'Conservative';
   return 'Oversized';
 }
 
-function batteryStressLabel(utilisation) {
-  if (utilisation <= 0.40)               return 'Low stress: long battery life';
-  if (utilisation <= BATT_STRESS_IDEAL_MAX)  return 'Normal Daily Use';
-  if (utilisation <= BATT_STRESS_ACCEPT_MAX) return 'Moderate Daily Cycling';
+function batteryStressLabel(u) {
+  if (u <= 0.40)                    return 'Low stress: long battery life';
+  if (u <= BATT_STRESS_IDEAL_MAX)   return 'Normal Daily Use';
+  if (u <= BATT_STRESS_ACCEPT_MAX)  return 'Moderate Daily Cycling';
   return 'Heavy Daily Cycling';
 }
 
 // ── BATTERY SELECTOR ──────────────────────────────────────────────────────
-// Battery covers EVENING ONLY — the hours when solar is not generating.
-// requiredUsableKWh = evening energy needed (dailyUsage * eveningFraction)
-// requiredBackupKW  = peak load the battery must sustain during outage
+// Selects the best battery to cover EVENING ONLY (not 24hrs).
+// Hard filters:  runtime >= autonomy, headroom >= 1.10, dailyUtil <= 0.80, power >= peakLoad
+// Scoring:       penalise deviation from 1.15–1.35 headroom band, stress, oversizing, cost
 function selectBestBattery(requiredUsableKWh, requiredBackupKW, autonomy) {
   const candidates = [];
-  const avgDrawKW = Math.max(requiredUsableKWh / autonomy, 0.01);
+  const avgDrawKW  = Math.max(requiredUsableKWh / autonomy, 0.01);
 
   DB.batteries.forEach(batt => {
     for (let units = 1; units <= 12; units++) {
       const installedKWh = batt.usable * units;
-      const totalKW      = batt.kw    * units;
+      const totalKW      = batt.kw * units;
       const runtime      = installedKWh / avgDrawKW;
       const headroom     = installedKWh / requiredUsableKWh;
       const dailyUtil    = requiredUsableKWh / installedKWh;
 
-      // Hard filters — must satisfy all four
-      if (runtime   <  autonomy)             continue;
-      if (headroom  <  BATT_HEADROOM_MIN)    continue;
-      if (dailyUtil >  BATT_STRESS_HARD_MAX) continue;
-      if (totalKW   <  requiredBackupKW)     continue;
+      // Hard filters
+      if (runtime   < autonomy)              continue;
+      if (headroom  < BATT_HEADROOM_MIN)     continue;
+      if (dailyUtil > BATT_STRESS_HARD_MAX)  continue;
+      if (totalKW   < requiredBackupKW)      continue;
 
       const headroomScore =
         headroom < BATT_HEADROOM_IDEAL_MIN ? (BATT_HEADROOM_IDEAL_MIN - headroom) * 10 :
         headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom - BATT_HEADROOM_IDEAL_MAX) * 10 : 0;
-
-      const batteryStressPenalty =
-        dailyUtil <= BATT_STRESS_IDEAL_MAX ? 0 :
-        (dailyUtil - BATT_STRESS_IDEAL_MAX) * 20;
-      const batteryOversizePenalty =
-        headroom > BATT_HEADROOM_IDEAL_MAX ?
-        (headroom - BATT_HEADROOM_IDEAL_MAX) * 15 : 0;
-      const batteryCostWeight = (batt.price * units) * 0.001;
-
-      const score = headroomScore + batteryStressPenalty + batteryOversizePenalty + batteryCostWeight;
+      const stressPenalty   = dailyUtil > BATT_STRESS_IDEAL_MAX ? (dailyUtil - BATT_STRESS_IDEAL_MAX) * 20 : 0;
+      const oversizePenalty = headroom  > BATT_HEADROOM_IDEAL_MAX ? (headroom - BATT_HEADROOM_IDEAL_MAX) * 15 : 0;
+      const costWeight      = batt.price * units * 0.001;
+      const score = headroomScore + stressPenalty + oversizePenalty + costWeight;
 
       candidates.push({
         ...batt, units, installedKWh, totalKW, runtime, headroom, dailyUtil,
@@ -610,22 +554,17 @@ function selectBestBattery(requiredUsableKWh, requiredBackupKW, autonomy) {
   });
 
   if (!candidates.length) return null;
-
-  // Prefer batteries that are not oversized (headroom ≤ 1.60)
   const preferred = candidates.filter(c => c.headroom <= BATT_HEADROOM_MAX);
   const pool = preferred.length ? preferred : candidates;
-  const statusOrder = { Balanced: 0, Conservative: 1, Tight: 2, Oversized: 3, Undersized: 4 };
-
-  pool.sort((a, b) => {
-    if (a.techScore !== b.techScore) return a.techScore - b.techScore;
-    if (statusOrder[a.headroomStatus] !== statusOrder[b.headroomStatus])
-      return statusOrder[a.headroomStatus] - statusOrder[b.headroomStatus];
-    if (a.dailyUtil !== b.dailyUtil) return a.dailyUtil - b.dailyUtil;
-    if (a.headroom  !== b.headroom)  return a.headroom  - b.headroom;
-    if (a.totalCost !== b.totalCost) return a.totalCost - b.totalCost;
-    return a.units - b.units;
-  });
-
+  const ord = { Balanced:0, Conservative:1, Tight:2, Oversized:3, Undersized:4 };
+  pool.sort((a,b) =>
+    a.techScore - b.techScore ||
+    ord[a.headroomStatus] - ord[b.headroomStatus] ||
+    a.dailyUtil - b.dailyUtil ||
+    a.headroom  - b.headroom  ||
+    a.totalCost - b.totalCost ||
+    a.units - b.units
+  );
   return pool[0];
 }
 
@@ -635,12 +574,11 @@ function calculate() {
     toast('⚠ Data still loading — please wait'); return;
   }
 
-  // ── Read inputs ──
+  // Inputs
   const locSel  = document.getElementById('sel-location');
-  const locId   = locSel.value;
   const locOpt  = locSel.options[locSel.selectedIndex];
   const locName = locOpt ? locOpt.text : 'Unknown';
-  const psh     = locOpt ? parseFloat(locOpt.dataset.gti) || 4.80 : 4.80;
+  const psh     = locOpt ? parseFloat(locOpt.dataset.gti)||4.80 : 4.80;
 
   const loadSel = document.getElementById('sel-load');
   let peakLoad, dailyUsage;
@@ -648,40 +586,35 @@ function calculate() {
     peakLoad   = parseFloat(document.getElementById('custom-peak').value)  || 3;
     dailyUsage = parseFloat(document.getElementById('custom-daily').value) || 20;
   } else {
-    peakLoad   = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.peak);
-    dailyUsage = parseFloat(loadSel.options[loadSel.selectedIndex].dataset.daily);
+    const o = loadSel.options[loadSel.selectedIndex];
+    peakLoad   = parseFloat(o.dataset.peak);
+    dailyUsage = parseFloat(o.dataset.daily);
   }
 
   const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value) / 100;
 
-  // ── BATTERY ENERGY: evening-only backup, NOT 24-hour sizing ──────────
-  // During the day, solar provides power directly to the load.
-  // Battery only covers the non-solar (evening) window.
-  // Evening energy = proportional slice of daily usage for the backup period.
+  // ── BATTERY ENERGY — evening window only ─────────────────────────────
+  // Solar covers the day.  Battery covers the evening (autonomy hrs out of 24).
   const batteryBackupKWh   = dailyUsage * (autonomy / 24);
   const battRechargeEnergy = batteryBackupKWh / BATT_ROUND_TRIP_EFF;
 
-  // ── SOLAR SIZING ──────────────────────────────────────────────────────
-  // Solar covers daytime direct load + energy to recharge battery for evening.
-  // Daytime load = total daily usage minus the evening slice (battery covers that).
+  // ── SOLAR — covers daytime load + battery recharge ───────────────────
   const requiredSolarEnergy = (dailyUsage - batteryBackupKWh) + battRechargeEnergy;
   const requiredSolarKW     = requiredSolarEnergy / (psh * SYSTEM_EFFICIENCY);
 
-  // Pick the smallest panel combination that meets or exceeds required DC
   let bestPanel = null, bestOversize = Infinity;
   DB.panels.forEach(p => {
-    const n  = Math.ceil(requiredSolarKW * 1000 / p.watts);
+    const n = Math.ceil(requiredSolarKW * 1000 / p.watts);
     const dc = n * p.watts / 1000;
     const os = dc - requiredSolarKW;
-    if (os >= 0 && os < bestOversize) { bestOversize = os; bestPanel = { ...p, panelsNeeded: n, dcKW: dc }; }
+    if (os >= 0 && os < bestOversize) { bestOversize = os; bestPanel = { ...p, panelsNeeded:n, dcKW:dc }; }
   });
   if (!bestPanel) {
-    const p  = DB.panels[DB.panels.length - 1];
-    bestPanel = { ...p };
-    bestPanel.panelsNeeded = Math.ceil(requiredSolarKW * 1000 / p.watts);
-    bestPanel.dcKW         = bestPanel.panelsNeeded * p.watts / 1000;
+    const p = DB.panels[DB.panels.length - 1];
+    bestPanel = { ...p, panelsNeeded: Math.ceil(requiredSolarKW*1000/p.watts) };
+    bestPanel.dcKW = bestPanel.panelsNeeded * p.watts / 1000;
   }
 
   const systemDC           = bestPanel.dcKW;
@@ -691,109 +624,108 @@ function calculate() {
   const annualConsumption  = dailyUsage * 365;
   const panelCount         = bestPanel.panelsNeeded;
   const footprint          = panelCount * 2.2;
-  const roofFitData = panelCount <= 14 ? ['Easy Fit', 'Fits a single roof plane. Quick installation.']
-    : panelCount <= 20 ? ['Standard Fit', 'May use multiple roof sections. Common setup.']
-    : panelCount <= 30 ? ['Complex Layout', 'East/West layout recommended for optimal production.']
-    : ['Large System Layout', 'Carport or ground mount may be considered.'];
+  const roofFitData =
+    panelCount <= 14 ? ['Easy Fit',         'Fits a single roof plane. Quick installation.'] :
+    panelCount <= 20 ? ['Standard Fit',     'May use multiple roof sections. Common setup.'] :
+    panelCount <= 30 ? ['Complex Layout',   'East/West layout recommended for optimal production.'] :
+                       ['Large System Layout','Carport or ground mount may be considered.'];
 
-  // ── BATTERY SIZING ────────────────────────────────────────────────────
+  // ── BATTERY ───────────────────────────────────────────────────────────
   const requiredUsableKWh = batteryBackupKWh;
   const bestBatt = selectBestBattery(requiredUsableKWh, peakLoad, autonomy);
-  if (!bestBatt) {
-    toast('⚠ No suitable battery found — check load/autonomy inputs'); return;
-  }
+  if (!bestBatt) { toast('⚠ No suitable battery found — check load/autonomy inputs'); return; }
 
   const installedBattKWh   = bestBatt.installedKWh;
   const battRuntime        = bestBatt.runtime;
   const battCapRatio       = bestBatt.headroom;
-  const battRuntimeRatio   = battRuntime / autonomy;
   const battDailyUtil      = bestBatt.dailyUtil;
   const battStress         = batteryStressLabel(battDailyUtil);
   const battHeadroomStatus = bestBatt.headroomStatus;
-  const battTotalKW        = bestBatt.totalKW;  // battery total continuous power (kW)
+  const battTotalKW        = bestBatt.totalKW;
 
-  const battRisk = battCapRatio < BATT_HEADROOM_MIN       ? 'High risk – storage below requirement'
-    : battCapRatio < BATT_HEADROOM_IDEAL_MIN              ? 'Tight design – minimal reserve'
-    : battCapRatio <= BATT_HEADROOM_IDEAL_MAX             ? 'Low risk – right-sized reserve'
-    : battCapRatio <= BATT_HEADROOM_MAX                   ? 'Low risk – conservative reserve'
-    : 'Oversized – review battery reserve';
+  const battRisk =
+    battCapRatio < BATT_HEADROOM_MIN       ? 'High risk – storage below requirement' :
+    battCapRatio < BATT_HEADROOM_IDEAL_MIN ? 'Tight design – minimal reserve' :
+    battCapRatio <= BATT_HEADROOM_IDEAL_MAX ? 'Low risk – right-sized reserve' :
+    battCapRatio <= BATT_HEADROOM_MAX       ? 'Low risk – conservative reserve' :
+    'Conservative – slightly oversized (min unit constraint)';
 
   const backupCovRatio = battTotalKW / peakLoad;
-  const coverage = backupCovRatio < 1    ? 'Only Essential Loads Supported'
-    : backupCovRatio < 1.15              ? 'Essential + Some Comfort Loads'
-    : backupCovRatio <= 1.40             ? 'Most Loads Covered'
-    : 'Safe power headroom';
+  const coverage =
+    backupCovRatio < 1    ? 'Only Essential Loads Supported' :
+    backupCovRatio < 1.15 ? 'Essential + Some Comfort Loads' :
+    backupCovRatio <= 1.40 ? 'Most Loads Covered' :
+    'Safe power headroom';
 
-  const issues = [];
-  if (battCapRatio  <  BATT_HEADROOM_MIN)      issues.push('Increase battery capacity');
-  if (battRuntime   <  autonomy)               issues.push('Increase backup runtime');
-  if (battDailyUtil >  BATT_STRESS_ACCEPT_MAX) issues.push('Reduce battery stress');
-  if (battCapRatio  >  BATT_HEADROOM_MAX)      issues.push('Reduce battery oversizing');
-  if (battTotalKW   <  peakLoad)               issues.push('Increase battery power support');
+  // ── BATTERY PASS CRITERIA (hard failures only) ────────────────────────
+  // NOTE: Battery "oversizing" is NOT a hard failure — installers can't buy
+  // fractional units.  It is flagged in battRisk/battHeadroomStatus but does
+  // NOT block the system recommendation.
+  const battIssues = [];
+  if (battCapRatio  < BATT_HEADROOM_MIN)     battIssues.push('Increase battery capacity');
+  if (battRuntime   < autonomy)              battIssues.push('Increase backup runtime');
+  if (battDailyUtil > BATT_STRESS_ACCEPT_MAX) battIssues.push('Reduce battery stress');
+  if (battTotalKW   < peakLoad)              battIssues.push('Battery power below peak load');
 
-  const battVerdict = issues.length > 0 ? 'Action Required: ' + issues.join(' | ')
-    : battHeadroomStatus === 'Balanced'      ? 'Well Designed: Balanced and reliable'
-    : battHeadroomStatus === 'Conservative'  ? 'Acceptable Design: Conservative reserve'
-    : 'Acceptable Design: Limited safety margin';
+  const battVerdict = battIssues.length > 0 ? 'Action Required: ' + battIssues.join(' | ') :
+    battHeadroomStatus === 'Balanced'     ? 'Well Designed: Balanced and reliable' :
+    battHeadroomStatus === 'Conservative' ? 'Acceptable Design: Conservative reserve' :
+    battHeadroomStatus === 'Oversized'    ? 'Acceptable Design: Min unit constraint applied' :
+    'Acceptable Design: Limited safety margin';
 
-  // ── INVERTER SELECTION ────────────────────────────────────────────────
-  const requiredAC = peakLoad * 1.3;
-  let bestInv = null;
-  let bestScore = Infinity;
+  const battPasses = battIssues.length === 0;
 
+  // ── INVERTER ─────────────────────────────────────────────────────────
+  // Inverter must handle: (a) peak load × 1.3 safety factor, AND
+  // (b) battery continuous discharge power (battTotalKW).
+  // Both are hard requirements.  DC/AC ratio is INFORMATIONAL only.
+  const requiredInvAC = Math.max(peakLoad * 1.3, battTotalKW);
+
+  let bestInv = null, bestInvScore = Infinity;
   DB.inverters.forEach(inv => {
-    if (inv.ac < requiredAC || inv.dc < systemDC) return;
+    if (inv.ac < requiredInvAC || inv.dc < systemDC) return;
     const dcAc = systemDC / inv.ac;
-    const headroom = inv.ac - peakLoad;
-    let score = 0;
-    if (dcAc < 0.95) {
-      score += 80;
-    } else if (dcAc > 1.5) {
-      score += 120;
-    } else {
-      score += Math.abs(dcAc - 1.2) * 50;
-    }
-    const idealHeadroom = peakLoad * 0.3;
-    score += Math.abs(headroom - idealHeadroom) * 10;
-    score += (inv.price || 0) * 0.001;
-    if (score < bestScore) { bestScore = score; bestInv = inv; }
+    let score = dcAc < 0.80 ? 80 : dcAc > 1.5 ? 120 : Math.abs(dcAc - 1.2) * 50;
+    score += Math.abs(inv.ac - peakLoad - peakLoad * 0.3) * 10;
+    score += (inv.price||0) * 0.001;
+    if (score < bestInvScore) { bestInvScore = score; bestInv = inv; }
   });
-
-  if (!bestInv) {
-    bestInv = DB.inverters.reduce((a, b) => (a.ac > b.ac ? a : b));
-  }
+  if (!bestInv) bestInv = DB.inverters.reduce((a,b) => a.ac > b.ac ? a : b);
 
   const dcAcRatio  = systemDC / bestInv.ac;
-  const dcAcStatus = dcAcRatio < 0.95  ? 'Under-Utilised'
-    : dcAcRatio <= 1.35                ? 'Balanced'
-    : dcAcRatio <= 1.5                 ? 'Pushing Limits'
-    : 'Too Large (Clipping)';
+  const dcAcStatus =
+    dcAcRatio < 0.80  ? 'Under-Utilised (small load)' :
+    dcAcRatio < 0.95  ? 'Slightly Under-Utilised' :
+    dcAcRatio <= 1.35 ? 'Balanced' :
+    dcAcRatio <= 1.5  ? 'Pushing Limits' :
+    'Too Large (Clipping Risk)';
   const invHeadroom = bestInv.ac - peakLoad;
   const invLoadOK   = bestInv.ac >= peakLoad * 1.3;
-  const battPowerOK = battTotalKW >= peakLoad;
 
-  // ── CROSS-SYSTEM COMPATIBILITY ────────────────────────────────────────
-  // All 3 components must pass for a system recommendation.
-  // 1. Solar: must produce enough to cover daytime load AND recharge battery
+  // ── CROSS-SYSTEM CHECKS ───────────────────────────────────────────────
   const solarCanRechargeBatt = expectedDailySolar >= requiredSolarEnergy;
-  // 2. Inverter: AC rating must support battery continuous power discharge
   const invSupportsBattPwr   = bestInv.ac >= battTotalKW;
+  const battPowerOK          = battTotalKW >= peakLoad;
 
-  // Individual pass/fail for each component
+  // ── PASS / FAIL for each of the 3 components ──────────────────────────
+  // Solar: array size is non-negative AND daily production meets demand
   const solarPasses = oversizePct >= 0 && solarCanRechargeBatt;
-  const battPasses  = issues.length === 0;
-  const invPasses   = invLoadOK && dcAcRatio >= 0.95 && dcAcRatio <= 1.5;
+  // Battery: no hard issues (oversizing is NOT a hard issue)
+  // battPasses already computed above
+  // Inverter: handles peak load AND battery discharge power (DC/AC ratio is informational)
+  const invPasses = invLoadOK && invSupportsBattPwr;
 
-  // ALL THREE must pass — plus cross-system checks — for system recommendation
-  const systemRecommended = solarPasses && battPasses && invPasses && invSupportsBattPwr;
+  // ALL 3 must pass
+  const systemRecommended = solarPasses && battPasses && invPasses;
 
   const stringsNeeded = Math.ceil(panelCount / 12);
   const mpptRequired  = Math.ceil(stringsNeeded / 2);
   const mpptAvailable = bestInv.mppt;
-  const mpptStatus    = mpptRequired < mpptAvailable  ? 'Spare inputs available'
-    : mpptRequired === mpptAvailable                  ? 'All inputs used'
-    : mpptRequired === mpptAvailable + 1              ? 'Limited headroom'
-    : 'Additional inputs required';
+  const mpptStatus    =
+    mpptRequired <  mpptAvailable   ? 'Spare inputs available' :
+    mpptRequired === mpptAvailable  ? 'All inputs used' :
+    mpptRequired === mpptAvailable+1 ? 'Limited headroom' :
+    'Additional inputs required';
 
   // ── FINANCIALS ────────────────────────────────────────────────────────
   const panelCost      = panelCount * bestPanel.price;
@@ -809,10 +741,9 @@ function calculate() {
   const simplePayback  = annualSavings > 0 ? totalCost / annualSavings : 999;
   const lifetimeSavings = annualSavings * 25;
   const annualROI      = (annualSavings / totalCost) * 100;
-
   let cumS = 0, realPayback = 25;
   for (let yr = 1; yr <= 25; yr++) {
-    const f = yr <= 3 ? Math.pow(1.1274, yr - 1) : Math.pow(1.1274, 2) * Math.pow(1.054, yr - 3);
+    const f = yr <= 3 ? Math.pow(1.1274,yr-1) : Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
     cumS += annualSavings * f;
     if (cumS >= totalCost && realPayback === 25) realPayback = yr;
   }
@@ -824,29 +755,29 @@ function calculate() {
   const coal    = annualSolar / 2460;
   const water   = annualSolar * 1.8;
   const monthlyKWh = expectedDailySolar * 30;
-  const segment = monthlyKWh <= 1500   ? 'Low Residential'
-    : monthlyKWh <= 3000               ? 'High Residential'
-    : monthlyKWh <= 20000              ? 'Small Commercial'
-    : monthlyKWh <= 50000              ? 'Large Commercial'
-    : 'Industrial';
+  const segment =
+    monthlyKWh <= 1500  ? 'Low Residential' :
+    monthlyKWh <= 3000  ? 'High Residential' :
+    monthlyKWh <= 20000 ? 'Small Commercial' :
+    monthlyKWh <= 50000 ? 'Large Commercial' : 'Industrial';
   const indepPct = Math.min(annualSolar / annualConsumption, 1) * 100;
 
   calcResult = {
-    locId, locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
+    locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
     requiredSolarKW, requiredSolarEnergy, systemDC,
-    panelCount, panelModel: bestPanel.model, panelWatts: bestPanel.watts,
+    panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
     expectedDailySolar, oversizePct, annualSolar, footprint,
-    roofFit: roofFitData[0], roofGuidance: roofFitData[1],
+    roofFit:roofFitData[0], roofGuidance:roofFitData[1],
     requiredUsableKWh, installedBattKWh, battRuntime,
-    battModel: bestBatt.model, battUnits: bestBatt.units, battUsable: bestBatt.usable,
-    battCapRatio, battRuntimeRatio, battRisk, battVerdict, battStress,
+    battModel:bestBatt.model, battUnits:bestBatt.units, battUsable:bestBatt.usable,
+    battCapRatio, battRisk, battVerdict, battStress,
     battDailyUtil, battHeadroomStatus, coverage,
-    battTotalCost: bestBatt.totalCost,
-    battTotalKW,                          // ← battery total continuous power (kW) — required for display
-    solarCanRechargeBatt, invSupportsBattPwr, solarPasses, battPasses, invPasses, systemRecommended,
-    invModel: bestInv.model, invAC: bestInv.ac, invDC: bestInv.dc, invEff: bestInv.eff,
-    dcAcRatio, dcAcStatus, invHeadroom, invLoadOK, battPowerOK,
-    mpptRequired, mpptAvailable, mpptStatus, invPrice: bestInv.price,
+    battTotalCost:bestBatt.totalCost, battTotalKW, battPowerOK,
+    solarCanRechargeBatt, invSupportsBattPwr,
+    solarPasses, battPasses, invPasses, systemRecommended,
+    invModel:bestInv.model, invAC:bestInv.ac, invDC:bestInv.dc, invEff:bestInv.eff,
+    dcAcRatio, dcAcStatus, invHeadroom, invLoadOK,
+    mpptRequired, mpptAvailable, mpptStatus, invPrice:bestInv.price,
     panelCost, bosCost, hwCost, totalCost, sellPrice, profit, costPerKW,
     monthlySavings, annualSavings, lifetimeSavings, annualROI, simplePayback, realPayback,
     annualConsumption, co2Tons, trees, coal, water, segment, indepPct
@@ -858,126 +789,137 @@ function calculate() {
 
 // ── RENDER ────────────────────────────────────────────────────────────────
 function fmtR(n) { return 'R' + Math.round(n).toLocaleString('en-ZA'); }
-function fmtN(n, d = 1) { return Number(n).toFixed(d); }
+function fmtN(n, d=1) { return Number(n).toFixed(d); }
 
 function renderAll(r) {
+  // Solar tab
   set('r-panel-model', r.panelModel);
-  set('r-req-solar',   fmtN(r.requiredSolarKW, 2) + ' kW');
-  set('r-dc-cap',      fmtN(r.systemDC, 2) + ' kW');
+  set('r-req-solar',   fmtN(r.requiredSolarKW,2) + ' kW');
+  set('r-dc-cap',      fmtN(r.systemDC,2) + ' kW');
   set('r-panel-count', r.panelCount + ' Panels');
   set('r-panel-watts', r.panelWatts + ' W');
-  set('r-daily-solar', fmtN(r.expectedDailySolar, 2) + ' kWh');
+  set('r-daily-solar', fmtN(r.expectedDailySolar,2) + ' kWh');
   set('r-daily-solar-sub',
-    r.expectedDailySolar >= r.requiredSolarEnergy * 1.1 ? 'Fully covers demand' :
-    r.expectedDailySolar >= r.requiredSolarEnergy       ? 'Meets demand' : 'Insufficient production');
+    r.expectedDailySolar >= r.requiredSolarEnergy*1.1 ? 'Fully covers demand' :
+    r.expectedDailySolar >= r.requiredSolarEnergy      ? 'Meets demand' : 'Insufficient production');
   const op = r.oversizePct;
-  set('r-oversize', (op * 100).toFixed(1) + '%');
+  set('r-oversize', (op*100).toFixed(1)+'%');
   set('r-oversize-sub',
-    op < 0       ? 'Undersized — risk of shortage' :
-    op <= 0.15   ? 'Optimal sizing' :
-    op <= 0.30   ? 'Safety margin included' :
-    op <= 0.40   ? 'Rounding oversize — acceptable' : 'Excess capacity — review string layout');
+    op < 0    ? 'Undersized — risk of shortage' :
+    op <= 0.15 ? 'Optimal sizing' :
+    op <= 0.30 ? 'Safety margin included' :
+    op <= 0.40 ? 'Rounding oversize — acceptable' : 'Excess capacity — review string layout');
   set('r-roof-fit',      r.roofFit);
   set('r-roof-guidance', r.roofGuidance);
-  set('r-psh',           fmtN(r.psh, 2) + ' hrs/day');
-  set('r-req-energy',    fmtN(r.requiredSolarEnergy, 2) + ' kWh/day');
-  set('r-footprint',     fmtN(r.footprint, 1) + ' m²');
+  set('r-psh',           fmtN(r.psh,2) + ' hrs/day');
+  set('r-req-energy',    fmtN(r.requiredSolarEnergy,2) + ' kWh/day');
+  set('r-footprint',     fmtN(r.footprint,1) + ' m²');
   set('r-annual-solar',  Math.round(r.annualSolar).toLocaleString('en-ZA') + ' kWh');
 
-  // ── System Recommendation Banner (all 3 must pass) ──
+  // System recommendation banner
   const sysKpi = document.getElementById('sys-rec-kpi');
   if (r.systemRecommended) {
     set('sys-rec-value', '✓ Recommended System');
     set('sys-rec-sub', 'Solar array, battery and inverter are all compatible and correctly sized');
     sysKpi.className = 'kpi green';
   } else {
-    const failList = [];
-    if (!r.solarPasses)          failList.push('Solar array');
-    if (!r.battPasses)           failList.push('Battery');
-    if (!r.invPasses)            failList.push('Inverter');
-    if (!r.solarCanRechargeBatt) failList.push('Solar → Battery recharge');
-    if (!r.invSupportsBattPwr)   failList.push('Inverter → Battery power');
+    const fl = [];
+    if (!r.solarPasses)          fl.push('Solar array');
+    if (!r.battPasses)           fl.push('Battery');
+    if (!r.invPasses)            fl.push('Inverter');
+    if (!r.solarCanRechargeBatt) fl.push('Solar → Battery recharge');
+    if (!r.invSupportsBattPwr)   fl.push('Inverter AC < Battery power');
     set('sys-rec-value', '✗ System Not Recommended');
-    set('sys-rec-sub', 'Issues with: ' + failList.join(', '));
+    set('sys-rec-sub', 'Issues with: ' + fl.join(', '));
     sysKpi.className = 'kpi red';
   }
 
-  setKpi('b-verdict',  r.battVerdict,  r.battVerdict.includes('Action') ? 'red' : r.battVerdict.includes('Acceptable') ? 'amber' : 'green');
-  setKpi('b-stress',   r.battStress,   r.battStress.includes('Low') || r.battStress.includes('Normal') ? 'green' : r.battStress.includes('Moderate') ? 'amber' : 'red');
-  setKpi('b-risk',     r.battRisk,     r.battRisk.includes('Low') ? 'green' : r.battRisk.includes('Tight') || r.battRisk.includes('Oversized') ? 'amber' : 'red');
-  setKpi('b-coverage', r.coverage,     r.coverage.includes('Safe') || r.coverage.includes('Most') ? 'green' : r.coverage.includes('Essential +') ? 'amber' : 'red');
-  set('b-needed',    fmtN(r.requiredUsableKWh, 2) + ' kWh');
-  set('b-installed', fmtN(r.installedBattKWh, 2) + ' kWh');
-  set('b-units',     r.battUnits + ' unit' + (r.battUnits > 1 ? 's' : ''));
-  set('b-runtime',   fmtN(r.battRuntime, 1) + ' hrs');
-  set('b-model',     r.battModel);
-  set('b-usable-per', fmtN(r.battUsable, 2) + ' kWh');
-  set('b-cap-ratio',  fmtN(r.battCapRatio, 2) + 'x (' + r.battHeadroomStatus + ')');
+  setKpi('b-verdict',  r.battVerdict, r.battVerdict.includes('Action') ? 'red' : r.battVerdict.includes('Acceptable') ? 'amber' : 'green');
+  setKpi('b-stress',   r.battStress,  r.battStress.includes('Low')||r.battStress.includes('Normal') ? 'green' : r.battStress.includes('Moderate') ? 'amber' : 'red');
+  setKpi('b-risk',     r.battRisk,    r.battRisk.includes('Low') ? 'green' : r.battRisk.includes('Conservative') ? 'amber' : 'red');
+  setKpi('b-coverage', r.coverage,    r.coverage.includes('Safe')||r.coverage.includes('Most') ? 'green' : r.coverage.includes('Essential +') ? 'amber' : 'red');
 
-  // Cross-system compatibility rows — use correct kW values
+  set('b-needed',     fmtN(r.requiredUsableKWh,2) + ' kWh');
+  set('b-installed',  fmtN(r.installedBattKWh,2)  + ' kWh');
+  set('b-units',      r.battUnits + ' unit' + (r.battUnits>1?'s':''));
+  set('b-runtime',    fmtN(r.battRuntime,1) + ' hrs');
+  set('b-model',      r.battModel);
+  set('b-usable-per', fmtN(r.battUsable,2) + ' kWh');
+  set('b-cap-ratio',  fmtN(r.battCapRatio,2) + 'x (' + r.battHeadroomStatus + ')');
+
   set('b-solar-compat', r.solarCanRechargeBatt
-    ? '✓ Solar produces ' + fmtN(r.expectedDailySolar,2) + ' kWh — covers daytime load + battery recharge (' + fmtN(r.requiredSolarEnergy,2) + ' kWh needed)'
-    : '✗ Solar output insufficient to cover load + recharge battery — increase array size');
+    ? '✓ Solar produces ' + fmtN(r.expectedDailySolar,2) + ' kWh — meets daytime load + recharge (' + fmtN(r.requiredSolarEnergy,2) + ' kWh needed)'
+    : '✗ Solar output insufficient — increase array size');
   set('b-inv-compat', r.invSupportsBattPwr
-    ? '✓ Inverter AC (' + fmtN(r.invAC,1) + ' kW) supports battery continuous power (' + fmtN(r.battTotalKW,1) + ' kW)'
-    : '✗ Inverter AC (' + fmtN(r.invAC,1) + ' kW) below battery continuous power (' + fmtN(r.battTotalKW,1) + ' kW) — upgrade inverter');
+    ? '✓ Inverter AC ' + fmtN(r.invAC,1) + ' kW ≥ Battery discharge ' + fmtN(r.battTotalKW,1) + ' kW'
+    : '✗ Inverter AC ' + fmtN(r.invAC,1) + ' kW < Battery discharge ' + fmtN(r.battTotalKW,1) + ' kW — upgrade inverter');
+  set('b-load-compat', r.battPowerOK
+    ? '✓ Battery ' + fmtN(r.battTotalKW,1) + ' kW ≥ Peak load ' + fmtN(r.peakLoad,1) + ' kW'
+    : '✗ Battery ' + fmtN(r.battTotalKW,1) + ' kW < Peak load ' + fmtN(r.peakLoad,1) + ' kW — add battery units');
 
   document.getElementById('b-bar').style.width = Math.min(r.battCapRatio / BATT_HEADROOM_MAX, 1) * 100 + '%';
   document.getElementById('b-bar').style.background =
-    r.battHeadroomStatus === 'Balanced' ? 'var(--green)' :
-    r.battHeadroomStatus === 'Conservative' || r.battHeadroomStatus === 'Tight' ? 'var(--amber)' : 'var(--red)';
-  set('b-bar-tip', 'Daily discharge utilisation: ' + fmtN(r.battDailyUtil * 100, 0) +
-    '% | Headroom target: ' + fmtN(BATT_HEADROOM_IDEAL_MIN, 2) + 'x–' + fmtN(BATT_HEADROOM_IDEAL_MAX, 2) + 'x');
+    r.battHeadroomStatus === 'Balanced'     ? 'var(--green)' :
+    r.battHeadroomStatus === 'Tight'        ? 'var(--amber)' :
+    r.battHeadroomStatus === 'Conservative' ? 'var(--amber)' :
+    r.battHeadroomStatus === 'Oversized'    ? 'var(--amber)' : 'var(--red)';
+  set('b-bar-tip', 'Evening discharge utilisation: ' + fmtN(r.battDailyUtil*100,0) +
+    '% | Ideal headroom: ' + fmtN(BATT_HEADROOM_IDEAL_MIN,2) + 'x–' + fmtN(BATT_HEADROOM_IDEAL_MAX,2) + 'x');
 
+  // Inverter tab
   set('i-model', r.invModel);
-  setKpi('i-batt-support', r.battPowerOK ? 'OK' : 'Mismatch', r.battPowerOK ? 'green' : 'red');
-  setKpi('i-dcac',    fmtN(r.dcAcRatio, 2), r.dcAcStatus === 'Balanced' ? 'green' : r.dcAcStatus === 'Pushing Limits' ? 'amber' : 'red');
+  setKpi('i-batt-support', r.invSupportsBattPwr ? 'Compatible' : 'Mismatch', r.invSupportsBattPwr ? 'green' : 'red');
+  set('i-batt-sub', 'Inverter ' + fmtN(r.invAC,1) + ' kW vs Battery ' + fmtN(r.battTotalKW,1) + ' kW');
+  setKpi('i-dcac',    fmtN(r.dcAcRatio,2), r.dcAcStatus.includes('Balanced') ? 'green' : r.dcAcStatus.includes('Pushing') ? 'amber' : 'white');
   set('i-dcac-sub',   r.dcAcStatus);
   setKpi('i-load-ok', r.invLoadOK ? 'OK' : 'Undersized', r.invLoadOK ? 'green' : 'red');
-  set('i-load-sub',   r.invLoadOK ? "Inverter can handle the site's peak load" : 'Inverter AC rating is below peak load requirement');
+  set('i-load-sub',   r.invLoadOK ? "Handles site peak load with safety margin" : 'Inverter AC below peak load requirement');
   setKpi('i-mppt-status', r.mpptStatus,
-    r.mpptStatus === 'Spare inputs available' ? 'green' : r.mpptStatus === 'All inputs used' ? 'amber' : 'red');
+    r.mpptStatus==='Spare inputs available' ? 'green' : r.mpptStatus==='All inputs used' ? 'amber' : 'red');
   set('i-mppt-alloc', r.mpptRequired + ' of ' + r.mpptAvailable + ' MPPT inputs allocated');
-  set('i-mppt-pct',   fmtN(r.mpptRequired / r.mpptAvailable * 100, 0) + '%');
-  set('i-ac-kw',      fmtN(r.invAC, 1) + ' kW');
-  set('i-dc-max',     fmtN(r.invDC, 1) + ' kW');
-  set('i-headroom',   (r.invHeadroom > 0 ? '+' : '') + fmtN(r.invHeadroom, 1) + ' kW');
-  set('i-eff',        fmtN(r.invEff, 1) + '%');
+  set('i-mppt-pct',   fmtN(r.mpptRequired/r.mpptAvailable*100,0) + '%');
+  set('i-ac-kw',      fmtN(r.invAC,1) + ' kW');
+  set('i-dc-max',     fmtN(r.invDC,1) + ' kW');
+  set('i-headroom',   (r.invHeadroom>0?'+':'') + fmtN(r.invHeadroom,1) + ' kW');
+  set('i-eff',        fmtN(r.invEff,1) + '%');
   const mx = Math.max(r.systemDC, r.invAC) * 1.1;
-  document.getElementById('bar-dc').style.width = (r.systemDC / mx * 100) + '%';
-  set('bar-dc-val', fmtN(r.systemDC, 2) + ' kW');
-  document.getElementById('bar-ac').style.width = (r.invAC / mx * 100) + '%';
-  set('bar-ac-val', fmtN(r.invAC, 1) + ' kW');
+  document.getElementById('bar-dc').style.width = (r.systemDC/mx*100) + '%';
+  set('bar-dc-val', fmtN(r.systemDC,2) + ' kW');
+  document.getElementById('bar-ac').style.width = (r.invAC/mx*100) + '%';
+  set('bar-ac-val', fmtN(r.invAC,1) + ' kW');
 
-  set('f-total-cost',   fmtR(r.totalCost));
-  set('f-cost-per-kw',  fmtR(r.costPerKW));
-  set('f-sell-price',   fmtR(r.sellPrice));
-  set('f-annual-savings', fmtR(r.annualSavings));
-  set('f-profit',       fmtR(r.profit));
-  set('f-inv-cost',     fmtR(r.invPrice));
-  set('f-hw-cost',      fmtR(r.hwCost));
-  set('f-payback',      fmtN(r.simplePayback, 1) + ' year payback');
-  set('f-monthly',      fmtR(r.monthlySavings));
-  set('f-lifetime',     fmtR(r.lifetimeSavings));
-  set('f-real-payback', r.realPayback + ' years (escalating tariff)');
-  set('f-roi',          fmtN(r.annualROI, 1) + '%');
-  set('f-consumption',  Math.round(r.annualConsumption).toLocaleString('en-ZA') + ' kWh');
+  // Financials tab
+  set('f-total-cost',    fmtR(r.totalCost));
+  set('f-cost-per-kw',   fmtR(r.costPerKW));
+  set('f-sell-price',    fmtR(r.sellPrice));
+  set('f-annual-savings',fmtR(r.annualSavings));
+  set('f-profit',        fmtR(r.profit));
+  set('f-inv-cost',      fmtR(r.invPrice));
+  set('f-hw-cost',       fmtR(r.hwCost));
+  set('f-payback',       fmtN(r.simplePayback,1) + ' year payback');
+  set('f-monthly',       fmtR(r.monthlySavings));
+  set('f-lifetime',      fmtR(r.lifetimeSavings));
+  set('f-real-payback',  r.realPayback + ' years (escalating tariff)');
+  set('f-roi',           fmtN(r.annualROI,1) + '%');
+  set('f-consumption',   Math.round(r.annualConsumption).toLocaleString('en-ZA') + ' kWh');
   const mx2 = Math.max(r.panelCost, r.bosCost, r.battTotalCost, r.invPrice);
-  setBar('cb-panels', r.panelCost     / mx2 * 100, 'cb-panels-v', fmtR(r.panelCost));
-  setBar('cb-bos',    r.bosCost       / mx2 * 100, 'cb-bos-v',    fmtR(r.bosCost));
-  setBar('cb-batt',   r.battTotalCost / mx2 * 100, 'cb-batt-v',   fmtR(r.battTotalCost));
-  setBar('cb-inv',    r.invPrice      / mx2 * 100, 'cb-inv-v',    fmtR(r.invPrice));
+  setBar('cb-panels', r.panelCost/mx2*100,     'cb-panels-v', fmtR(r.panelCost));
+  setBar('cb-bos',    r.bosCost/mx2*100,       'cb-bos-v',    fmtR(r.bosCost));
+  setBar('cb-batt',   r.battTotalCost/mx2*100, 'cb-batt-v',   fmtR(r.battTotalCost));
+  setBar('cb-inv',    r.invPrice/mx2*100,      'cb-inv-v',    fmtR(r.invPrice));
 
-  set('e-co2',   fmtN(r.co2Tons, 2));
+  // Environment tab
+  set('e-co2',   fmtN(r.co2Tons,2));
   set('e-trees', Math.round(r.trees).toLocaleString('en-ZA'));
-  set('e-coal',  fmtN(r.coal, 2));
+  set('e-coal',  fmtN(r.coal,2));
   set('e-water', Math.round(r.water).toLocaleString('en-ZA'));
-  set('e-annual-solar',  Math.round(r.annualSolar).toLocaleString('en-ZA') + ' kWh');
-  set('e-consumption',   Math.round(r.annualConsumption).toLocaleString('en-ZA') + ' kWh');
+  set('e-annual-solar', Math.round(r.annualSolar).toLocaleString('en-ZA') + ' kWh');
+  set('e-consumption',  Math.round(r.annualConsumption).toLocaleString('en-ZA') + ' kWh');
   set('e-segment', r.segment);
   document.getElementById('e-indep-bar').style.width = r.indepPct + '%';
-  set('e-indep-tip', 'Solar supplies approx. ' + fmtN(r.indepPct, 0) + '% of annual energy needs.');
+  set('e-indep-tip', 'Solar supplies approx. ' + fmtN(r.indepPct,0) + '% of annual energy needs.');
 
+  // Proposal tab
   set('ps-system',  r.panelCount + '× ' + r.panelModel + ' | ' + r.invModel + ' | ' + r.battUnits + '× ' + r.battModel);
   set('ps-cost',    fmtR(r.totalCost));
   set('ps-savings', fmtR(r.annualSavings) + '/year');
@@ -985,81 +927,75 @@ function renderAll(r) {
   document.getElementById('btn-gen').disabled = false;
 }
 
-function set(id, val)    { const el = document.getElementById(id); if (el) el.textContent = val; }
-function setKpi(id, val, color) {
-  const el = document.getElementById(id); if (!el) return;
-  el.textContent = val;
-  const k = el.closest('.kpi'); if (k) k.className = 'kpi ' + color;
+function set(id,val) { const el=document.getElementById(id); if(el) el.textContent=val; }
+function setKpi(id,val,color) {
+  const el=document.getElementById(id); if(!el) return;
+  el.textContent=val;
+  const k=el.closest('.kpi'); if(k) k.className='kpi '+color;
 }
-function setBar(bid, pct, vid, val) {
-  const b = document.getElementById(bid); if (b) b.style.width = Math.max(pct, 2) + '%';
-  set(vid, val);
+function setBar(bid,pct,vid,val) {
+  const b=document.getElementById(bid); if(b) b.style.width=Math.max(pct,2)+'%';
+  set(vid,val);
 }
 function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 function newCalculation() {
   document.getElementById('success-card').classList.remove('on');
-  document.getElementById('btn-gen').disabled = false;
+  document.getElementById('btn-gen').disabled=false;
   showTab('tab-solar');
 }
 
 // ── GENERATE PROPOSAL ─────────────────────────────────────────────────────
 async function generateProposal() {
   if (!calcResult || !installer) return;
-  const r   = calcResult;
-  const btn = document.getElementById('btn-gen');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Generating…';
-
+  const r=calcResult, btn=document.getElementById('btn-gen');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating…';
   const clientName    = document.getElementById('p-name').value.trim()    || 'Client';
   const clientEmail   = document.getElementById('p-email').value.trim();
   const clientPhone   = document.getElementById('p-phone').value.trim();
   const clientAddress = document.getElementById('p-address').value.trim();
-
-  if (!clientEmail) { toast('⚠ Please enter client email'); btn.disabled=false; btn.textContent='Generate Proposal'; return; }
-
-  const payload = { record: {
-    contact_email: clientEmail, installer_id: installer.installer_id,
-    installer_name: installer.installer_name, logo_url: installer.logo_url || '',
-    primary_color: installer.primary_color || '#0B1F3A', secondary_color: installer.secondary_color || '#FFFFFF',
-    accent_color: installer.accent_color || '#F0B429', contact_number: installer.contact_number || '',
-    client_name: clientName, client_email: clientEmail, client_phone: clientPhone, client_address: clientAddress,
-    location: r.locName, system_size_kw: r.systemDC, total_cost: r.totalCost,
-    annual_savings: r.annualSavings, monthly_savings: r.monthlySavings,
-    lifetime_savings: r.lifetimeSavings, payback_years: r.realPayback, segment: r.segment,
-    panel_model: r.panelModel, panel_number: r.panelCount, inverter_model: r.invModel,
-    battery_model: r.battModel, battery_capacity_kwh: r.installedBattKWh,
-    required_load_kw: r.peakLoad, required_autonomy_hours: r.autonomy,
-    annual_consumption_kwh: r.annualConsumption, annual_solar_kwh: r.annualSolar,
-    trees_equivalent: r.trees, coal_avoided_tons: r.coal, annual_co2_saved: r.co2Tons * 1000,
-    ai_prompt: `Solar proposal for ${clientName} in ${r.locName}. ${r.panelCount}× ${r.panelModel}, ${r.invModel}, ${r.battUnits}× ${r.battModel}. DC: ${r.systemDC.toFixed(2)}kW. Cost: R${Math.round(r.totalCost).toLocaleString()}. Savings: R${Math.round(r.annualSavings).toLocaleString()}/yr. Payback: ${r.realPayback} yrs.`
+  if (!clientEmail){toast('⚠ Please enter client email');btn.disabled=false;btn.textContent='Generate Proposal';return;}
+  const payload={record:{
+    contact_email:clientEmail, installer_id:installer.installer_id,
+    installer_name:installer.installer_name, logo_url:installer.logo_url||'',
+    primary_color:installer.primary_color||'#0B1F3A', secondary_color:installer.secondary_color||'#FFFFFF',
+    accent_color:installer.accent_color||'#F0B429', contact_number:installer.contact_number||'',
+    client_name:clientName, client_email:clientEmail, client_phone:clientPhone, client_address:clientAddress,
+    location:r.locName, system_size_kw:r.systemDC, total_cost:r.totalCost,
+    annual_savings:r.annualSavings, monthly_savings:r.monthlySavings,
+    lifetime_savings:r.lifetimeSavings, payback_years:r.realPayback, segment:r.segment,
+    panel_model:r.panelModel, panel_number:r.panelCount, inverter_model:r.invModel,
+    battery_model:r.battModel, battery_capacity_kwh:r.installedBattKWh,
+    required_load_kw:r.peakLoad, required_autonomy_hours:r.autonomy,
+    annual_consumption_kwh:r.annualConsumption, annual_solar_kwh:r.annualSolar,
+    trees_equivalent:r.trees, coal_avoided_tons:r.coal, annual_co2_saved:r.co2Tons*1000,
+    ai_prompt:`Solar proposal for ${clientName} in ${r.locName}. ${r.panelCount}× ${r.panelModel}, ${r.invModel}, ${r.battUnits}× ${r.battModel}. DC: ${r.systemDC.toFixed(2)}kW. Cost: R${Math.round(r.totalCost).toLocaleString()}. Savings: R${Math.round(r.annualSavings).toLocaleString()}/yr. Payback: ${r.realPayback} yrs.`
   }};
-
   try {
-    const res  = await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-      body: JSON.stringify(payload)
+    const res=await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`,{
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+      body:JSON.stringify(payload)
     });
-    const data = await res.json();
-    if (data.success) {
-      const portalUrl = `prposal_portal.html?ai_id=${encodeURIComponent(data.ai_id)}&email=${encodeURIComponent(installer.contact_email)}`;
-      document.getElementById('success-ai-label').innerHTML = 'AI Proposal ID <span class="ai-id-tag">' + data.ai_id + '</span>';
-      document.getElementById('btn-open-portal').href = portalUrl;
-      const pdfBtn = document.getElementById('btn-download-pdf');
-      if (data.pdf_url) { pdfBtn.href = data.pdf_url; pdfBtn.style.display = 'flex'; } else pdfBtn.style.display = 'none';
+    const data=await res.json();
+    if (data.success){
+      const portalUrl=`prposal_portal.html?ai_id=${encodeURIComponent(data.ai_id)}&email=${encodeURIComponent(installer.contact_email)}`;
+      document.getElementById('success-ai-label').innerHTML='AI Proposal ID <span class="ai-id-tag">'+data.ai_id+'</span>';
+      document.getElementById('btn-open-portal').href=portalUrl;
+      const pdfBtn=document.getElementById('btn-download-pdf');
+      if(data.pdf_url){pdfBtn.href=data.pdf_url;pdfBtn.style.display='flex';}else pdfBtn.style.display='none';
       document.getElementById('success-card').classList.add('on');
       toast('✓ Proposal generated — opening portal');
-      setTimeout(() => { window.location.href = portalUrl; }, 2800);
+      setTimeout(()=>{window.location.href=portalUrl;},2800);
     } else {
-      toast('⚠ Error: ' + (data.error || 'Unknown error'));
-      btn.disabled = false; btn.textContent = 'Generate Proposal';
+      toast('⚠ Error: '+(data.error||'Unknown error'));
+      btn.disabled=false; btn.textContent='Generate Proposal';
     }
-  } catch(e) {
-    toast('⚠ Network error: ' + e.message);
-    btn.disabled = false; btn.textContent = 'Generate Proposal';
+  } catch(e){
+    toast('⚠ Network error: '+e.message);
+    btn.disabled=false; btn.textContent='Generate Proposal';
   }
 }
 </script>
