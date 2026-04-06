@@ -218,7 +218,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 
   <div id="tab-battery" class="tab-panel">
-    <!-- All 3 must pass banner -->
     <div class="kpi-grid" style="margin-bottom:8px">
       <div class="kpi" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
         <div class="label">⚡ System Recommendation — Solar ✕ Battery ✕ Inverter (all 3 must pass)</div>
@@ -228,7 +227,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     </div>
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">—</div></div>
-      <div class="kpi"><div class="label">Battery Stress Level</div><div class="value" id="b-stress" style="font-size:.9rem">—</div></div>
+      <div class="kpi"><div class="label">Daily Cycle Stress</div><div class="value" id="b-stress" style="font-size:.9rem">—</div><div class="sub" id="b-stress-sub"></div></div>
       <div class="kpi"><div class="label">Design Risk</div><div class="value" id="b-risk" style="font-size:.9rem">—</div></div>
       <div class="kpi"><div class="label">Battery Power During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">—</div></div>
     </div>
@@ -488,15 +487,20 @@ function showTab(id){
 }
 
 // ── ENGINEERING CONSTANTS ─────────────────────────────────────────────────
-const BATT_HEADROOM_MIN       = 1.10;  // min installed/required ratio
-const BATT_HEADROOM_IDEAL_MIN = 1.15;
-const BATT_HEADROOM_IDEAL_MAX = 1.35;
-const BATT_HEADROOM_MAX       = 1.60;
-const BATT_STRESS_IDEAL_MAX   = 0.60;  // daily discharge ÷ installed
-const BATT_STRESS_ACCEPT_MAX  = 0.75;  // hard warn above this
-const BATT_STRESS_HARD_MAX    = 0.80;  // hard reject above this
-const SYSTEM_EFFICIENCY       = 0.85;  // panel derating (temp, wiring, soiling)
-const BATT_ROUND_TRIP_EFF     = 0.90;  // charge + discharge combined loss
+// Battery sizing — evening backup only (NOT 24hr)
+const BATT_HEADROOM_MIN       = 1.10;  // hard min installed/required ratio
+const BATT_HEADROOM_IDEAL_MIN = 1.15;  // ideal band lower
+const BATT_HEADROOM_IDEAL_MAX = 1.35;  // ideal band upper
+const BATT_HEADROOM_MAX       = 1.60;  // informational oversized threshold
+// Daily depth-of-discharge (DoD) levels — INFORMATIONAL only, NOT hard blockers
+// LFP batteries are rated for 80–100% DoD; stress affects cycle life, not function
+const BATT_DOD_LOW    = 0.50;  // low stress threshold
+const BATT_DOD_NORMAL = 0.70;  // normal daily cycling
+const BATT_DOD_HIGH   = 0.85;  // high — acceptable for LFP, shorter cycle life
+// Max DoD allowed in selector (hard cap only to prevent extreme sizing edge-cases)
+const BATT_DOD_MAX    = 0.95;  // absolute maximum — anything above this filtered
+const SYSTEM_EFFICIENCY    = 0.85;  // panel derating (temp, wiring, soiling)
+const BATT_ROUND_TRIP_EFF  = 0.90;  // combined charge + discharge loss
 
 function batteryHeadroomStatus(h){
   if(h<BATT_HEADROOM_MIN)        return 'Undersized';
@@ -505,52 +509,56 @@ function batteryHeadroomStatus(h){
   if(h<=BATT_HEADROOM_MAX)       return 'Conservative';
   return 'Oversized';
 }
-function batteryStressLabel(u){
-  if(u<=0.40)                   return 'Low stress: long battery life';
-  if(u<=BATT_STRESS_IDEAL_MAX)  return 'Normal Daily Use';
-  if(u<=BATT_STRESS_ACCEPT_MAX) return 'Moderate Daily Cycling';
-  return 'Heavy Daily Cycling';
+
+// Stress label — purely informational display
+function batteryStressLabel(dod){
+  if(dod<=BATT_DOD_LOW)    return ['Low stress','Long cycle life expected'];
+  if(dod<=BATT_DOD_NORMAL) return ['Normal cycling','Standard daily use'];
+  if(dod<=BATT_DOD_HIGH)   return ['High cycling','Acceptable for LFP — monitor life'];
+  return ['Very high cycling','Consider adding a battery unit'];
 }
 
 // ── BATTERY SELECTOR ──────────────────────────────────────────────────────
-// PURPOSE: Pick the smallest battery bank that can:
-//   1. Supply enough kWh for the evening window (headroom ≥ 1.10)
-//   2. Last the full backup duration (runtime ≥ autonomy)
-//   3. Not be overstressed (dailyUtil ≤ 0.80)
-//   4. Supply enough continuous power for peak load (totalKW ≥ peakLoad)
+// Finds the minimum cost battery bank that satisfies ALL hard engineering rules:
+//   1. Installed capacity >= required kWh × 1.10 (headroom)
+//   2. Battery bank power >= peak load (can supply the load during outage)
+//   3. DoD <= 95% absolute cap (prevents extreme edge cases)
 //
-// NOTE: battTotalKW (= units × batt.kw) is ONLY compared to peakLoad here.
-// It is NOT used for inverter sizing — the inverter handles the load, not
-// the battery's aggregate kW rating.
-function selectBestBattery(requiredUsableKWh, peakLoad, autonomy){
+// STRESS (DoD level) is INFORMATIONAL only — it affects cycle life but is NOT
+// a pass/fail criterion. The scoring system already strongly prefers lower DoD.
+// This is correct for LFP chemistry used in all modern solar batteries.
+function selectBestBattery(requiredKWh, peakLoad, autonomy){
   const candidates = [];
-  const avgDrawKW = Math.max(requiredUsableKWh / autonomy, 0.01);
+  const avgDrawKW = Math.max(requiredKWh / autonomy, 0.01); // avg kW draw over evening
 
   DB.batteries.forEach(batt=>{
-    for(let units=1; units<=20; units++){
+    for(let units=1; units<=30; units++){
       const installedKWh = batt.usable * units;
       const totalKW      = batt.kw * units;
+      const headroom     = installedKWh / requiredKWh;
+      const dod          = requiredKWh / installedKWh;
       const runtime      = installedKWh / avgDrawKW;
-      const headroom     = installedKWh / requiredUsableKWh;
-      const dailyUtil    = requiredUsableKWh / installedKWh;
 
-      // Hard filters — all must pass
-      if(headroom  < BATT_HEADROOM_MIN)    continue; // can't cover required energy
-      if(runtime   < autonomy)             continue; // can't last backup period
-      if(dailyUtil > BATT_STRESS_HARD_MAX) continue; // too stressed
-      if(totalKW   < peakLoad)             continue; // can't supply peak load power
+      // ── HARD FILTERS (genuine engineering failures) ──────────────────
+      if(headroom < BATT_HEADROOM_MIN) continue; // energy insufficient
+      if(totalKW  < peakLoad)         continue; // power insufficient for load
+      if(dod      > BATT_DOD_MAX)     continue; // absolute DoD cap
 
-      // Scoring — lower is better
-      const headroomScore =
+      // ── SCORING (lower = better) ─────────────────────────────────────
+      // Penalise deviation from ideal headroom band
+      const headroomPenalty =
         headroom < BATT_HEADROOM_IDEAL_MIN ? (BATT_HEADROOM_IDEAL_MIN-headroom)*10 :
         headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom-BATT_HEADROOM_IDEAL_MAX)*10 : 0;
-      const stressPenalty   = dailyUtil>BATT_STRESS_IDEAL_MAX ? (dailyUtil-BATT_STRESS_IDEAL_MAX)*20 : 0;
-      const oversizePenalty = headroom>BATT_HEADROOM_IDEAL_MAX ? (headroom-BATT_HEADROOM_IDEAL_MAX)*15 : 0;
-      const costWeight      = batt.price * units * 0.001;
-      const score = headroomScore + stressPenalty + oversizePenalty + costWeight;
+      // Penalise high DoD (prefer batteries that cycle less hard)
+      const dodPenalty = dod > BATT_DOD_NORMAL ? (dod-BATT_DOD_NORMAL)*30 : 0;
+      // Penalise oversizing beyond ideal band
+      const oversizePenalty = headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom-BATT_HEADROOM_IDEAL_MAX)*15 : 0;
+      // Small cost weight to break ties in favour of cheaper options
+      const costWeight = batt.price * units * 0.0005;
+      const score = headroomPenalty + dodPenalty + oversizePenalty + costWeight;
 
       candidates.push({
-        ...batt, units, installedKWh, totalKW, runtime, headroom, dailyUtil,
+        ...batt, units, installedKWh, totalKW, runtime, headroom, dod,
         totalCost: batt.price*units,
         headroomStatus: batteryHeadroomStatus(headroom),
         techScore: score
@@ -559,14 +567,14 @@ function selectBestBattery(requiredUsableKWh, peakLoad, autonomy){
   });
 
   if(!candidates.length) return null;
-  // Prefer candidates within acceptable headroom band
+  // Prefer candidates within the acceptable headroom band first
   const preferred = candidates.filter(c=>c.headroom<=BATT_HEADROOM_MAX);
   const pool = preferred.length ? preferred : candidates;
   const ord = {Balanced:0,Conservative:1,Tight:2,Oversized:3,Undersized:4};
   pool.sort((a,b)=>
     a.techScore-b.techScore ||
     ord[a.headroomStatus]-ord[b.headroomStatus] ||
-    a.dailyUtil-b.dailyUtil ||
+    a.dod-b.dod ||
     a.headroom-b.headroom ||
     a.totalCost-b.totalCost ||
     a.units-b.units
@@ -580,7 +588,7 @@ function calculate(){
     toast('⚠ Data still loading — please wait'); return;
   }
 
-  // ── Inputs ──────────────────────────────────────────────────────────────
+  // ── Read inputs ─────────────────────────────────────────────────────────
   const locSel = document.getElementById('sel-location');
   const locOpt = locSel.options[locSel.selectedIndex];
   const locName= locOpt ? locOpt.text : 'Unknown';
@@ -596,23 +604,23 @@ function calculate(){
     peakLoad   = parseFloat(o.dataset.peak);
     dailyUsage = parseFloat(o.dataset.daily);
   }
-
   const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
   const tariff   = parseFloat(document.getElementById('sel-tariff').value);
   const markup   = parseFloat(document.getElementById('sel-markup').value)/100;
 
-  // ── BATTERY ENERGY — evening window only ─────────────────────────────
-  // Solar provides power during the day.
-  // Battery only needs to cover the evening backup window (autonomy hrs out of 24).
-  const batteryBackupKWh   = dailyUsage * (autonomy/24);
-  const battRechargeEnergy = batteryBackupKWh / BATT_ROUND_TRIP_EFF;
+  // ── BATTERY ENERGY — evening window only (NOT 24hr sizing) ─────────────
+  // Solar powers the load during the day. Battery covers ONLY the backup window.
+  // Energy in backup window = average hourly usage × backup hours.
+  const batteryBackupKWh   = dailyUsage * (autonomy / 24);
+  const battRechargeEnergy = batteryBackupKWh / BATT_ROUND_TRIP_EFF; // extra solar to refill battery
 
-  // ── SOLAR — covers daytime direct load + recharges battery ────────────
-  // Daytime load = dailyUsage minus the evening slice (battery handles that)
+  // ── SOLAR — sized for daytime direct load + battery recharge ────────────
+  // Daytime load = total daily − evening slice (battery handles that part)
+  // Solar also needs to recharge the battery, so total = day load + recharge energy
   const requiredSolarEnergy = (dailyUsage - batteryBackupKWh) + battRechargeEnergy;
   const requiredSolarKW     = requiredSolarEnergy / (psh * SYSTEM_EFFICIENCY);
 
-  // Pick smallest panel combination that meets/exceeds required DC
+  // Select smallest panel combination that meets or exceeds required DC
   let bestPanel=null, bestOversize=Infinity;
   DB.panels.forEach(p=>{
     const n  = Math.ceil(requiredSolarKW*1000/p.watts);
@@ -639,17 +647,17 @@ function calculate(){
     panelCount<=30 ? ['Complex Layout',    'East/West layout recommended for optimal production.'] :
                      ['Large System Layout','Carport or ground mount may be considered.'];
 
-  // ── BATTERY ────────────────────────────────────────────────────────────
+  // ── BATTERY ─────────────────────────────────────────────────────────────
   const bestBatt = selectBestBattery(batteryBackupKWh, peakLoad, autonomy);
   if(!bestBatt){ toast('⚠ No suitable battery found — check load/autonomy inputs'); return; }
 
   const installedBattKWh   = bestBatt.installedKWh;
   const battRuntime        = bestBatt.runtime;
   const battCapRatio       = bestBatt.headroom;
-  const battDailyUtil      = bestBatt.dailyUtil;
-  const battStress         = batteryStressLabel(battDailyUtil);
+  const battDod            = bestBatt.dod;   // depth of discharge (informational)
   const battHeadroomStatus = bestBatt.headroomStatus;
-  const battTotalKW        = bestBatt.totalKW; // battery bank continuous power output (kW)
+  const battTotalKW        = bestBatt.totalKW;
+  const [battStress, battStressSub] = batteryStressLabel(battDod);
 
   const battRisk =
     battCapRatio<BATT_HEADROOM_MIN        ? 'High risk – storage below requirement' :
@@ -665,38 +673,36 @@ function calculate(){
     backupCovRatio<=1.40? 'Most Loads Covered' :
     'Safe power headroom';
 
-  // ── BATTERY PASS/FAIL ─────────────────────────────────────────────────
-  // Hard failures only. Oversizing is NOT a failure (can't buy half a unit).
-  const battIssues=[];
-  if(battCapRatio  < BATT_HEADROOM_MIN)      battIssues.push('Insufficient capacity');
-  if(battRuntime   < autonomy)               battIssues.push('Runtime below backup target');
-  if(battDailyUtil > BATT_STRESS_ACCEPT_MAX) battIssues.push('Battery overstressed');
-  if(battTotalKW   < peakLoad)               battIssues.push('Battery power below peak load');
+  // ── BATTERY PASS/FAIL — hard engineering failures ONLY ─────────────────
+  // Stress/DoD is NOT a hard failure. It's informational — shown as a tile.
+  // Only two true hard failures:
+  //   1. Battery can't cover required kWh (headroom < minimum)
+  //   2. Battery can't supply peak load power (kW < peakLoad)
+  const battIssues = [];
+  if(battCapRatio < BATT_HEADROOM_MIN) battIssues.push('Insufficient stored energy');
+  if(battTotalKW  < peakLoad)          battIssues.push('Battery power below peak load');
 
   const battVerdict = battIssues.length>0 ? 'Action Required: '+battIssues.join(' | ') :
     battHeadroomStatus==='Balanced'     ? 'Well Designed: Balanced and reliable' :
-    battHeadroomStatus==='Conservative' ? 'Acceptable Design: Conservative reserve' :
-    battHeadroomStatus==='Oversized'    ? 'Acceptable Design: Min unit constraint' :
-    'Acceptable Design: Limited safety margin';
+    battHeadroomStatus==='Conservative' ? 'Acceptable: Conservative reserve' :
+    battHeadroomStatus==='Oversized'    ? 'Acceptable: Min unit constraint applied' :
+    battHeadroomStatus==='Tight'        ? 'Acceptable: Tight but within range' :
+    'Review: Below ideal — check sizing';
 
-  const battPasses = battIssues.length===0;
+  const battPasses  = battIssues.length===0;
   const battPowerOK = battTotalKW >= peakLoad;
 
-  // ── INVERTER ─────────────────────────────────────────────────────────
-  // The inverter is sized for the PEAK LOAD with a safety margin.
-  // It does NOT need to match battTotalKW — the battery's job is to supply
-  // enough power for the load, and the inverter routes that power.
-  // These are independent checks: battery kW ≥ peakLoad, inverter AC ≥ peakLoad×1.3
+  // ── INVERTER ─────────────────────────────────────────────────────────────
+  // Sized for PEAK LOAD × 1.3 safety margin.
+  // Independent of battTotalKW — battery supplies the power, inverter routes it.
   const requiredInvAC = peakLoad * 1.3;
 
   let bestInv=null, bestInvScore=Infinity;
   DB.inverters.forEach(inv=>{
-    // Must handle peak load (with safety) AND accept the solar DC array
     if(inv.ac<requiredInvAC || inv.dc<systemDC) return;
     const dcAc = systemDC/inv.ac;
-    // Score: favour balanced DC/AC ratio (~1.0–1.35), penalise excess cost
     let score = dcAc<0.80 ? 60 : dcAc>1.5 ? 100 : Math.abs(dcAc-1.15)*40;
-    score += Math.abs(inv.ac - peakLoad*1.3)*5; // prefer just-right AC
+    score += Math.abs(inv.ac - requiredInvAC)*5;
     score += (inv.price||0)*0.0005;
     if(score<bestInvScore){ bestInvScore=score; bestInv=inv; }
   });
@@ -704,29 +710,22 @@ function calculate(){
 
   const dcAcRatio  = systemDC/bestInv.ac;
   const dcAcStatus =
-    dcAcRatio<0.80  ? 'Under-Utilised (small load vs inverter)' :
+    dcAcRatio<0.80  ? 'Under-Utilised (small load)' :
     dcAcRatio<0.95  ? 'Slightly Under-Utilised' :
     dcAcRatio<=1.35 ? 'Balanced' :
     dcAcRatio<=1.5  ? 'Pushing Limits' : 'Too Large (Clipping Risk)';
   const invHeadroom = bestInv.ac-peakLoad;
-  const invLoadOK   = bestInv.ac >= requiredInvAC; // inverter handles peak load + 30% safety
+  const invLoadOK   = bestInv.ac >= requiredInvAC;
 
-  // ── CROSS-SYSTEM CHECKS ───────────────────────────────────────────────
-  // 1. Solar covers daytime + battery recharge
+  // ── CROSS-SYSTEM CHECKS ──────────────────────────────────────────────────
   const solarCanRechargeBatt = expectedDailySolar >= requiredSolarEnergy;
-  // 2. Battery power is sufficient for peak load (independent of inverter)
-  // battPowerOK already computed above
-  // 3. Inverter handles peak load with safety margin
-  // invLoadOK already computed above
-
-  // ── PASS/FAIL — each component judged independently ──────────────────
   const solarPasses = oversizePct>=0 && solarCanRechargeBatt;
-  // battPasses computed above
-  const invPasses   = invLoadOK; // inverter sized for load — DC/AC ratio is informational only
+  const invPasses   = invLoadOK;
 
-  // System green ONLY when all 3 pass
+  // All 3 must pass for system recommendation
   const systemRecommended = solarPasses && battPasses && invPasses;
 
+  // ── MPPT STRINGS ─────────────────────────────────────────────────────────
   const stringsNeeded = Math.ceil(panelCount/12);
   const mpptRequired  = Math.ceil(stringsNeeded/2);
   const mpptAvailable = bestInv.mppt;
@@ -735,7 +734,7 @@ function calculate(){
     mpptRequired===mpptAvailable  ? 'All inputs used' :
     mpptRequired===mpptAvailable+1? 'Limited headroom' : 'Additional inputs required';
 
-  // ── FINANCIALS ─────────────────────────────────────────────────────────
+  // ── FINANCIALS ────────────────────────────────────────────────────────────
   const panelCost      = panelCount*bestPanel.price;
   const bosCost        = systemDC*3000;
   const hwCost         = panelCost+bosCost;
@@ -756,19 +755,14 @@ function calculate(){
     if(cumS>=totalCost&&realPayback===25) realPayback=yr;
   }
 
-  // ── ENVIRONMENT ────────────────────────────────────────────────────────
-  const co2KG   = annualSolar*0.895;
-  const co2Tons = co2KG/1000;
-  const trees   = co2KG/21;
-  const coal    = annualSolar/2460;
-  const water   = annualSolar*1.8;
+  // ── ENVIRONMENT ───────────────────────────────────────────────────────────
+  const co2KG=annualSolar*0.895, co2Tons=co2KG/1000, trees=co2KG/21;
+  const coal=annualSolar/2460, water=annualSolar*1.8;
   const monthlyKWh=expectedDailySolar*30;
-  const segment =
-    monthlyKWh<=1500  ? 'Low Residential' :
-    monthlyKWh<=3000  ? 'High Residential' :
-    monthlyKWh<=20000 ? 'Small Commercial' :
-    monthlyKWh<=50000 ? 'Large Commercial' : 'Industrial';
-  const indepPct = Math.min(annualSolar/annualConsumption,1)*100;
+  const segment=
+    monthlyKWh<=1500 ?'Low Residential':monthlyKWh<=3000?'High Residential':
+    monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial';
+  const indepPct=Math.min(annualSolar/annualConsumption,1)*100;
 
   calcResult = {
     locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
@@ -776,10 +770,10 @@ function calculate(){
     panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
     expectedDailySolar, oversizePct, annualSolar, footprint,
     roofFit:roofFitData[0], roofGuidance:roofFitData[1],
-    requiredUsableKWh:batteryBackupKWh, installedBattKWh, battRuntime,
+    batteryBackupKWh, installedBattKWh, battRuntime,
     battModel:bestBatt.model, battUnits:bestBatt.units, battUsable:bestBatt.usable,
-    battCapRatio, battRisk, battVerdict, battStress,
-    battDailyUtil, battHeadroomStatus, coverage, battTotalKW, battPowerOK,
+    battCapRatio, battRisk, battVerdict, battStress, battStressSub,
+    battDod, battHeadroomStatus, coverage, battTotalKW, battPowerOK,
     battTotalCost:bestBatt.totalCost,
     solarCanRechargeBatt, solarPasses, battPasses, invPasses, systemRecommended,
     invModel:bestInv.model, invAC:bestInv.ac, invDC:bestInv.dc, invEff:bestInv.eff,
@@ -794,7 +788,7 @@ function calculate(){
   toast('✓ System calculated — check all tabs');
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────
+// ── RENDER ─────────────────────────────────────────────────────────────────
 function fmtR(n){ return 'R'+Math.round(n).toLocaleString('en-ZA'); }
 function fmtN(n,d=1){ return Number(n).toFixed(d); }
 
@@ -812,16 +806,13 @@ function renderAll(r){
   const op=r.oversizePct;
   set('r-oversize',(op*100).toFixed(1)+'%');
   set('r-oversize-sub',
-    op<0    ?'Undersized — risk of shortage':
-    op<=0.15?'Optimal sizing':
-    op<=0.30?'Safety margin included':
-    op<=0.40?'Rounding oversize — acceptable':'Excess capacity — review string layout');
-  set('r-roof-fit',      r.roofFit);
-  set('r-roof-guidance', r.roofGuidance);
-  set('r-psh',           fmtN(r.psh,2)+' hrs/day');
-  set('r-req-energy',    fmtN(r.requiredSolarEnergy,2)+' kWh/day');
-  set('r-footprint',     fmtN(r.footprint,1)+' m²');
-  set('r-annual-solar',  Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
+    op<0?'Undersized — risk of shortage':op<=0.15?'Optimal sizing':
+    op<=0.30?'Safety margin included':op<=0.40?'Rounding oversize — acceptable':'Excess capacity — review string layout');
+  set('r-roof-fit',     r.roofFit);  set('r-roof-guidance',r.roofGuidance);
+  set('r-psh',          fmtN(r.psh,2)+' hrs/day');
+  set('r-req-energy',   fmtN(r.requiredSolarEnergy,2)+' kWh/day');
+  set('r-footprint',    fmtN(r.footprint,1)+' m²');
+  set('r-annual-solar', Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
 
   // System recommendation banner
   const sysKpi=document.getElementById('sys-rec-kpi');
@@ -831,9 +822,9 @@ function renderAll(r){
     sysKpi.className='kpi green';
   } else {
     const fl=[];
-    if(!r.solarPasses) fl.push('Solar array');
-    if(!r.battPasses)  fl.push('Battery');
-    if(!r.invPasses)   fl.push('Inverter');
+    if(!r.solarPasses)          fl.push('Solar array');
+    if(!r.battPasses)           fl.push('Battery');
+    if(!r.invPasses)            fl.push('Inverter');
     if(!r.solarCanRechargeBatt) fl.push('Solar output too low');
     set('sys-rec-value','✗ System Not Recommended');
     set('sys-rec-sub','Issues with: '+fl.join(', '));
@@ -841,12 +832,18 @@ function renderAll(r){
   }
 
   // Battery KPIs
-  setKpi('b-verdict', r.battVerdict, r.battVerdict.includes('Action')?'red':r.battVerdict.includes('Acceptable')?'amber':'green');
-  setKpi('b-stress',  r.battStress,  r.battStress.includes('Low')||r.battStress.includes('Normal')?'green':r.battStress.includes('Moderate')?'amber':'red');
-  setKpi('b-risk',    r.battRisk,    r.battRisk.includes('Low')?'green':r.battRisk.includes('Conservative')?'amber':'red');
-  setKpi('b-coverage',r.coverage,    r.coverage.includes('Safe')||r.coverage.includes('Most')?'green':r.coverage.includes('Essential +')?'amber':'red');
+  setKpi('b-verdict', r.battVerdict,
+    r.battVerdict.includes('Action')?'red':r.battVerdict.includes('Acceptable')||r.battVerdict.includes('Well')?'green':'amber');
+  // Stress tile — colour by DoD level, purely informational
+  const stressColor = r.battDod<=0.50?'green':r.battDod<=0.70?'green':r.battDod<=0.85?'amber':'amber';
+  setKpi('b-stress', r.battStress, stressColor);
+  set('b-stress-sub', fmtN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
+  setKpi('b-risk',    r.battRisk,
+    r.battRisk.includes('Low')?'green':r.battRisk.includes('Conservative')?'amber':'red');
+  setKpi('b-coverage',r.coverage,
+    r.coverage.includes('Safe')||r.coverage.includes('Most')?'green':r.coverage.includes('Essential +')?'amber':'red');
 
-  set('b-needed',    fmtN(r.requiredUsableKWh,2)+' kWh');
+  set('b-needed',    fmtN(r.batteryBackupKWh,2)+' kWh');
   set('b-installed', fmtN(r.installedBattKWh,2)+' kWh');
   set('b-units',     r.battUnits+' unit'+(r.battUnits>1?'s':''));
   set('b-runtime',   fmtN(r.battRuntime,1)+' hrs');
@@ -854,31 +851,30 @@ function renderAll(r){
   set('b-usable-per',fmtN(r.battUsable,2)+' kWh');
   set('b-cap-ratio', fmtN(r.battCapRatio,2)+'x ('+r.battHeadroomStatus+')');
 
-  // Cross-system compatibility rows — 3 clean independent checks
+  // Cross-system compatibility rows
   set('b-solar-compat', r.solarCanRechargeBatt
     ? '✓ '+fmtN(r.expectedDailySolar,2)+' kWh produced ≥ '+fmtN(r.requiredSolarEnergy,2)+' kWh needed'
     : '✗ Solar produces '+fmtN(r.expectedDailySolar,2)+' kWh — need '+fmtN(r.requiredSolarEnergy,2)+' kWh');
   set('b-load-compat', r.battPowerOK
-    ? '✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW output ≥ peak load '+fmtN(r.peakLoad,1)+' kW'
-    : '✗ Battery bank '+fmtN(r.battTotalKW,1)+' kW output < peak load '+fmtN(r.peakLoad,1)+' kW — add units');
+    ? '✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW ≥ peak load '+fmtN(r.peakLoad,1)+' kW'
+    : '✗ Battery bank '+fmtN(r.battTotalKW,1)+' kW < peak load '+fmtN(r.peakLoad,1)+' kW — add units');
   set('b-inv-compat', r.invLoadOK
-    ? '✓ Inverter '+fmtN(r.invAC,1)+' kW AC ≥ required '+fmtN(r.peakLoad*1.3,1)+' kW (peak × 1.3 safety)'
+    ? '✓ Inverter '+fmtN(r.invAC,1)+' kW AC ≥ required '+fmtN(r.peakLoad*1.3,1)+' kW (peak × 1.3)'
     : '✗ Inverter '+fmtN(r.invAC,1)+' kW AC < required '+fmtN(r.peakLoad*1.3,1)+' kW — upgrade inverter');
 
   document.getElementById('b-bar').style.width=Math.min(r.battCapRatio/BATT_HEADROOM_MAX,1)*100+'%';
   document.getElementById('b-bar').style.background=
-    r.battHeadroomStatus==='Balanced'?'var(--green)':
-    r.battHeadroomStatus==='Undersized'?'var(--red)':'var(--amber)';
-  set('b-bar-tip','Evening discharge utilisation: '+fmtN(r.battDailyUtil*100,0)+
-    '% | Ideal headroom: '+fmtN(BATT_HEADROOM_IDEAL_MIN,2)+'x–'+fmtN(BATT_HEADROOM_IDEAL_MAX,2)+'x');
+    r.battHeadroomStatus==='Balanced'?'var(--green)':r.battHeadroomStatus==='Undersized'?'var(--red)':'var(--amber)';
+  set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+
+    'x | Ideal: '+fmtN(BATT_HEADROOM_IDEAL_MIN,2)+'x–'+fmtN(BATT_HEADROOM_IDEAL_MAX,2)+'x');
 
   // Inverter tab
   set('i-model', r.invModel);
   setKpi('i-load-ok', r.invLoadOK?'OK':'Undersized', r.invLoadOK?'green':'red');
   set('i-load-sub', r.invLoadOK?'Handles peak load with 30% safety margin':'Inverter AC below peak load requirement');
-  setKpi('i-dcac',  fmtN(r.dcAcRatio,2), r.dcAcStatus.includes('Balanced')?'green':r.dcAcStatus.includes('Pushing')?'amber':'white');
+  setKpi('i-dcac', fmtN(r.dcAcRatio,2),
+    r.dcAcStatus.includes('Balanced')?'green':r.dcAcStatus.includes('Pushing')?'amber':'white');
   set('i-dcac-sub', r.dcAcStatus);
-  // Battery power check — informational on inverter tab
   setKpi('i-batt-support', r.battPowerOK?'Sufficient':'Insufficient', r.battPowerOK?'green':'red');
   set('i-batt-sub', 'Battery bank '+fmtN(r.battTotalKW,1)+' kW vs peak load '+fmtN(r.peakLoad,1)+' kW');
   setKpi('i-mppt-status', r.mpptStatus,
@@ -896,30 +892,24 @@ function renderAll(r){
   set('bar-ac-val', fmtN(r.invAC,1)+' kW');
 
   // Financials tab
-  set('f-total-cost',    fmtR(r.totalCost));
-  set('f-cost-per-kw',   fmtR(r.costPerKW));
-  set('f-sell-price',    fmtR(r.sellPrice));
-  set('f-annual-savings',fmtR(r.annualSavings));
-  set('f-profit',        fmtR(r.profit));
-  set('f-inv-cost',      fmtR(r.invPrice));
-  set('f-hw-cost',       fmtR(r.hwCost));
-  set('f-payback',       fmtN(r.simplePayback,1)+' year payback');
+  set('f-total-cost',    fmtR(r.totalCost));  set('f-cost-per-kw',fmtR(r.costPerKW));
+  set('f-sell-price',    fmtR(r.sellPrice));  set('f-annual-savings',fmtR(r.annualSavings));
+  set('f-profit',        fmtR(r.profit));      set('f-inv-cost',fmtR(r.invPrice));
+  set('f-hw-cost',       fmtR(r.hwCost));      set('f-payback',fmtN(r.simplePayback,1)+' year payback');
   set('f-monthly',       fmtR(r.monthlySavings));
   set('f-lifetime',      fmtR(r.lifetimeSavings));
   set('f-real-payback',  r.realPayback+' years (escalating tariff)');
   set('f-roi',           fmtN(r.annualROI,1)+'%');
   set('f-consumption',   Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');
   const mx2=Math.max(r.panelCost,r.bosCost,r.battTotalCost,r.invPrice);
-  setBar('cb-panels',r.panelCost/mx2*100,    'cb-panels-v',fmtR(r.panelCost));
-  setBar('cb-bos',   r.bosCost/mx2*100,      'cb-bos-v',   fmtR(r.bosCost));
-  setBar('cb-batt',  r.battTotalCost/mx2*100,'cb-batt-v',  fmtR(r.battTotalCost));
-  setBar('cb-inv',   r.invPrice/mx2*100,     'cb-inv-v',   fmtR(r.invPrice));
+  setBar('cb-panels',r.panelCost/mx2*100,'cb-panels-v',fmtR(r.panelCost));
+  setBar('cb-bos',   r.bosCost/mx2*100,  'cb-bos-v',   fmtR(r.bosCost));
+  setBar('cb-batt',  r.battTotalCost/mx2*100,'cb-batt-v',fmtR(r.battTotalCost));
+  setBar('cb-inv',   r.invPrice/mx2*100, 'cb-inv-v',   fmtR(r.invPrice));
 
   // Environment tab
-  set('e-co2',   fmtN(r.co2Tons,2));
-  set('e-trees', Math.round(r.trees).toLocaleString('en-ZA'));
-  set('e-coal',  fmtN(r.coal,2));
-  set('e-water', Math.round(r.water).toLocaleString('en-ZA'));
+  set('e-co2',   fmtN(r.co2Tons,2)); set('e-trees',Math.round(r.trees).toLocaleString('en-ZA'));
+  set('e-coal',  fmtN(r.coal,2));    set('e-water',Math.round(r.water).toLocaleString('en-ZA'));
   set('e-annual-solar', Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
   set('e-consumption',  Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');
   set('e-segment',r.segment);
@@ -955,7 +945,7 @@ function newCalculation(){
   showTab('tab-solar');
 }
 
-// ── GENERATE PROPOSAL ─────────────────────────────────────────────────────
+// ── GENERATE PROPOSAL ──────────────────────────────────────────────────────
 async function generateProposal(){
   if(!calcResult||!installer) return;
   const r=calcResult, btn=document.getElementById('btn-gen');
