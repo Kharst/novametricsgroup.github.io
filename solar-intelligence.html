@@ -42,7 +42,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
 .success-msg{color:var(--green);font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
 .login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-/* Forgot-password link button */
 .link-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px;text-align:center;width:100%;display:block;margin-top:10px;transition:color .15s;}
 .link-btn:hover{color:var(--gold)}
 .data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
@@ -165,7 +164,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <button class="link-btn" onclick="showPanel('signin')">← Back to Sign In</button>
   </div>
 
-  <!-- ── PANEL 3: Set New Password (after clicking email link) ──── -->
+  <!-- ── PANEL 3: Set New Password (shown after installer clicks the email link) -->
   <div class="login-box" id="panel-setpass" style="display:none">
     <div class="login-logo">N</div>
     <div class="login-title">Set <em style="font-style:italic;color:var(--gold)">Password</em></div>
@@ -401,6 +400,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 
+// ── THE EXACT URL THIS PAGE LIVES AT ON GITHUB PAGES ─────────────────────
+// This must match what is whitelisted in Supabase → Authentication →
+// URL Configuration → Redirect URLs.
+// Supabase will refuse to redirect back here if this URL isn't on that list.
+const APP_URL = 'https://kharst.github.io/novametricsgroup.github.io/solar-intelligence.html';
+
 // ── SUPABASE AUTH CLIENT ──────────────────────────────────────────────────
 const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
@@ -415,9 +420,9 @@ function showPanel(name) {
   });
 }
 
-// ── LISTEN FOR PASSWORD RECOVERY (user clicked the email link) ────────────
-// When an installer clicks their "Set Password" link, Supabase fires this event.
-// We intercept it and show the set-password form instead of the app.
+// ── LISTEN FOR PASSWORD RECOVERY (fires when installer clicks the email link)
+// Supabase appends #access_token=...&type=recovery to the redirect URL.
+// The SDK detects this hash and fires PASSWORD_RECOVERY before SIGNED_IN.
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
   if (event === 'PASSWORD_RECOVERY') {
     document.getElementById('login-screen').style.display = 'flex';
@@ -437,7 +442,7 @@ async function sbFetch(path) {
   return res.json();
 }
 
-// ── BOOT: restore session via Supabase Auth ───────────────────────────────
+// ── BOOT: restore existing session ───────────────────────────────────────
 (async function boot() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
@@ -451,7 +456,7 @@ async function sbFetch(path) {
   }
 })();
 
-// ── LOAD INSTALLER PROFILE FROM DB (after auth) ───────────────────────────
+// ── LOAD INSTALLER PROFILE FROM DB ───────────────────────────────────────
 async function loadInstallerProfile(email) {
   const rows = await sbFetch(`/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number&limit=1`);
   if (!rows || rows.length === 0) throw new Error('No installer profile found for this account.');
@@ -571,16 +576,19 @@ document.addEventListener('keydown', e => {
       const activePanel = ['signin','forgot','setpass'].find(p =>
         document.getElementById('panel-'+p).style.display !== 'none'
       );
-      if (activePanel === 'signin')   doLogin();
-      if (activePanel === 'forgot')   doForgotPassword();
-      if (activePanel === 'setpass')  doSetPassword();
+      if (activePanel === 'signin')  doLogin();
+      if (activePanel === 'forgot')  doForgotPassword();
+      if (activePanel === 'setpass') doSetPassword();
     }
   }
 });
 
 // ── FORGOT PASSWORD ───────────────────────────────────────────────────────
-// Sends Supabase Auth password-reset email. The link takes the user back
-// to this page, which detects the recovery token and shows panel-setpass.
+// FIX: use the hardcoded APP_URL instead of window.location.href.
+// Supabase only sends reset links to URLs that are whitelisted in
+// Authentication → URL Configuration → Redirect URLs.
+// window.location.href can include query params / hashes that won't match
+// the allowlist, causing the redirect to silently fail.
 async function doForgotPassword() {
   const email = document.getElementById('forgot-email').value.trim().toLowerCase();
   const errEl = document.getElementById('forgot-error');
@@ -594,7 +602,7 @@ async function doForgotPassword() {
   btn.innerHTML = '<span class="login-spinner"></span>Sending…';
 
   const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.href   // sends them back to this exact page
+    redirectTo: APP_URL   // ← fixed: hardcoded URL that matches the Supabase allowlist
   });
 
   btn.disabled = false;
@@ -603,7 +611,7 @@ async function doForgotPassword() {
   if (error) {
     errEl.textContent = error.message;
   } else {
-    sucEl.textContent = '✓ Reset link sent! Check your email inbox, then click the link to set your password.';
+    sucEl.textContent = '✓ Reset link sent! Check your email inbox and click the link to set your password.';
   }
 }
 
@@ -615,8 +623,8 @@ async function doSetPassword() {
   const btn     = document.getElementById('setpass-btn');
   errEl.textContent = '';
 
-  if (pass.length < 8)    { errEl.textContent = 'Password must be at least 8 characters.'; return; }
-  if (pass !== confirm)   { errEl.textContent = 'Passwords do not match.'; return; }
+  if (pass.length < 8)  { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+  if (pass !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
 
   btn.disabled = true;
   btn.innerHTML = '<span class="login-spinner"></span>Setting password…';
@@ -630,7 +638,6 @@ async function doSetPassword() {
     return;
   }
 
-  // Password set — load workspace immediately (user is already authenticated)
   try {
     showLoadingOverlay('Setting up your workspace…');
     await loadInstallerProfile(data.user.email);
