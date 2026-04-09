@@ -60,7 +60,6 @@
     .forgot-link { text-align:right; margin-top:-0.6rem; margin-bottom:1.4rem; }
     .forgot-link button { background:none; border:none; cursor:pointer; font-size:0.72rem; color:var(--muted); font-family:'DM Sans',sans-serif; transition:color .2s; padding:0; }
     .forgot-link button:hover { color:var(--gold-l); }
-    /* Forgot password panel */
     .forgot-panel { display:none; }
     .back-btn { background:none; border:none; cursor:pointer; font-size:0.72rem; color:var(--muted); font-family:'DM Sans',sans-serif; transition:color .2s; padding:0; margin-bottom:1.5rem; display:flex; align-items:center; gap:5px; }
     .back-btn:hover { color:var(--gold-l); }
@@ -93,7 +92,7 @@
       <img src="https://github.com/Kharst/Nova-logo-Public/blob/main/Nova%20Metrics%20Logo%20(2).png?raw=true" alt="Nova Metrics" />
     </div>
 
-    <!-- ══ LOGIN ══ -->
+    <!-- LOGIN -->
     <div id="loginScreen">
       <h1>Installer <em>portal</em></h1>
       <p class="subhead">Authorised access only</p>
@@ -106,7 +105,6 @@
         <label>Password <span class="req">*</span></label>
         <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
       </div>
-      <!-- Forgot password link -->
       <div class="forgot-link">
         <button onclick="showForgot()">Forgot password?</button>
       </div>
@@ -120,9 +118,8 @@
       </div>
     </div>
 
-    <!-- ══ FORGOT PASSWORD PANEL ══ -->
+    <!-- FORGOT PASSWORD -->
     <div id="forgotPanel" class="forgot-panel">
-      <!-- Email entry -->
       <div id="forgotForm">
         <button class="back-btn" onclick="showLogin()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -144,11 +141,10 @@
           <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
         </div>
       </div>
-      <!-- Sent confirmation -->
       <div class="sent-state" id="forgotSent">
         <div class="sent-icon">&#9993;</div>
         <h2>Email <em>sent</em></h2>
-        <p>If an account exists for that email address, a reset link has been sent. Check your inbox (and spam folder) — it should arrive within a minute.</p>
+        <p>If an account exists for that address, a reset link has been sent. Check your inbox and spam folder — it should arrive within a minute.</p>
         <button class="btn-primary" onclick="showLogin()"><span>Back to Sign In</span></button>
         <div class="card-footer" style="margin-top:1.75rem;">
           <span>Nova Metrics &copy; 2026</span>
@@ -157,7 +153,7 @@
       </div>
     </div>
 
-    <!-- ══ ADD CLIENT ══ -->
+    <!-- ADD CLIENT (shown after login) -->
     <div id="clientScreen" class="hidden">
       <div class="session-bar" id="sessionBar">
         <span class="su" id="sessionUser"></span>
@@ -215,28 +211,33 @@
   <script>
     var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-    var SESSION_KEY   = 'nm_installer_session';
     var currentInstaller = null;
 
     window.addEventListener('DOMContentLoaded', function() {
-      var saved = sessionStorage.getItem(SESSION_KEY);
+      // Restore session from localStorage (persists across page refreshes)
+      var saved = localStorage.getItem('nm_installer');
       if (saved) {
-        try { currentInstaller = JSON.parse(saved); showClientScreen(); } catch(e) { sessionStorage.removeItem(SESSION_KEY); }
+        try {
+          currentInstaller = JSON.parse(saved);
+          showClientScreen();
+        } catch(e) { localStorage.removeItem('nm_installer'); }
       }
       ['loginEmail','loginPassword'].forEach(function(id) {
-        document.getElementById(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleLogin(); });
+        document.getElementById(id).addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') handleLogin();
+        });
       });
       document.getElementById('forgotEmail').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') handleForgot();
       });
     });
 
-    // ── NAVIGATION ──────────────────────────────────────────────────────
+    // NAVIGATION
     function showForgot() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('forgotPanel').style.display = 'block';
-      document.getElementById('forgotForm').style.display = 'block';
-      document.getElementById('forgotSent').style.display = 'none';
+      document.getElementById('forgotForm').style.display  = 'block';
+      document.getElementById('forgotSent').style.display  = 'none';
       document.getElementById('forgotEmail').value = document.getElementById('loginEmail').value;
       document.getElementById('forgotEmail').focus();
     }
@@ -246,7 +247,7 @@
       document.getElementById('loginMsg').textContent = '';
     }
 
-    // ── LOGIN ────────────────────────────────────────────────────────────
+    // LOGIN — uses Supabase Auth signInWithPassword (no plaintext DB lookup)
     async function handleLogin() {
       var email    = document.getElementById('loginEmail').value.trim().toLowerCase();
       var password = document.getElementById('loginPassword').value;
@@ -254,43 +255,78 @@
       var msg      = document.getElementById('loginMsg');
       if (!email || !password) { showMsg(msg,'error','Please enter your email and password.'); return; }
       btn.disabled = true;
-      showMsg(msg,'loading','Verifying…');
+      showMsg(msg,'loading','Verifying\u2026');
       try {
-        var res = await fetch(
-          SUPABASE_URL + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email)
-          + '&password=eq.' + encodeURIComponent(password)
-          + '&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
-          { headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON } }
-        );
-        if (!res.ok) throw new Error('Connection error. Please try again.');
-        var rows = await res.json();
-        if (!rows || !rows.length) {
-          showMsg(msg,'error','Invalid email or password.');
+        // Step 1: Authenticate with Supabase Auth
+        var authRes = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var authData = await authRes.json();
+        if (!authRes.ok || authData.error) {
+          showMsg(msg, 'error', 'Invalid email or password.');
           btn.disabled = false;
           return;
         }
-        currentInstaller = rows[0];
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentInstaller));
+
+        var accessToken = authData.access_token;
+        var authUserId  = authData.user?.id;
+
+        // Step 2: Look up their installer profile by auth_user_id OR email
+        var profileRes = await fetch(
+          SUPABASE_URL + '/rest/v1/installers?select=installer_id,installer_name,contact_email,logo_url,primary_color,accent_color&or=(auth_user_id.eq.' + authUserId + ',contact_email.eq.' + encodeURIComponent(email) + ')&limit=1',
+          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
+        );
+        var profiles = await profileRes.json();
+
+        if (!profiles || !profiles.length) {
+          // Auth succeeded but no installer profile — account exists in auth but not in installers table
+          showMsg(msg, 'error', 'Account found but no installer profile. Please contact Nova Metrics support.');
+          btn.disabled = false;
+          return;
+        }
+
+        // Step 3: Store session — installer profile + auth token
+        currentInstaller = Object.assign({}, profiles[0], {
+          access_token: accessToken,
+          auth_user_id: authUserId,
+        });
+
+        // Backfill auth_user_id if not yet linked
+        if (!profiles[0].auth_user_id) {
+          fetch(SUPABASE_URL + '/rest/v1/installers?installer_id=eq.' + profiles[0].installer_id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken },
+            body: JSON.stringify({ auth_user_id: authUserId })
+          }).catch(function(){});
+        }
+
+        localStorage.setItem('nm_installer', JSON.stringify(currentInstaller));
         showClientScreen();
       } catch(err) {
-        showMsg(msg,'error', err.message || 'Something went wrong. Please try again.');
+        showMsg(msg, 'error', 'Connection error. Please try again.');
         btn.disabled = false;
       }
     }
 
-    // ── FORGOT PASSWORD ──────────────────────────────────────────────────
+    // FORGOT PASSWORD — calls Supabase Auth resetPasswordForEmail via edge function
     async function handleForgot() {
       var email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       var btn   = document.getElementById('forgotBtn');
       var msg   = document.getElementById('forgotMsg');
       if (!email) { showMsg(msg,'error','Please enter your email address.'); return; }
       btn.disabled = true;
-      showMsg(msg,'loading','Sending reset link…');
+      showMsg(msg,'loading','Sending reset link\u2026');
       try {
-        await fetch(SUPABASE_URL + '/functions/v1/send-password-reset', {
+        // Use Supabase Auth directly — sends branded email via Brevo SMTP
+        await fetch(SUPABASE_URL + '/auth/v1/recover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ email: email })
+          body: JSON.stringify({
+            email: email,
+            gotrue_meta_security: {},
+          })
         });
         // Always show success (prevents email enumeration)
         document.getElementById('forgotForm').style.display = 'none';
@@ -301,24 +337,28 @@
       }
     }
 
+    // LOGOUT
     function handleLogout() {
-      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem('nm_installer');
       currentInstaller = null;
       document.getElementById('clientScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginEmail').value    = '';
       document.getElementById('loginPassword').value = '';
       document.getElementById('loginMsg').textContent = '';
-      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtn').disabled    = false;
     }
 
     function showClientScreen() {
       document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('forgotPanel').style.display = 'none';
       document.getElementById('clientScreen').classList.remove('hidden');
       document.getElementById('sessionBar').style.display = 'flex';
-      document.getElementById('sessionUser').textContent = '● ' + (currentInstaller.installer_name || currentInstaller.contact_email);
+      document.getElementById('sessionUser').textContent =
+        '\u25CF ' + (currentInstaller.installer_name || currentInstaller.contact_email);
     }
 
+    // ADD CLIENT FORM
     document.getElementById('clientForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       var name    = document.getElementById('client_name').value.trim();
@@ -329,21 +369,30 @@
       var msg     = document.getElementById('clientMsg');
       if (!name)  { showMsg(msg,'error','Please enter the client name.'); return; }
       if (!email) { showMsg(msg,'error','Please enter an email address.'); return; }
-      if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
-      showMsg(msg,'loading','Saving client…');
+      if (phone && !/^\+?[\d\s\-(). ]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
+      showMsg(msg,'loading','Saving client\u2026');
       btn.disabled = true;
       try {
         var res = await fetch(SUPABASE_URL + '/functions/v1/create-client', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ installer_id: currentInstaller.installer_id, client_name: name, client_email: email, client_phone: phone||null, client_address: address||null })
+          body: JSON.stringify({
+            installer_id:   currentInstaller.installer_id,
+            client_name:    name,
+            client_email:   email,
+            client_phone:   phone   || null,
+            client_address: address || null
+          })
         });
         if (!res.ok) throw new Error('Server error ' + res.status);
         var data = await res.json();
-        if (data.success) { showSuccessState(name, data.ai_id||null); }
+        if (data.success) { showSuccessState(name, data.ai_id || null); }
         else { showMsg(msg,'error', data.error || 'Something went wrong. Please try again.'); }
-      } catch(err) { showMsg(msg,'error','Connection error: ' + err.message); }
-      finally { btn.disabled = false; }
+      } catch(err) {
+        showMsg(msg,'error','Connection error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
     });
 
     function showSuccessState(clientName, aiId) {
