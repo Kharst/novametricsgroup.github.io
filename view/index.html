@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opening your proposal — Nova Metrics</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--gold:#B8962E;--midnight:#0A1628;}
+    body{
+      font-family:'DM Sans',sans-serif;font-weight:300;
+      background:var(--midnight);min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;
+    }
+    .wrap{
+      text-align:center;
+      display:flex;flex-direction:column;align-items:center;gap:20px;
+      animation:up .6s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .logo{
+      width:52px;height:52px;border-radius:14px;
+      background:var(--gold);
+      display:flex;align-items:center;justify-content:center;
+      font-family:'DM Serif Display',serif;
+      font-size:22px;font-weight:400;color:var(--midnight);
+    }
+    .brand{font-size:13px;font-weight:500;color:rgba(255,255,255,.7);letter-spacing:.02em;}
+    .brand span{color:var(--gold);}
+    .title{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:400;color:#fff;line-height:1.2;}
+    .title em{font-style:italic;color:var(--gold);}
+    .spinner{
+      width:36px;height:36px;
+      border:2px solid rgba(184,150,46,.2);
+      border-top-color:var(--gold);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .sub{font-size:13px;color:rgba(255,255,255,.35);letter-spacing:.02em;}
+    .err{display:none;text-align:center;padding:32px 24px;}
+    .err-icon{
+      width:52px;height:52px;border-radius:50%;
+      background:rgba(235,112,112,.1);border:1px solid rgba(235,112,112,.3);
+      display:flex;align-items:center;justify-content:center;
+      font-size:20px;margin:0 auto 16px;
+    }
+    .err h2{font-family:'DM Serif Display',serif;font-weight:400;font-size:1.4rem;margin-bottom:8px;}
+    .err p{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7;max-width:300px;margin:0 auto 20px;}
+    .err a{
+      display:inline-block;padding:10px 24px;
+      background:var(--gold);color:var(--midnight);
+      border-radius:6px;font-size:13px;font-weight:600;
+      text-decoration:none;transition:opacity .2s;
+    }
+    .err a:hover{opacity:.85;}
+  </style>
+</head>
+<body>
+
+  <div class="wrap" id="loadWrap">
+    <div class="logo">N</div>
+    <div class="brand">Nova Metrics <span>&bull;</span> Solar Intelligence</div>
+    <div class="title">Opening your <em>proposal</em></div>
+    <div class="spinner"></div>
+    <div class="sub">Preparing your document&hellip;</div>
+  </div>
+
+  <div class="err" id="errWrap">
+    <div class="err-icon">&#x2715;</div>
+    <h2>Proposal Not Found</h2>
+    <p>This proposal link is invalid or has expired. Please contact your solar installer for a new link.</p>
+    <a href="https://novametricsgroup.github.io">novametricsgroup.com</a>
+  </div>
+
+  <script>
+    // Read the proposal ID from ?id= parameter
+    var id = new URLSearchParams(window.location.search).get('id');
+
+    if (!id) {
+      document.getElementById('loadWrap').style.display = 'none';
+      document.getElementById('errWrap').style.display = 'block';
+    } else {
+      // Small delay so the branded loading screen is visible
+      setTimeout(function() {
+        window.location.href =
+          'https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/proposal-view/' + id;
+      }, 600);
+    }
+  </script>
+
+</body>
+</html>
