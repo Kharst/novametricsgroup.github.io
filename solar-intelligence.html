@@ -6,6 +6,8 @@
 <title>Solar Intelligence — Nova Metrics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<!-- Supabase JS SDK (Auth) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
   --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
@@ -364,41 +366,67 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <div id="toast"></div>
 
 <script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-const SESSION_KEY = 'nm_installer_session';
+
+// ── SUPABASE AUTH CLIENT ──────────────────────────────────────────────────
+// Uses the bundled SDK loaded in <head>. Manages JWT sessions server-side.
+const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[] };
 let installer  = null;
 let calcResult = null;
 
+// ── AUTHENTICATED FETCH ───────────────────────────────────────────────────
+// Always uses the current Supabase Auth JWT — never the plain anon key alone.
 async function sbFetch(path) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const token = session ? session.access_token : SUPA_ANON;
   const res = await fetch(SUPA_URL + path, {
-    headers:{ 'apikey':SUPA_ANON, 'Authorization':'Bearer '+SUPA_ANON, 'Accept':'application/json' }
+    headers: {
+      'apikey': SUPA_ANON,
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/json'
+    }
   });
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
 
-(function boot() {
-  const saved = localStorage.getItem(SESSION_KEY);
-  if (saved) { try { installer = JSON.parse(saved); } catch(e) { localStorage.removeItem(SESSION_KEY); } }
-  if (installer) {
+// ── BOOT: restore session via Supabase Auth (no raw passwords in localStorage)
+(async function boot() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
     showLoadingOverlay('Loading your workspace…');
-    loadAllData().then(()=>{ hideLoadingOverlay(); showApp(); }).catch(showDataError);
+    try {
+      await loadInstallerProfile(session.user.email);
+      await loadAllData();
+      hideLoadingOverlay();
+      showApp();
+    } catch(e) {
+      showDataError(e);
+    }
   }
 })();
 
+// ── LOAD INSTALLER PROFILE FROM DB (after auth) ───────────────────────────
+async function loadInstallerProfile(email) {
+  const rows = await sbFetch(`/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number&limit=1`);
+  if (!rows || rows.length === 0) throw new Error('No installer profile found for this account.');
+  installer = rows[0];
+}
+
 function showLoadingOverlay(msg) {
-  document.getElementById('dlMsg').textContent = msg||'Loading…';
+  document.getElementById('dlMsg').textContent = msg || 'Loading…';
   document.getElementById('dlErr').style.display = 'none';
   document.getElementById('dataLoading').classList.add('on');
 }
-function hideLoadingOverlay(){ document.getElementById('dataLoading').classList.remove('on'); }
-function showDataError(err){
-  document.getElementById('dlMsg').textContent='Failed to load data';
-  document.getElementById('dlErr').textContent=String(err);
-  document.getElementById('dlErr').style.display='block';
+function hideLoadingOverlay() { document.getElementById('dataLoading').classList.remove('on'); }
+function showDataError(err) {
+  document.getElementById('dlMsg').textContent = 'Failed to load data';
+  document.getElementById('dlErr').textContent = String(err);
+  document.getElementById('dlErr').style.display = 'block';
 }
 
 async function loadAllData() {
@@ -421,10 +449,10 @@ async function loadAllData() {
 async function getInstallerLocationIds(instId) {
   try {
     const rows = await sbFetch(`/rest/v1/installer_locations?installer_id=eq.${instId}&select=location_id`);
-    if (rows&&rows.length>0) return rows.map(r=>r.location_id).join(',');
-  } catch(e){}
+    if (rows && rows.length > 0) return rows.map(r=>r.location_id).join(',');
+  } catch(e) {}
   const all = await sbFetch('/rest/v1/solar_locations?select=id');
-  return (all||[]).map(r=>r.id).join(',')||'0';
+  return (all||[]).map(r=>r.id).join(',') || '0';
 }
 
 function populateDropdowns() {
@@ -437,45 +465,73 @@ function populateDropdowns() {
     `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
   ).join('') + '<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
   loadSel.onchange = function(){
-    const c = this.value==='custom';
-    document.getElementById('custom-peak-wrap').style.display = c?'flex':'none';
-    document.getElementById('custom-daily-wrap').style.display = c?'flex':'none';
+    const c = this.value === 'custom';
+    document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
+    document.getElementById('custom-daily-wrap').style.display = c ? 'flex' : 'none';
   };
 }
 
 function showApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app-screen').style.display='block';
-  const badge=document.getElementById('installer-badge');
-  badge.textContent=installer.installer_name; badge.style.display='inline-block';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  const badge = document.getElementById('installer-badge');
+  badge.textContent = installer.installer_name;
+  badge.style.display = 'inline-block';
 }
-document.getElementById('sign-out-btn').addEventListener('click',function(){
-  localStorage.removeItem(SESSION_KEY); window.location.href='nova-metrics_1.html';
+
+// ── SIGN OUT via Supabase Auth ────────────────────────────────────────────
+document.getElementById('sign-out-btn').addEventListener('click', async function() {
+  await supabaseClient.auth.signOut();
+  window.location.href = 'nova-metrics_1.html';
 });
 
+// ── LOGIN via Supabase Auth signInWithPassword ────────────────────────────
+// Passwords are verified server-side with bcrypt. No password ever reaches
+// the browser. A short-lived JWT is returned and managed by the SDK.
 async function doLogin(){
-  const emailEl=document.getElementById('login-email'),passEl=document.getElementById('login-password');
-  const errEl=document.getElementById('login-error'),btn=document.getElementById('login-btn');
-  const email=emailEl.value.trim().toLowerCase(),pass=passEl.value.trim();
-  errEl.textContent='';
-  if(!email){errEl.textContent='Please enter your email address.';emailEl.focus();return;}
-  if(!pass){errEl.textContent='Please enter your password.';passEl.focus();return;}
-  btn.disabled=true; btn.innerHTML='<span class="login-spinner"></span>Signing in…';
-  try{
-    const data=await sbFetch(`/rest/v1/installers?contact_email=eq.${encodeURIComponent(email)}&select=*&limit=1`);
-    if(!data||data.length===0){errEl.textContent='No account found for this email address.';btn.disabled=false;btn.textContent='Sign In';return;}
-    const row=data[0];
-    if(row.password&&row.password.trim()!==''&&row.password.trim()!==pass){
-      errEl.textContent='Incorrect password. Please try again.';passEl.value='';passEl.focus();btn.disabled=false;btn.textContent='Sign In';return;
-    }
-    installer=row;
-    localStorage.setItem(SESSION_KEY,JSON.stringify({installer_id:row.installer_id,installer_name:row.installer_name,contact_email:row.contact_email,logo_url:row.logo_url,primary_color:row.primary_color}));
+  const emailEl = document.getElementById('login-email');
+  const passEl  = document.getElementById('login-password');
+  const errEl   = document.getElementById('login-error');
+  const btn     = document.getElementById('login-btn');
+  const email   = emailEl.value.trim().toLowerCase();
+  const pass    = passEl.value;
+  errEl.textContent = '';
+
+  if (!email) { errEl.textContent = 'Please enter your email address.'; emailEl.focus(); return; }
+  if (!pass)  { errEl.textContent = 'Please enter your password.';      passEl.focus();  return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span>Signing in…';
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+
+  if (error) {
+    errEl.textContent = error.message === 'Invalid login credentials'
+      ? 'Incorrect email or password. Please try again.'
+      : error.message;
+    passEl.value = '';
+    passEl.focus();
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+    return;
+  }
+
+  try {
     showLoadingOverlay('Loading your workspace…');
-    await loadAllData(); hideLoadingOverlay(); showApp();
-  }catch(e){errEl.textContent='Login error: '+e.message;btn.disabled=false;btn.textContent='Sign In';}
+    await loadInstallerProfile(data.user.email);
+    await loadAllData();
+    hideLoadingOverlay();
+    showApp();
+  } catch(e) {
+    showDataError(e);
+  }
 }
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){const ls=document.getElementById('login-screen');if(ls&&ls.style.display!=='none')doLogin();}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const ls = document.getElementById('login-screen');
+    if (ls && ls.style.display !== 'none') doLogin();
+  }
 });
 
 function showTab(id){
@@ -880,6 +936,10 @@ async function generateProposal(){
   const clientPhone   = document.getElementById('p-phone').value.trim();
   const clientAddress = document.getElementById('p-address').value.trim();
   if(!clientEmail){toast('⚠ Please enter client email');btn.disabled=false;btn.textContent='Generate Proposal';return;}
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const token = session ? session.access_token : SUPA_ANON;
+
   const payload={record:{
     contact_email:clientEmail,installer_id:installer.installer_id,
     installer_name:installer.installer_name,logo_url:installer.logo_url||'',
@@ -899,7 +959,8 @@ async function generateProposal(){
   }};
   try{
     const res=await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`,{
-      method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},
       body:JSON.stringify(payload)
     });
     const data=await res.json();
