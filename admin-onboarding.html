@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova Metrics — Admin Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--text:#f0f4f8;--muted:#7a95af;
+  --border:rgba(255,255,255,.08);--surface:#112840;--surface2:#0e2035;
+  --green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+/* ── NAV ── */
+.nav{background:var(--surface2);border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--navy);font-family:'DM Serif Display',serif}
+.nav-title{font-size:14px;font-weight:600}
+.nav-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.admin-badge{font-size:11px;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:var(--amber);padding:4px 12px;border-radius:20px}
+/* ── ADMIN LOCK ── */
+#admin-lock{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:24px}
+.lock-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:36px;width:100%;max-width:380px;text-align:center;position:relative;overflow:hidden}
+.lock-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+.lock-icon{font-size:32px;margin-bottom:12px}
+.lock-title{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:6px}
+.lock-sub{font-size:12px;color:var(--muted);margin-bottom:24px}
+/* ── MAIN LAYOUT ── */
+#admin-app{display:none;padding:28px;max-width:1100px;margin:0 auto}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.7rem}
+.page-sub{font-size:12px;color:var(--muted);margin-top:2px}
+/* ── CARDS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.grid-2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.2)}
+.field textarea{resize:vertical;min-height:70px}
+.field select option{background:var(--surface2)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ── COLOR PREVIEW ── */
+.color-row{display:flex;gap:10px;align-items:center}
+.color-row input[type=color]{width:44px;height:38px;padding:2px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:none;cursor:pointer}
+.color-label{font-size:11px;color:var(--muted)}
+/* ── LOCATION PICKER ── */
+.loc-search{margin-bottom:10px}
+.loc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:6px;max-height:260px;overflow-y:auto;padding-right:4px}
+.loc-grid::-webkit-scrollbar{width:4px}.loc-grid::-webkit-scrollbar-track{background:transparent}.loc-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+.loc-chip{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);cursor:pointer;transition:all .15s;font-size:11px}
+.loc-chip:hover{border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.06)}
+.loc-chip.selected{border-color:rgba(255,215,0,.45);background:rgba(255,215,0,.1);color:var(--gold)}
+.loc-chip input{display:none}
+.loc-chip-name{flex:1;font-weight:500}
+.loc-chip-prov{font-size:10px;color:var(--muted)}
+.loc-chip.selected .loc-chip-prov{color:rgba(255,215,0,.6)}
+.loc-sel-count{font-size:11px;color:var(--muted);margin-bottom:8px}
+.loc-sel-count b{color:var(--gold)}
+.loc-actions{display:flex;gap:8px;margin-bottom:10px}
+/* ── BUTTONS ── */
+.btn{border:none;padding:10px 22px;border-radius:8px;font-weight:600;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+.btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover:not(:disabled){background:#fff}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted)}.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:11px;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-full{width:100%;justify-content:center}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* ── MESSAGES ── */
+.msg{font-size:12px;padding:10px 14px;border-radius:8px;margin-top:12px;display:none}
+.msg.show{display:block}
+.msg.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--green)}
+.msg.err{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:var(--red)}
+/* ── INSTALLER TABLE ── */
+.table-wrap{overflow-x:auto;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600}
+.pill-green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.pill-amber{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.pill-red{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.color-dot{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.15);vertical-align:middle}
+/* ── RESET EMAIL TRIGGER ── */
+.action-cell{display:flex;gap:6px;align-items:center}
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid rgba(52,211,153,.3);color:var(--green);padding:11px 18px;border-radius:9px;font-size:12px;font-weight:500;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999}
+#toast.show{opacity:1}
+#toast.err{border-color:rgba(248,113,113,.3);color:var(--red)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-icon">N</div>
+    <div>
+      <div class="nav-title">Nova Metrics</div>
+      <div class="nav-sub">Admin Panel</div>
+    </div>
+  </div>
+  <div class="admin-badge">⚙ Installer Management</div>
+</nav>
+
+<!-- ── ADMIN LOCK SCREEN ── -->
+<div id="admin-lock">
+  <div class="lock-box">
+    <div class="lock-icon">🔐</div>
+    <div class="lock-title">Admin Access</div>
+    <div class="lock-sub">Enter your Nova Metrics admin secret to continue</div>
+    <div class="field">
+      <input type="password" id="admin-secret-input" placeholder="Admin secret key" />
+    </div>
+    <button class="btn btn-gold btn-full" onclick="unlockAdmin()">Unlock Panel</button>
+    <div class="msg err" id="lock-err"></div>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ── -->
+<div id="admin-app">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Installer Onboarding</div>
+      <div class="page-sub">Invite a new installer — creates their login, profile & location access in one step</div>
+    </div>
+    <button class="btn btn-ghost" onclick="loadInstallers()">↻ Refresh List</button>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- ── LEFT: INVITE FORM ── -->
+    <div>
+      <div class="card">
+        <div class="card-title">➕ New Installer</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Company / Installer Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. SunPower Cape" />
+          </div>
+          <div class="field">
+            <label>Email Address *</label>
+            <input type="email" id="f-email" placeholder="installer@example.com" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Contact Number</label>
+          <input type="tel" id="f-phone" placeholder="+27 82 000 0000" />
+        </div>
+
+        <div class="field">
+          <label>Logo URL <span style="color:var(--muted);font-weight:400;text-transform:none">(optional — paste a hosted image link)</span></label>
+          <input type="url" id="f-logo" placeholder="https://..." />
+        </div>
+
+        <div class="card-title" style="margin-top:6px">🎨 Branding Colours</div>
+
+        <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <div class="color-label" style="margin-bottom:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em">Primary</div>
+            <div class="color-row">
+              <input type="color" id="f-primary" value="#0A2540" oninput="syncHex('f-primary','f-primary-hex')">
+              <input type="text" id="f-primary-hex" value="#0A2540" maxlength="7" style="width:80px" oninput="syncColor('f-primary-hex','f-primary')">
+            </div>
+          </div>
+          <div>
+            <div class="color-label" style="margin-bottom:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em">Secondary</div>
+            <div class="color-row">
+              <input type="color" id="f-secondary" value="#FFFFFF" oninput="syncHex('f-secondary','f-secondary-hex')">
+              <input type="text" id="f-secondary-hex" value="#FFFFFF" maxlength="7" style="width:80px" oninput="syncColor('f-secondary-hex','f-secondary')">
+            </div>
+          </div>
+          <div>
+            <div class="color-label" style="margin-bottom:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em">Accent</div>
+            <div class="color-row">
+              <input type="color" id="f-accent" value="#B8962E" oninput="syncHex('f-accent','f-accent-hex')">
+              <input type="text" id="f-accent-hex" value="#B8962E" maxlength="7" style="width:80px" oninput="syncColor('f-accent-hex','f-accent')">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-gold btn-full" id="invite-btn" onclick="inviteInstaller()">
+          📧 Send Invite & Create Account
+        </button>
+        <div class="msg" id="invite-msg"></div>
+      </div>
+
+      <!-- ── LOCATION PICKER ── -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title">📍 Assign Locations</div>
+        <div class="loc-sel-count">Selected: <b id="loc-count">0</b> of <span id="loc-total">—</span> locations</div>
+        <div class="loc-actions">
+          <button class="btn btn-ghost btn-sm" onclick="selectAllLocs()">Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearAllLocs()">Clear All</button>
+        </div>
+        <input class="field loc-search" type="text" placeholder="🔍 Search city or province…" oninput="filterLocs(this.value)" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 12px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;width:100%;margin-bottom:10px" />
+        <div class="loc-grid" id="loc-grid">
+          <div style="color:var(--muted);font-size:12px">Loading locations…</div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px">
+          Locations are assigned <em>after</em> the invite is sent. Select them first, then click Invite — both happen automatically.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: EXISTING INSTALLERS ── -->
+    <div>
+      <div class="card" style="min-height:300px">
+        <div class="card-title">👥 Current Installers</div>
+        <div class="table-wrap">
+          <table id="installer-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Auth</th>
+                <th>Colours</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="installer-tbody">
+              <tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── QUICK ACTIONS ── -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-title">⚡ Quick Actions</div>
+
+        <div class="field">
+          <label>Send Password Reset to Existing Installer</label>
+          <div style="display:flex;gap:8px">
+            <input type="email" id="reset-email" placeholder="installer@email.com" style="flex:1" />
+            <button class="btn btn-ghost" onclick="sendReset()" id="reset-btn">Send Reset</button>
+          </div>
+          <div class="msg" id="reset-msg"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:16px 0"></div>
+
+        <div class="field">
+          <label>Assign Locations to Existing Installer</label>
+          <select id="assign-installer-sel" style="margin-bottom:8px">
+            <option value="">— select installer —</option>
+          </select>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:8px">Select locations in the picker on the left, choose the installer above, then click Assign.</p>
+          <button class="btn btn-ghost" onclick="assignLocationsOnly()" id="assign-btn">Assign Selected Locations</button>
+          <div class="msg" id="assign-msg"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+
+let adminSecret = '';
+let allLocations = [];
+
+// ── ADMIN UNLOCK ────────────────────────────────────────────────────────
+async function unlockAdmin() {
+  const val = document.getElementById('admin-secret-input').value.trim();
+  if (!val) return showLockErr('Please enter the admin secret.');
+  // Verify by calling the invite function with a deliberate bad payload
+  // — if the secret is wrong it returns 401, if wrong email it returns 400 (secret accepted)
+  const res = await fetch(`${SUPA_URL}/functions/v1/invite-installer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+    body: JSON.stringify({ admin_secret: val, email: '' })
+  });
+  const data = await res.json();
+  if (res.status === 401) return showLockErr('Incorrect admin secret. Try again.');
+  // 400 = secret correct, email missing — that's fine
+  adminSecret = val;
+  document.getElementById('admin-lock').style.display = 'none';
+  document.getElementById('admin-app').style.display  = 'block';
+  loadLocations();
+  loadInstallers();
+}
+document.getElementById('admin-secret-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') unlockAdmin();
+});
+function showLockErr(msg) {
+  const el = document.getElementById('lock-err');
+  el.textContent = msg; el.classList.add('show');
+}
+
+// ── LOCATIONS ───────────────────────────────────────────────────────────
+async function loadLocations() {
+  const res = await fetch(`${SUPA_URL}/rest/v1/solar_locations?select=id,city,location_name&order=city.asc`, {
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON }
+  });
+  allLocations = await res.json();
+  document.getElementById('loc-total').textContent = allLocations.length;
+  renderLocGrid(allLocations);
+}
+
+function renderLocGrid(locs) {
+  const grid = document.getElementById('loc-grid');
+  grid.innerHTML = locs.map(l => `
+    <label class="loc-chip" id="chip-${l.id}" onclick="toggleChip(${l.id}, this)">
+      <input type="checkbox" value="${l.id}" />
+      <span class="loc-chip-name">${l.city}</span>
+      <span class="loc-chip-prov">${l.location_name}</span>
+    </label>
+  `).join('');
+}
+
+function toggleChip(id, el) {
+  el.classList.toggle('selected');
+  const cb = el.querySelector('input');
+  cb.checked = el.classList.contains('selected');
+  updateLocCount();
+}
+
+function updateLocCount() {
+  const sel = document.querySelectorAll('#loc-grid input:checked').length;
+  document.getElementById('loc-count').textContent = sel;
+}
+
+function filterLocs(q) {
+  const lower = q.toLowerCase();
+  const filtered = lower
+    ? allLocations.filter(l => l.city.toLowerCase().includes(lower) || l.location_name.toLowerCase().includes(lower))
+    : allLocations;
+  renderLocGrid(filtered);
+  updateLocCount();
+}
+
+function selectAllLocs() {
+  document.querySelectorAll('#loc-grid .loc-chip').forEach(el => {
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+  });
+  updateLocCount();
+}
+
+function clearAllLocs() {
+  document.querySelectorAll('#loc-grid .loc-chip').forEach(el => {
+    el.classList.remove('selected');
+    el.querySelector('input').checked = false;
+  });
+  updateLocCount();
+}
+
+function getSelectedLocIds() {
+  return [...document.querySelectorAll('#loc-grid input:checked')].map(cb => parseInt(cb.value));
+}
+
+// ── COLOUR SYNC ─────────────────────────────────────────────────────────
+function syncHex(colorId, hexId) {
+  document.getElementById(hexId).value = document.getElementById(colorId).value;
+}
+function syncColor(hexId, colorId) {
+  const val = document.getElementById(hexId).value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) document.getElementById(colorId).value = val;
+}
+
+// ── INVITE INSTALLER ────────────────────────────────────────────────────
+async function inviteInstaller() {
+  const name  = document.getElementById('f-name').value.trim();
+  const email = document.getElementById('f-email').value.trim().toLowerCase();
+  const phone = document.getElementById('f-phone').value.trim();
+  const logo  = document.getElementById('f-logo').value.trim();
+  const primary   = document.getElementById('f-primary-hex').value.trim() || '#0A2540';
+  const secondary = document.getElementById('f-secondary-hex').value.trim() || '#FFFFFF';
+  const accent    = document.getElementById('f-accent-hex').value.trim() || '#B8962E';
+  const locIds    = getSelectedLocIds();
+  const msgEl = document.getElementById('invite-msg');
+  const btn   = document.getElementById('invite-btn');
+
+  msgEl.className = 'msg'; msgEl.textContent = '';
+
+  if (!name)  return showMsg(msgEl, 'err', 'Please enter the installer name.');
+  if (!email) return showMsg(msgEl, 'err', 'Please enter the installer email.');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Sending invite…';
+
+  try {
+    // Step 1 — create auth user + installer record via edge function
+    const res = await fetch(`${SUPA_URL}/functions/v1/invite-installer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({
+        admin_secret: adminSecret,
+        email, installer_name: name, contact_number: phone,
+        primary_color: primary, secondary_color: secondary, accent_color: accent,
+        logo_url: logo || null
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Invite failed');
+    }
+
+    const installerId = data.installer_id;
+
+    // Step 2 — assign locations if any selected
+    if (locIds.length > 0 && installerId) {
+      await assignLocations(installerId, locIds);
+    }
+
+    showMsg(msgEl, 'ok',
+      `✓ Invite sent to ${email}! They will receive an email to set their password.\n` +
+      (locIds.length > 0 ? `${locIds.length} location(s) assigned.` : 'No locations assigned yet.')
+    );
+    toast(`✓ ${name} invited successfully`);
+
+    // Reset form
+    ['f-name','f-email','f-phone','f-logo'].forEach(id => document.getElementById(id).value = '');
+    clearAllLocs();
+    loadInstallers();
+
+  } catch(e) {
+    showMsg(msgEl, 'err', '✗ ' + e.message);
+    toast(e.message, true);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '📧 Send Invite & Create Account';
+}
+
+// ── ASSIGN LOCATIONS ─────────────────────────────────────────────────────
+async function assignLocations(installerId, locIds) {
+  // Delete existing first, then reinsert (simple replace strategy)
+  await fetch(`${SUPA_URL}/rest/v1/installer_locations?installer_id=eq.${installerId}`, {
+    method: 'DELETE',
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Prefer': 'return=minimal' }
+  });
+
+  if (locIds.length === 0) return;
+
+  const rows = locIds.map(lid => ({ installer_id: installerId, location_id: lid }));
+  await fetch(`${SUPA_URL}/rest/v1/installer_locations`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON,
+      'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify(rows)
+  });
+}
+
+// ── ASSIGN LOCATIONS TO EXISTING INSTALLER ───────────────────────────────
+async function assignLocationsOnly() {
+  const sel = document.getElementById('assign-installer-sel');
+  const installerId = parseInt(sel.value);
+  const locIds = getSelectedLocIds();
+  const msgEl = document.getElementById('assign-msg');
+  const btn   = document.getElementById('assign-btn');
+  msgEl.className = 'msg'; msgEl.textContent = '';
+
+  if (!installerId) return showMsg(msgEl, 'err', 'Please select an installer.');
+  if (locIds.length === 0) return showMsg(msgEl, 'err', 'Please select at least one location.');
+
+  btn.disabled = true; btn.textContent = 'Assigning…';
+  try {
+    await assignLocations(installerId, locIds);
+    showMsg(msgEl, 'ok', `✓ ${locIds.length} location(s) assigned.`);
+    toast('✓ Locations assigned');
+  } catch(e) {
+    showMsg(msgEl, 'err', '✗ ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Assign Selected Locations';
+}
+
+// ── SEND PASSWORD RESET ──────────────────────────────────────────────────
+async function sendReset() {
+  const email = document.getElementById('reset-email').value.trim().toLowerCase();
+  const msgEl = document.getElementById('reset-msg');
+  const btn   = document.getElementById('reset-btn');
+  msgEl.className = 'msg'; msgEl.textContent = '';
+
+  if (!email) return showMsg(msgEl, 'err', 'Enter an email address.');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  try {
+    const res = await fetch(`${SUPA_URL}/functions/v1/send-password-reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({ admin_secret: adminSecret, email })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showMsg(msgEl, 'ok', `✓ Reset email sent to ${email}`);
+    toast('✓ Reset email sent');
+  } catch(e) {
+    showMsg(msgEl, 'err', '✗ ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Send Reset';
+}
+
+// ── LOAD INSTALLERS TABLE ────────────────────────────────────────────────
+async function loadInstallers() {
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/installers?select=installer_id,installer_name,contact_email,primary_color,accent_color,auth_user_id&order=installer_id.asc`,
+    { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON } }
+  );
+  const installers = await res.json();
+
+  // Get location counts per installer
+  const lcRes = await fetch(
+    `${SUPA_URL}/rest/v1/installer_locations?select=installer_id,location_id`,
+    { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON } }
+  );
+  const lc = await lcRes.json();
+  const lcMap = {};
+  lc.forEach(r => { lcMap[r.installer_id] = (lcMap[r.installer_id] || 0) + 1; });
+
+  const tbody = document.getElementById('installer-tbody');
+  const assignSel = document.getElementById('assign-installer-sel');
+
+  // Rebuild assign dropdown
+  assignSel.innerHTML = '<option value="">— select installer —</option>' +
+    installers.map(i => `<option value="${i.installer_id}">${i.installer_name || i.contact_email}</option>`).join('');
+
+  if (!installers.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">No installers yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = installers.map(i => {
+    const hasAuth = !!i.auth_user_id;
+    const locCount = lcMap[i.installer_id] || 0;
+    const authPill = hasAuth
+      ? `<span class="pill pill-green">Auth ✓</span>`
+      : `<span class="pill pill-red">No Auth</span>`;
+    return `
+      <tr>
+        <td><strong>${i.installer_name || '—'}</strong><br><span style="color:var(--muted);font-size:10px">#${i.installer_id} · ${locCount} locations</span></td>
+        <td style="color:var(--muted)">${i.contact_email || '—'}</td>
+        <td>${authPill}</td>
+        <td>
+          <span class="color-dot" style="background:${i.primary_color||'#0A2540'}" title="${i.primary_color}"></span>
+          <span class="color-dot" style="background:${i.accent_color||'#B8962E'}" title="${i.accent_color}"></span>
+        </td>
+        <td>
+          <div class="action-cell">
+            <button class="btn btn-ghost btn-sm" onclick="prefillReset('${i.contact_email||''}')">Reset PW</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function prefillReset(email) {
+  document.getElementById('reset-email').value = email;
+  document.getElementById('reset-email').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────
+function showMsg(el, type, text) {
+  el.textContent = text;
+  el.className = `msg ${type} show`;
+}
+
+function toast(msg, isErr = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isErr ? 'show err' : 'show';
+  setTimeout(() => t.className = '', 3000);
+}
+</script>
+</body>
+</html>
