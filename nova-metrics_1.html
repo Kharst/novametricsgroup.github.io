@@ -57,6 +57,18 @@
     .btn-secondary:hover { background:rgba(184,150,46,0.08); border-color:var(--gold); }
     .msg { margin-top:1rem; font-size:0.79rem; min-height:1.1rem; letter-spacing:0.03em; text-align:center; }
     .msg.success { color:#72d4a0; } .msg.error { color:#eb7070; } .msg.loading { color:var(--muted); }
+    .forgot-link { text-align:right; margin-top:-0.6rem; margin-bottom:1.4rem; }
+    .forgot-link button { background:none; border:none; cursor:pointer; font-size:0.72rem; color:var(--muted); font-family:'DM Sans',sans-serif; transition:color .2s; padding:0; }
+    .forgot-link button:hover { color:var(--gold-l); }
+    /* Forgot password panel */
+    .forgot-panel { display:none; }
+    .back-btn { background:none; border:none; cursor:pointer; font-size:0.72rem; color:var(--muted); font-family:'DM Sans',sans-serif; transition:color .2s; padding:0; margin-bottom:1.5rem; display:flex; align-items:center; gap:5px; }
+    .back-btn:hover { color:var(--gold-l); }
+    .sent-state { display:none; text-align:center; padding:0.5rem 0; }
+    .sent-icon { width:52px; height:52px; border-radius:50%; background:rgba(114,212,160,0.1); border:1px solid rgba(114,212,160,0.3); display:grid; place-items:center; margin:0 auto 1.25rem; font-size:1.3rem; }
+    .sent-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
+    .sent-state h2 em { font-style:italic; color:#72d4a0; }
+    .sent-state p { font-size:0.84rem; color:var(--muted); line-height:1.7; margin-bottom:1.5rem; }
     .session-bar { display:none; align-items:center; justify-content:space-between; margin-bottom:1.75rem; padding:0.6rem 0.9rem; border:1px solid rgba(184,150,46,0.18); border-radius:2px; background:rgba(184,150,46,0.06); }
     .session-bar .su { font-size:0.72rem; color:var(--gold-l); letter-spacing:0.06em; }
     .session-bar button { background:none; border:none; cursor:pointer; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); transition:color 0.2s; font-family:'DM Sans',sans-serif; }
@@ -94,7 +106,11 @@
         <label>Password <span class="req">*</span></label>
         <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
       </div>
-      <div style="margin-top:1.5rem;">
+      <!-- Forgot password link -->
+      <div class="forgot-link">
+        <button onclick="showForgot()">Forgot password?</button>
+      </div>
+      <div style="margin-top:0.5rem;">
         <button class="btn-primary" id="loginBtn" onclick="handleLogin()"><span>Sign in</span></button>
         <div class="msg" id="loginMsg"></div>
       </div>
@@ -104,14 +120,49 @@
       </div>
     </div>
 
+    <!-- ══ FORGOT PASSWORD PANEL ══ -->
+    <div id="forgotPanel" class="forgot-panel">
+      <!-- Email entry -->
+      <div id="forgotForm">
+        <button class="back-btn" onclick="showLogin()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Back to sign in
+        </button>
+        <h1>Reset <em>password</em></h1>
+        <p class="subhead">Installer account recovery</p>
+        <div class="divider"></div>
+        <div class="field">
+          <label>Email address <span class="req">*</span></label>
+          <input type="email" id="forgotEmail" placeholder="your@email.com" autocomplete="email" />
+        </div>
+        <div style="margin-top:1.5rem;">
+          <button class="btn-primary" id="forgotBtn" onclick="handleForgot()"><span>Send Reset Link</span></button>
+          <div class="msg" id="forgotMsg"></div>
+        </div>
+        <div class="card-footer">
+          <span>Nova Metrics &copy; 2026</span>
+          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
+        </div>
+      </div>
+      <!-- Sent confirmation -->
+      <div class="sent-state" id="forgotSent">
+        <div class="sent-icon">&#9993;</div>
+        <h2>Email <em>sent</em></h2>
+        <p>If an account exists for that email address, a reset link has been sent. Check your inbox (and spam folder) — it should arrive within a minute.</p>
+        <button class="btn-primary" onclick="showLogin()"><span>Back to Sign In</span></button>
+        <div class="card-footer" style="margin-top:1.75rem;">
+          <span>Nova Metrics &copy; 2026</span>
+          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ ADD CLIENT ══ -->
     <div id="clientScreen" class="hidden">
       <div class="session-bar" id="sessionBar">
         <span class="su" id="sessionUser"></span>
         <button onclick="handleLogout()">Sign out</button>
       </div>
-
-      <!-- Form -->
       <div id="addClientForm">
         <h1>Add a <em>new</em> client</h1>
         <p class="subhead">Client onboarding</p>
@@ -138,21 +189,19 @@
             <div class="msg" id="clientMsg"></div>
           </div>
         </form>
-        <a href="prposal_portal.html" class="btn-secondary">View proposal portal →</a>
+        <a href="prposal_portal.html" class="btn-secondary">View proposal portal &rarr;</a>
         <div class="card-footer">
           <span>Nova Metrics &copy; 2026</span>
           <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
         </div>
       </div>
-
-      <!-- Success state -->
       <div id="successState" class="success-state hidden">
-        <div class="success-icon">✓</div>
+        <div class="success-icon">&#10003;</div>
         <h2>Client <em>registered</em></h2>
         <div class="client-chip" id="successClientName"></div>
         <p>The client has been saved to your pipeline. Head to the proposal portal to preview and send proposals.</p>
         <a id="portalBtn" href="prposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
-          <span>Open proposal portal →</span>
+          <span>Open proposal portal &rarr;</span>
         </a>
         <button onclick="resetForm()" class="btn-secondary" style="margin-top:0.75rem;">Add another client</button>
         <div class="card-footer" style="margin-top:1.75rem;">
@@ -177,8 +226,27 @@
       ['loginEmail','loginPassword'].forEach(function(id) {
         document.getElementById(id).addEventListener('keydown', function(e) { if (e.key === 'Enter') handleLogin(); });
       });
+      document.getElementById('forgotEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleForgot();
+      });
     });
 
+    // ── NAVIGATION ──────────────────────────────────────────────────────
+    function showForgot() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('forgotPanel').style.display = 'block';
+      document.getElementById('forgotForm').style.display = 'block';
+      document.getElementById('forgotSent').style.display = 'none';
+      document.getElementById('forgotEmail').value = document.getElementById('loginEmail').value;
+      document.getElementById('forgotEmail').focus();
+    }
+    function showLogin() {
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('forgotPanel').style.display = 'none';
+      document.getElementById('loginMsg').textContent = '';
+    }
+
+    // ── LOGIN ────────────────────────────────────────────────────────────
     async function handleLogin() {
       var email    = document.getElementById('loginEmail').value.trim().toLowerCase();
       var password = document.getElementById('loginPassword').value;
@@ -197,7 +265,7 @@
         if (!res.ok) throw new Error('Connection error. Please try again.');
         var rows = await res.json();
         if (!rows || !rows.length) {
-          showMsg(msg,'error','Invalid email or password. Contact Nova Metrics to request access.');
+          showMsg(msg,'error','Invalid email or password.');
           btn.disabled = false;
           return;
         }
@@ -206,6 +274,29 @@
         showClientScreen();
       } catch(err) {
         showMsg(msg,'error', err.message || 'Something went wrong. Please try again.');
+        btn.disabled = false;
+      }
+    }
+
+    // ── FORGOT PASSWORD ──────────────────────────────────────────────────
+    async function handleForgot() {
+      var email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+      var btn   = document.getElementById('forgotBtn');
+      var msg   = document.getElementById('forgotMsg');
+      if (!email) { showMsg(msg,'error','Please enter your email address.'); return; }
+      btn.disabled = true;
+      showMsg(msg,'loading','Sending reset link…');
+      try {
+        await fetch(SUPABASE_URL + '/functions/v1/send-password-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+          body: JSON.stringify({ email: email })
+        });
+        // Always show success (prevents email enumeration)
+        document.getElementById('forgotForm').style.display = 'none';
+        document.getElementById('forgotSent').style.display = 'block';
+      } catch(err) {
+        showMsg(msg,'error','Connection error. Please try again.');
         btn.disabled = false;
       }
     }
@@ -236,60 +327,37 @@
       var address = document.getElementById('client_address').value.trim();
       var btn     = document.getElementById('submitBtn');
       var msg     = document.getElementById('clientMsg');
-
       if (!name)  { showMsg(msg,'error','Please enter the client name.'); return; }
       if (!email) { showMsg(msg,'error','Please enter an email address.'); return; }
       if (phone && !/^\+?[\d\s\-().]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
-
       showMsg(msg,'loading','Saving client…');
       btn.disabled = true;
-
       try {
         var res = await fetch(SUPABASE_URL + '/functions/v1/create-client', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            installer_id:   currentInstaller.installer_id,
-            client_name:    name,
-            client_email:   email,
-            client_phone:   phone   || null,
-            client_address: address || null
-          })
+          body: JSON.stringify({ installer_id: currentInstaller.installer_id, client_name: name, client_email: email, client_phone: phone||null, client_address: address||null })
         });
         if (!res.ok) throw new Error('Server error ' + res.status);
         var data = await res.json();
-
-        if (data.success) {
-          // Pass ai_id to success state so portal button deep-links to the new proposal
-          showSuccessState(name, data.ai_id || null);
-        } else {
-          showMsg(msg,'error', data.error || 'Something went wrong. Please try again.');
-        }
-      } catch(err) {
-        showMsg(msg,'error','Connection error: ' + err.message);
-      } finally {
-        btn.disabled = false;
-      }
+        if (data.success) { showSuccessState(name, data.ai_id||null); }
+        else { showMsg(msg,'error', data.error || 'Something went wrong. Please try again.'); }
+      } catch(err) { showMsg(msg,'error','Connection error: ' + err.message); }
+      finally { btn.disabled = false; }
     });
 
     function showSuccessState(clientName, aiId) {
       document.getElementById('addClientForm').classList.add('hidden');
       document.getElementById('successState').classList.remove('hidden');
       document.getElementById('successClientName').textContent = clientName;
-      // Deep-link to the specific proposal if we have the ai_id
-      var portalHref = aiId
-        ? 'prposal_portal.html?ai_id=' + aiId
-        : 'prposal_portal.html';
-      document.getElementById('portalBtn').href = portalHref;
+      document.getElementById('portalBtn').href = aiId ? 'prposal_portal.html?ai_id=' + aiId : 'prposal_portal.html';
     }
-
     function resetForm() {
       document.getElementById('successState').classList.add('hidden');
       document.getElementById('addClientForm').classList.remove('hidden');
       document.getElementById('clientForm').reset();
       document.getElementById('clientMsg').textContent = '';
     }
-
     function showMsg(el, type, text) { el.className = 'msg ' + type; el.textContent = text; }
   </script>
 </body>
