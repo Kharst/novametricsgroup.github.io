@@ -40,7 +40,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .btn-primary{background:var(--gold);color:var(--navy);border:none;padding:13px 24px;border-radius:9px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;margin-top:4px;}
 .btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
 .error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.success-msg{color:var(--green);font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
 .login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+/* Forgot-password link button */
+.link-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px;text-align:center;width:100%;display:block;margin-top:10px;transition:color .15s;}
+.link-btn:hover{color:var(--gold)}
 .data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .data-loading.on{display:flex;}
 .dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
@@ -136,7 +140,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </nav>
 
 <div id="login-screen">
-  <div class="login-box">
+
+  <!-- ── PANEL 1: Sign In ─────────────────────────────────────────── -->
+  <div class="login-box" id="panel-signin">
     <div class="login-logo">N</div>
     <div class="login-title">Installer <em style="font-style:italic;color:var(--gold)">Login</em></div>
     <div class="login-sub">Sign in with your Nova Metrics installer account</div>
@@ -144,7 +150,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
     <div id="login-error" class="error-msg"></div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="link-btn" onclick="showPanel('forgot')">Forgot password?</button>
   </div>
+
+  <!-- ── PANEL 2: Forgot Password ────────────────────────────────── -->
+  <div class="login-box" id="panel-forgot" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Reset <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Enter your email and we'll send a reset link</div>
+    <input type="email" id="forgot-email" placeholder="Your installer email address" autocomplete="email" />
+    <div id="forgot-error" class="error-msg"></div>
+    <div id="forgot-success" class="success-msg"></div>
+    <button class="btn-primary" id="forgot-btn" onclick="doForgotPassword()">Send Reset Link</button>
+    <button class="link-btn" onclick="showPanel('signin')">← Back to Sign In</button>
+  </div>
+
+  <!-- ── PANEL 3: Set New Password (after clicking email link) ──── -->
+  <div class="login-box" id="panel-setpass" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Set <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Choose a secure password for your account</div>
+    <input type="password" id="new-password" placeholder="New password (min 8 characters)" />
+    <input type="password" id="new-password-confirm" placeholder="Confirm new password" />
+    <div id="setpass-error" class="error-msg"></div>
+    <button class="btn-primary" id="setpass-btn" onclick="doSetPassword()">Set Password &amp; Sign In</button>
+  </div>
+
 </div>
 
 <div id="app-screen">
@@ -371,30 +402,42 @@ const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 
 // ── SUPABASE AUTH CLIENT ──────────────────────────────────────────────────
-// Uses the bundled SDK loaded in <head>. Manages JWT sessions server-side.
 const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[] };
 let installer  = null;
 let calcResult = null;
 
+// ── LOGIN PANEL SWITCHER ──────────────────────────────────────────────────
+function showPanel(name) {
+  ['signin','forgot','setpass'].forEach(p => {
+    document.getElementById('panel-'+p).style.display = p === name ? 'block' : 'none';
+  });
+}
+
+// ── LISTEN FOR PASSWORD RECOVERY (user clicked the email link) ────────────
+// When an installer clicks their "Set Password" link, Supabase fires this event.
+// We intercept it and show the set-password form instead of the app.
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app-screen').style.display   = 'none';
+    showPanel('setpass');
+  }
+});
+
 // ── AUTHENTICATED FETCH ───────────────────────────────────────────────────
-// Always uses the current Supabase Auth JWT — never the plain anon key alone.
 async function sbFetch(path) {
   const { data: { session } } = await supabaseClient.auth.getSession();
   const token = session ? session.access_token : SUPA_ANON;
   const res = await fetch(SUPA_URL + path, {
-    headers: {
-      'apikey': SUPA_ANON,
-      'Authorization': 'Bearer ' + token,
-      'Accept': 'application/json'
-    }
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
   });
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
 
-// ── BOOT: restore session via Supabase Auth (no raw passwords in localStorage)
+// ── BOOT: restore session via Supabase Auth ───────────────────────────────
 (async function boot() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
@@ -404,9 +447,7 @@ async function sbFetch(path) {
       await loadAllData();
       hideLoadingOverlay();
       showApp();
-    } catch(e) {
-      showDataError(e);
-    }
+    } catch(e) { showDataError(e); }
   }
 })();
 
@@ -479,15 +520,13 @@ function showApp(){
   badge.style.display = 'inline-block';
 }
 
-// ── SIGN OUT via Supabase Auth ────────────────────────────────────────────
+// ── SIGN OUT ──────────────────────────────────────────────────────────────
 document.getElementById('sign-out-btn').addEventListener('click', async function() {
   await supabaseClient.auth.signOut();
   window.location.href = 'nova-metrics_1.html';
 });
 
-// ── LOGIN via Supabase Auth signInWithPassword ────────────────────────────
-// Passwords are verified server-side with bcrypt. No password ever reaches
-// the browser. A short-lived JWT is returned and managed by the SDK.
+// ── SIGN IN ───────────────────────────────────────────────────────────────
 async function doLogin(){
   const emailEl = document.getElementById('login-email');
   const passEl  = document.getElementById('login-password');
@@ -507,7 +546,7 @@ async function doLogin(){
 
   if (error) {
     errEl.textContent = error.message === 'Invalid login credentials'
-      ? 'Incorrect email or password. Please try again.'
+      ? 'Incorrect email or password. Use "Forgot password?" if this is your first login.'
       : error.message;
     passEl.value = '';
     passEl.focus();
@@ -522,17 +561,84 @@ async function doLogin(){
     await loadAllData();
     hideLoadingOverlay();
     showApp();
-  } catch(e) {
-    showDataError(e);
-  }
+  } catch(e) { showDataError(e); }
 }
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     const ls = document.getElementById('login-screen');
-    if (ls && ls.style.display !== 'none') doLogin();
+    if (ls && ls.style.display !== 'none') {
+      const activePanel = ['signin','forgot','setpass'].find(p =>
+        document.getElementById('panel-'+p).style.display !== 'none'
+      );
+      if (activePanel === 'signin')   doLogin();
+      if (activePanel === 'forgot')   doForgotPassword();
+      if (activePanel === 'setpass')  doSetPassword();
+    }
   }
 });
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────────────────
+// Sends Supabase Auth password-reset email. The link takes the user back
+// to this page, which detects the recovery token and shows panel-setpass.
+async function doForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim().toLowerCase();
+  const errEl = document.getElementById('forgot-error');
+  const sucEl = document.getElementById('forgot-success');
+  const btn   = document.getElementById('forgot-btn');
+  errEl.textContent = ''; sucEl.textContent = '';
+
+  if (!email) { errEl.textContent = 'Please enter your email address.'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span>Sending…';
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.href   // sends them back to this exact page
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Send Reset Link';
+
+  if (error) {
+    errEl.textContent = error.message;
+  } else {
+    sucEl.textContent = '✓ Reset link sent! Check your email inbox, then click the link to set your password.';
+  }
+}
+
+// ── SET NEW PASSWORD (after installer clicks the email link) ──────────────
+async function doSetPassword() {
+  const pass    = document.getElementById('new-password').value;
+  const confirm = document.getElementById('new-password-confirm').value;
+  const errEl   = document.getElementById('setpass-error');
+  const btn     = document.getElementById('setpass-btn');
+  errEl.textContent = '';
+
+  if (pass.length < 8)    { errEl.textContent = 'Password must be at least 8 characters.'; return; }
+  if (pass !== confirm)   { errEl.textContent = 'Passwords do not match.'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="login-spinner"></span>Setting password…';
+
+  const { data, error } = await supabaseClient.auth.updateUser({ password: pass });
+
+  if (error) {
+    errEl.textContent = error.message;
+    btn.disabled = false;
+    btn.textContent = 'Set Password & Sign In';
+    return;
+  }
+
+  // Password set — load workspace immediately (user is already authenticated)
+  try {
+    showLoadingOverlay('Setting up your workspace…');
+    await loadInstallerProfile(data.user.email);
+    await loadAllData();
+    hideLoadingOverlay();
+    showApp();
+  } catch(e) { showDataError(e); }
+}
 
 function showTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
