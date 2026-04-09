@@ -18,6 +18,7 @@
   --gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.18);
   --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
   --sidebar-w:300px;
+  --wa:#25D366;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden;}
@@ -37,71 +38,36 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;overflow:hidden;
 }
-.brand{
-  display:flex;align-items:center;gap:12px;
-  padding:22px 20px 18px;
-  border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
+.brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .brand-icon{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
 .brand-name{font-size:14px;font-weight:600;white-space:nowrap;}
 .brand-sub{font-size:10px;color:var(--gold);letter-spacing:.09em;text-transform:uppercase;}
 
-/* installer card */
 .s-sec{padding:18px 16px 6px;flex-shrink:0;}
 .s-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;padding:0 4px;}
-.inst-card{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.05);
-  border:1px solid var(--gold-border);
-  border-radius:11px;padding:11px 13px;
-}
+.inst-card{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:11px;padding:11px 13px;}
 .inst-av{width:34px;height:34px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--navy);flex-shrink:0;}
 .inst-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .inst-email{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
 
-/* client list section */
 .c-list-section{display:flex;flex-direction:column;flex:1;overflow:hidden;padding:6px 0 0;}
 .c-list-header{padding:14px 20px 8px;flex-shrink:0;}
 .c-list{flex:1;overflow-y:auto;padding:0 10px;}
-.c-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 12px;border-radius:10px;cursor:pointer;
-  transition:background .15s;margin-bottom:3px;
-  border:1px solid transparent;gap:8px;
-}
+.c-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s;margin-bottom:3px;border:1px solid transparent;gap:8px;}
 .c-row:hover{background:var(--card);}
 .c-row.active{background:var(--gold-dim);border-color:var(--gold-border);}
 .c-info{flex:1;min-width:0;}
 .c-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .c-email{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.badge{
-  font-size:9px;font-weight:700;letter-spacing:.06em;
-  padding:3px 9px;border-radius:20px;text-transform:uppercase;
-  white-space:nowrap;flex-shrink:0;
-}
+.badge{font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
 .b-none{background:rgba(255,255,255,.07);color:var(--muted);}
 .b-ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
 .loading-row{padding:14px 16px;font-size:12px;color:var(--muted);text-align:center;}
 
-/* sidebar bottom buttons */
 .sidebar-footer{padding:10px 14px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);}
-.add-btn{
-  display:flex;align-items:center;gap:8px;padding:9px 13px;
-  border-radius:9px;border:1px dashed var(--gold-border);
-  color:var(--gold);font-size:12px;font-weight:500;
-  cursor:pointer;transition:background .15s;background:transparent;
-  width:100%;font-family:'DM Sans',sans-serif;
-}
+.add-btn{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:9px;border:1px dashed var(--gold-border);color:var(--gold);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s;background:transparent;width:100%;font-family:'DM Sans',sans-serif;}
 .add-btn:hover{background:var(--gold-dim);}
-.new-calc-btn{
-  display:flex;align-items:center;gap:8px;justify-content:center;
-  padding:10px 14px;border-radius:9px;
-  background:var(--gold);color:var(--navy);
-  font-size:12px;font-weight:700;cursor:pointer;
-  border:none;text-decoration:none;font-family:'DM Sans',sans-serif;
-  transition:all .2s;
-}
+.new-calc-btn{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 14px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .new-calc-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,215,0,.25);}
 .new-calc-btn svg{width:13px;height:13px;flex-shrink:0;}
 
@@ -135,7 +101,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-/* client header card */
 .ch{background:var(--navy);border-radius:16px;padding:22px 26px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;gap:16px;flex-wrap:wrap;}
 .ch::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.07) 0%,transparent 60%);pointer-events:none;}
 .ch-l{display:flex;align-items:center;gap:16px;min-width:0;}
@@ -149,7 +114,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .pill.r{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
 .pill.p{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
 
-/* stats grid */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
 .s-card{background:#fff;border-radius:13px;padding:17px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .s-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,37,64,.08);}
@@ -160,7 +124,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .s-unit{font-size:13px;font-weight:400;color:#6b7280;margin-left:1px;}
 .s-sub2{font-size:11px;color:#9ca3af;margin-top:4px;}
 
-/* specs grid */
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .sp-card{background:#fff;border-radius:13px;padding:18px 20px;border:1px solid #e8ecf0;}
 .sp-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
@@ -169,7 +132,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sp-row:last-child{border-bottom:none;}
 .sk{color:#6b7280;}.sv{color:var(--navy);font-weight:500;text-align:right;max-width:58%;}
 
-/* no proposal placeholder */
 .no-prop{background:#fff;border-radius:13px;padding:22px 24px;border:1.5px dashed #d1d5db;display:flex;align-items:center;gap:16px;}
 .np-ic{width:42px;height:42px;background:#f3f4f6;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .np-t{font-size:14px;font-weight:500;color:#374151;}.np-s{font-size:12px;color:#9ca3af;margin-top:3px;}
@@ -179,65 +141,56 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 /* ── PROPOSAL READY BANNER ── */
 .dl{
   background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);
-  border-radius:16px;
-  border:1px solid var(--gold-border);
+  border-radius:16px;border:1px solid var(--gold-border);
   padding:26px 28px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  position:relative;
-  overflow:hidden;
-  flex-shrink:0;
-  gap:20px;
-  flex-wrap:wrap;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;flex-shrink:0;gap:20px;flex-wrap:wrap;
 }
-.dl::before{
-  content:'';position:absolute;
-  top:-60px;right:-60px;
-  width:220px;height:220px;
-  border-radius:50%;
-  background:rgba(255,215,0,.06);
-  pointer-events:none;
-}
-.dl::after{
-  content:'';position:absolute;
-  bottom:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,var(--gold) 0%,rgba(255,215,0,.2) 100%);
-}
+.dl::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
+.dl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,rgba(255,215,0,.2) 100%);}
 .dl-left{min-width:0;flex:1;}
-.dl-eyebrow{
-  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--gold);font-weight:600;margin-bottom:6px;
-  display:flex;align-items:center;gap:7px;
-}
+.dl-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
 .dl-eyebrow::before{content:'';width:20px;height:1px;background:var(--gold);display:inline-block;}
 .dl-ti{font-size:18px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;line-height:1.25;}
 .dl-su{font-size:12px;color:rgba(255,255,255,.42);margin-top:5px;}
 .dl-actions{display:flex;gap:10px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+
+/* Download PDF button */
 .dl-btn{
   display:flex;align-items:center;gap:9px;
   background:var(--gold);color:var(--navy);
-  border:none;border-radius:10px;
-  padding:12px 22px;
+  border:none;border-radius:10px;padding:12px 22px;
   font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-  position:relative;z-index:1;
+  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
 }
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.3);}
 .dl-btn svg{width:15px;height:15px;flex-shrink:0;}
-.dl-btn-secondary{
+
+/* Email button */
+.dl-btn-email{
   display:flex;align-items:center;gap:9px;
   background:rgba(34,197,94,.15);color:#4ade80;
   border:1px solid rgba(34,197,94,.3);
   border-radius:10px;padding:12px 22px;
   font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-  position:relative;z-index:1;
+  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
 }
-.dl-btn-secondary:hover{background:rgba(34,197,94,.25);transform:translateY(-2px);}
-.dl-btn-secondary svg{width:15px;height:15px;flex-shrink:0;}
+.dl-btn-email:hover{background:rgba(34,197,94,.25);transform:translateY(-2px);}
+.dl-btn-email svg{width:15px;height:15px;flex-shrink:0;}
 
-/* arrival banner */
+/* WhatsApp button */
+.dl-btn-wa{
+  display:flex;align-items:center;gap:9px;
+  background:rgba(37,211,102,.15);color:#25D366;
+  border:1px solid rgba(37,211,102,.35);
+  border-radius:10px;padding:12px 22px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
+}
+.dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.2);}
+.dl-btn-wa svg{width:15px;height:15px;flex-shrink:0;}
+.dl-btn-wa.sent{background:rgba(37,211,102,.3);border-color:#25D366;}
+
 .arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:10px 26px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
 .ab-text{font-size:12px;color:#374151;display:flex;align-items:center;gap:8px;}
@@ -336,22 +289,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ms-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
 .ms-close{width:100%;padding:12px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
 
-/* scrollbars */
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
 
-/* responsive */
-@media(max-width:900px){
-  :root{--sidebar-w:240px;}
-  .stats{grid-template-columns:repeat(2,1fr);}
-  .specs{grid-template-columns:1fr;}
-}
-@media(max-width:700px){
-  .sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}
-  .main{margin-bottom:56px;}
-  :root{--sidebar-w:100%;}
-}
+@media(max-width:900px){:root{--sidebar-w:240px;}.stats{grid-template-columns:repeat(2,1fr);}.specs{grid-template-columns:1fr;}}
+@media(max-width:700px){.sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}.main{margin-bottom:56px;}:root{--sidebar-w:100%;}}
 </style>
 </head>
 <body>
@@ -367,7 +310,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <div class="brand-icon">N</div>
     <div><div class="brand-name">Nova Metrics</div><div class="brand-sub">Proposal Portal</div></div>
   </div>
-
   <div class="s-sec">
     <div class="s-lbl">Installer Account</div>
     <div class="inst-card">
@@ -378,20 +320,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
     </div>
   </div>
-
   <div class="c-list-section">
-    <div class="c-list-header">
-      <div class="s-lbl" id="clientCount">Loading…</div>
-    </div>
-    <div class="c-list" id="clientList">
-      <div class="loading-row">Loading clients…</div>
-    </div>
+    <div class="c-list-header"><div class="s-lbl" id="clientCount">Loading…</div></div>
+    <div class="c-list" id="clientList"><div class="loading-row">Loading clients…</div></div>
   </div>
-
   <div class="sidebar-footer">
-    <button class="add-btn" id="addClientBtn">
-      <span style="font-size:17px;line-height:1">+</span> Add new client
-    </button>
+    <button class="add-btn" id="addClientBtn"><span style="font-size:17px;line-height:1">+</span> Add new client</button>
     <a href="solar-intelligence.html" class="new-calc-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       New System Design
@@ -418,7 +352,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <div class="arrival-banner" id="arrivalBanner">
     <div class="ab-text">
       <div class="ab-check">✓</div>
-      <span>Proposal generated successfully — <strong id="arrivalClientName">your client</strong>'s proposal is highlighted below.</span>
+      <span>Proposal generated — <strong id="arrivalClientName">your client</strong>'s proposal is highlighted below.</span>
     </div>
     <button class="ab-close" onclick="document.getElementById('arrivalBanner').classList.remove('on')">✕</button>
   </div>
@@ -447,6 +381,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
               <div class="ch-mi">📍 <strong id="chLoc">—</strong></div>
               <div class="ch-mi">⚡ <strong id="chSeg">—</strong></div>
               <div class="ch-mi">📅 <strong id="chDt">—</strong></div>
+              <div class="ch-mi" id="chPhoneRow" style="display:none">📱 <strong id="chPhone">—</strong></div>
             </div>
           </div>
         </div>
@@ -465,26 +400,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 
       <!-- Stats row -->
       <div class="stats" id="statsRow" style="display:none">
-        <div class="s-card cg">
-          <div class="s-lbl2">System Size</div>
-          <div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div>
-          <div class="s-sub2" id="stPanels">—</div>
-        </div>
-        <div class="s-card cgn">
-          <div class="s-lbl2">Annual Saving</div>
-          <div class="s-val">R <span id="stAnnual">—</span></div>
-          <div class="s-sub2">vs. Eskom bill</div>
-        </div>
-        <div class="s-card cbl">
-          <div class="s-lbl2">System Cost</div>
-          <div class="s-val">R <span id="stCost">—</span></div>
-          <div class="s-sub2" id="stMonthlySub">—</div>
-        </div>
-        <div class="s-card ctl">
-          <div class="s-lbl2">Payback Period</div>
-          <div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div>
-          <div class="s-sub2">Escalating tariff</div>
-        </div>
+        <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div><div class="s-sub2" id="stPanels">—</div></div>
+        <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom bill</div></div>
+        <div class="s-card cbl"><div class="s-lbl2">System Cost</div><div class="s-val">R <span id="stCost">—</span></div><div class="s-sub2" id="stMonthlySub">—</div></div>
+        <div class="s-card ctl"><div class="s-lbl2">Payback Period</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
       </div>
 
       <!-- Spec cards -->
@@ -513,7 +432,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- PROPOSAL READY BANNER -->
+      <!-- PROPOSAL READY BANNER — all 3 send buttons -->
       <div class="dl" id="dlRow" style="display:none">
         <div class="dl-left">
           <div class="dl-eyebrow">Proposal Document</div>
@@ -521,13 +440,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <div class="dl-su" id="dlSub">—</div>
         </div>
         <div class="dl-actions">
+          <!-- Download PDF -->
           <button class="dl-btn" id="dlBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download PDF
           </button>
-          <button class="dl-btn-secondary" id="sendBtn">
+          <!-- Email to client -->
+          <button class="dl-btn-email" id="sendBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Email to Client
+          </button>
+          <!-- Send via WhatsApp -->
+          <button class="dl-btn-wa" id="waBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+            Send via WhatsApp
           </button>
         </div>
       </div>
@@ -669,8 +597,8 @@ function renderAllDashTabs(rows){
   var avgKw=avg(completed,'system_size_kw'),avgPanels=avg(completed,'panel_number'),avgYield=avg(completed,'annual_solar_kwh'),avgDailySolar=avgYield/365;
   d('sAvgKw',completed.length?avgKw.toFixed(2)+' kW':'—');d('sAvgPanels',completed.length?Math.round(avgPanels)+' panels':'—');d('sAvgSolar',completed.length?avgDailySolar.toFixed(1)+' kWh':'—');d('sAvgYield',completed.length?Math.round(avgYield).toLocaleString('en-ZA')+' kWh':'—');
   d('sKwDC',completed.length?avgKw.toFixed(2)+' kW DC':'—');var topPanel=mode(completed,'panel_model');d('sPanelModel',topPanel||'—');d('sPanelCount',completed.length?Math.round(avgPanels)+' units':'—');d('sPeakLoad',completed.length?avg(completed,'required_load_kw').toFixed(1)+' kW':'—');d('sAutonomy',completed.length?avg(completed,'required_autonomy_hrs').toFixed(0)+' hours':'—');
-  var distBuckets={'< 5 kW':0,'5–10 kW':0,'10–15 kW':0,'> 15 kW':0};
-  completed.forEach(function(r){var kw=parseFloat(r.system_size_kw)||0;if(kw<5)distBuckets['< 5 kW']++;else if(kw<=10)distBuckets['5–10 kW']++;else if(kw<=15)distBuckets['10–15 kW']++;else distBuckets['> 15 kW']++;});
+  var distBuckets={'< 5 kW':0,'5-10 kW':0,'10-15 kW':0,'> 15 kW':0};
+  completed.forEach(function(r){var kw=parseFloat(r.system_size_kw)||0;if(kw<5)distBuckets['< 5 kW']++;else if(kw<=10)distBuckets['5-10 kW']++;else if(kw<=15)distBuckets['10-15 kW']++;else distBuckets['> 15 kW']++;});
   document.getElementById('sDistBody').innerHTML=Object.keys(distBuckets).map(function(k){return'<div class="wc-row"><span class="wc-k">'+k+'</span><span class="wc-v">'+distBuckets[k]+' proposals</span></div>';}).join('')||'<div style="color:#9ca3af;font-size:12px;padding:8px 0">No data yet</div>';
   var avgBkwh=avg(completed,'battery_capacity_kwh'),avgBhours=avg(completed,'required_autonomy_hrs'),topBatt=mode(completed,'battery_model'),totalBkwh=sum(completed,'battery_capacity_kwh');
   d('bAvgKwh',completed.length?avgBkwh.toFixed(1)+' kWh':'—');d('bAvgHours',completed.length?avgBhours.toFixed(0)+' hrs':'—');d('bTopModel',topBatt||'—');d('bAvgCost','—');
@@ -692,7 +620,7 @@ function renderAllDashTabs(rows){
   document.getElementById('iRatioStatus').innerHTML=completed.length?'<div class="wc-row"><span class="wc-k">Avg Ratio</span><span class="wc-v"><strong style="color:'+ratioColor+'">'+avgRatio.toFixed(2)+'</strong></span></div><div class="wc-row"><span class="wc-k">Status</span><span class="wc-v"><span style="color:'+ratioColor+';font-weight:600">'+ratioStatus+'</span></span></div><div class="wc-row"><span class="wc-k">NRS 097-2-3 Margin</span><span class="wc-v">30% applied</span></div><div class="wc-row"><span class="wc-k">SANS 10142-1</span><span class="wc-v">Balanced: 0.95–1.35</span></div>':'<div style="color:#9ca3af;font-size:12px;padding:8px 0">No data yet</div>';
   var total=rows.length,generated=rows.filter(function(r){return r.status==='completed'||r.pdf_url;}).length,sent=rows.filter(function(r){return r.email_sent_at;}).length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){return r.client_engaged;}).length;
   d('pTotal',total);d('pGenerated',generated);d('pSent',sent);d('pEngaged',engaged);
-  var rates=[{lbl:'Lead → Proposal',val:pct(generated,total)},{lbl:'Email Open Rate',val:pct(opened,sent)},{lbl:'View Rate',val:pct(viewed,sent)},{lbl:'PDF Download Rate',val:pct(downloaded,sent)},{lbl:'Engagement Rate',val:pct(engaged,sent)}];
+  var rates=[{lbl:'Lead to Proposal',val:pct(generated,total)},{lbl:'Email Open Rate',val:pct(opened,sent)},{lbl:'View Rate',val:pct(viewed,sent)},{lbl:'PDF Download Rate',val:pct(downloaded,sent)},{lbl:'Engagement Rate',val:pct(engaged,sent)}];
   document.getElementById('pRateRow').innerHTML=rates.map(function(r){return'<div class="rate-pill"><div class="rp-lbl">'+r.lbl+'</div><div class="rp-val">'+r.val+'</div></div>';}).join('');
   var funnelSteps=[{lbl:'Clients in Pipeline',n:total,color:'#FFD700'},{lbl:'Proposals Generated',n:generated,color:'#22c55e'},{lbl:'Emails Sent',n:sent,color:'#3b82f6'},{lbl:'Emails Opened',n:opened,color:'#14b8a6'},{lbl:'Proposals Viewed',n:viewed,color:'#8b5cf6'},{lbl:'PDFs Downloaded',n:downloaded,color:'#f97316'},{lbl:'Clients Engaged',n:engaged,color:'#ef4444'}];
   var base=Math.max(total,1);
@@ -700,7 +628,7 @@ function renderAllDashTabs(rows){
   var sentRows=rows.filter(function(r){return r.email_sent_at;}).slice(0,20);
   d('pTableCount',sentRows.length+' sent proposals');
   if(!sentRows.length){document.getElementById('pFollowTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">No proposals sent yet</td></tr>';}
-  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var daysSince=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var status,fup,fupClass;if(r.client_engaged){status='🟢 Engaged';fup='Closed';fupClass='fp-closed';}else if(r.pdf_downloaded_at){status='📥 Downloaded';fup='🔴 Hot — follow up now';fupClass='fp-hot';}else if(r.proposal_viewed_at&&daysSince>=2){status='👁 Viewed';fup='🔴 Hot — follow up now';fupClass='fp-hot';}else if(r.email_opened_at&&daysSince>=3){status='✉ Opened';fup='🟠 Warm — follow up soon';fupClass='fp-warm';}else if(daysSince>=7){status='📤 Sent';fup='🔵 Cold — resend or call';fupClass='fp-cold';}else{status='📤 Sent';fup='🟡 Waiting';fupClass='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong><br><span style="font-size:11px;color:#9ca3af">'+esc(r.client_email||'')+'</span></td><td>'+esc(r.location||'—')+'</td><td>'+status+'</td><td class="'+fupClass+'">'+fup+'</td><td>'+(daysSince!==null?daysSince+'d ago':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
+  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var daysSince=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var status,fup,fupClass;if(r.client_engaged){status='Engaged';fup='Closed';fupClass='fp-closed';}else if(r.pdf_downloaded_at){status='Downloaded';fup='Hot - follow up now';fupClass='fp-hot';}else if(r.proposal_viewed_at&&daysSince>=2){status='Viewed';fup='Hot - follow up now';fupClass='fp-hot';}else if(r.email_opened_at&&daysSince>=3){status='Opened';fup='Warm - follow up soon';fupClass='fp-warm';}else if(daysSince>=7){status='Sent';fup='Cold - resend or call';fupClass='fp-cold';}else{status='Sent';fup='Waiting';fupClass='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong><br><span style="font-size:11px;color:#9ca3af">'+esc(r.client_email||'')+'</span></td><td>'+esc(r.location||'—')+'</td><td>'+status+'</td><td class="'+fupClass+'">'+fup+'</td><td>'+(daysSince!==null?daysSince+'d ago':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
 }
 
 function avg(arr,key){var vals=arr.map(function(r){return parseFloat(r[key])||0;});return vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;}
@@ -758,7 +686,8 @@ async function loadClients(){
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    // ── fetch client_phone from ai_results too ──────────────────────────
+    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
     var aiByEmail={};
     (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(k&&!aiByEmail[k])aiByEmail[k]=r;});
@@ -798,8 +727,12 @@ function pick(idx,rowEl){
   if(!document.getElementById('proposalsTab').classList.contains('on'))switchTab('proposals');
   document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
   rowEl.classList.add('active');
-  var c=allClients[idx],name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
-  var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—',has=!!c.ai,ai=c.ai;
+  var c=allClients[idx];
+  var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
+  var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
+  // Resolve phone: prefer ai_results, fallback to lead
+  var phone=(c.ai&&c.ai.client_phone)||(c.lead&&c.lead.client_phone)||'';
+  var has=!!c.ai,ai=c.ai;
   document.getElementById('emptyState').style.display='none';
   var panel=document.getElementById('detailPanel');
   panel.classList.remove('on');void panel.offsetWidth;panel.classList.add('on');
@@ -807,11 +740,18 @@ function pick(idx,rowEl){
   s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
   s('chSeg',has?(ai.client_segment||'—'):'—');
   s('chDt',has?fmtDate(ai.created_at):'—');
+  // Show phone in header if available
+  if(phone){
+    s('chPhone',phone);
+    document.getElementById('chPhoneRow').style.display='flex';
+  } else {
+    document.getElementById('chPhoneRow').style.display='none';
+  }
   var pill=document.getElementById('chPill');
   pill.textContent=has?'Proposal Ready':'No Proposal';pill.className=has?'pill r':'pill p';
   vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
   if(!has)return;
-  s('stKw',round(ai.system_size_kw,2));s('stPanels',(ai.panel_number||'—')+'× '+(ai.panel_model||'—'));
+  s('stKw',round(ai.system_size_kw,2));s('stPanels',(ai.panel_number||'—')+'x '+(ai.panel_model||'—'));
   s('stAnnual',fmt(ai.annual_savings));s('stCost',fmt(ai.total_cost));
   s('stMonthlySub','R '+fmt(ai.monthly_savings)+' / month saving');s('stPayback',ai.payback_years||'—');
   s('spPanel',ai.panel_model||'—');s('spCount',(ai.panel_number||'—')+' units');
@@ -824,10 +764,66 @@ function pick(idx,rowEl){
   s('spCO2',round(ai.annual_co2_saved,1)+' tons / year');s('spCoal',round(ai.coal_avoided_tons,1)+' tons / year');
   s('spTree',fmt(Math.round(ai.trees_equivalent||0))+' trees');
   s('dlTitle','Ready to send to '+name.split(' ')[0]);
-  s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal');
-  document.getElementById('dlBtn').onclick=function(){window.open(PDF_FN+ai.ai_id,'_blank');};
-  document.getElementById('sendBtn').onclick=async function(){
-    try{var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});alert(res.ok?'Proposal sent to client ✅':'Failed to send email ❌');}catch(err){alert('Error sending email');}
+  s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
+
+  // ── DOWNLOAD PDF ──────────────────────────────────────────────────────
+  document.getElementById('dlBtn').onclick=function(){
+    window.open(PDF_FN+ai.ai_id,'_blank');
+  };
+
+  // ── EMAIL TO CLIENT ────────────────────────────────────────────────────
+  var sendBtn=document.getElementById('sendBtn');
+  sendBtn.textContent=''; // reset
+  sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
+  sendBtn.disabled=false;
+  sendBtn.onclick=async function(){
+    sendBtn.disabled=true;
+    sendBtn.textContent='Sending…';
+    try{
+      var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});
+      var data=await res.json();
+      if(res.ok&&data.success){
+        sendBtn.textContent='Sent!';
+        setTimeout(function(){sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;},3000);
+      } else {
+        alert('Failed to send email: '+(data.error||'Unknown error'));
+        sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
+        sendBtn.disabled=false;
+      }
+    }catch(err){alert('Connection error: '+err.message);sendBtn.innerHTML='Email to Client';sendBtn.disabled=false;}
+  };
+
+  // ── SEND VIA WHATSAPP ─────────────────────────────────────────────────
+  var waBtn=document.getElementById('waBtn');
+  waBtn.classList.remove('sent');
+  waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Send via WhatsApp';
+  waBtn.disabled=false;
+  waBtn.onclick=async function(){
+    waBtn.disabled=true;
+    waBtn.textContent='Opening…';
+    try{
+      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':ANON},
+        body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})
+      });
+      var data=await res.json();
+      if(res.ok&&data.success&&data.wa_url){
+        window.open(data.wa_url,'_blank');
+        waBtn.classList.add('sent');
+        waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Sent via WhatsApp';
+        setTimeout(function(){
+          waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Send via WhatsApp';
+          waBtn.disabled=false;
+        },4000);
+      } else {
+        alert('Could not open WhatsApp: '+(data.error||'Unknown error'));
+        waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;
+      }
+    }catch(err){
+      alert('Connection error: '+err.message);
+      waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;
+    }
   };
 }
 
