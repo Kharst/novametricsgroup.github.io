@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <!--
   Nova Metrics — Proposal Portal
-  AUTH: Reads shared localStorage session (nm_installer_session) set by Solar Intelligence.
-        Falls back to URL ?email= param for direct deep-links, then redirects to login.
-  FLOW: Solar Intelligence (sizing engine) → generates proposal → redirects here
 -->
 <html lang="en">
 <head>
@@ -17,39 +14,27 @@
   --navy:#0B1F3A;--navy2:#112640;--navy3:#1a3455;
   --gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.18);
   --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
-  --sidebar-w:300px;
-  --wa:#25D366;
+  --sidebar-w:300px;--wa:#25D366;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden;}
-
-/* ── BOOT ── */
 .boot{position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999;}
 .boot.hidden{display:none;}
 .boot-icon{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;}
 .boot-msg{font-size:13px;color:var(--muted);}
 .boot-spinner{width:22px;height:22px;border:2px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar-w);min-width:var(--sidebar-w);
-  background:linear-gradient(180deg,#0d2240 0%,#0B1F3A 100%);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:linear-gradient(180deg,#0d2240 0%,#0B1F3A 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 .brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .brand-icon{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
 .brand-name{font-size:14px;font-weight:600;white-space:nowrap;}
 .brand-sub{font-size:10px;color:var(--gold);letter-spacing:.09em;text-transform:uppercase;}
-
 .s-sec{padding:18px 16px 6px;flex-shrink:0;}
 .s-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;padding:0 4px;}
 .inst-card{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:11px;padding:11px 13px;}
 .inst-av{width:34px;height:34px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--navy);flex-shrink:0;}
 .inst-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .inst-email{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
-
 .c-list-section{display:flex;flex-direction:column;flex:1;overflow:hidden;padding:6px 0 0;}
 .c-list-header{padding:14px 20px 8px;flex-shrink:0;}
 .c-list{flex:1;overflow-y:auto;padding:0 10px;}
@@ -63,15 +48,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .b-none{background:rgba(255,255,255,.07);color:var(--muted);}
 .b-ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
 .loading-row{padding:14px 16px;font-size:12px;color:var(--muted);text-align:center;}
-
 .sidebar-footer{padding:10px 14px 16px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);}
 .add-btn{display:flex;align-items:center;gap:8px;padding:9px 13px;border-radius:9px;border:1px dashed var(--gold-border);color:var(--gold);font-size:12px;font-weight:500;cursor:pointer;transition:background .15s;background:transparent;width:100%;font-family:'DM Sans',sans-serif;}
 .add-btn:hover{background:var(--gold-dim);}
 .new-calc-btn{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 14px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;cursor:pointer;border:none;text-decoration:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
 .new-calc-btn:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 18px rgba(255,215,0,.25);}
 .new-calc-btn svg{width:13px;height:13px;flex-shrink:0;}
-
-/* ── MAIN ── */
 .main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;}
 .t-tabs{display:flex;gap:4px;}
@@ -84,23 +66,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .new-calc-topbtn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
 .new-calc-topbtn:hover{background:#1e3a5f;}
 .new-calc-topbtn svg{width:12px;height:12px;flex-shrink:0;}
-
 .tab-content{display:none;flex:1;flex-direction:column;overflow:hidden;}
 .tab-content.on{display:flex;}
-
-/* ── EMPTY STATE ── */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
 .e-icon{width:68px;height:68px;background:#f0f2f5;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:30px;}
 .e-title{font-size:16px;font-weight:500;color:#374151;}.e-sub{font-size:13px;color:#9ca3af;}
 .e-cta{display:flex;align-items:center;gap:7px;padding:10px 22px;border-radius:9px;background:var(--navy);color:#fff;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:8px;border:none;cursor:pointer;}
 .e-cta:hover{background:#1e3a5f;transform:translateY(-1px);}
 .e-cta svg{width:14px;height:14px;}
-
-/* ── DETAIL PANEL ── */
 .detail{flex:1;overflow-y:auto;padding:22px 26px;display:none;flex-direction:column;gap:16px;animation:up .25s ease;}
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
 .ch{background:var(--navy);border-radius:16px;padding:22px 26px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;gap:16px;flex-wrap:wrap;}
 .ch::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.07) 0%,transparent 60%);pointer-events:none;}
 .ch-l{display:flex;align-items:center;gap:16px;min-width:0;}
@@ -113,7 +89,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .pill{padding:6px 16px;border-radius:30px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;}
 .pill.r{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
 .pill.p{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
-
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
 .s-card{background:#fff;border-radius:13px;padding:17px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .s-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,37,64,.08);}
@@ -123,7 +98,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .s-val{font-size:22px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1.1;}
 .s-unit{font-size:13px;font-weight:400;color:#6b7280;margin-left:1px;}
 .s-sub2{font-size:11px;color:#9ca3af;margin-top:4px;}
-
 .specs{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .sp-card{background:#fff;border-radius:13px;padding:18px 20px;border:1px solid #e8ecf0;}
 .sp-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
@@ -131,21 +105,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sp-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:12.5px;}
 .sp-row:last-child{border-bottom:none;}
 .sk{color:#6b7280;}.sv{color:var(--navy);font-weight:500;text-align:right;max-width:58%;}
-
 .no-prop{background:#fff;border-radius:13px;padding:22px 24px;border:1.5px dashed #d1d5db;display:flex;align-items:center;gap:16px;}
 .np-ic{width:42px;height:42px;background:#f3f4f6;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .np-t{font-size:14px;font-weight:500;color:#374151;}.np-s{font-size:12px;color:#9ca3af;margin-top:3px;}
 .np-cta{display:inline-flex;align-items:center;gap:6px;margin-top:11px;padding:8px 18px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
 .np-cta:hover{background:#1e3a5f;}
-
-/* ── PROPOSAL READY BANNER ── */
-.dl{
-  background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);
-  border-radius:16px;border:1px solid var(--gold-border);
-  padding:26px 28px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:relative;overflow:hidden;flex-shrink:0;gap:20px;flex-wrap:wrap;
-}
+.dl{background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);border-radius:16px;border:1px solid var(--gold-border);padding:26px 28px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;gap:20px;flex-wrap:wrap;}
 .dl::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
 .dl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,rgba(255,215,0,.2) 100%);}
 .dl-left{min-width:0;flex:1;}
@@ -154,43 +119,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-ti{font-size:18px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;line-height:1.25;}
 .dl-su{font-size:12px;color:rgba(255,255,255,.42);margin-top:5px;}
 .dl-actions{display:flex;gap:10px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
-
-/* Download PDF button */
-.dl-btn{
-  display:flex;align-items:center;gap:9px;
-  background:var(--gold);color:var(--navy);
-  border:none;border-radius:10px;padding:12px 22px;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
-}
+.dl-btn{display:flex;align-items:center;gap:9px;background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:12px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,215,0,.3);}
 .dl-btn svg{width:15px;height:15px;flex-shrink:0;}
-
-/* Email button */
-.dl-btn-email{
-  display:flex;align-items:center;gap:9px;
-  background:rgba(34,197,94,.15);color:#4ade80;
-  border:1px solid rgba(34,197,94,.3);
-  border-radius:10px;padding:12px 22px;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
-}
+.dl-btn-email{display:flex;align-items:center;gap:9px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:12px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn-email:hover{background:rgba(34,197,94,.25);transform:translateY(-2px);}
 .dl-btn-email svg{width:15px;height:15px;flex-shrink:0;}
-
-/* WhatsApp button */
-.dl-btn-wa{
-  display:flex;align-items:center;gap:9px;
-  background:rgba(37,211,102,.15);color:#25D366;
-  border:1px solid rgba(37,211,102,.35);
-  border-radius:10px;padding:12px 22px;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;
-}
-.dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.2);}
+.dl-btn-wa{display:flex;align-items:center;gap:9px;background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.35);border-radius:10px;padding:12px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
+.dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);}
 .dl-btn-wa svg{width:15px;height:15px;flex-shrink:0;}
 .dl-btn-wa.sent{background:rgba(37,211,102,.3);border-color:#25D366;}
-
 .arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:10px 26px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
 .ab-text{font-size:12px;color:#374151;display:flex;align-items:center;gap:8px;}
@@ -198,8 +136,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ab-check{width:22px;height:22px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
 .ab-close{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:16px;padding:0 4px;line-height:1;}
 .ab-close:hover{color:#6b7280;}
-
-/* ── ANALYTICS ── */
 #analyticsTab{overflow:hidden;flex-direction:column;}
 .dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -256,8 +192,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .fp-hot{color:#dc2626;font-weight:600;}.fp-warm{color:#d97706;font-weight:600;}
 .fp-cold{color:#2563eb;font-weight:600;}.fp-wait{color:#6b7280;}
 .fp-closed{color:#16a34a;font-weight:600;}
-
-/* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(3px);}
 .overlay.on{display:flex;}
 .modal{background:var(--navy);border:1px solid rgba(184,150,46,.22);border-radius:16px;width:100%;max-width:440px;padding:32px;position:relative;animation:up .25s ease;}
@@ -285,14 +219,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ms-icon{width:52px;height:52px;border-radius:50%;background:rgba(114,212,160,.12);border:1px solid rgba(114,212,160,.3);display:grid;place-items:center;margin:0 auto 16px;font-size:22px;}
 .ms-title{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px;}
 .ms-title em{font-style:italic;color:#72d4a0;}
-.ms-chip{display:inline-block;background:rgba(184,150,46,.1);border:1px solid rgba(184,150,46,.2);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--gold);margin-bottom:16px;}
+.ms-chip{display:inline-block;background:rgba(184,150,46,.1);border:1px solid rgba(184,150,46,.2);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--gold);margin-bottom:12px;}
+/* re-onboard notice */
+.ms-notice{font-size:12px;color:rgba(255,215,0,.65);background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.5;text-align:left;display:none;}
 .ms-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
 .ms-close{width:100%;padding:12px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
-
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
-
 @media(max-width:900px){:root{--sidebar-w:240px;}.stats{grid-template-columns:repeat(2,1fr);}.specs{grid-template-columns:1fr;}}
 @media(max-width:700px){.sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}.main{margin-bottom:56px;}:root{--sidebar-w:100%;}}
 </style>
@@ -325,7 +259,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <div class="c-list" id="clientList"><div class="loading-row">Loading clients…</div></div>
   </div>
   <div class="sidebar-footer">
-    <button class="add-btn" id="addClientBtn"><span style="font-size:17px;line-height:1">+</span> Add new client</button>
+    <button class="add-btn" id="addClientBtn"><span style="font-size:17px;line-height:1">+</span> Add / re-onboard client</button>
     <a href="solar-intelligence.html" class="new-calc-btn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       New System Design
@@ -357,7 +291,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <button class="ab-close" onclick="document.getElementById('arrivalBanner').classList.remove('on')">✕</button>
   </div>
 
-  <!-- PROPOSALS TAB -->
   <div class="tab-content on" id="proposalsTab">
     <div class="empty" id="emptyState">
       <div class="e-icon">☀️</div>
@@ -370,7 +303,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
 
     <div class="detail" id="detailPanel">
-      <!-- Client header -->
       <div class="ch">
         <div class="ch-l">
           <div class="ch-av" id="chAv">?</div>
@@ -388,7 +320,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="pill p" id="chPill">No Proposal</div>
       </div>
 
-      <!-- No proposal placeholder -->
       <div class="no-prop" id="noPropRow">
         <div class="np-ic">📋</div>
         <div>
@@ -398,7 +329,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- Stats row -->
       <div class="stats" id="statsRow" style="display:none">
         <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div><div class="s-sub2" id="stPanels">—</div></div>
         <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom bill</div></div>
@@ -406,7 +336,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="s-card ctl"><div class="s-lbl2">Payback Period</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
       </div>
 
-      <!-- Spec cards -->
       <div class="specs" id="specsRow" style="display:none">
         <div class="sp-card">
           <div class="sp-title"><div class="dot g"></div>System Design</div>
@@ -432,7 +361,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- PROPOSAL READY BANNER — all 3 send buttons -->
       <div class="dl" id="dlRow" style="display:none">
         <div class="dl-left">
           <div class="dl-eyebrow">Proposal Document</div>
@@ -440,21 +368,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <div class="dl-su" id="dlSub">—</div>
         </div>
         <div class="dl-actions">
-          <!-- Download PDF -->
           <button class="dl-btn" id="dlBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Download PDF
           </button>
-          <!-- Email to client -->
           <button class="dl-btn-email" id="sendBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Email to Client
           </button>
-          <!-- Send via WhatsApp -->
           <button class="dl-btn-wa" id="waBtn">
-            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-            </svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
             Send via WhatsApp
           </button>
         </div>
@@ -462,7 +385,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
   </div>
 
-  <!-- ANALYTICS TAB -->
   <div class="tab-content" id="analyticsTab">
     <div class="dash-shell">
       <div class="dash-topbar">
@@ -481,66 +403,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
       <div class="dash-loading" id="dashLoading"><div class="dash-spin"></div><div style="font-size:13px;color:#6b7280">Loading analytics…</div></div>
       <div class="dash-body" id="dashBody" style="display:none">
-        <div class="stab-pane on" id="pane-system">
-          <div class="g4">
-            <div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div>
-            <div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels per system</div></div>
-            <div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day est.</div></div>
-            <div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div>
-          </div>
-          <div class="g2">
-            <div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div></div>
-            <div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:12.5px;color:#374151"></div></div>
-          </div>
-        </div>
-        <div class="stab-pane" id="pane-battery">
-          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div>
-          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div></div></div></div>
-        </div>
-        <div class="stab-pane" id="pane-financials">
-          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div>
-          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div></div></div></div>
-        </div>
-        <div class="stab-pane" id="pane-environmental">
-          <div class="g4"><div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div>
-          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Total Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div></div></div></div>
-        </div>
-        <div class="stab-pane" id="pane-inverter">
-          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95–1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div>
-          <div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div><div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:12.5px;color:#374151"></div></div></div>
-        </div>
-        <div class="stab-pane" id="pane-pipeline">
-          <div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Clients Engaged</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">responded / converted</div></div></div>
-          <div class="rate-row" id="pRateRow"></div>
-          <div class="white-card"><div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div><div id="pFunnel"></div></div>
-          <div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th>Client</th><th>Location</th><th>Status</th><th>Follow-Up</th><th>Days Sent</th><th>System Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">Loading…</td></tr></tbody></table></div>
-        </div>
+        <div class="stab-pane on" id="pane-system"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div><div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels per system</div></div><div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day est.</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:12.5px;color:#374151"></div></div></div></div>
+        <div class="stab-pane" id="pane-battery"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-financials"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-environmental"><div class="g4"><div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Total Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-inverter"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:14px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95-1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div><div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:12.5px;color:#374151"></div></div></div></div>
+        <div class="stab-pane" id="pane-pipeline"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Clients Engaged</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">responded / converted</div></div></div><div class="rate-row" id="pRateRow"></div><div class="white-card"><div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div><div id="pFunnel"></div></div><div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th>Client</th><th>Location</th><th>Status</th><th>Follow-Up</th><th>Days Sent</th><th>System Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:20px">Loading…</td></tr></tbody></table></div></div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- ADD CLIENT MODAL -->
+<!-- ADD / RE-ONBOARD CLIENT MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
     <div id="modalForm">
-      <h2>Add a <em>new</em> client</h2>
-      <p class="modal-sub">Client onboarding</p>
+      <h2>Add / <em>re-onboard</em> client</h2>
+      <p class="modal-sub">New or existing client</p>
       <div class="m-divider"></div>
       <div class="m-field"><label>Client name <span class="req">*</span></label><input type="text" id="m_name" placeholder="Full name" autocomplete="name"></div>
       <div class="m-field"><label>Email address <span class="req">*</span></label><input type="email" id="m_email" placeholder="client@example.com" autocomplete="email"></div>
       <div class="m-field"><label>Phone number</label><input type="tel" id="m_phone" placeholder="+27 00 000 0000" autocomplete="tel"></div>
       <div class="m-field"><label>Address</label><input type="text" id="m_address" placeholder="Street, City, Province" autocomplete="street-address"></div>
-      <button class="m-submit" id="m_submit">Register client</button>
+      <button class="m-submit" id="m_submit">Save &amp; Create Proposal Slot</button>
       <div class="m-msg" id="m_msg"></div>
     </div>
     <div class="modal-success" id="modalSuccess">
       <div class="ms-icon">✓</div>
-      <h2 class="ms-title">Client <em>registered</em></h2>
+      <h2 class="ms-title" id="msTitle">Client <em>registered</em></h2>
       <div class="ms-chip" id="msChip"></div>
-      <p class="ms-sub">The client has been saved to your pipeline. Open Solar Intelligence to design and generate a proposal.</p>
-      <button class="ms-close" id="msClose">Done</button>
+      <div class="ms-notice" id="msNotice"></div>
+      <p class="ms-sub" id="msSub">A new proposal slot has been created. Open Solar Intelligence to run the sizing calculation and generate the PDF.</p>
+      <button class="ms-close" id="msClose">Open Solar Intelligence</button>
     </div>
   </div>
 </div>
@@ -550,7 +445,7 @@ var SUPA='https://zloxcqrhkcohheeixfns.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 var PDF_FN=SUPA+'/functions/v1/proposal-view/';
 var SESSION_KEY='nm_installer_session';
-var installer=null,allClients=[],dashLoaded=false,dashData=null;
+var installer=null,allClients=[],dashLoaded=false;
 var params=new URLSearchParams(window.location.search);
 var urlAiId=params.get('ai_id');
 var urlEmail=(params.get('email')||'').toLowerCase().trim();
@@ -584,7 +479,7 @@ async function loadAnalytics(forceRefresh){
     var res=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+installer.installer_id+'&select=ai_id,client_name,client_email,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,annual_consumption_kwh,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,client_engaged,created_at,pdf_url,status&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var rows=await res.json();
     if(!Array.isArray(rows))rows=[];
-    dashData=rows;renderAllDashTabs(rows);
+    renderAllDashTabs(rows);
     document.getElementById('dashUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('dashLoading').style.display='none';
     document.getElementById('dashBody').style.display='block';
@@ -686,7 +581,6 @@ async function loadClients(){
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    // ── fetch client_phone from ai_results too ──────────────────────────
     var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
     var aiByEmail={};
@@ -730,7 +624,6 @@ function pick(idx,rowEl){
   var c=allClients[idx];
   var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
   var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
-  // Resolve phone: prefer ai_results, fallback to lead
   var phone=(c.ai&&c.ai.client_phone)||(c.lead&&c.lead.client_phone)||'';
   var has=!!c.ai,ai=c.ai;
   document.getElementById('emptyState').style.display='none';
@@ -740,13 +633,8 @@ function pick(idx,rowEl){
   s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
   s('chSeg',has?(ai.client_segment||'—'):'—');
   s('chDt',has?fmtDate(ai.created_at):'—');
-  // Show phone in header if available
-  if(phone){
-    s('chPhone',phone);
-    document.getElementById('chPhoneRow').style.display='flex';
-  } else {
-    document.getElementById('chPhoneRow').style.display='none';
-  }
+  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}
+  else{document.getElementById('chPhoneRow').style.display='none';}
   var pill=document.getElementById('chPill');
   pill.textContent=has?'Proposal Ready':'No Proposal';pill.className=has?'pill r':'pill p';
   vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
@@ -766,67 +654,41 @@ function pick(idx,rowEl){
   s('dlTitle','Ready to send to '+name.split(' ')[0]);
   s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
 
-  // ── DOWNLOAD PDF ──────────────────────────────────────────────────────
-  document.getElementById('dlBtn').onclick=function(){
-    window.open(PDF_FN+ai.ai_id,'_blank');
-  };
+  document.getElementById('dlBtn').onclick=function(){window.open(PDF_FN+ai.ai_id,'_blank');};
 
-  // ── EMAIL TO CLIENT ────────────────────────────────────────────────────
   var sendBtn=document.getElementById('sendBtn');
-  sendBtn.textContent=''; // reset
   sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
   sendBtn.disabled=false;
   sendBtn.onclick=async function(){
-    sendBtn.disabled=true;
-    sendBtn.textContent='Sending…';
+    sendBtn.disabled=true;sendBtn.textContent='Sending…';
     try{
       var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});
       var data=await res.json();
-      if(res.ok&&data.success){
-        sendBtn.textContent='Sent!';
-        setTimeout(function(){sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;},3000);
-      } else {
-        alert('Failed to send email: '+(data.error||'Unknown error'));
-        sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
-        sendBtn.disabled=false;
-      }
+      if(res.ok&&data.success){sendBtn.textContent='Sent!';setTimeout(function(){sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;},3000);}
+      else{alert('Failed to send email: '+(data.error||'Unknown error'));sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;}
     }catch(err){alert('Connection error: '+err.message);sendBtn.innerHTML='Email to Client';sendBtn.disabled=false;}
   };
 
-  // ── SEND VIA WHATSAPP ─────────────────────────────────────────────────
   var waBtn=document.getElementById('waBtn');
   waBtn.classList.remove('sent');
-  waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Send via WhatsApp';
+  var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+  waBtn.innerHTML=waSvg+' Send via WhatsApp';
   waBtn.disabled=false;
   waBtn.onclick=async function(){
-    waBtn.disabled=true;
-    waBtn.textContent='Opening…';
+    waBtn.disabled=true;waBtn.textContent='Opening…';
     try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','apikey':ANON},
-        body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})
-      });
+      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})});
       var data=await res.json();
       if(res.ok&&data.success&&data.wa_url){
         window.open(data.wa_url,'_blank');
-        waBtn.classList.add('sent');
-        waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Sent via WhatsApp';
-        setTimeout(function(){
-          waBtn.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg> Send via WhatsApp';
-          waBtn.disabled=false;
-        },4000);
-      } else {
-        alert('Could not open WhatsApp: '+(data.error||'Unknown error'));
-        waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;
-      }
-    }catch(err){
-      alert('Connection error: '+err.message);
-      waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;
-    }
+        waBtn.classList.add('sent');waBtn.innerHTML=waSvg+' Sent via WhatsApp';
+        setTimeout(function(){waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;},4000);
+      }else{alert('Could not open WhatsApp: '+(data.error||'Unknown error'));waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;}
+    }catch(err){alert('Connection error: '+err.message);waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;}
   };
 }
 
+// ── ADD / RE-ONBOARD CLIENT MODAL ─────────────────────────────────────────
 document.getElementById('addClientBtn').addEventListener('click',openModal);
 document.getElementById('modalClose').addEventListener('click',closeModal);
 document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -839,22 +701,55 @@ function openModal(){
   document.getElementById('overlay').classList.add('on');document.getElementById('m_name').focus();
 }
 function closeModal(){document.getElementById('overlay').classList.remove('on');}
+
 document.getElementById('m_submit').addEventListener('click',async function(){
-  var name=document.getElementById('m_name').value.trim(),email=document.getElementById('m_email').value.trim();
-  var phone=document.getElementById('m_phone').value.trim(),address=document.getElementById('m_address').value.trim();
+  var name=document.getElementById('m_name').value.trim();
+  var email=document.getElementById('m_email').value.trim();
+  var phone=document.getElementById('m_phone').value.trim();
+  var address=document.getElementById('m_address').value.trim();
   var btn=document.getElementById('m_submit'),msg=document.getElementById('m_msg');
   if(!name){setMsg(msg,'err','Please enter the client name.');return;}
   if(!email){setMsg(msg,'err','Please enter an email address.');return;}
-  btn.disabled=true;setMsg(msg,'loading','Saving client…');
+  btn.disabled=true;setMsg(msg,'loading','Saving…');
   try{
-    var res=await fetch(SUPA+'/functions/v1/create-client',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({installer_id:installer.installer_id,client_name:name,client_email:email,client_phone:phone||null,client_address:address||null})});
+    var res=await fetch(SUPA+'/functions/v1/create-client',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({installer_id:installer.installer_id,client_name:name,client_email:email,client_phone:phone||null,client_address:address||null})
+    });
     if(!res.ok)throw new Error('Server error '+res.status);
     var data=await res.json();
-    if(data&&data.success!==false){document.getElementById('modalForm').style.display='none';document.getElementById('msChip').textContent=name;document.getElementById('modalSuccess').classList.add('on');loadClients();}
-    else{setMsg(msg,'err',(data&&data.error)||'Something went wrong.');btn.disabled=false;}
+    if(data&&data.success!==false){
+      // ── Contextual success messaging ───────────────────────────────
+      document.getElementById('modalForm').style.display='none';
+      document.getElementById('msChip').textContent=name;
+      var noticeEl=document.getElementById('msNotice');
+      var titleEl=document.getElementById('msTitle');
+      var subEl=document.getElementById('msSub');
+      if(data.is_new===false){
+        titleEl.innerHTML='Proposal slot <em>created</em>';
+        noticeEl.textContent='This client was already in your pipeline. A fresh proposal slot has been added — no existing data was changed.';
+        noticeEl.style.display='block';
+        subEl.textContent='Go to Solar Intelligence, run the calculation and generate the PDF. The client will then appear with their new proposal.';
+      } else {
+        titleEl.innerHTML='Client <em>registered</em>';
+        noticeEl.style.display='none';
+        subEl.textContent='A new proposal slot has been created. Open Solar Intelligence to run the sizing calculation and generate the PDF.';
+      }
+      document.getElementById('modalSuccess').classList.add('on');
+      loadClients();
+    } else {
+      setMsg(msg,'err',(data&&data.error)||'Something went wrong.');
+      btn.disabled=false;
+    }
   }catch(err){setMsg(msg,'err','Connection error: '+err.message);btn.disabled=false;}
 });
-document.getElementById('msClose').addEventListener('click',closeModal);
+
+// Close button on success goes straight to Solar Intelligence
+document.getElementById('msClose').addEventListener('click',function(){
+  closeModal();
+  window.location.href='solar-intelligence.html';
+});
 </script>
 </body>
 </html>
