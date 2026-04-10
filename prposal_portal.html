@@ -591,10 +591,13 @@ function showPortal(){
   if(urlAiId)document.getElementById('arrivalBanner').classList.add('on');
 }
 
-document.getElementById('signOutBtn').addEventListener('click',function(){
-  await sb.auth.signOut();
-localStorage.removeItem(SESSION_KEY);
-window.location.href='solar-intelligence.html';
+document.getElementById('signOutBtn').addEventListener('click', async function () {
+  try {
+    await sb.auth.signOut();
+  } finally {
+    localStorage.removeItem(SESSION_KEY);
+    window.location.href = 'solar-intelligence.html';
+  }
 });
 
 async function loadClients(){
