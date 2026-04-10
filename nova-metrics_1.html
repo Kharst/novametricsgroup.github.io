@@ -214,7 +214,6 @@
     var currentInstaller = null;
 
     window.addEventListener('DOMContentLoaded', function() {
-      // Restore session from localStorage (persists across page refreshes)
       var saved = localStorage.getItem('nm_installer');
       if (saved) {
         try {
@@ -232,7 +231,6 @@
       });
     });
 
-    // NAVIGATION
     function showForgot() {
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('forgotPanel').style.display = 'block';
@@ -247,7 +245,6 @@
       document.getElementById('loginMsg').textContent = '';
     }
 
-    // LOGIN — uses Supabase Auth signInWithPassword (no plaintext DB lookup)
     async function handleLogin() {
       var email    = document.getElementById('loginEmail').value.trim().toLowerCase();
       var password = document.getElementById('loginPassword').value;
@@ -256,8 +253,9 @@
       if (!email || !password) { showMsg(msg,'error','Please enter your email and password.'); return; }
       btn.disabled = true;
       showMsg(msg,'loading','Verifying\u2026');
+
       try {
-        // Step 1: Authenticate with Supabase Auth
+        // Step 1: Authenticate
         var authRes = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
@@ -271,46 +269,76 @@
         }
 
         var accessToken = authData.access_token;
-        var authUserId  = authData.user?.id;
+        var authUserId  = authData.user && authData.user.id;
+        var userMeta    = (authData.user && authData.user.user_metadata) || {};
 
-        // Step 2: Look up their installer profile by auth_user_id OR email
+        // Step 2: Look up installer profile by auth_user_id OR email
         var profileRes = await fetch(
-          SUPABASE_URL + '/rest/v1/installers?select=installer_id,installer_name,contact_email,logo_url,primary_color,accent_color&or=(auth_user_id.eq.' + authUserId + ',contact_email.eq.' + encodeURIComponent(email) + ')&limit=1',
+          SUPABASE_URL + '/rest/v1/installers?select=installer_id,installer_name,contact_email,logo_url,primary_color,accent_color,auth_user_id' +
+          '&or=(auth_user_id.eq.' + authUserId + ',contact_email.eq.' + encodeURIComponent(email) + ')&limit=1',
           { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
         );
         var profiles = await profileRes.json();
 
+        // Step 3: If no profile found, auto-create one from auth metadata
+        // This handles the case where invite-installer created auth user but
+        // the installers INSERT failed silently
         if (!profiles || !profiles.length) {
-          // Auth succeeded but no installer profile — account exists in auth but not in installers table
-          showMsg(msg, 'error', 'Account found but no installer profile. Please contact Nova Metrics support.');
-          btn.disabled = false;
-          return;
+          showMsg(msg, 'loading', 'Setting up your account\u2026');
+          var autoName = userMeta.installer_name || email.split('@')[0];
+          var createRes = await fetch(SUPABASE_URL + '/rest/v1/installers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON,
+              'Authorization': 'Bearer ' + accessToken,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              contact_email:   email,
+              installer_name:  autoName,
+              auth_user_id:    authUserId,
+              primary_color:   '#0A2540',
+              secondary_color: '#FFFFFF',
+              accent_color:    '#B8962E',
+              password:        null
+            })
+          });
+          var created = await createRes.json();
+          // created is an array from Supabase REST
+          profiles = Array.isArray(created) ? created : (created ? [created] : []);
+
+          if (!profiles || !profiles.length) {
+            showMsg(msg, 'error', 'Could not create your profile. Please contact Nova Metrics.');
+            btn.disabled = false;
+            return;
+          }
         }
 
-        // Step 3: Store session — installer profile + auth token
-        currentInstaller = Object.assign({}, profiles[0], {
-          access_token: accessToken,
-          auth_user_id: authUserId,
-        });
+        var profile = profiles[0];
 
-        // Backfill auth_user_id if not yet linked
-        if (!profiles[0].auth_user_id) {
-          fetch(SUPABASE_URL + '/rest/v1/installers?installer_id=eq.' + profiles[0].installer_id, {
+        // Backfill auth_user_id if missing (legacy records)
+        if (!profile.auth_user_id) {
+          fetch(SUPABASE_URL + '/rest/v1/installers?installer_id=eq.' + profile.installer_id, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken },
             body: JSON.stringify({ auth_user_id: authUserId })
           }).catch(function(){});
         }
 
+        currentInstaller = Object.assign({}, profile, {
+          access_token: accessToken,
+          auth_user_id: authUserId
+        });
         localStorage.setItem('nm_installer', JSON.stringify(currentInstaller));
         showClientScreen();
+
       } catch(err) {
         showMsg(msg, 'error', 'Connection error. Please try again.');
         btn.disabled = false;
       }
     }
 
-    // FORGOT PASSWORD — calls Supabase Auth resetPasswordForEmail via edge function
     async function handleForgot() {
       var email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       var btn   = document.getElementById('forgotBtn');
@@ -319,16 +347,11 @@
       btn.disabled = true;
       showMsg(msg,'loading','Sending reset link\u2026');
       try {
-        // Use Supabase Auth directly — sends branded email via Brevo SMTP
         await fetch(SUPABASE_URL + '/auth/v1/recover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({
-            email: email,
-            gotrue_meta_security: {},
-          })
+          body: JSON.stringify({ email: email, gotrue_meta_security: {} })
         });
-        // Always show success (prevents email enumeration)
         document.getElementById('forgotForm').style.display = 'none';
         document.getElementById('forgotSent').style.display = 'block';
       } catch(err) {
@@ -337,7 +360,6 @@
       }
     }
 
-    // LOGOUT
     function handleLogout() {
       localStorage.removeItem('nm_installer');
       currentInstaller = null;
@@ -358,7 +380,6 @@
         '\u25CF ' + (currentInstaller.installer_name || currentInstaller.contact_email);
     }
 
-    // ADD CLIENT FORM
     document.getElementById('clientForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       var name    = document.getElementById('client_name').value.trim();
