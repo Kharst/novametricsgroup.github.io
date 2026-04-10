@@ -230,6 +230,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 @media(max-width:900px){:root{--sidebar-w:240px;}.stats{grid-template-columns:repeat(2,1fr);}.specs{grid-template-columns:1fr;}}
 @media(max-width:700px){.sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}.main{margin-bottom:56px;}:root{--sidebar-w:100%;}}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -541,20 +542,41 @@ function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=
 function setMsg(el,type,text){el.className='m-msg '+type;el.textContent=text;}
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
 
-window.addEventListener('DOMContentLoaded',boot);
-async function boot(){
-  var saved=localStorage.getItem(SESSION_KEY);
-  if(saved){try{installer=JSON.parse(saved);}catch(e){installer=null;}}
-  if(!installer&&urlEmail){
-    document.getElementById('bootMsg').textContent='Verifying access…';
-    try{
-      var res=await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-      var rows=await res.json();
-      if(rows&&rows.length){installer=rows[0];localStorage.setItem(SESSION_KEY,JSON.stringify(installer));}
-    }catch(e){}
+var sb = supabase.createClient(SUPA, ANON);
+
+window.addEventListener('DOMContentLoaded', boot);
+
+async function boot() {
+  // 1. Check Supabase Auth JWT (set by solar-intelligence.html)
+  try {
+    var r = await sb.auth.getSession();
+    var session = r.data && r.data.session;
+    if (session && session.user && session.user.email) {
+      var email = session.user.email.toLowerCase().trim();
+      var res = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        {headers:{apikey:ANON,'Authorization':'Bearer '+session.access_token}});
+      var rows = await res.json();
+      if (rows && rows.length) { installer = rows[0]; showPortal(); return; }
+    }
+  } catch(e) {}
+
+  // 2. Legacy fallback: old localStorage key
+  var saved = localStorage.getItem(SESSION_KEY);
+  if (saved) { try { installer = JSON.parse(saved); } catch(e) {} }
+  if (installer) { showPortal(); return; }
+
+  // 3. URL param fallback (old portal links)
+  if (urlEmail) {
+    try {
+      var res2 = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+      var rows2 = await res2.json();
+      if (rows2 && rows2.length) { installer = rows2[0]; showPortal(); return; }
+    } catch(e) {}
   }
-  if(!installer){window.location.href='nova-metrics_1.html?return='+encodeURIComponent(window.location.href);return;}
-  showPortal();
+
+  // 4. No session — go to login (not nova-metrics_1.html, avoids old loop)
+  window.location.href = 'solar-intelligence.html';
 }
 
 function showPortal(){
@@ -570,8 +592,9 @@ function showPortal(){
 }
 
 document.getElementById('signOutBtn').addEventListener('click',function(){
-  localStorage.removeItem(SESSION_KEY);
-  window.location.href='nova-metrics_1.html';
+  await sb.auth.signOut();
+localStorage.removeItem(SESSION_KEY);
+window.location.href='solar-intelligence.html';
 });
 
 async function loadClients(){
