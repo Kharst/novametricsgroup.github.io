@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Solar Proposal — Nova Metrics</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0B1F3A;color:#f0f4f8;min-height:100vh;display:flex;flex-direction:column}
+/* ── HEADER ── */
+.header{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:34px;height:34px;background:#B8962E;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#0B1F3A}
+.brand-name{font-size:14px;font-weight:600}
+.brand-sub{font-size:10px;color:#B8962E;letter-spacing:.1em;text-transform:uppercase}
+.header-right{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+.btn-gold{background:#B8962E;color:#0B1F3A}.btn-gold:hover{background:#d4ac3a;transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.07);color:#f0f4f8;border:1px solid rgba(255,255,255,.1)}.btn-ghost:hover{background:rgba(255,255,255,.12)}
+/* ── STATES ── */
+.state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center}
+.state.hidden{display:none}
+.spinner{width:36px;height:36px;border:3px solid rgba(184,150,46,.2);border-top-color:#B8962E;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.state-icon{font-size:40px;margin-bottom:4px}
+.state-title{font-size:1.3rem;font-weight:600}
+.state-sub{font-size:13px;color:#7a95af;max-width:400px;line-height:1.6}
+/* ── PDF FRAME ── */
+#pdf-container{flex:1;display:none;flex-direction:column}
+.pdf-toolbar{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.proposal-info{font-size:12px;color:#7a95af}
+.proposal-info strong{color:#f0f4f8}
+iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
+/* ── MOBILE FALLBACK ── */
+#mobile-fallback{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;gap:16px}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="brand-icon">N</div>
+    <div>
+      <div class="brand-name">Nova Metrics</div>
+      <div class="brand-sub">Solar Proposal</div>
+    </div>
+  </div>
+  <div class="header-right" id="header-actions" style="display:none">
+    <button class="btn btn-ghost" id="btn-download" onclick="trackDownload()">
+      ⬇ Download PDF
+    </button>
+  </div>
+</header>
+
+<!-- Loading -->
+<div class="state" id="state-loading">
+  <div class="spinner"></div>
+  <div class="state-title">Loading your proposal…</div>
+  <div class="state-sub">Please wait while we prepare your personalised solar report.</div>
+</div>
+
+<!-- Error -->
+<div class="state hidden" id="state-error">
+  <div class="state-icon">⚠️</div>
+  <div class="state-title">Proposal Not Found</div>
+  <div class="state-sub" id="error-msg">This proposal link may have expired or is incorrect. Please contact your installer.</div>
+</div>
+
+<!-- PDF viewer (desktop) -->
+<div id="pdf-container">
+  <div class="pdf-toolbar">
+    <div class="proposal-info">Solar Proposal — <strong id="info-name">—</strong> — <strong id="info-loc">—</strong></div>
+    <button class="btn btn-gold" onclick="trackDownload()">⬇ Download PDF</button>
+  </div>
+  <iframe id="pdf-frame" title="Solar Proposal"></iframe>
+</div>
+
+<!-- Mobile fallback -->
+<div id="mobile-fallback">
+  <div class="state-icon">📄</div>
+  <div class="state-title">Your Solar Proposal is Ready</div>
+  <div class="state-sub">Tap the button below to open your personalised solar report.</div>
+  <a id="mobile-open-btn" class="btn btn-gold" href="#" target="_blank">Open Proposal PDF</a>
+</div>
+
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+
+const params = new URLSearchParams(window.location.search);
+const aiId   = params.get('id');
+let   signedUrl = null;
+
+function show(id) {
+  ['state-loading','state-error','pdf-container','mobile-fallback']
+    .forEach(s => {
+      const el = document.getElementById(s);
+      if (el) el.style.display = s === id ? (s === 'pdf-container' ? 'flex' : s === 'mobile-fallback' ? 'flex' : 'flex') : 'none';
+    });
+}
+
+function isMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 640;
+}
+
+async function trackDownload() {
+  if (!aiId) return;
+  // fire-and-forget: record download, then open the PDF
+  fetch(`${SUPA_URL}/functions/v1/proposal-view/${aiId}?track=download`, {
+    headers: { apikey: SUPA_ANON }
+  }).catch(() => {});
+  if (signedUrl) {
+    const a = document.createElement('a');
+    a.href = signedUrl;
+    a.download = `solar-proposal-${aiId}.pdf`;
+    a.target = '_blank';
+    a.click();
+  }
+}
+
+async function boot() {
+  if (!aiId) {
+    document.getElementById('error-msg').textContent = 'No proposal ID in the link. Please use the link from your email.';
+    show('state-error');
+    return;
+  }
+
+  try {
+    // Call edge function in JSON mode — this records the view and returns a fresh signed URL
+    const res = await fetch(
+      `${SUPA_URL}/functions/v1/proposal-view/${aiId}?format=json`,
+      { headers: { apikey: SUPA_ANON } }
+    );
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      document.getElementById('error-msg').textContent =
+        data.error || 'Could not load proposal. Please try again or contact your installer.';
+      show('state-error');
+      return;
+    }
+
+    signedUrl = data.signed_url;
+
+    // Show proposal info
+    if (data.client_name) document.getElementById('info-name').textContent = data.client_name;
+    if (data.location)    document.getElementById('info-loc').textContent  = data.location;
+
+    document.getElementById('header-actions').style.display = 'flex';
+
+    if (isMobile()) {
+      // On mobile: show a button instead of iframe (better UX)
+      document.getElementById('mobile-open-btn').href = signedUrl;
+      document.getElementById('mobile-fallback').style.display = 'flex';
+      document.getElementById('state-loading').style.display = 'none';
+    } else {
+      // Desktop: embed PDF in iframe
+      document.getElementById('pdf-frame').src = signedUrl;
+      document.getElementById('pdf-container').style.display = 'flex';
+      document.getElementById('state-loading').style.display = 'none';
+    }
+
+  } catch(e) {
+    document.getElementById('error-msg').textContent = 'Network error. Please check your connection and try again.';
+    show('state-error');
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
