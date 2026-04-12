@@ -1,0 +1,9 @@
+# Clean URL routing for Nova Metrics
+# /view → view.html (proposal viewer for clients)
+/view  /view.html  200
+
+# Ensure all other pages work without .html extension
+/solar-intelligence  /solar-intelligence.html  200
+/prposal_portal      /prposal_portal.html       200
+/reset-password      /reset-password.html       200
+/admin-onboarding    /admin-onboarding.html     200
