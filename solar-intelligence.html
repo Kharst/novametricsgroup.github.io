@@ -26,6 +26,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .nav-right{display:flex;align-items:center;gap:12px}
 .portal-link{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.02em;}
 .portal-link:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,215,0,.25)}
+.portal-link.ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);}
+.portal-link.ghost:hover{background:rgba(255,255,255,.12);color:var(--gold);box-shadow:none;}
 .installer-badge{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue);display:none;}
 .sign-out-link{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;}
 .sign-out-link:hover{color:var(--red)}
@@ -131,6 +133,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .ai-id-tag{display:inline-block;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-left:6px}
 #toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
 #toast.show{opacity:1}
+
+/* ── Hardware source banner ──────────────────────────────────────────────── */
+.hw-banner{display:none;margin-bottom:16px;border-radius:10px;padding:11px 16px;font-size:12px;line-height:1.5;align-items:center;gap:10px;}
+.hw-banner.on{display:flex;}
+.hw-banner.custom{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.hw-banner.shared{background:rgba(255,215,0,.07);border:1px solid var(--gold-border);color:var(--muted)}
+.hw-banner.partial{background:rgba(122,200,248,.07);border:1px solid rgba(122,200,248,.2);color:var(--blue)}
+.hw-banner a{color:inherit;font-weight:600;text-decoration:underline dotted;}
+.hw-banner a:hover{opacity:.8}
 </style>
 </head>
 <body>
@@ -154,6 +165,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div class="nav-right">
     <div id="installer-badge" class="installer-badge"></div>
+    <a href="hardware-pricelist.html" class="portal-link ghost" id="hw-pl-link">
+      ⚙ My Hardware
+    </a>
     <a href="prposal_portal.html" class="portal-link">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Proposal Portal
@@ -195,6 +209,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </div>
 
 <div id="app-screen">
+
+  <!-- ── Hardware source banner (shown after login) ── -->
+  <div id="hw-source-banner" class="hw-banner"></div>
+
   <div class="input-strip">
 
     <!-- ── Searchable location combobox ── -->
@@ -429,9 +447,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const APP_URL   = 'https://novametricsgroup.github.io/solar-intelligence.html';
+const NOVA_METRICS_ID = 1; // Demo account — always uses shared hardware tables
 const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
-let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[] };
+let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let installer  = null;
 let calcResult = null;
 let selectedLoc = null; // { id, label, gti }
@@ -491,20 +510,70 @@ function showDataError(err) {
   document.getElementById('dlErr').style.display = 'block';
 }
 
+// ── DATA LOADER ───────────────────────────────────────────────────────────
+// Strategy:
+//   Nova Metrics (id=1) → always use shared tables (demo mode)
+//   All other installers → prefer their own installer_panels/inverters/batteries
+//                          fall back to shared tables for any category not yet uploaded
 async function loadAllData() {
   const instId = installer.installer_id;
-  const [locRows,panelRows,invRows,battRows,loadRows] = await Promise.all([
-    sbFetch(`/rest/v1/solar_locations?id=in.(${await getInstallerLocationIds(instId)})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
-    sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
-    sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
-    sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`),
+  const isNova = instId === NOVA_METRICS_ID;
+
+  // Always fetch locations and load profiles from shared tables
+  const locIds = await getInstallerLocationIds(instId);
+  const [locRows, loadRows] = await Promise.all([
+    sbFetch(`/rest/v1/solar_locations?id=in.(${locIds})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
     sbFetch(`/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc`)
   ]);
-  DB.locations  = (locRows||[]).map(r=>({ id:r.id, city:r.city, name:r.location_name||r.city, gti:parseFloat(r.design_gti_kwh_m2_day)||4.80 }));
-  DB.panels     = (panelRows||[]).map(r=>({ id:r.id, model:r['PanelModel'], watts:parseInt(r['Watts'])||0, area:parseFloat(r['Area_sqm'])||2.0, price:parseFloat(r['UnitPrice_R'])||0 })).filter(p=>p.watts>0&&p.price>0);
-  DB.inverters  = (invRows||[]).map(r=>({ id:r.id, model:r['InverterModel'], ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0, mppt:parseInt(r['MPPT_count'])||1, eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 })).filter(i=>i.ac>0&&i.price>0);
-  DB.batteries  = (battRows||[]).map(r=>({ id:r.id, model:r['BatteryModel'], usable:parseFloat(r['Usable_kWh'])||0, kw:parseFloat(r['Nominal_kW'])||5, price:parseFloat(r['UnitPrice_R'])||0 })).filter(b=>b.usable>0&&b.price>0);
+
+  // ── Hardware resolution ───────────────────────────────────────────────────
+  let panelRows = null, invRows = null, battRows = null;
+  let custPanels = 0, custInverters = 0, custBatteries = 0;
+
+  if (!isNova) {
+    // Check installer's own custom pricelist tables
+    const [cp, ci, cb] = await Promise.all([
+      sbFetch(`/rest/v1/installer_panels?installer_id=eq.${instId}&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc`),
+      sbFetch(`/rest/v1/installer_inverters?installer_id=eq.${instId}&select=id,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc`),
+      sbFetch(`/rest/v1/installer_batteries?installer_id=eq.${instId}&select=id,battery_model,usable_kwh,nominal_kw,unit_price_r&order=usable_kwh.asc`)
+    ]);
+    if (cp && cp.length)  { panelRows = cp; custPanels    = cp.length; }
+    if (ci && ci.length)  { invRows   = ci; custInverters = ci.length; }
+    if (cb && cb.length)  { battRows  = cb; custBatteries = cb.length; }
+  }
+
+  // Fall back to shared Nova Metrics tables for any category not yet uploaded
+  const [sharedP, sharedI, sharedB] = await Promise.all([
+    panelRows ? Promise.resolve(null) : sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
+    invRows   ? Promise.resolve(null) : sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
+    battRows  ? Promise.resolve(null) : sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`)
+  ]);
+  if (!panelRows) panelRows = sharedP;
+  if (!invRows)   invRows   = sharedI;
+  if (!battRows)  battRows  = sharedB;
+
+  // ── Normalise to unified DB format ────────────────────────────────────────
+  DB.panels = (panelRows || []).map(r => custPanels
+    ? { id:r.id, model:r.panel_model,   watts:parseInt(r.watts)||0,            area:parseFloat(r.area_sqm)||2.0,    price:parseFloat(r.unit_price_r)||0 }
+    : { id:r.id, model:r['PanelModel'], watts:parseInt(r['Watts'])||0,          area:parseFloat(r['Area_sqm'])||2.0, price:parseFloat(r['UnitPrice_R'])||0 }
+  ).filter(p => p.watts > 0 && p.price > 0);
+
+  DB.inverters = (invRows || []).map(r => custInverters
+    ? { id:r.id, model:r.inverter_model,   ac:parseFloat(r.ac_continuous_kw)||0, dc:parseFloat(r.dc_max_kw)||0,       mppt:parseInt(r.mppt_count)||1,     eff:parseFloat(r.efficiency_pct)||97, price:parseFloat(r.unit_price_r)||0 }
+    : { id:r.id, model:r['InverterModel'], ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0,   mppt:parseInt(r['MPPT_count'])||1,  eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 }
+  ).filter(i => i.ac > 0 && i.price > 0);
+
+  DB.batteries = (battRows || []).map(r => custBatteries
+    ? { id:r.id, model:r.battery_model,   usable:parseFloat(r.usable_kwh)||0, kw:parseFloat(r.nominal_kw)||5,  price:parseFloat(r.unit_price_r)||0 }
+    : { id:r.id, model:r['BatteryModel'], usable:parseFloat(r['Usable_kWh'])||0, kw:parseFloat(r['Nominal_kW'])||5, price:parseFloat(r['UnitPrice_R'])||0 }
+  ).filter(b => b.usable > 0 && b.price > 0);
+
+  DB.locations    = (locRows||[]).map(r=>({ id:r.id, city:r.city, name:r.location_name||r.city, gti:parseFloat(r.design_gti_kwh_m2_day)||4.80 }));
   DB.loadProfiles = (loadRows||[]).map(r=>({ id:r.id, name:r.profile_name, peak:parseFloat(r.peak_load_kw)||0, daily:parseFloat(r.daily_usage_kwh)||0 }));
+
+  // Store for banner display
+  DB.hwSource = { custPanels, custInverters, custBatteries, isNova };
+
   populateDropdowns();
 }
 
@@ -624,6 +693,36 @@ function showApp(){
   const badge = document.getElementById('installer-badge');
   badge.textContent = installer.installer_name;
   badge.style.display = 'inline-block';
+  showHwBanner();
+}
+
+// ── HARDWARE SOURCE BANNER ─────────────────────────────────────────────────
+function showHwBanner() {
+  const banner = document.getElementById('hw-source-banner');
+  if (!banner || !DB.hwSource) return;
+  const { custPanels, custInverters, custBatteries, isNova } = DB.hwSource;
+  const allCustom  = custPanels > 0 && custInverters > 0 && custBatteries > 0;
+  const someCustom = custPanels > 0 || custInverters > 0 || custBatteries > 0;
+
+  if (isNova) {
+    banner.className = 'hw-banner shared on';
+    banner.innerHTML = '🌟 <span><b>Nova Metrics Demo</b> — using shared Nova Metrics hardware database. Proposals reflect reference pricing.</span>';
+    return;
+  }
+  if (allCustom) {
+    banner.className = 'hw-banner custom on';
+    banner.innerHTML = `✓ <span><b>Custom pricing active</b> — your uploaded hardware: ${custPanels} panels, ${custInverters} inverters, ${custBatteries} batteries. Proposals use your own pricing. <a href="hardware-pricelist.html">Update →</a></span>`;
+  } else if (someCustom) {
+    const useParts = [], fallParts = [];
+    if (custPanels    > 0) useParts.push(`${custPanels} panels`);    else fallParts.push('panels');
+    if (custInverters > 0) useParts.push(`${custInverters} inverters`); else fallParts.push('inverters');
+    if (custBatteries > 0) useParts.push(`${custBatteries} batteries`); else fallParts.push('batteries');
+    banner.className = 'hw-banner partial on';
+    banner.innerHTML = `⚡ <span><b>Partial custom pricing</b> — ${useParts.join(', ')} using your prices; ${fallParts.join(', ')} falling back to shared database. <a href="hardware-pricelist.html">Upload missing →</a></span>`;
+  } else {
+    banner.className = 'hw-banner shared on';
+    banner.innerHTML = `⚠ <span><b>Using shared hardware database</b> — for accurate proposals tailored to your pricing, <a href="hardware-pricelist.html">upload your hardware pricelist →</a></span>`;
+  }
 }
 
 document.getElementById('sign-out-btn').addEventListener('click', async function() {
