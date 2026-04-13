@@ -54,6 +54,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
 .inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
+
+/* ── Searchable location combobox ──────────────────────────────────────── */
+.loc-combo{position:relative;min-width:190px}
+.loc-combo-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 30px 9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;cursor:pointer;}
+.loc-combo-input:focus{outline:none;border-color:var(--gold)}
+.loc-combo-input::placeholder{color:rgba(255,255,255,.35)}
+.loc-combo-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:10px;transition:transform .2s;}
+.loc-combo.open .loc-combo-arrow{transform:translateY(-50%) rotate(180deg)}
+.loc-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d2040;border:1px solid rgba(255,215,0,.22);border-radius:9px;max-height:230px;overflow-y:auto;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.55);}
+.loc-dd.open{display:block}
+.loc-dd-search{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;background:#0d2040;z-index:1;}
+.loc-dd-search input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;}
+.loc-dd-search input:focus{outline:none;border-color:var(--gold)}
+.loc-dd-search input::placeholder{color:rgba(255,255,255,.3)}
+.loc-dd-list{max-height:176px;overflow-y:auto;}
+.loc-opt{padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s;}
+.loc-opt:last-child{border-bottom:none}
+.loc-opt:hover,.loc-opt.active{background:rgba(255,215,0,.1);color:var(--gold)}
+.loc-opt mark{background:transparent;color:var(--gold);font-weight:600;}
+.loc-none{padding:10px 12px;font-size:12px;color:var(--muted);font-style:italic}
+/* scrollbar inside dropdown */
+.loc-dd-list::-webkit-scrollbar{width:4px}
+.loc-dd-list::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:4px}
+
 .btn-calc{background:var(--gold);color:var(--navy);border:none;padding:10px 26px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;white-space:nowrap;transition:all .2s;}
 .btn-calc:hover{background:#fff}
 .tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
@@ -172,10 +196,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 
 <div id="app-screen">
   <div class="input-strip">
+
+    <!-- ── Searchable location combobox ── -->
     <div class="inp-group">
       <label>Location</label>
-      <select id="sel-location"><option value="">Loading…</option></select>
+      <div class="loc-combo" id="loc-combo">
+        <input type="text" id="loc-display" class="loc-combo-input" placeholder="Select location…" autocomplete="off" readonly />
+        <span class="loc-combo-arrow">▼</span>
+        <div class="loc-dd" id="loc-dd">
+          <div class="loc-dd-search">
+            <input type="text" id="loc-search" placeholder="🔍  Type to search…" autocomplete="off" />
+          </div>
+          <div class="loc-dd-list" id="loc-dd-list"></div>
+        </div>
+      </div>
     </div>
+
     <div class="inp-group">
       <label>Load Profile</label>
       <select id="sel-load"><option value="">Loading…</option></select>
@@ -316,7 +352,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="chart-row"><div class="chart-label">Panels</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-panels" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="cb-panels-v">—</div></div>
       <div class="chart-row"><div class="chart-label">BOS</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-bos" style="width:0%;background:var(--blue)"></div></div><div class="chart-val" id="cb-bos-v">—</div></div>
       <div class="chart-row"><div class="chart-label">Battery</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-batt" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="cb-batt-v">—</div></div>
-      <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa"></div></div><div class="chart-val" id="cb-inv-v">—</div></div>
+      <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa)"></div></div><div class="chart-val" id="cb-inv-v">—</div></div>
     </div>
     <div class="section-title">Financial Metrics</div>
     <div class="status-row"><span class="lbl">Monthly Savings</span><span class="val" id="f-monthly">—</span></div>
@@ -398,6 +434,7 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[] };
 let installer  = null;
 let calcResult = null;
+let selectedLoc = null; // { id, label, gti }
 
 function showPanel(name) {
   ['signin','forgot','setpass'].forEach(p => {
@@ -480,11 +517,96 @@ async function getInstallerLocationIds(instId) {
   return (all||[]).map(r=>r.id).join(',') || '0';
 }
 
+// ── SEARCHABLE LOCATION COMBOBOX ──────────────────────────────────────────
+function setupLocCombo(locations) {
+  const combo    = document.getElementById('loc-combo');
+  const display  = document.getElementById('loc-display');
+  const dd       = document.getElementById('loc-dd');
+  const search   = document.getElementById('loc-search');
+  const list     = document.getElementById('loc-dd-list');
+
+  // Build the label for each location once
+  const allItems = locations.map(l => ({
+    id:    l.id,
+    gti:   l.gti,
+    label: l.city + (l.name && l.name !== l.city ? ' – ' + l.name : '')
+  }));
+
+  function openDD() {
+    dd.classList.add('open');
+    combo.classList.add('open');
+    search.value = '';
+    renderList('');
+    setTimeout(() => search.focus(), 50);
+  }
+
+  function closeDD() {
+    dd.classList.remove('open');
+    combo.classList.remove('open');
+  }
+
+  function renderList(query) {
+    const q = query.trim().toLowerCase();
+    const filtered = q
+      ? allItems.filter(it => it.label.toLowerCase().includes(q))
+      : allItems;
+
+    if (!filtered.length) {
+      list.innerHTML = '<div class="loc-none">No locations match "' + escHtml(query) + '"</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(it => {
+      const highlighted = q
+        ? it.label.replace(new RegExp('(' + escRegex(q) + ')', 'gi'), '<mark>$1</mark>')
+        : it.label;
+      return `<div class="loc-opt" data-id="${it.id}" data-gti="${it.gti}" data-label="${escAttr(it.label)}">${highlighted}</div>`;
+    }).join('');
+
+    // Click handler for each option
+    list.querySelectorAll('.loc-opt').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedLoc = { id: el.dataset.id, gti: parseFloat(el.dataset.gti) || 4.80, label: el.dataset.label };
+        display.value = selectedLoc.label;
+        closeDD();
+      });
+    });
+  }
+
+  // Toggle open/close on the display input click
+  display.addEventListener('click', () => {
+    dd.classList.contains('open') ? closeDD() : openDD();
+  });
+
+  // Filter as user types in search box
+  search.addEventListener('input', () => renderList(search.value));
+
+  // Close when clicking outside
+  document.addEventListener('click', e => {
+    if (!combo.contains(e.target)) closeDD();
+  });
+
+  // Keyboard: Escape closes
+  search.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeDD();
+  });
+
+  // Auto-select first location if available
+  if (allItems.length) {
+    selectedLoc = allItems[0];
+    display.value = selectedLoc.label;
+  }
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
+function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
 function populateDropdowns() {
-  const locSel = document.getElementById('sel-location');
-  locSel.innerHTML = DB.locations.length
-    ? DB.locations.map(l=>`<option value="${l.id}" data-gti="${l.gti}">${l.city}${l.name&&l.name!==l.city?' – '+l.name:''}</option>`).join('')
-    : '<option value="">No locations assigned</option>';
+  // ── Location: use searchable combobox ─────────────────────────────────
+  setupLocCombo(DB.locations);
+
+  // ── Load profile: plain select ─────────────────────────────────────────
   const loadSel = document.getElementById('sel-load');
   loadSel.innerHTML = DB.loadProfiles.map(p=>
     `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
@@ -607,8 +729,8 @@ const BATT_HEADROOM_IDEAL_MIN = 1.15;
 const BATT_HEADROOM_IDEAL_MAX = 1.35;
 const BATT_HEADROOM_MAX       = 1.60;
 const BATT_DOD_LOW    = 0.50;
-const BATT_DOD_NORMAL = 0.70;  // above this → "High cycling" advisory on recommendation
-const BATT_DOD_HIGH   = 0.85;  // above this → "Very high cycling"
+const BATT_DOD_NORMAL = 0.70;
+const BATT_DOD_HIGH   = 0.85;
 const BATT_DOD_MAX    = 0.95;
 const SYSTEM_EFFICIENCY   = 0.85;
 const BATT_ROUND_TRIP_EFF = 0.90;
@@ -668,41 +790,24 @@ function selectBestBattery(requiredKWh, peakLoad, autonomy){
   return pool[0];
 }
 
-// ── INVERTER SELECTOR — supports parallel units for large commercial systems ──
-// For loads above what a single inverter can handle (Large Office/Industrial),
-// two or more identical inverters are wired in parallel — each handles its own
-// string group. This is standard practice for commercial PV systems.
-// The selector tries 1–4 units of each model and picks the lowest-score combination.
+// ── INVERTER SELECTOR ─────────────────────────────────────────────────────
 function selectBestInverter(requiredInvAC, systemDC){
   let bestInv = null, bestScore = Infinity, bestUnits = 1;
-
   DB.inverters.forEach(inv=>{
     for(let units=1; units<=4; units++){
       const totalAC = inv.ac * units;
       const totalDC = inv.dc * units;
-      if(totalAC < requiredInvAC) continue;  // can't handle peak load
-      if(totalDC < systemDC)     continue;  // can't accept solar array
-
+      if(totalAC < requiredInvAC) continue;
+      if(totalDC < systemDC)     continue;
       const dcAc = systemDC / totalAC;
       let score = dcAc<0.80 ? 60 : dcAc>1.5 ? 100 : Math.abs(dcAc-1.15)*40;
       score += Math.abs(totalAC - requiredInvAC) * 3;
       score += (inv.price * units) * 0.0005;
-      score += (units - 1) * 25; // prefer single unit — add penalty per extra unit
-
-      if(score < bestScore){
-        bestScore = score;
-        bestInv   = inv;
-        bestUnits = units;
-      }
+      score += (units - 1) * 25;
+      if(score < bestScore){ bestScore = score; bestInv = inv; bestUnits = units; }
     }
   });
-
-  if(!bestInv){
-    // Absolute fallback: nothing fits even with 4 units → use largest single
-    bestInv   = DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b);
-    bestUnits = 1;
-  }
-
+  if(!bestInv){ bestInv = DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b); bestUnits = 1; }
   return { inv: bestInv, units: bestUnits };
 }
 
@@ -712,11 +817,11 @@ function calculate(){
     toast('⚠ Data still loading — please wait'); return;
   }
 
-  // ── Inputs ──────────────────────────────────────────────────────────────
-  const locSel = document.getElementById('sel-location');
-  const locOpt = locSel.options[locSel.selectedIndex];
-  const locName= locOpt ? locOpt.text : 'Unknown';
-  const psh    = locOpt ? parseFloat(locOpt.dataset.gti)||4.80 : 4.80;
+  // ── Location from searchable combobox ────────────────────────────────────
+  if(!selectedLoc){ toast('⚠ Please select a location first'); return; }
+  const locName = selectedLoc.label;
+  const psh     = selectedLoc.gti;
+
   const loadSel = document.getElementById('sel-load');
   let peakLoad, dailyUsage;
   if(loadSel.value==='custom'){
@@ -804,15 +909,13 @@ function calculate(){
   const battPasses  = battIssues.length===0;
   const battPowerOK = battTotalKW >= peakLoad;
 
-  // ── Inverter — multi-unit for large systems ───────────────────────────────
+  // ── Inverter ──────────────────────────────────────────────────────────────
   const requiredInvAC = peakLoad * 1.3;
   const { inv: bestInv, units: invUnits } = selectBestInverter(requiredInvAC, systemDC);
 
-  // Combined ratings for selected inverter bank
   const invTotalAC    = bestInv.ac    * invUnits;
   const invTotalDC    = bestInv.dc    * invUnits;
   const invTotalPrice = bestInv.price * invUnits;
-  // Total MPPT inputs available across all parallel inverter units
   const invTotalMPPT  = bestInv.mppt  * invUnits;
 
   const dcAcRatio  = systemDC / invTotalAC;
@@ -823,11 +926,7 @@ function calculate(){
     dcAcRatio<=1.5  ? 'Pushing Limits' : 'Too Large (Clipping Risk)';
   const invHeadroom = invTotalAC - peakLoad;
   const invLoadOK   = invTotalAC >= requiredInvAC;
-
-  // Label: "2× Inverter Model" for parallel configs, plain model name for single
-  const invDisplayModel = invUnits > 1
-    ? `${invUnits}x ${bestInv.model} (parallel)`
-    : bestInv.model;
+  const invDisplayModel = invUnits > 1 ? `${invUnits}x ${bestInv.model} (parallel)` : bestInv.model;
 
   // ── Cross-system checks ───────────────────────────────────────────────────
   const solarCanRechargeBatt = expectedDailySolar >= requiredSolarEnergy;
@@ -835,7 +934,7 @@ function calculate(){
   const invPasses            = invLoadOK;
   const systemRecommended    = solarPasses && battPasses && invPasses;
 
-  // ── MPPT string allocation ────────────────────────────────────────────────
+  // ── MPPT ──────────────────────────────────────────────────────────────────
   const stringsNeeded = Math.ceil(panelCount / 12);
   const mpptRequired  = Math.ceil(stringsNeeded / 2);
   const mpptAvailable = invTotalMPPT;
@@ -905,7 +1004,6 @@ function fmtR(n){ return 'R'+Math.round(n).toLocaleString('en-ZA'); }
 function fmtN(n,d=1){ return Number(n).toFixed(d); }
 
 function renderAll(r){
-  // Solar
   set('r-panel-model', r.panelModel);
   set('r-req-solar',   fmtN(r.requiredSolarKW,2)+' kW');
   set('r-dc-cap',      fmtN(r.systemDC,2)+' kW');
@@ -926,10 +1024,6 @@ function renderAll(r){
   set('r-footprint', fmtN(r.footprint,1)+' m²');
   set('r-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
 
-  // ── System recommendation banner ─────────────────────────────────────────
-  // Battery DoD > BATT_DOD_NORMAL means cycling is high but still acceptable.
-  // Show amber "Recommended with Advisory" rather than solid green to prompt
-  // the installer to discuss battery longevity with the client.
   const sysKpi = document.getElementById('sys-rec-kpi');
   if(r.systemRecommended){
     const highCycling = r.battDod > BATT_DOD_NORMAL;
@@ -941,13 +1035,12 @@ function renderAll(r){
         +(r.battDod > BATT_DOD_HIGH
           ? 'adding an extra battery unit to reduce cycle depth and extend lifespan.'
           : 'monitoring cycle wear or adding a unit for extended battery life.'));
-      sysKpi.className = 'kpi amber';  // amber = recommended with note
+      sysKpi.className = 'kpi amber';
     } else {
       set('sys-rec-sub','Solar, battery and inverter are all correctly sized and compatible');
       sysKpi.className = 'kpi green';
     }
     if(r.invUnits > 1){
-      // Append parallel inverter note
       const sub = document.getElementById('sys-rec-sub');
       sub.textContent += (sub.textContent ? ' ' : '')
         + `Note: ${r.invUnits} inverters in parallel required for this load size.`;
@@ -963,7 +1056,6 @@ function renderAll(r){
     sysKpi.className = 'kpi red';
   }
 
-  // Battery KPIs
   setKpi('b-verdict',r.battVerdict,
     r.battVerdict.includes('Action')?'red':
     r.battVerdict.includes('Acceptable')||r.battVerdict.includes('Well')?'green':'amber');
@@ -999,7 +1091,6 @@ function renderAll(r){
   set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+
     'x | Ideal: '+fmtN(BATT_HEADROOM_IDEAL_MIN,2)+'x–'+fmtN(BATT_HEADROOM_IDEAL_MAX,2)+'x');
 
-  // Inverter
   set('i-model', r.invModel);
   setKpi('i-load-ok', r.invLoadOK?'OK':'Undersized', r.invLoadOK?'green':'red');
   set('i-load-sub', r.invLoadOK
@@ -1025,7 +1116,6 @@ function renderAll(r){
   document.getElementById('bar-ac').style.width = (r.invAC/mx*100)+'%';
   set('bar-ac-val', fmtN(r.invAC,1)+' kW');
 
-  // Financials
   set('f-total-cost',    fmtR(r.totalCost));  set('f-cost-per-kw',  fmtR(r.costPerKW));
   set('f-sell-price',    fmtR(r.sellPrice));  set('f-annual-savings',fmtR(r.annualSavings));
   set('f-profit',        fmtR(r.profit));      set('f-inv-cost',      fmtR(r.invPrice));
@@ -1041,7 +1131,6 @@ function renderAll(r){
   setBar('cb-batt',  r.battTotalCost/mx2*100,'cb-batt-v',fmtR(r.battTotalCost));
   setBar('cb-inv',   r.invPrice/mx2*100,'cb-inv-v',    fmtR(r.invPrice));
 
-  // Environment
   set('e-co2',   fmtN(r.co2Tons,2)); set('e-trees',Math.round(r.trees).toLocaleString('en-ZA'));
   set('e-coal',  fmtN(r.coal,2));    set('e-water',Math.round(r.water).toLocaleString('en-ZA'));
   set('e-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
@@ -1050,7 +1139,6 @@ function renderAll(r){
   document.getElementById('e-indep-bar').style.width = r.indepPct+'%';
   set('e-indep-tip','Solar supplies approx. '+fmtN(r.indepPct,0)+'% of annual energy needs.');
 
-  // Proposal summary
   set('ps-system', r.panelCount+'x '+r.panelModel+' | '+r.invModel+' | '+r.battUnits+'x '+r.battModel);
   set('ps-cost',    fmtR(r.totalCost));
   set('ps-savings', fmtR(r.annualSavings)+'/year');
