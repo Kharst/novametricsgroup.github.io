@@ -127,7 +127,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-btn-email svg{width:15px;height:15px;flex-shrink:0;}
 .dl-btn-wa{display:flex;align-items:center;gap:9px;background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.35);border-radius:10px;padding:12px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);}
-.dl-btn-wa svg{width:15px;height:15px;flex-shrink:0;}
 .dl-btn-wa.sent{background:rgba(37,211,102,.3);border-color:#25D366;}
 .arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:10px 26px;display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
@@ -220,7 +219,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ms-title{font-family:'DM Serif Display',serif;font-size:1.4rem;margin-bottom:8px;}
 .ms-title em{font-style:italic;color:#72d4a0;}
 .ms-chip{display:inline-block;background:rgba(184,150,46,.1);border:1px solid rgba(184,150,46,.2);border-radius:100px;padding:4px 14px;font-size:12px;color:var(--gold);margin-bottom:12px;}
-/* re-onboard notice */
 .ms-notice{font-size:12px;color:rgba(255,215,0,.65);background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.15);border-radius:8px;padding:10px 14px;margin-bottom:14px;line-height:1.5;text-align:left;display:none;}
 .ms-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;}
 .ms-close{width:100%;padding:12px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
@@ -230,7 +228,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 @media(max-width:900px){:root{--sidebar-w:240px;}.stats{grid-template-columns:repeat(2,1fr);}.specs{grid-template-columns:1fr;}}
 @media(max-width:700px){.sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}.main{margin-bottom:56px;}:root{--sidebar-w:100%;}}
 </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -452,6 +450,9 @@ var urlAiId=params.get('ai_id');
 var urlEmail=(params.get('email')||'').toLowerCase().trim();
 var activeDashTab='system';
 
+// ── Supabase Auth client (shared with solar-intelligence.html) ────────────
+var sb = supabase.createClient(SUPA, ANON);
+
 function switchTab(tab){
   var isA=tab==='analytics';
   document.getElementById('proposalsTab').classList.toggle('on',!isA);
@@ -542,12 +543,10 @@ function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=
 function setMsg(el,type,text){el.className='m-msg '+type;el.textContent=text;}
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
 
-var sb = supabase.createClient(SUPA, ANON);
-
 window.addEventListener('DOMContentLoaded', boot);
 
 async function boot() {
-  // 1. Check Supabase Auth JWT (set by solar-intelligence.html)
+  // 1. Supabase Auth JWT (set by solar-intelligence.html login)
   try {
     var r = await sb.auth.getSession();
     var session = r.data && r.data.session;
@@ -560,12 +559,12 @@ async function boot() {
     }
   } catch(e) {}
 
-  // 2. Legacy fallback: old localStorage key
+  // 2. Legacy: old localStorage key (pre-Supabase-Auth installers)
   var saved = localStorage.getItem(SESSION_KEY);
   if (saved) { try { installer = JSON.parse(saved); } catch(e) {} }
   if (installer) { showPortal(); return; }
 
-  // 3. URL param fallback (old portal links)
+  // 3. URL param fallback (redirect from solar-intelligence.html)
   if (urlEmail) {
     try {
       var res2 = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
@@ -575,7 +574,7 @@ async function boot() {
     } catch(e) {}
   }
 
-  // 4. No session — go to login (not nova-metrics_1.html, avoids old loop)
+  // 4. No session — send to login
   window.location.href = 'solar-intelligence.html';
 }
 
@@ -592,9 +591,7 @@ function showPortal(){
 }
 
 document.getElementById('signOutBtn').addEventListener('click', async function () {
-  try {
-    await sb.auth.signOut();
-  } finally {
+  try { await sb.auth.signOut(); } finally {
     localStorage.removeItem(SESSION_KEY);
     window.location.href = 'solar-intelligence.html';
   }
@@ -609,13 +606,27 @@ async function loadClients(){
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
     var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
+
+    // ── FIX: prefer the record WITH a pdf_url over a pending one ─────────
+    // Results are DESC by created_at, so we see newest first.
+    // If the newest has no pdf (still pending), we keep looking for an older
+    // one that has a PDF so the installer always sees a completed proposal.
     var aiByEmail={};
-    (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(k&&!aiByEmail[k])aiByEmail[k]=r;});
+    (aiRows||[]).forEach(function(r){
+      var k=(r.client_email||'').toLowerCase().trim();
+      if(!k) return;
+      if(!aiByEmail[k]){ aiByEmail[k]=r; return; }
+      // Override only if this older record has a pdf and the stored one doesn't
+      if(r.pdf_url && !aiByEmail[k].pdf_url) aiByEmail[k]=r;
+    });
+
     allClients=unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
     Object.keys(aiByEmail).forEach(function(k){var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});if(!exists)allClients.push({lead:null,ai:aiByEmail[k]});});
     renderClientList();
     if(urlAiId){
+      // Try to find by exact ai_id first; fall back to any entry for that client email
       var idx=allClients.findIndex(function(c){return c.ai&&String(c.ai.ai_id)===String(urlAiId);});
+      if(idx<0) idx=allClients.findIndex(function(c){return c.ai&&c.ai.pdf_url;});
       if(idx>=0){var rows2=document.querySelectorAll('.c-row');if(rows2[idx])pick(idx,rows2[idx]);var c=allClients[idx];var cname=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'your client';document.getElementById('arrivalClientName').textContent=cname;return;}
     }
     document.getElementById('emptyState').style.display='flex';
@@ -633,7 +644,9 @@ function renderClientList(){
   allClients.forEach(function(c,i){
     var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
     var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'';
-    var has=!!c.ai;var row=document.createElement('div');
+    // FIX: only show "Ready" badge when there is an actual PDF, not just any ai record
+    var has=!!(c.ai&&c.ai.pdf_url);
+    var row=document.createElement('div');
     row.className='c-row';row.dataset.idx=i;
     var se=email.length>26?email.slice(0,24)+'…':email;
     row.innerHTML='<div class="c-info"><div class="c-name">'+esc(name)+'</div><div class="c-email">'+esc(se)+'</div></div><span class="badge '+(has?'b-ready':'b-none')+'">'+(has?'Ready':'None')+'</span>';
@@ -651,14 +664,15 @@ function pick(idx,rowEl){
   var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
   var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
   var phone=(c.ai&&c.ai.client_phone)||(c.lead&&c.lead.client_phone)||'';
-  var has=!!c.ai,ai=c.ai;
+  // FIX: has = true only when there is a completed PDF
+  var has=!!(c.ai&&c.ai.pdf_url),ai=c.ai;
   document.getElementById('emptyState').style.display='none';
   var panel=document.getElementById('detailPanel');
   panel.classList.remove('on');void panel.offsetWidth;panel.classList.add('on');
   s('chAv',init(name));s('chNm',name);s('chEm',email);
   s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
   s('chSeg',has?(ai.client_segment||'—'):'—');
-  s('chDt',has?fmtDate(ai.created_at):'—');
+  s('chDt',ai?fmtDate(ai.created_at):'—');
   if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}
   else{document.getElementById('chPhoneRow').style.display='none';}
   var pill=document.getElementById('chPill');
@@ -680,7 +694,15 @@ function pick(idx,rowEl){
   s('dlTitle','Ready to send to '+name.split(' ')[0]);
   s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
 
-  document.getElementById('dlBtn').onclick=function(){window.open(PDF_FN+ai.ai_id,'_blank');};
+  // ── FIX: installer download uses ?source=installer — NOT tracked in analytics
+  document.getElementById('dlBtn').onclick=async function(){
+    try{
+      var dlRes=await fetch(PDF_FN+ai.ai_id+'?format=json&source=installer',{headers:{apikey:ANON}});
+      var dlData=await dlRes.json();
+      if(dlData.signed_url) window.open(dlData.signed_url,'_blank');
+      else alert('PDF not ready. Please regenerate the proposal from Solar Intelligence.');
+    }catch(e){alert('Error loading PDF: '+e.message);}
+  };
 
   var sendBtn=document.getElementById('sendBtn');
   sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
@@ -746,7 +768,6 @@ document.getElementById('m_submit').addEventListener('click',async function(){
     if(!res.ok)throw new Error('Server error '+res.status);
     var data=await res.json();
     if(data&&data.success!==false){
-      // ── Contextual success messaging ───────────────────────────────
       document.getElementById('modalForm').style.display='none';
       document.getElementById('msChip').textContent=name;
       var noticeEl=document.getElementById('msNotice');
@@ -771,7 +792,6 @@ document.getElementById('m_submit').addEventListener('click',async function(){
   }catch(err){setMsg(msg,'err','Connection error: '+err.message);btn.disabled=false;}
 });
 
-// Close button on success goes straight to Solar Intelligence
 document.getElementById('msClose').addEventListener('click',function(){
   closeModal();
   window.location.href='solar-intelligence.html';
