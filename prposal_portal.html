@@ -451,7 +451,6 @@ var urlAiId=params.get('ai_id');
 var urlEmail=(params.get('email')||'').toLowerCase().trim();
 var activeDashTab='system';
 
-// ── Supabase Auth client ────────────
 var sb = supabase.createClient(SUPA, ANON);
 
 function switchTab(tab){
@@ -601,21 +600,24 @@ async function loadClients(){
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+
+    // ── FIX: select includes client_type & status; order is a separate parameter (not inside select) ──
+    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
 
+    // ── FIX: prefer completed rows with a known (non-Unknown) segment over pending/Unknown duplicates ──
     var aiByEmail={};
     (aiRows||[]).forEach(function(r){
-    var k=(r.client_email||'').toLowerCase().trim();
-    if(!k) return;
-    if(!aiByEmail[k]){ aiByEmail[k]=r; return; }
-  // Prefer: has pdf_url > has known client_type > has non-Unknown segment > newest
-    var cur=aiByEmail[k];
-    var rHasPdf=!!r.pdf_url, curHasPdf=!!cur.pdf_url;
-    var rKnown=r.client_segment&&r.client_segment!=='Unknown'&&r.status==='completed';
-    var curKnown=cur.client_segment&&cur.client_segment!=='Unknown'&&cur.status==='completed';
-    if(rHasPdf&&rKnown&&(!curHasPdf||!curKnown)) aiByEmail[k]=r;
-    else if(rHasPdf&&!curHasPdf) aiByEmail[k]=r;
+      var k=(r.client_email||'').toLowerCase().trim();
+      if(!k) return;
+      if(!aiByEmail[k]){ aiByEmail[k]=r; return; }
+      var cur=aiByEmail[k];
+      var rHasPdf=!!r.pdf_url, curHasPdf=!!cur.pdf_url;
+      var rKnown=r.client_segment&&r.client_segment!=='Unknown'&&r.status==='completed';
+      var curKnown=cur.client_segment&&cur.client_segment!=='Unknown'&&cur.status==='completed';
+      // Replace if: incoming has pdf + known segment, and current doesn't have both
+      if(rHasPdf&&rKnown&&(!curHasPdf||!curKnown)) aiByEmail[k]=r;
+      else if(rHasPdf&&!curHasPdf) aiByEmail[k]=r;
     });
 
     allClients=unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
@@ -689,7 +691,6 @@ function pick(idx,rowEl){
   s('dlTitle','Ready to send to '+name.split(' ')[0]);
   s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
 
-  // ── Installer download via proxy — no raw storage URL exposed ────────────
   document.getElementById('dlBtn').onclick=function(){
     window.open(DOWNLOAD_FN+ai.ai_id+'?source=installer','_blank');
   };
