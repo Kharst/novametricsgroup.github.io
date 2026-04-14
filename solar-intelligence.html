@@ -6,7 +6,6 @@
 <title>Solar Intelligence — Nova Metrics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<!-- Supabase JS SDK (Auth) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -56,8 +55,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
 .inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
-
-/* ── Searchable location combobox ──────────────────────────────────────── */
 .loc-combo{position:relative;min-width:190px}
 .loc-combo-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 30px 9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;cursor:pointer;}
 .loc-combo-input:focus{outline:none;border-color:var(--gold)}
@@ -76,10 +73,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .loc-opt:hover,.loc-opt.active{background:rgba(255,215,0,.1);color:var(--gold)}
 .loc-opt mark{background:transparent;color:var(--gold);font-weight:600;}
 .loc-none{padding:10px 12px;font-size:12px;color:var(--muted);font-style:italic}
-/* scrollbar inside dropdown */
 .loc-dd-list::-webkit-scrollbar{width:4px}
 .loc-dd-list::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:4px}
-
 .btn-calc{background:var(--gold);color:var(--navy);border:none;padding:10px 26px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;white-space:nowrap;transition:all .2s;}
 .btn-calc:hover{background:#fff}
 .tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
@@ -133,8 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .ai-id-tag{display:inline-block;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-left:6px}
 #toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
 #toast.show{opacity:1}
-
-/* ── Hardware source banner ──────────────────────────────────────────────── */
+/* ── Hardware source banner ── */
 .hw-banner{display:none;margin-bottom:16px;border-radius:10px;padding:11px 16px;font-size:12px;line-height:1.5;align-items:center;gap:10px;}
 .hw-banner.on{display:flex;}
 .hw-banner.custom{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:var(--green)}
@@ -142,6 +136,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .hw-banner.partial{background:rgba(122,200,248,.07);border:1px solid rgba(122,200,248,.2);color:var(--blue)}
 .hw-banner a{color:inherit;font-weight:600;text-decoration:underline dotted;}
 .hw-banner a:hover{opacity:.8}
+/* ── Client Type Toggle ── */
+.client-type-wrap{margin-top:18px;}
+.client-type-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:block;}
+.ct-toggle{display:flex;gap:10px;flex-wrap:wrap;}
+.ct-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;flex:1;min-width:160px;}
+.ct-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text);}
+.ct-btn.active.residential{background:rgba(122,200,248,.10);border-color:rgba(122,200,248,.4);color:var(--blue);}
+.ct-btn.active.commercial{background:rgba(255,215,0,.10);border-color:var(--gold-border);color:var(--gold);}
+.ct-btn .ct-icon{font-size:20px;line-height:1;}
+.ct-btn .ct-text{}
+.ct-btn .ct-title{font-weight:600;font-size:13px;display:block;}
+.ct-btn .ct-sub{font-size:10px;color:var(--muted);display:block;margin-top:1px;}
+.ct-btn.active .ct-sub{color:inherit;opacity:.7;}
+.ct-hint{margin-top:10px;font-size:11px;color:var(--muted);padding:8px 12px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);}
+.ct-hint.residential{border-color:rgba(122,200,248,.2);background:rgba(122,200,248,.05);color:var(--blue);}
+.ct-hint.commercial{border-color:var(--gold-border);background:rgba(255,215,0,.05);color:var(--muted);}
 </style>
 </head>
 <body>
@@ -165,9 +175,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div class="nav-right">
     <div id="installer-badge" class="installer-badge"></div>
-    <a href="hardware-pricelist.html" class="portal-link ghost" id="hw-pl-link">
-      ⚙ My Hardware
-    </a>
+    <a href="hardware-pricelist.html" class="portal-link ghost">⚙ My Hardware</a>
     <a href="prposal_portal.html" class="portal-link">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Proposal Portal
@@ -209,27 +217,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </div>
 
 <div id="app-screen">
-
-  <!-- ── Hardware source banner (shown after login) ── -->
   <div id="hw-source-banner" class="hw-banner"></div>
-
   <div class="input-strip">
-
-    <!-- ── Searchable location combobox ── -->
     <div class="inp-group">
       <label>Location</label>
       <div class="loc-combo" id="loc-combo">
         <input type="text" id="loc-display" class="loc-combo-input" placeholder="Select location…" autocomplete="off" readonly />
         <span class="loc-combo-arrow">▼</span>
         <div class="loc-dd" id="loc-dd">
-          <div class="loc-dd-search">
-            <input type="text" id="loc-search" placeholder="🔍  Type to search…" autocomplete="off" />
-          </div>
+          <div class="loc-dd-search"><input type="text" id="loc-search" placeholder="🔍  Type to search…" autocomplete="off" /></div>
           <div class="loc-dd-list" id="loc-dd-list"></div>
         </div>
       </div>
     </div>
-
     <div class="inp-group">
       <label>Load Profile</label>
       <select id="sel-load"><option value="">Loading…</option></select>
@@ -404,13 +404,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div><label>Client Phone</label><input type="tel" id="p-phone" placeholder="+27…" /></div>
       <div><label>Client Address</label><input type="text" id="p-address" placeholder="Street address" /></div>
     </div>
+
+    <!-- ── CLIENT TYPE SELECTOR ── -->
+    <div class="client-type-wrap">
+      <span class="client-type-label">Client Type — determines which PDF is generated</span>
+      <div class="ct-toggle">
+        <button class="ct-btn residential active" id="ct-residential" onclick="setClientType('residential')">
+          <span class="ct-icon">🏠</span>
+          <span class="ct-text">
+            <span class="ct-title">Residential</span>
+            <span class="ct-sub">4-page homeowner proposal — savings, backup &amp; next steps</span>
+          </span>
+        </button>
+        <button class="ct-btn commercial" id="ct-commercial" onclick="setClientType('commercial')">
+          <span class="ct-icon">🏢</span>
+          <span class="ct-text">
+            <span class="ct-title">Commercial</span>
+            <span class="ct-sub">8-page technical proposal — NPV, IRR, NERSA compliance</span>
+          </span>
+        </button>
+      </div>
+      <div class="ct-hint residential" id="ct-hint">
+        🏠 <strong>Homeowner PDF:</strong> Plain language — savings, payback, backup hours, installation steps. No IRR or NERSA pages.
+      </div>
+    </div>
+
     <div class="section-title" style="margin-top:20px">System Summary</div>
     <div class="status-row"><span class="lbl">System</span><span class="val" id="ps-system">Run calculation first ⚡</span></div>
     <div class="status-row"><span class="lbl">Total Cost</span><span class="val" id="ps-cost">—</span></div>
     <div class="status-row"><span class="lbl">Annual Savings</span><span class="val" id="ps-savings">—</span></div>
     <div class="status-row"><span class="lbl">Payback</span><span class="val" id="ps-payback">—</span></div>
     <div class="proposal-strip">
-      <div class="info">AI-powered proposal via Nova Metrics pipeline.<br><b>PDF generated &amp; delivered — then view in Proposal Portal.</b></div>
+      <div class="info">AI-powered proposal via Nova Metrics pipeline.<br><b id="pdf-type-hint">🏠 Homeowner PDF — clear, simple, deal-closing</b></div>
       <button class="btn-generate" id="btn-gen" onclick="generateProposal()" disabled>Generate Proposal</button>
     </div>
     <div class="success-card" id="success-card">
@@ -443,17 +468,35 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <div id="toast"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const APP_URL   = 'https://novametricsgroup.github.io/solar-intelligence.html';
-const NOVA_METRICS_ID = 1; // Demo account — always uses shared hardware tables
+const NOVA_METRICS_ID = 1;
 const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let installer  = null;
 let calcResult = null;
-let selectedLoc = null; // { id, label, gti }
+let selectedLoc = null;
+let selectedClientType = 'residential'; // default
+
+// ── CLIENT TYPE TOGGLE ─────────────────────────────────────────────────────
+function setClientType(type) {
+  selectedClientType = type;
+  document.getElementById('ct-residential').classList.toggle('active', type === 'residential');
+  document.getElementById('ct-commercial').classList.toggle('active', type === 'commercial');
+  const hint = document.getElementById('ct-hint');
+  const pdfHint = document.getElementById('pdf-type-hint');
+  if (type === 'residential') {
+    hint.className = 'ct-hint residential';
+    hint.innerHTML = '🏠 <strong>Homeowner PDF:</strong> Plain language — savings, payback, backup hours, installation steps. No IRR or NERSA pages.';
+    if (pdfHint) pdfHint.textContent = '🏠 Homeowner PDF — clear, simple, deal-closing';
+  } else {
+    hint.className = 'ct-hint commercial';
+    hint.innerHTML = '🏢 <strong>Commercial PDF:</strong> Full 8-page technical proposal — NPV, IRR, Section 12B, NERSA compliance &amp; 25-year model.';
+    if (pdfHint) pdfHint.textContent = '🏢 Commercial PDF — full technical & financial analysis';
+  }
+}
 
 function showPanel(name) {
   ['signin','forgot','setpass'].forEach(p => {
@@ -510,28 +553,17 @@ function showDataError(err) {
   document.getElementById('dlErr').style.display = 'block';
 }
 
-// ── DATA LOADER ───────────────────────────────────────────────────────────
-// Strategy:
-//   Nova Metrics (id=1) → always use shared tables (demo mode)
-//   All other installers → prefer their own installer_panels/inverters/batteries
-//                          fall back to shared tables for any category not yet uploaded
 async function loadAllData() {
   const instId = installer.installer_id;
   const isNova = instId === NOVA_METRICS_ID;
-
-  // Always fetch locations and load profiles from shared tables
   const locIds = await getInstallerLocationIds(instId);
   const [locRows, loadRows] = await Promise.all([
     sbFetch(`/rest/v1/solar_locations?id=in.(${locIds})&select=id,city,location_name,design_gti_kwh_m2_day&order=city`),
     sbFetch(`/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc`)
   ]);
-
-  // ── Hardware resolution ───────────────────────────────────────────────────
   let panelRows = null, invRows = null, battRows = null;
   let custPanels = 0, custInverters = 0, custBatteries = 0;
-
   if (!isNova) {
-    // Check installer's own custom pricelist tables
     const [cp, ci, cb] = await Promise.all([
       sbFetch(`/rest/v1/installer_panels?installer_id=eq.${instId}&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc`),
       sbFetch(`/rest/v1/installer_inverters?installer_id=eq.${instId}&select=id,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc`),
@@ -541,8 +573,6 @@ async function loadAllData() {
     if (ci && ci.length)  { invRows   = ci; custInverters = ci.length; }
     if (cb && cb.length)  { battRows  = cb; custBatteries = cb.length; }
   }
-
-  // Fall back to shared Nova Metrics tables for any category not yet uploaded
   const [sharedP, sharedI, sharedB] = await Promise.all([
     panelRows ? Promise.resolve(null) : sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
     invRows   ? Promise.resolve(null) : sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
@@ -551,29 +581,21 @@ async function loadAllData() {
   if (!panelRows) panelRows = sharedP;
   if (!invRows)   invRows   = sharedI;
   if (!battRows)  battRows  = sharedB;
-
-  // ── Normalise to unified DB format ────────────────────────────────────────
   DB.panels = (panelRows || []).map(r => custPanels
     ? { id:r.id, model:r.panel_model,   watts:parseInt(r.watts)||0,            area:parseFloat(r.area_sqm)||2.0,    price:parseFloat(r.unit_price_r)||0 }
     : { id:r.id, model:r['PanelModel'], watts:parseInt(r['Watts'])||0,          area:parseFloat(r['Area_sqm'])||2.0, price:parseFloat(r['UnitPrice_R'])||0 }
   ).filter(p => p.watts > 0 && p.price > 0);
-
   DB.inverters = (invRows || []).map(r => custInverters
     ? { id:r.id, model:r.inverter_model,   ac:parseFloat(r.ac_continuous_kw)||0, dc:parseFloat(r.dc_max_kw)||0,       mppt:parseInt(r.mppt_count)||1,     eff:parseFloat(r.efficiency_pct)||97, price:parseFloat(r.unit_price_r)||0 }
     : { id:r.id, model:r['InverterModel'], ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0,   mppt:parseInt(r['MPPT_count'])||1,  eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 }
   ).filter(i => i.ac > 0 && i.price > 0);
-
   DB.batteries = (battRows || []).map(r => custBatteries
     ? { id:r.id, model:r.battery_model,   usable:parseFloat(r.usable_kwh)||0, kw:parseFloat(r.nominal_kw)||5,  price:parseFloat(r.unit_price_r)||0 }
     : { id:r.id, model:r['BatteryModel'], usable:parseFloat(r['Usable_kWh'])||0, kw:parseFloat(r['Nominal_kW'])||5, price:parseFloat(r['UnitPrice_R'])||0 }
   ).filter(b => b.usable > 0 && b.price > 0);
-
   DB.locations    = (locRows||[]).map(r=>({ id:r.id, city:r.city, name:r.location_name||r.city, gti:parseFloat(r.design_gti_kwh_m2_day)||4.80 }));
   DB.loadProfiles = (loadRows||[]).map(r=>({ id:r.id, name:r.profile_name, peak:parseFloat(r.peak_load_kw)||0, daily:parseFloat(r.daily_usage_kwh)||0 }));
-
-  // Store for banner display
   DB.hwSource = { custPanels, custInverters, custBatteries, isNova };
-
   populateDropdowns();
 }
 
@@ -586,232 +608,102 @@ async function getInstallerLocationIds(instId) {
   return (all||[]).map(r=>r.id).join(',') || '0';
 }
 
-// ── SEARCHABLE LOCATION COMBOBOX ──────────────────────────────────────────
 function setupLocCombo(locations) {
   const combo    = document.getElementById('loc-combo');
   const display  = document.getElementById('loc-display');
   const dd       = document.getElementById('loc-dd');
   const search   = document.getElementById('loc-search');
   const list     = document.getElementById('loc-dd-list');
-
-  // Build the label for each location once
-  const allItems = locations.map(l => ({
-    id:    l.id,
-    gti:   l.gti,
-    label: l.city + (l.name && l.name !== l.city ? ' – ' + l.name : '')
-  }));
-
-  function openDD() {
-    dd.classList.add('open');
-    combo.classList.add('open');
-    search.value = '';
-    renderList('');
-    setTimeout(() => search.focus(), 50);
-  }
-
-  function closeDD() {
-    dd.classList.remove('open');
-    combo.classList.remove('open');
-  }
-
+  const allItems = locations.map(l => ({ id:l.id, gti:l.gti, label:l.city+(l.name&&l.name!==l.city?' – '+l.name:'') }));
+  function openDD() { dd.classList.add('open'); combo.classList.add('open'); search.value=''; renderList(''); setTimeout(()=>search.focus(),50); }
+  function closeDD() { dd.classList.remove('open'); combo.classList.remove('open'); }
   function renderList(query) {
-    const q = query.trim().toLowerCase();
-    const filtered = q
-      ? allItems.filter(it => it.label.toLowerCase().includes(q))
-      : allItems;
-
-    if (!filtered.length) {
-      list.innerHTML = '<div class="loc-none">No locations match "' + escHtml(query) + '"</div>';
-      return;
-    }
-
-    list.innerHTML = filtered.map(it => {
-      const highlighted = q
-        ? it.label.replace(new RegExp('(' + escRegex(q) + ')', 'gi'), '<mark>$1</mark>')
-        : it.label;
-      return `<div class="loc-opt" data-id="${it.id}" data-gti="${it.gti}" data-label="${escAttr(it.label)}">${highlighted}</div>`;
+    const q=query.trim().toLowerCase();
+    const filtered=q?allItems.filter(it=>it.label.toLowerCase().includes(q)):allItems;
+    if(!filtered.length){list.innerHTML='<div class="loc-none">No locations match "'+escHtml(query)+'"</div>';return;}
+    list.innerHTML=filtered.map(it=>{
+      const h=q?it.label.replace(new RegExp('('+escRegex(q)+')','gi'),'<mark>$1</mark>'):it.label;
+      return `<div class="loc-opt" data-id="${it.id}" data-gti="${it.gti}" data-label="${escAttr(it.label)}">${h}</div>`;
     }).join('');
-
-    // Click handler for each option
-    list.querySelectorAll('.loc-opt').forEach(el => {
-      el.addEventListener('click', () => {
-        selectedLoc = { id: el.dataset.id, gti: parseFloat(el.dataset.gti) || 4.80, label: el.dataset.label };
-        display.value = selectedLoc.label;
-        closeDD();
-      });
+    list.querySelectorAll('.loc-opt').forEach(el=>{
+      el.addEventListener('click',()=>{selectedLoc={id:el.dataset.id,gti:parseFloat(el.dataset.gti)||4.80,label:el.dataset.label};display.value=selectedLoc.label;closeDD();});
     });
   }
-
-  // Toggle open/close on the display input click
-  display.addEventListener('click', () => {
-    dd.classList.contains('open') ? closeDD() : openDD();
-  });
-
-  // Filter as user types in search box
-  search.addEventListener('input', () => renderList(search.value));
-
-  // Close when clicking outside
-  document.addEventListener('click', e => {
-    if (!combo.contains(e.target)) closeDD();
-  });
-
-  // Keyboard: Escape closes
-  search.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeDD();
-  });
-
-  // Auto-select first location if available
-  if (allItems.length) {
-    selectedLoc = allItems[0];
-    display.value = selectedLoc.label;
-  }
+  display.addEventListener('click',()=>dd.classList.contains('open')?closeDD():openDD());
+  search.addEventListener('input',()=>renderList(search.value));
+  document.addEventListener('click',e=>{if(!combo.contains(e.target))closeDD();});
+  search.addEventListener('keydown',e=>{if(e.key==='Escape')closeDD();});
+  if(allItems.length){selectedLoc=allItems[0];display.value=selectedLoc.label;}
 }
 
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escAttr(s) { return String(s).replace(/"/g,'&quot;'); }
-function escRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return String(s).replace(/"/g,'&quot;');}
+function escRegex(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 
-function populateDropdowns() {
-  // ── Location: use searchable combobox ─────────────────────────────────
+function populateDropdowns(){
   setupLocCombo(DB.locations);
-
-  // ── Load profile: plain select ─────────────────────────────────────────
-  const loadSel = document.getElementById('sel-load');
-  loadSel.innerHTML = DB.loadProfiles.map(p=>
-    `<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`
-  ).join('') + '<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
-  loadSel.onchange = function(){
-    const c = this.value === 'custom';
-    document.getElementById('custom-peak-wrap').style.display = c ? 'flex' : 'none';
-    document.getElementById('custom-daily-wrap').style.display = c ? 'flex' : 'none';
-  };
+  const loadSel=document.getElementById('sel-load');
+  loadSel.innerHTML=DB.loadProfiles.map(p=>`<option value="${p.id}" data-peak="${p.peak}" data-daily="${p.daily}">${p.name}</option>`).join('')+'<option value="custom" data-peak="0" data-daily="0">Custom…</option>';
+  loadSel.onchange=function(){const c=this.value==='custom';document.getElementById('custom-peak-wrap').style.display=c?'flex':'none';document.getElementById('custom-daily-wrap').style.display=c?'flex':'none';};
 }
 
 function showApp(){
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app-screen').style.display = 'block';
-  const badge = document.getElementById('installer-badge');
-  badge.textContent = installer.installer_name;
-  badge.style.display = 'inline-block';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  const badge=document.getElementById('installer-badge');
+  badge.textContent=installer.installer_name;badge.style.display='inline-block';
   showHwBanner();
 }
 
-// ── HARDWARE SOURCE BANNER ─────────────────────────────────────────────────
-function showHwBanner() {
-  const banner = document.getElementById('hw-source-banner');
-  if (!banner || !DB.hwSource) return;
-  const { custPanels, custInverters, custBatteries, isNova } = DB.hwSource;
-  const allCustom  = custPanels > 0 && custInverters > 0 && custBatteries > 0;
-  const someCustom = custPanels > 0 || custInverters > 0 || custBatteries > 0;
-
-  if (isNova) {
-    banner.className = 'hw-banner shared on';
-    banner.innerHTML = '🌟 <span><b>Nova Metrics Demo</b> — using shared Nova Metrics hardware database. Proposals reflect reference pricing.</span>';
-    return;
-  }
-  if (allCustom) {
-    banner.className = 'hw-banner custom on';
-    banner.innerHTML = `✓ <span><b>Custom pricing active</b> — your uploaded hardware: ${custPanels} panels, ${custInverters} inverters, ${custBatteries} batteries. Proposals use your own pricing. <a href="hardware-pricelist.html">Update →</a></span>`;
-  } else if (someCustom) {
-    const useParts = [], fallParts = [];
-    if (custPanels    > 0) useParts.push(`${custPanels} panels`);    else fallParts.push('panels');
-    if (custInverters > 0) useParts.push(`${custInverters} inverters`); else fallParts.push('inverters');
-    if (custBatteries > 0) useParts.push(`${custBatteries} batteries`); else fallParts.push('batteries');
-    banner.className = 'hw-banner partial on';
-    banner.innerHTML = `⚡ <span><b>Partial custom pricing</b> — ${useParts.join(', ')} using your prices; ${fallParts.join(', ')} falling back to shared database. <a href="hardware-pricelist.html">Upload missing →</a></span>`;
-  } else {
-    banner.className = 'hw-banner shared on';
-    banner.innerHTML = `⚠ <span><b>Using shared hardware database</b> — for accurate proposals tailored to your pricing, <a href="hardware-pricelist.html">upload your hardware pricelist →</a></span>`;
-  }
+function showHwBanner(){
+  const banner=document.getElementById('hw-source-banner');
+  if(!banner||!DB.hwSource)return;
+  const{custPanels,custInverters,custBatteries,isNova}=DB.hwSource;
+  const allCustom=custPanels>0&&custInverters>0&&custBatteries>0;
+  const someCustom=custPanels>0||custInverters>0||custBatteries>0;
+  if(isNova){banner.className='hw-banner shared on';banner.innerHTML='🌟 <span><b>Nova Metrics Demo</b> — using shared Nova Metrics hardware database. Proposals reflect reference pricing.</span>';return;}
+  if(allCustom){banner.className='hw-banner custom on';banner.innerHTML=`✓ <span><b>Custom pricing active</b> — your uploaded hardware: ${custPanels} panels, ${custInverters} inverters, ${custBatteries} batteries. Proposals use your own pricing. <a href="hardware-pricelist.html">Update →</a></span>`;}
+  else if(someCustom){const u=[],f=[];if(custPanels>0)u.push(`${custPanels} panels`);else f.push('panels');if(custInverters>0)u.push(`${custInverters} inverters`);else f.push('inverters');if(custBatteries>0)u.push(`${custBatteries} batteries`);else f.push('batteries');banner.className='hw-banner partial on';banner.innerHTML=`⚡ <span><b>Partial custom pricing</b> — ${u.join(', ')} using your prices; ${f.join(', ')} falling back to shared database. <a href="hardware-pricelist.html">Upload missing →</a></span>`;}
+  else{banner.className='hw-banner shared on';banner.innerHTML=`⚠ <span><b>Using shared hardware database</b> — for accurate proposals tailored to your pricing, <a href="hardware-pricelist.html">upload your hardware pricelist →</a></span>`;}
 }
 
-document.getElementById('sign-out-btn').addEventListener('click', async function() {
-  await supabaseClient.auth.signOut();
-  window.location.href = 'nova-metrics_1.html';
-});
+document.getElementById('sign-out-btn').addEventListener('click',async function(){await supabaseClient.auth.signOut();window.location.href='nova-metrics_1.html';});
 
 async function doLogin(){
-  const emailEl = document.getElementById('login-email');
-  const passEl  = document.getElementById('login-password');
-  const errEl   = document.getElementById('login-error');
-  const btn     = document.getElementById('login-btn');
-  const email   = emailEl.value.trim().toLowerCase();
-  const pass    = passEl.value;
-  errEl.textContent = '';
-  if (!email) { errEl.textContent = 'Please enter your email address.'; emailEl.focus(); return; }
-  if (!pass)  { errEl.textContent = 'Please enter your password.';      passEl.focus();  return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="login-spinner"></span>Signing in…';
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-  if (error) {
-    errEl.textContent = error.message === 'Invalid login credentials'
-      ? 'Incorrect email or password. Use "Forgot password?" if this is your first login.'
-      : error.message;
-    passEl.value = ''; passEl.focus();
-    btn.disabled = false; btn.textContent = 'Sign In';
-    return;
-  }
-  try {
-    showLoadingOverlay('Loading your workspace…');
-    await loadInstallerProfile(data.user.email);
-    await loadAllData();
-    hideLoadingOverlay();
-    showApp();
-  } catch(e) { showDataError(e); }
+  const emailEl=document.getElementById('login-email'),passEl=document.getElementById('login-password'),errEl=document.getElementById('login-error'),btn=document.getElementById('login-btn');
+  const email=emailEl.value.trim().toLowerCase(),pass=passEl.value;
+  errEl.textContent='';
+  if(!email){errEl.textContent='Please enter your email address.';emailEl.focus();return;}
+  if(!pass){errEl.textContent='Please enter your password.';passEl.focus();return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Signing in…';
+  const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error){errEl.textContent=error.message==='Invalid login credentials'?'Incorrect email or password. Use "Forgot password?" if this is your first login.':error.message;passEl.value='';passEl.focus();btn.disabled=false;btn.textContent='Sign In';return;}
+  try{showLoadingOverlay('Loading your workspace…');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    const ls = document.getElementById('login-screen');
-    if (ls && ls.style.display !== 'none') {
-      const activePanel = ['signin','forgot','setpass'].find(p =>
-        document.getElementById('panel-'+p).style.display !== 'none'
-      );
-      if (activePanel === 'signin')  doLogin();
-      if (activePanel === 'forgot')  doForgotPassword();
-      if (activePanel === 'setpass') doSetPassword();
-    }
-  }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const ls=document.getElementById('login-screen');if(ls&&ls.style.display!=='none'){const ap=['signin','forgot','setpass'].find(p=>document.getElementById('panel-'+p).style.display!=='none');if(ap==='signin')doLogin();if(ap==='forgot')doForgotPassword();if(ap==='setpass')doSetPassword();}}
 });
 
-async function doForgotPassword() {
-  const email = document.getElementById('forgot-email').value.trim().toLowerCase();
-  const errEl = document.getElementById('forgot-error');
-  const sucEl = document.getElementById('forgot-success');
-  const btn   = document.getElementById('forgot-btn');
-  errEl.textContent = ''; sucEl.textContent = '';
-  if (!email) { errEl.textContent = 'Please enter your email address.'; return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="login-spinner"></span>Sending…';
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: APP_URL });
-  btn.disabled = false; btn.textContent = 'Send Reset Link';
-  if (error) { errEl.textContent = error.message; }
-  else { sucEl.textContent = '✓ Reset link sent! Check your email inbox and click the link to set your password.'; }
+async function doForgotPassword(){
+  const email=document.getElementById('forgot-email').value.trim().toLowerCase(),errEl=document.getElementById('forgot-error'),sucEl=document.getElementById('forgot-success'),btn=document.getElementById('forgot-btn');
+  errEl.textContent='';sucEl.textContent='';
+  if(!email){errEl.textContent='Please enter your email address.';return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Sending…';
+  const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:APP_URL});
+  btn.disabled=false;btn.textContent='Send Reset Link';
+  if(error)errEl.textContent=error.message;else sucEl.textContent='✓ Reset link sent! Check your email inbox and click the link to set your password.';
 }
 
-async function doSetPassword() {
-  const pass    = document.getElementById('new-password').value;
-  const confirm = document.getElementById('new-password-confirm').value;
-  const errEl   = document.getElementById('setpass-error');
-  const btn     = document.getElementById('setpass-btn');
-  errEl.textContent = '';
-  if (pass.length < 8)  { errEl.textContent = 'Password must be at least 8 characters.'; return; }
-  if (pass !== confirm) { errEl.textContent = 'Passwords do not match.'; return; }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="login-spinner"></span>Setting password…';
-  const { data, error } = await supabaseClient.auth.updateUser({ password: pass });
-  if (error) {
-    errEl.textContent = error.message;
-    btn.disabled = false; btn.textContent = 'Set Password & Sign In';
-    return;
-  }
-  try {
-    showLoadingOverlay('Setting up your workspace…');
-    await loadInstallerProfile(data.user.email);
-    await loadAllData();
-    hideLoadingOverlay();
-    showApp();
-  } catch(e) { showDataError(e); }
+async function doSetPassword(){
+  const pass=document.getElementById('new-password').value,confirm=document.getElementById('new-password-confirm').value,errEl=document.getElementById('setpass-error'),btn=document.getElementById('setpass-btn');
+  errEl.textContent='';
+  if(pass.length<8){errEl.textContent='Password must be at least 8 characters.';return;}
+  if(pass!==confirm){errEl.textContent='Passwords do not match.';return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Setting password…';
+  const{data,error}=await supabaseClient.auth.updateUser({password:pass});
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';return;}
+  try{showLoadingOverlay('Setting up your workspace…');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}
 }
 
 function showTab(id){
@@ -822,468 +714,127 @@ function showTab(id){
   document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
 }
 
-// ── ENGINEERING CONSTANTS ─────────────────────────────────────────────────
-const BATT_HEADROOM_MIN       = 1.10;
-const BATT_HEADROOM_IDEAL_MIN = 1.15;
-const BATT_HEADROOM_IDEAL_MAX = 1.35;
-const BATT_HEADROOM_MAX       = 1.60;
-const BATT_DOD_LOW    = 0.50;
-const BATT_DOD_NORMAL = 0.70;
-const BATT_DOD_HIGH   = 0.85;
-const BATT_DOD_MAX    = 0.95;
-const SYSTEM_EFFICIENCY   = 0.85;
-const BATT_ROUND_TRIP_EFF = 0.90;
+const BATT_HEADROOM_MIN=1.10,BATT_HEADROOM_IDEAL_MIN=1.15,BATT_HEADROOM_IDEAL_MAX=1.35,BATT_HEADROOM_MAX=1.60;
+const BATT_DOD_LOW=0.50,BATT_DOD_NORMAL=0.70,BATT_DOD_HIGH=0.85,BATT_DOD_MAX=0.95;
+const SYSTEM_EFFICIENCY=0.85,BATT_ROUND_TRIP_EFF=0.90;
 
-function batteryHeadroomStatus(h){
-  if(h<BATT_HEADROOM_MIN)        return 'Undersized';
-  if(h<BATT_HEADROOM_IDEAL_MIN)  return 'Tight';
-  if(h<=BATT_HEADROOM_IDEAL_MAX) return 'Balanced';
-  if(h<=BATT_HEADROOM_MAX)       return 'Conservative';
-  return 'Oversized';
-}
-function batteryStressLabel(dod){
-  if(dod<=BATT_DOD_LOW)    return ['Low stress','Long cycle life expected'];
-  if(dod<=BATT_DOD_NORMAL) return ['Normal cycling','Standard daily use'];
-  if(dod<=BATT_DOD_HIGH)   return ['High cycling','Acceptable for LFP — monitor life'];
-  return ['Very high cycling','Consider adding a battery unit'];
-}
+function batteryHeadroomStatus(h){if(h<BATT_HEADROOM_MIN)return'Undersized';if(h<BATT_HEADROOM_IDEAL_MIN)return'Tight';if(h<=BATT_HEADROOM_IDEAL_MAX)return'Balanced';if(h<=BATT_HEADROOM_MAX)return'Conservative';return'Oversized';}
+function batteryStressLabel(dod){if(dod<=BATT_DOD_LOW)return['Low stress','Long cycle life expected'];if(dod<=BATT_DOD_NORMAL)return['Normal cycling','Standard daily use'];if(dod<=BATT_DOD_HIGH)return['High cycling','Acceptable for LFP — monitor life'];return['Very high cycling','Consider adding a battery unit'];}
 
-// ── BATTERY SELECTOR ──────────────────────────────────────────────────────
-function selectBestBattery(requiredKWh, peakLoad, autonomy){
-  const candidates = [];
-  const avgDrawKW = Math.max(requiredKWh / autonomy, 0.01);
-  DB.batteries.forEach(batt=>{
-    for(let units=1; units<=30; units++){
-      const installedKWh = batt.usable * units;
-      const totalKW      = batt.kw * units;
-      const headroom     = installedKWh / requiredKWh;
-      const dod          = requiredKWh / installedKWh;
-      const runtime      = installedKWh / avgDrawKW;
-      if(headroom < BATT_HEADROOM_MIN) continue;
-      if(totalKW  < peakLoad)         continue;
-      if(dod      > BATT_DOD_MAX)     continue;
-      const headroomPenalty =
-        headroom < BATT_HEADROOM_IDEAL_MIN ? (BATT_HEADROOM_IDEAL_MIN-headroom)*10 :
-        headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom-BATT_HEADROOM_IDEAL_MAX)*10 : 0;
-      const dodPenalty      = dod > BATT_DOD_NORMAL ? (dod-BATT_DOD_NORMAL)*30 : 0;
-      const oversizePenalty = headroom > BATT_HEADROOM_IDEAL_MAX ? (headroom-BATT_HEADROOM_IDEAL_MAX)*15 : 0;
-      const costWeight      = batt.price * units * 0.0005;
-      candidates.push({
-        ...batt, units, installedKWh, totalKW, runtime, headroom, dod,
-        totalCost: batt.price*units,
-        headroomStatus: batteryHeadroomStatus(headroom),
-        techScore: headroomPenalty + dodPenalty + oversizePenalty + costWeight
-      });
-    }
-  });
-  if(!candidates.length) return null;
-  const preferred = candidates.filter(c=>c.headroom<=BATT_HEADROOM_MAX);
-  const pool = preferred.length ? preferred : candidates;
-  const ord = {Balanced:0,Conservative:1,Tight:2,Oversized:3,Undersized:4};
-  pool.sort((a,b)=>
-    a.techScore-b.techScore ||
-    ord[a.headroomStatus]-ord[b.headroomStatus] ||
-    a.dod-b.dod || a.headroom-b.headroom ||
-    a.totalCost-b.totalCost || a.units-b.units
-  );
+function selectBestBattery(requiredKWh,peakLoad,autonomy){
+  const candidates=[],avgDrawKW=Math.max(requiredKWh/autonomy,0.01);
+  DB.batteries.forEach(batt=>{for(let units=1;units<=30;units++){const installedKWh=batt.usable*units,totalKW=batt.kw*units,headroom=installedKWh/requiredKWh,dod=requiredKWh/installedKWh,runtime=installedKWh/avgDrawKW;if(headroom<BATT_HEADROOM_MIN)continue;if(totalKW<peakLoad)continue;if(dod>BATT_DOD_MAX)continue;const hp=headroom<BATT_HEADROOM_IDEAL_MIN?(BATT_HEADROOM_IDEAL_MIN-headroom)*10:headroom>BATT_HEADROOM_IDEAL_MAX?(headroom-BATT_HEADROOM_IDEAL_MAX)*10:0,dp=dod>BATT_DOD_NORMAL?(dod-BATT_DOD_NORMAL)*30:0,op=headroom>BATT_HEADROOM_IDEAL_MAX?(headroom-BATT_HEADROOM_IDEAL_MAX)*15:0,cw=batt.price*units*0.0005;candidates.push({...batt,units,installedKWh,totalKW,runtime,headroom,dod,totalCost:batt.price*units,headroomStatus:batteryHeadroomStatus(headroom),techScore:hp+dp+op+cw});}});
+  if(!candidates.length)return null;
+  const preferred=candidates.filter(c=>c.headroom<=BATT_HEADROOM_MAX),pool=preferred.length?preferred:candidates;
+  const ord={Balanced:0,Conservative:1,Tight:2,Oversized:3,Undersized:4};
+  pool.sort((a,b)=>a.techScore-b.techScore||ord[a.headroomStatus]-ord[b.headroomStatus]||a.dod-b.dod||a.headroom-b.headroom||a.totalCost-b.totalCost||a.units-b.units);
   return pool[0];
 }
 
-// ── INVERTER SELECTOR ─────────────────────────────────────────────────────
-function selectBestInverter(requiredInvAC, systemDC){
-  let bestInv = null, bestScore = Infinity, bestUnits = 1;
-  DB.inverters.forEach(inv=>{
-    for(let units=1; units<=4; units++){
-      const totalAC = inv.ac * units;
-      const totalDC = inv.dc * units;
-      if(totalAC < requiredInvAC) continue;
-      if(totalDC < systemDC)     continue;
-      const dcAc = systemDC / totalAC;
-      let score = dcAc<0.80 ? 60 : dcAc>1.5 ? 100 : Math.abs(dcAc-1.15)*40;
-      score += Math.abs(totalAC - requiredInvAC) * 3;
-      score += (inv.price * units) * 0.0005;
-      score += (units - 1) * 25;
-      if(score < bestScore){ bestScore = score; bestInv = inv; bestUnits = units; }
-    }
-  });
-  if(!bestInv){ bestInv = DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b); bestUnits = 1; }
-  return { inv: bestInv, units: bestUnits };
+function selectBestInverter(requiredInvAC,systemDC){
+  let bestInv=null,bestScore=Infinity,bestUnits=1;
+  DB.inverters.forEach(inv=>{for(let units=1;units<=4;units++){const totalAC=inv.ac*units,totalDC=inv.dc*units;if(totalAC<requiredInvAC)continue;if(totalDC<systemDC)continue;const dcAc=systemDC/totalAC;let score=dcAc<0.80?60:dcAc>1.5?100:Math.abs(dcAc-1.15)*40;score+=Math.abs(totalAC-requiredInvAC)*3;score+=(inv.price*units)*0.0005;score+=(units-1)*25;if(score<bestScore){bestScore=score;bestInv=inv;bestUnits=units;}}});
+  if(!bestInv){bestInv=DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b);bestUnits=1;}
+  return{inv:bestInv,units:bestUnits};
 }
 
-// ── MAIN CALCULATION ENGINE ───────────────────────────────────────────────
 function calculate(){
-  if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){
-    toast('⚠ Data still loading — please wait'); return;
-  }
-
-  // ── Location from searchable combobox ────────────────────────────────────
-  if(!selectedLoc){ toast('⚠ Please select a location first'); return; }
-  const locName = selectedLoc.label;
-  const psh     = selectedLoc.gti;
-
-  const loadSel = document.getElementById('sel-load');
-  let peakLoad, dailyUsage;
-  if(loadSel.value==='custom'){
-    peakLoad   = parseFloat(document.getElementById('custom-peak').value) ||3;
-    dailyUsage = parseFloat(document.getElementById('custom-daily').value)||20;
-  } else {
-    const o = loadSel.options[loadSel.selectedIndex];
-    peakLoad   = parseFloat(o.dataset.peak);
-    dailyUsage = parseFloat(o.dataset.daily);
-  }
-  const autonomy = parseFloat(document.getElementById('sel-autonomy').value);
-  const tariff   = parseFloat(document.getElementById('sel-tariff').value);
-  const markup   = parseFloat(document.getElementById('sel-markup').value)/100;
-
-  // ── Solar sizing ─────────────────────────────────────────────────────────
-  const batteryBackupKWh    = dailyUsage * (autonomy / 24);
-  const battRechargeEnergy  = batteryBackupKWh / BATT_ROUND_TRIP_EFF;
-  const requiredSolarEnergy = (dailyUsage - batteryBackupKWh) + battRechargeEnergy;
-  const requiredSolarKW     = requiredSolarEnergy / (psh * SYSTEM_EFFICIENCY);
-
-  let bestPanel=null, bestOversize=Infinity;
-  DB.panels.forEach(p=>{
-    const n  = Math.ceil(requiredSolarKW*1000/p.watts);
-    const dc = n*p.watts/1000;
-    const os = dc-requiredSolarKW;
-    if(os>=0 && os<bestOversize){ bestOversize=os; bestPanel={...p,panelsNeeded:n,dcKW:dc}; }
-  });
-  if(!bestPanel){
-    const p=DB.panels[DB.panels.length-1];
-    bestPanel={...p,panelsNeeded:Math.ceil(requiredSolarKW*1000/p.watts)};
-    bestPanel.dcKW=bestPanel.panelsNeeded*p.watts/1000;
-  }
-
-  const systemDC           = bestPanel.dcKW;
-  const expectedDailySolar = systemDC*psh*SYSTEM_EFFICIENCY;
-  const oversizePct        = (systemDC-requiredSolarKW)/requiredSolarKW;
-  const annualSolar        = expectedDailySolar*365;
-  const annualConsumption  = dailyUsage*365;
-  const panelCount         = bestPanel.panelsNeeded;
-  const footprint          = panelCount*2.2;
-  const roofFitData =
-    panelCount<=14 ? ['Easy Fit',          'Fits a single roof plane. Quick installation.'] :
-    panelCount<=20 ? ['Standard Fit',      'May use multiple roof sections. Common setup.'] :
-    panelCount<=30 ? ['Complex Layout',    'East/West layout recommended for optimal production.'] :
-    panelCount<=50 ? ['Large System Layout','Carport or ground mount may be considered.'] :
-                     ['Industrial Array',   'Multiple roof sections or ground mount required.'];
-
-  // ── Battery ───────────────────────────────────────────────────────────────
-  const bestBatt = selectBestBattery(batteryBackupKWh, peakLoad, autonomy);
-  if(!bestBatt){ toast('⚠ No suitable battery found — check load/autonomy inputs'); return; }
-
-  const installedBattKWh   = bestBatt.installedKWh;
-  const battRuntime        = bestBatt.runtime;
-  const battCapRatio       = bestBatt.headroom;
-  const battDod            = bestBatt.dod;
-  const battHeadroomStatus = bestBatt.headroomStatus;
-  const battTotalKW        = bestBatt.totalKW;
-  const [battStress, battStressSub] = batteryStressLabel(battDod);
-
-  const battRisk =
-    battCapRatio<BATT_HEADROOM_MIN        ? 'High risk – storage below requirement' :
-    battCapRatio<BATT_HEADROOM_IDEAL_MIN  ? 'Tight design – minimal reserve' :
-    battCapRatio<=BATT_HEADROOM_IDEAL_MAX ? 'Low risk – right-sized reserve' :
-    battCapRatio<=BATT_HEADROOM_MAX       ? 'Low risk – conservative reserve' :
-    'Conservative – min unit constraint applied';
-
-  const backupCovRatio = battTotalKW/peakLoad;
-  const coverage =
-    backupCovRatio<1    ? 'Only Essential Loads Supported' :
-    backupCovRatio<1.15 ? 'Essential + Some Comfort Loads' :
-    backupCovRatio<=1.40? 'Most Loads Covered' :
-    'Safe power headroom';
-
-  const battIssues = [];
-  if(battCapRatio < BATT_HEADROOM_MIN) battIssues.push('Insufficient stored energy');
-  if(battTotalKW  < peakLoad)          battIssues.push('Battery power below peak load');
-
-  const battVerdict = battIssues.length>0 ? 'Action Required: '+battIssues.join(' | ') :
-    battHeadroomStatus==='Balanced'     ? 'Well Designed: Balanced and reliable' :
-    battHeadroomStatus==='Conservative' ? 'Acceptable: Conservative reserve' :
-    battHeadroomStatus==='Oversized'    ? 'Acceptable: Min unit constraint applied' :
-    battHeadroomStatus==='Tight'        ? 'Acceptable: Tight but within range' :
-    'Review: Below ideal — check sizing';
-
-  const battPasses  = battIssues.length===0;
-  const battPowerOK = battTotalKW >= peakLoad;
-
-  // ── Inverter ──────────────────────────────────────────────────────────────
-  const requiredInvAC = peakLoad * 1.3;
-  const { inv: bestInv, units: invUnits } = selectBestInverter(requiredInvAC, systemDC);
-
-  const invTotalAC    = bestInv.ac    * invUnits;
-  const invTotalDC    = bestInv.dc    * invUnits;
-  const invTotalPrice = bestInv.price * invUnits;
-  const invTotalMPPT  = bestInv.mppt  * invUnits;
-
-  const dcAcRatio  = systemDC / invTotalAC;
-  const dcAcStatus =
-    dcAcRatio<0.80  ? 'Under-Utilised (small load)' :
-    dcAcRatio<0.95  ? 'Slightly Under-Utilised' :
-    dcAcRatio<=1.35 ? 'Balanced' :
-    dcAcRatio<=1.5  ? 'Pushing Limits' : 'Too Large (Clipping Risk)';
-  const invHeadroom = invTotalAC - peakLoad;
-  const invLoadOK   = invTotalAC >= requiredInvAC;
-  const invDisplayModel = invUnits > 1 ? `${invUnits}x ${bestInv.model} (parallel)` : bestInv.model;
-
-  // ── Cross-system checks ───────────────────────────────────────────────────
-  const solarCanRechargeBatt = expectedDailySolar >= requiredSolarEnergy;
-  const solarPasses          = oversizePct >= 0 && solarCanRechargeBatt;
-  const invPasses            = invLoadOK;
-  const systemRecommended    = solarPasses && battPasses && invPasses;
-
-  // ── MPPT ──────────────────────────────────────────────────────────────────
-  const stringsNeeded = Math.ceil(panelCount / 12);
-  const mpptRequired  = Math.ceil(stringsNeeded / 2);
-  const mpptAvailable = invTotalMPPT;
-  const mpptStatus    =
-    mpptRequired < mpptAvailable    ? 'Spare inputs available' :
-    mpptRequired === mpptAvailable  ? 'All inputs used' :
-    mpptRequired === mpptAvailable+1? 'Limited headroom' : 'Additional inputs required';
-
-  // ── Financials ────────────────────────────────────────────────────────────
-  const panelCost      = panelCount * bestPanel.price;
-  const bosCost        = systemDC * 3000;
-  const hwCost         = panelCost + bosCost;
-  const totalCost      = hwCost + bestBatt.totalCost + invTotalPrice;
-  const sellPrice      = totalCost * (1 + markup);
-  const profit         = sellPrice - totalCost;
-  const costPerKW      = totalCost / systemDC;
-  const dailyOffset    = Math.min(expectedDailySolar, dailyUsage);
-  const monthlySavings = dailyOffset * tariff * 30;
-  const annualSavings  = dailyOffset * tariff * 365;
-  const simplePayback  = annualSavings > 0 ? totalCost / annualSavings : 999;
-  const lifetimeSavings= annualSavings * 25;
-  const annualROI      = (annualSavings / totalCost) * 100;
-  let cumS=0, realPayback=25;
-  for(let yr=1;yr<=25;yr++){
-    const f=yr<=3?Math.pow(1.1274,yr-1):Math.pow(1.1274,2)*Math.pow(1.054,yr-3);
-    cumS+=annualSavings*f;
-    if(cumS>=totalCost&&realPayback===25) realPayback=yr;
-  }
-
-  // ── Environment ───────────────────────────────────────────────────────────
-  const co2KG = annualSolar*0.895, co2Tons=co2KG/1000, trees=co2KG/21;
-  const coal  = annualSolar/2460, water=annualSolar*1.8;
-  const monthlyKWh = expectedDailySolar*30;
-  const segment =
-    monthlyKWh<=1500 ?'Low Residential':monthlyKWh<=3000?'High Residential':
-    monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial';
-  const indepPct = Math.min(annualSolar/annualConsumption,1)*100;
-
-  calcResult = {
-    locName, psh, peakLoad, dailyUsage, autonomy, tariff, markup,
-    requiredSolarKW, requiredSolarEnergy, systemDC,
-    panelCount, panelModel:bestPanel.model, panelWatts:bestPanel.watts,
-    expectedDailySolar, oversizePct, annualSolar, footprint,
-    roofFit:roofFitData[0], roofGuidance:roofFitData[1],
-    batteryBackupKWh, installedBattKWh, battRuntime,
-    battModel:bestBatt.model, battUnits:bestBatt.units, battUsable:bestBatt.usable,
-    battCapRatio, battRisk, battVerdict, battStress, battStressSub,
-    battDod, battHeadroomStatus, coverage, battTotalKW, battPowerOK,
-    battTotalCost:bestBatt.totalCost,
-    solarCanRechargeBatt, solarPasses, battPasses, invPasses, systemRecommended,
-    invModel:invDisplayModel, invUnits,
-    invAC:invTotalAC, invDC:invTotalDC, invEff:bestInv.eff,
-    invHeadroom, invLoadOK, invPrice:invTotalPrice,
-    dcAcRatio, dcAcStatus,
-    mpptRequired, mpptAvailable, mpptStatus,
-    panelCost, bosCost, hwCost, totalCost, sellPrice, profit, costPerKW,
-    monthlySavings, annualSavings, lifetimeSavings, annualROI, simplePayback, realPayback,
-    annualConsumption, co2Tons, trees, coal, water, segment, indepPct
-  };
-
+  if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){toast('⚠ Data still loading — please wait');return;}
+  if(!selectedLoc){toast('⚠ Please select a location first');return;}
+  const locName=selectedLoc.label,psh=selectedLoc.gti;
+  const loadSel=document.getElementById('sel-load');
+  let peakLoad,dailyUsage;
+  if(loadSel.value==='custom'){peakLoad=parseFloat(document.getElementById('custom-peak').value)||3;dailyUsage=parseFloat(document.getElementById('custom-daily').value)||20;}
+  else{const o=loadSel.options[loadSel.selectedIndex];peakLoad=parseFloat(o.dataset.peak);dailyUsage=parseFloat(o.dataset.daily);}
+  const autonomy=parseFloat(document.getElementById('sel-autonomy').value),tariff=parseFloat(document.getElementById('sel-tariff').value),markup=parseFloat(document.getElementById('sel-markup').value)/100;
+  const batteryBackupKWh=dailyUsage*(autonomy/24),battRechargeEnergy=batteryBackupKWh/BATT_ROUND_TRIP_EFF,requiredSolarEnergy=(dailyUsage-batteryBackupKWh)+battRechargeEnergy,requiredSolarKW=requiredSolarEnergy/(psh*SYSTEM_EFFICIENCY);
+  let bestPanel=null,bestOversize=Infinity;
+  DB.panels.forEach(p=>{const n=Math.ceil(requiredSolarKW*1000/p.watts),dc=n*p.watts/1000,os=dc-requiredSolarKW;if(os>=0&&os<bestOversize){bestOversize=os;bestPanel={...p,panelsNeeded:n,dcKW:dc};}});
+  if(!bestPanel){const p=DB.panels[DB.panels.length-1];bestPanel={...p,panelsNeeded:Math.ceil(requiredSolarKW*1000/p.watts)};bestPanel.dcKW=bestPanel.panelsNeeded*p.watts/1000;}
+  const systemDC=bestPanel.dcKW,expectedDailySolar=systemDC*psh*SYSTEM_EFFICIENCY,oversizePct=(systemDC-requiredSolarKW)/requiredSolarKW,annualSolar=expectedDailySolar*365,annualConsumption=dailyUsage*365,panelCount=bestPanel.panelsNeeded,footprint=panelCount*2.2;
+  const roofFitData=panelCount<=14?['Easy Fit','Fits a single roof plane. Quick installation.']:panelCount<=20?['Standard Fit','May use multiple roof sections. Common setup.']:panelCount<=30?['Complex Layout','East/West layout recommended for optimal production.']:panelCount<=50?['Large System Layout','Carport or ground mount may be considered.']:['Industrial Array','Multiple roof sections or ground mount required.'];
+  const bestBatt=selectBestBattery(batteryBackupKWh,peakLoad,autonomy);
+  if(!bestBatt){toast('⚠ No suitable battery found — check load/autonomy inputs');return;}
+  const installedBattKWh=bestBatt.installedKWh,battRuntime=bestBatt.runtime,battCapRatio=bestBatt.headroom,battDod=bestBatt.dod,battHeadroomStatus=bestBatt.headroomStatus,battTotalKW=bestBatt.totalKW,[battStress,battStressSub]=batteryStressLabel(battDod);
+  const battRisk=battCapRatio<BATT_HEADROOM_MIN?'High risk – storage below requirement':battCapRatio<BATT_HEADROOM_IDEAL_MIN?'Tight design – minimal reserve':battCapRatio<=BATT_HEADROOM_IDEAL_MAX?'Low risk – right-sized reserve':battCapRatio<=BATT_HEADROOM_MAX?'Low risk – conservative reserve':'Conservative – min unit constraint applied';
+  const backupCovRatio=battTotalKW/peakLoad,coverage=backupCovRatio<1?'Only Essential Loads Supported':backupCovRatio<1.15?'Essential + Some Comfort Loads':backupCovRatio<=1.40?'Most Loads Covered':'Safe power headroom';
+  const battIssues=[];if(battCapRatio<BATT_HEADROOM_MIN)battIssues.push('Insufficient stored energy');if(battTotalKW<peakLoad)battIssues.push('Battery power below peak load');
+  const battVerdict=battIssues.length>0?'Action Required: '+battIssues.join(' | '):battHeadroomStatus==='Balanced'?'Well Designed: Balanced and reliable':battHeadroomStatus==='Conservative'?'Acceptable: Conservative reserve':battHeadroomStatus==='Oversized'?'Acceptable: Min unit constraint applied':battHeadroomStatus==='Tight'?'Acceptable: Tight but within range':'Review: Below ideal — check sizing';
+  const battPasses=battIssues.length===0,battPowerOK=battTotalKW>=peakLoad;
+  const requiredInvAC=peakLoad*1.3,{inv:bestInv,units:invUnits}=selectBestInverter(requiredInvAC,systemDC);
+  const invTotalAC=bestInv.ac*invUnits,invTotalDC=bestInv.dc*invUnits,invTotalPrice=bestInv.price*invUnits,invTotalMPPT=bestInv.mppt*invUnits;
+  const dcAcRatio=systemDC/invTotalAC,dcAcStatus=dcAcRatio<0.80?'Under-Utilised (small load)':dcAcRatio<0.95?'Slightly Under-Utilised':dcAcRatio<=1.35?'Balanced':dcAcRatio<=1.5?'Pushing Limits':'Too Large (Clipping Risk)';
+  const invHeadroom=invTotalAC-peakLoad,invLoadOK=invTotalAC>=requiredInvAC,invDisplayModel=invUnits>1?`${invUnits}x ${bestInv.model} (parallel)`:bestInv.model;
+  const solarCanRechargeBatt=expectedDailySolar>=requiredSolarEnergy,solarPasses=oversizePct>=0&&solarCanRechargeBatt,invPasses=invLoadOK,systemRecommended=solarPasses&&battPasses&&invPasses;
+  const stringsNeeded=Math.ceil(panelCount/12),mpptRequired=Math.ceil(stringsNeeded/2),mpptAvailable=invTotalMPPT,mpptStatus=mpptRequired<mpptAvailable?'Spare inputs available':mpptRequired===mpptAvailable?'All inputs used':mpptRequired===mpptAvailable+1?'Limited headroom':'Additional inputs required';
+  const panelCost=panelCount*bestPanel.price,bosCost=systemDC*3000,hwCost=panelCost+bosCost,totalCost=hwCost+bestBatt.totalCost+invTotalPrice,sellPrice=totalCost*(1+markup),profit=sellPrice-totalCost,costPerKW=totalCost/systemDC,dailyOffset=Math.min(expectedDailySolar,dailyUsage),monthlySavings=dailyOffset*tariff*30,annualSavings=dailyOffset*tariff*365,simplePayback=annualSavings>0?totalCost/annualSavings:999,lifetimeSavings=annualSavings*25,annualROI=(annualSavings/totalCost)*100;
+  let cumS=0,realPayback=25;for(let yr=1;yr<=25;yr++){const f=yr<=3?Math.pow(1.1274,yr-1):Math.pow(1.1274,2)*Math.pow(1.054,yr-3);cumS+=annualSavings*f;if(cumS>=totalCost&&realPayback===25)realPayback=yr;}
+  const co2KG=annualSolar*0.895,co2Tons=co2KG/1000,trees=co2KG/21,coal=annualSolar/2460,water=annualSolar*1.8,monthlyKWh=expectedDailySolar*30,segment=monthlyKWh<=1500?'Low Residential':monthlyKWh<=3000?'High Residential':monthlyKWh<=20000?'Small Commercial':monthlyKWh<=50000?'Large Commercial':'Industrial',indepPct=Math.min(annualSolar/annualConsumption,1)*100;
+  calcResult={locName,psh,peakLoad,dailyUsage,autonomy,tariff,markup,requiredSolarKW,requiredSolarEnergy,systemDC,panelCount,panelModel:bestPanel.model,panelWatts:bestPanel.watts,expectedDailySolar,oversizePct,annualSolar,footprint,roofFit:roofFitData[0],roofGuidance:roofFitData[1],batteryBackupKWh,installedBattKWh,battRuntime,battModel:bestBatt.model,battUnits:bestBatt.units,battUsable:bestBatt.usable,battCapRatio,battRisk,battVerdict,battStress,battStressSub,battDod,battHeadroomStatus,coverage,battTotalKW,battPowerOK,battTotalCost:bestBatt.totalCost,solarCanRechargeBatt,solarPasses,battPasses,invPasses,systemRecommended,invModel:invDisplayModel,invUnits,invAC:invTotalAC,invDC:invTotalDC,invEff:bestInv.eff,invHeadroom,invLoadOK,invPrice:invTotalPrice,dcAcRatio,dcAcStatus,mpptRequired,mpptAvailable,mpptStatus,panelCost,bosCost,hwCost,totalCost,sellPrice,profit,costPerKW,monthlySavings,annualSavings,lifetimeSavings,annualROI,simplePayback,realPayback,annualConsumption,co2Tons,trees,coal,water,segment,indepPct};
   renderAll(calcResult);
   toast('✓ System calculated — check all tabs');
 }
 
-// ── RENDER ─────────────────────────────────────────────────────────────────
-function fmtR(n){ return 'R'+Math.round(n).toLocaleString('en-ZA'); }
-function fmtN(n,d=1){ return Number(n).toFixed(d); }
+function fmtR(n){return'R'+Math.round(n).toLocaleString('en-ZA');}
+function fmtN(n,d=1){return Number(n).toFixed(d);}
 
 function renderAll(r){
-  set('r-panel-model', r.panelModel);
-  set('r-req-solar',   fmtN(r.requiredSolarKW,2)+' kW');
-  set('r-dc-cap',      fmtN(r.systemDC,2)+' kW');
-  set('r-panel-count', r.panelCount+' Panels');
-  set('r-panel-watts', r.panelWatts+' W');
-  set('r-daily-solar', fmtN(r.expectedDailySolar,2)+' kWh');
-  set('r-daily-solar-sub',
-    r.expectedDailySolar>=r.requiredSolarEnergy*1.1?'Fully covers demand':
-    r.expectedDailySolar>=r.requiredSolarEnergy    ?'Meets demand':'Insufficient production');
-  const op=r.oversizePct;
-  set('r-oversize',(op*100).toFixed(1)+'%');
-  set('r-oversize-sub',
-    op<0?'Undersized — risk of shortage':op<=0.15?'Optimal sizing':
-    op<=0.30?'Safety margin included':op<=0.40?'Rounding oversize — acceptable':'Excess capacity — review string layout');
-  set('r-roof-fit',r.roofFit); set('r-roof-guidance',r.roofGuidance);
-  set('r-psh',       fmtN(r.psh,2)+' hrs/day');
-  set('r-req-energy',fmtN(r.requiredSolarEnergy,2)+' kWh/day');
-  set('r-footprint', fmtN(r.footprint,1)+' m²');
-  set('r-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
-
-  const sysKpi = document.getElementById('sys-rec-kpi');
-  if(r.systemRecommended){
-    const highCycling = r.battDod > BATT_DOD_NORMAL;
-    set('sys-rec-value', '✓ Recommended System');
-    if(highCycling){
-      set('sys-rec-sub',
-        'All components correctly sized. Advisory: battery cycling at '
-        + fmtN(r.battDod*100,0)+'% DoD — acceptable for LFP but consider '
-        +(r.battDod > BATT_DOD_HIGH
-          ? 'adding an extra battery unit to reduce cycle depth and extend lifespan.'
-          : 'monitoring cycle wear or adding a unit for extended battery life.'));
-      sysKpi.className = 'kpi amber';
-    } else {
-      set('sys-rec-sub','Solar, battery and inverter are all correctly sized and compatible');
-      sysKpi.className = 'kpi green';
-    }
-    if(r.invUnits > 1){
-      const sub = document.getElementById('sys-rec-sub');
-      sub.textContent += (sub.textContent ? ' ' : '')
-        + `Note: ${r.invUnits} inverters in parallel required for this load size.`;
-    }
-  } else {
-    const fl=[];
-    if(!r.solarPasses)          fl.push('Solar array');
-    if(!r.battPasses)           fl.push('Battery');
-    if(!r.invPasses)            fl.push('Inverter');
-    if(!r.solarCanRechargeBatt) fl.push('Solar output too low');
-    set('sys-rec-value','✗ System Not Recommended');
-    set('sys-rec-sub','Issues with: '+fl.join(', '));
-    sysKpi.className = 'kpi red';
-  }
-
-  setKpi('b-verdict',r.battVerdict,
-    r.battVerdict.includes('Action')?'red':
-    r.battVerdict.includes('Acceptable')||r.battVerdict.includes('Well')?'green':'amber');
-  setKpi('b-stress', r.battStress, r.battDod<=BATT_DOD_NORMAL?'green':'amber');
-  set('b-stress-sub',fmtN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
-  setKpi('b-risk',   r.battRisk,
-    r.battRisk.includes('Low')?'green':r.battRisk.includes('Conservative')?'amber':'red');
-  setKpi('b-coverage',r.coverage,
-    r.coverage.includes('Safe')||r.coverage.includes('Most')?'green':
-    r.coverage.includes('Essential +')?'amber':'red');
-
-  set('b-needed',    fmtN(r.batteryBackupKWh,2)+' kWh');
-  set('b-installed', fmtN(r.installedBattKWh,2)+' kWh');
-  set('b-units',     r.battUnits+' unit'+(r.battUnits>1?'s':''));
-  set('b-runtime',   fmtN(r.battRuntime,1)+' hrs');
-  set('b-model',     r.battModel);
-  set('b-usable-per',fmtN(r.battUsable,2)+' kWh');
-  set('b-cap-ratio', fmtN(r.battCapRatio,2)+'x ('+r.battHeadroomStatus+')');
-
-  set('b-solar-compat',r.solarCanRechargeBatt
-    ?'✓ '+fmtN(r.expectedDailySolar,2)+' kWh produced >= '+fmtN(r.requiredSolarEnergy,2)+' kWh needed'
-    :'✗ Solar produces '+fmtN(r.expectedDailySolar,2)+' kWh — need '+fmtN(r.requiredSolarEnergy,2)+' kWh');
-  set('b-load-compat',r.battPowerOK
-    ?'✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW >= peak load '+fmtN(r.peakLoad,1)+' kW'
-    :'✗ Battery bank '+fmtN(r.battTotalKW,1)+' kW < peak load '+fmtN(r.peakLoad,1)+' kW — add units');
-  set('b-inv-compat',r.invLoadOK
-    ?'✓ Inverter '+fmtN(r.invAC,1)+' kW AC >= required '+fmtN(r.peakLoad*1.3,1)+' kW (peak x 1.3)'
-    :'✗ Inverter '+fmtN(r.invAC,1)+' kW AC < required '+fmtN(r.peakLoad*1.3,1)+' kW — upgrade inverter');
-
-  document.getElementById('b-bar').style.width = Math.min(r.battCapRatio/BATT_HEADROOM_MAX,1)*100+'%';
-  document.getElementById('b-bar').style.background =
-    r.battHeadroomStatus==='Balanced'?'var(--green)':r.battHeadroomStatus==='Undersized'?'var(--red)':'var(--amber)';
-  set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+
-    'x | Ideal: '+fmtN(BATT_HEADROOM_IDEAL_MIN,2)+'x–'+fmtN(BATT_HEADROOM_IDEAL_MAX,2)+'x');
-
-  set('i-model', r.invModel);
-  setKpi('i-load-ok', r.invLoadOK?'OK':'Undersized', r.invLoadOK?'green':'red');
-  set('i-load-sub', r.invLoadOK
-    ? (r.invUnits>1 ? r.invUnits+'x parallel — handles peak load with 30% safety margin' : 'Handles peak load with 30% safety margin')
-    : 'Inverter AC below peak load requirement');
-  setKpi('i-dcac', fmtN(r.dcAcRatio,2),
-    r.dcAcStatus.includes('Balanced')?'green':r.dcAcStatus.includes('Pushing')?'amber':'white');
-  set('i-dcac-sub', r.dcAcStatus);
-  setKpi('i-batt-support', r.battPowerOK?'Sufficient':'Insufficient', r.battPowerOK?'green':'red');
-  set('i-batt-sub','Battery bank '+fmtN(r.battTotalKW,1)+' kW vs peak load '+fmtN(r.peakLoad,1)+' kW');
-  setKpi('i-mppt-status', r.mpptStatus,
-    r.mpptStatus==='Spare inputs available'?'green':r.mpptStatus==='All inputs used'?'amber':'red');
-  set('i-mppt-alloc', r.mpptRequired+' of '+r.mpptAvailable+' MPPT inputs allocated'
-    +(r.invUnits>1?' ('+r.invUnits+' inverters)':''));
-  set('i-mppt-pct',   fmtN(r.mpptRequired/r.mpptAvailable*100,0)+'%');
-  set('i-ac-kw',  fmtN(r.invAC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
-  set('i-dc-max', fmtN(r.invDC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
-  set('i-headroom',(r.invHeadroom>0?'+':'')+fmtN(r.invHeadroom,1)+' kW');
-  set('i-eff', fmtN(r.invEff,1)+'%');
-  const mx = Math.max(r.systemDC,r.invAC)*1.1;
-  document.getElementById('bar-dc').style.width = (r.systemDC/mx*100)+'%';
-  set('bar-dc-val', fmtN(r.systemDC,2)+' kW');
-  document.getElementById('bar-ac').style.width = (r.invAC/mx*100)+'%';
-  set('bar-ac-val', fmtN(r.invAC,1)+' kW');
-
-  set('f-total-cost',    fmtR(r.totalCost));  set('f-cost-per-kw',  fmtR(r.costPerKW));
-  set('f-sell-price',    fmtR(r.sellPrice));  set('f-annual-savings',fmtR(r.annualSavings));
-  set('f-profit',        fmtR(r.profit));      set('f-inv-cost',      fmtR(r.invPrice));
-  set('f-hw-cost',       fmtR(r.hwCost));      set('f-payback',fmtN(r.simplePayback,1)+' year payback');
-  set('f-monthly',       fmtR(r.monthlySavings));
-  set('f-lifetime',      fmtR(r.lifetimeSavings));
-  set('f-real-payback',  r.realPayback+' years (escalating tariff)');
-  set('f-roi',           fmtN(r.annualROI,1)+'%');
-  set('f-consumption',   Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');
-  const mx2 = Math.max(r.panelCost,r.bosCost,r.battTotalCost,r.invPrice);
-  setBar('cb-panels',r.panelCost/mx2*100,'cb-panels-v',fmtR(r.panelCost));
-  setBar('cb-bos',   r.bosCost/mx2*100,'cb-bos-v',     fmtR(r.bosCost));
-  setBar('cb-batt',  r.battTotalCost/mx2*100,'cb-batt-v',fmtR(r.battTotalCost));
-  setBar('cb-inv',   r.invPrice/mx2*100,'cb-inv-v',    fmtR(r.invPrice));
-
-  set('e-co2',   fmtN(r.co2Tons,2)); set('e-trees',Math.round(r.trees).toLocaleString('en-ZA'));
-  set('e-coal',  fmtN(r.coal,2));    set('e-water',Math.round(r.water).toLocaleString('en-ZA'));
-  set('e-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
-  set('e-consumption',  Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');
-  set('e-segment',r.segment);
-  document.getElementById('e-indep-bar').style.width = r.indepPct+'%';
-  set('e-indep-tip','Solar supplies approx. '+fmtN(r.indepPct,0)+'% of annual energy needs.');
-
-  set('ps-system', r.panelCount+'x '+r.panelModel+' | '+r.invModel+' | '+r.battUnits+'x '+r.battModel);
-  set('ps-cost',    fmtR(r.totalCost));
-  set('ps-savings', fmtR(r.annualSavings)+'/year');
-  set('ps-payback', r.realPayback+' years');
-  document.getElementById('btn-gen').disabled = false;
-}
-
-function set(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
-function setKpi(id,val,color){
-  const el=document.getElementById(id); if(!el) return;
-  el.textContent=val;
-  const k=el.closest('.kpi'); if(k) k.className='kpi '+color;
-}
-function setBar(bid,pct,vid,val){
-  const b=document.getElementById(bid); if(b) b.style.width=Math.max(pct,2)+'%';
-  set(vid,val);
-}
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-function newCalculation(){
-  document.getElementById('success-card').classList.remove('on');
+  set('r-panel-model',r.panelModel);set('r-req-solar',fmtN(r.requiredSolarKW,2)+' kW');set('r-dc-cap',fmtN(r.systemDC,2)+' kW');set('r-panel-count',r.panelCount+' Panels');set('r-panel-watts',r.panelWatts+' W');set('r-daily-solar',fmtN(r.expectedDailySolar,2)+' kWh');
+  set('r-daily-solar-sub',r.expectedDailySolar>=r.requiredSolarEnergy*1.1?'Fully covers demand':r.expectedDailySolar>=r.requiredSolarEnergy?'Meets demand':'Insufficient production');
+  const op=r.oversizePct;set('r-oversize',(op*100).toFixed(1)+'%');set('r-oversize-sub',op<0?'Undersized — risk of shortage':op<=0.15?'Optimal sizing':op<=0.30?'Safety margin included':op<=0.40?'Rounding oversize — acceptable':'Excess capacity — review string layout');
+  set('r-roof-fit',r.roofFit);set('r-roof-guidance',r.roofGuidance);set('r-psh',fmtN(r.psh,2)+' hrs/day');set('r-req-energy',fmtN(r.requiredSolarEnergy,2)+' kWh/day');set('r-footprint',fmtN(r.footprint,1)+' m²');set('r-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');
+  const sysKpi=document.getElementById('sys-rec-kpi');
+  if(r.systemRecommended){const hc=r.battDod>BATT_DOD_NORMAL;set('sys-rec-value','✓ Recommended System');if(hc){set('sys-rec-sub','All components correctly sized. Advisory: battery cycling at '+fmtN(r.battDod*100,0)+'% DoD — acceptable for LFP but consider '+(r.battDod>BATT_DOD_HIGH?'adding an extra battery unit to reduce cycle depth and extend lifespan.':'monitoring cycle wear or adding a unit for extended battery life.'));sysKpi.className='kpi amber';}else{set('sys-rec-sub','Solar, battery and inverter are all correctly sized and compatible');sysKpi.className='kpi green';}if(r.invUnits>1){const sub=document.getElementById('sys-rec-sub');sub.textContent+=(sub.textContent?' ':'')+`Note: ${r.invUnits} inverters in parallel required for this load size.`;}}
+  else{const fl=[];if(!r.solarPasses)fl.push('Solar array');if(!r.battPasses)fl.push('Battery');if(!r.invPasses)fl.push('Inverter');if(!r.solarCanRechargeBatt)fl.push('Solar output too low');set('sys-rec-value','✗ System Not Recommended');set('sys-rec-sub','Issues with: '+fl.join(', '));sysKpi.className='kpi red';}
+  setKpi('b-verdict',r.battVerdict,r.battVerdict.includes('Action')?'red':r.battVerdict.includes('Acceptable')||r.battVerdict.includes('Well')?'green':'amber');
+  setKpi('b-stress',r.battStress,r.battDod<=BATT_DOD_NORMAL?'green':'amber');set('b-stress-sub',fmtN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
+  setKpi('b-risk',r.battRisk,r.battRisk.includes('Low')?'green':r.battRisk.includes('Conservative')?'amber':'red');
+  setKpi('b-coverage',r.coverage,r.coverage.includes('Safe')||r.coverage.includes('Most')?'green':r.coverage.includes('Essential +')?'amber':'red');
+  set('b-needed',fmtN(r.batteryBackupKWh,2)+' kWh');set('b-installed',fmtN(r.installedBattKWh,2)+' kWh');set('b-units',r.battUnits+' unit'+(r.battUnits>1?'s':''));set('b-runtime',fmtN(r.battRuntime,1)+' hrs');set('b-model',r.battModel);set('b-usable-per',fmtN(r.battUsable,2)+' kWh');set('b-cap-ratio',fmtN(r.battCapRatio,2)+'x ('+r.battHeadroomStatus+')');
+  set('b-solar-compat',r.solarCanRechargeBatt?'✓ '+fmtN(r.expectedDailySolar,2)+' kWh produced >= '+fmtN(r.requiredSolarEnergy,2)+' kWh needed':'✗ Solar produces '+fmtN(r.expectedDailySolar,2)+' kWh — need '+fmtN(r.requiredSolarEnergy,2)+' kWh');
+  set('b-load-compat',r.battPowerOK?'✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW >= peak load '+fmtN(r.peakLoad,1)+' kW':'✗ Battery bank '+fmtN(r.battTotalKW,1)+' kW < peak load '+fmtN(r.peakLoad,1)+' kW — add units');
+  set('b-inv-compat',r.invLoadOK?'✓ Inverter '+fmtN(r.invAC,1)+' kW AC >= required '+fmtN(r.peakLoad*1.3,1)+' kW (peak x 1.3)':'✗ Inverter '+fmtN(r.invAC,1)+' kW AC < required '+fmtN(r.peakLoad*1.3,1)+' kW — upgrade inverter');
+  document.getElementById('b-bar').style.width=Math.min(r.battCapRatio/BATT_HEADROOM_MAX,1)*100+'%';document.getElementById('b-bar').style.background=r.battHeadroomStatus==='Balanced'?'var(--green)':r.battHeadroomStatus==='Undersized'?'var(--red)':'var(--amber)';
+  set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+'x | Ideal: '+fmtN(BATT_HEADROOM_IDEAL_MIN,2)+'x–'+fmtN(BATT_HEADROOM_IDEAL_MAX,2)+'x');
+  set('i-model',r.invModel);setKpi('i-load-ok',r.invLoadOK?'OK':'Undersized',r.invLoadOK?'green':'red');set('i-load-sub',r.invLoadOK?(r.invUnits>1?r.invUnits+'x parallel — handles peak load with 30% safety margin':'Handles peak load with 30% safety margin'):'Inverter AC below peak load requirement');
+  setKpi('i-dcac',fmtN(r.dcAcRatio,2),r.dcAcStatus.includes('Balanced')?'green':r.dcAcStatus.includes('Pushing')?'amber':'white');set('i-dcac-sub',r.dcAcStatus);setKpi('i-batt-support',r.battPowerOK?'Sufficient':'Insufficient',r.battPowerOK?'green':'red');set('i-batt-sub','Battery bank '+fmtN(r.battTotalKW,1)+' kW vs peak load '+fmtN(r.peakLoad,1)+' kW');
+  setKpi('i-mppt-status',r.mpptStatus,r.mpptStatus==='Spare inputs available'?'green':r.mpptStatus==='All inputs used'?'amber':'red');set('i-mppt-alloc',r.mpptRequired+' of '+r.mpptAvailable+' MPPT inputs allocated'+(r.invUnits>1?' ('+r.invUnits+' inverters)':''));set('i-mppt-pct',fmtN(r.mpptRequired/r.mpptAvailable*100,0)+'%');set('i-ac-kw',fmtN(r.invAC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));set('i-dc-max',fmtN(r.invDC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));set('i-headroom',(r.invHeadroom>0?'+':'')+fmtN(r.invHeadroom,1)+' kW');set('i-eff',fmtN(r.invEff,1)+'%');
+  const mx=Math.max(r.systemDC,r.invAC)*1.1;document.getElementById('bar-dc').style.width=(r.systemDC/mx*100)+'%';set('bar-dc-val',fmtN(r.systemDC,2)+' kW');document.getElementById('bar-ac').style.width=(r.invAC/mx*100)+'%';set('bar-ac-val',fmtN(r.invAC,1)+' kW');
+  set('f-total-cost',fmtR(r.totalCost));set('f-cost-per-kw',fmtR(r.costPerKW));set('f-sell-price',fmtR(r.sellPrice));set('f-annual-savings',fmtR(r.annualSavings));set('f-profit',fmtR(r.profit));set('f-inv-cost',fmtR(r.invPrice));set('f-hw-cost',fmtR(r.hwCost));set('f-payback',fmtN(r.simplePayback,1)+' year payback');set('f-monthly',fmtR(r.monthlySavings));set('f-lifetime',fmtR(r.lifetimeSavings));set('f-real-payback',r.realPayback+' years (escalating tariff)');set('f-roi',fmtN(r.annualROI,1)+'%');set('f-consumption',Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');
+  const mx2=Math.max(r.panelCost,r.bosCost,r.battTotalCost,r.invPrice);setBar('cb-panels',r.panelCost/mx2*100,'cb-panels-v',fmtR(r.panelCost));setBar('cb-bos',r.bosCost/mx2*100,'cb-bos-v',fmtR(r.bosCost));setBar('cb-batt',r.battTotalCost/mx2*100,'cb-batt-v',fmtR(r.battTotalCost));setBar('cb-inv',r.invPrice/mx2*100,'cb-inv-v',fmtR(r.invPrice));
+  set('e-co2',fmtN(r.co2Tons,2));set('e-trees',Math.round(r.trees).toLocaleString('en-ZA'));set('e-coal',fmtN(r.coal,2));set('e-water',Math.round(r.water).toLocaleString('en-ZA'));set('e-annual-solar',Math.round(r.annualSolar).toLocaleString('en-ZA')+' kWh');set('e-consumption',Math.round(r.annualConsumption).toLocaleString('en-ZA')+' kWh');set('e-segment',r.segment);document.getElementById('e-indep-bar').style.width=r.indepPct+'%';set('e-indep-tip','Solar supplies approx. '+fmtN(r.indepPct,0)+'% of annual energy needs.');
+  set('ps-system',r.panelCount+'x '+r.panelModel+' | '+r.invModel+' | '+r.battUnits+'x '+r.battModel);set('ps-cost',fmtR(r.totalCost));set('ps-savings',fmtR(r.annualSavings)+'/year');set('ps-payback',r.realPayback+' years');
   document.getElementById('btn-gen').disabled=false;
-  showTab('tab-solar');
 }
+
+function set(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function setKpi(id,val,color){const el=document.getElementById(id);if(!el)return;el.textContent=val;const k=el.closest('.kpi');if(k)k.className='kpi '+color;}
+function setBar(bid,pct,vid,val){const b=document.getElementById(bid);if(b)b.style.width=Math.max(pct,2)+'%';set(vid,val);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function newCalculation(){document.getElementById('success-card').classList.remove('on');document.getElementById('btn-gen').disabled=false;showTab('tab-solar');}
 
 async function generateProposal(){
-  if(!calcResult||!installer) return;
-  const r=calcResult, btn=document.getElementById('btn-gen');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Generating…';
-  const clientName    = document.getElementById('p-name').value.trim()||'Client';
-  const clientEmail   = document.getElementById('p-email').value.trim();
-  const clientPhone   = document.getElementById('p-phone').value.trim();
-  const clientAddress = document.getElementById('p-address').value.trim();
+  if(!calcResult||!installer)return;
+  const r=calcResult,btn=document.getElementById('btn-gen');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Generating…';
+  const clientName=document.getElementById('p-name').value.trim()||'Client';
+  const clientEmail=document.getElementById('p-email').value.trim();
+  const clientPhone=document.getElementById('p-phone').value.trim();
+  const clientAddress=document.getElementById('p-address').value.trim();
   if(!clientEmail){toast('⚠ Please enter client email');btn.disabled=false;btn.textContent='Generate Proposal';return;}
 
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  const token = session ? session.access_token : SUPA_ANON;
+  const{data:{session}}=await supabaseClient.auth.getSession();
+  const token=session?session.access_token:SUPA_ANON;
 
   const payload={record:{
+    client_type: selectedClientType,          // 🏠 residential | 🏢 commercial
     contact_email:clientEmail,installer_id:installer.installer_id,
-    installer_name:installer.installer_name,logo_url:installer.logo_url||'',
-    primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',
-    accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',
+    installer_name:installer.installer_name,
+    logo_url:installer.logo_url||'',           // dynamic — pulled from installer profile
+    primary_color:installer.primary_color||'#0B1F3A',
+    secondary_color:installer.secondary_color||'#FFFFFF',
+    accent_color:installer.accent_color||'#F0B429',
+    contact_number:installer.contact_number||'',
     client_name:clientName,client_email:clientEmail,client_phone:clientPhone,client_address:clientAddress,
     location:r.locName,system_size_kw:r.systemDC,total_cost:r.totalCost,
     annual_savings:r.annualSavings,monthly_savings:r.monthlySavings,
@@ -1294,14 +845,10 @@ async function generateProposal(){
     required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,
     annual_consumption_kwh:r.annualConsumption,annual_solar_kwh:r.annualSolar,
     trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2Tons*1000,
-    ai_prompt:`Solar proposal for ${clientName} in ${r.locName}. ${r.panelCount}x ${r.panelModel}, ${r.invModel}, ${r.battUnits}x ${r.battModel}. DC: ${r.systemDC.toFixed(2)}kW. Evening backup: ${r.autonomy}hrs using ${r.batteryBackupKWh.toFixed(1)}kWh from ${r.installedBattKWh.toFixed(1)}kWh battery. Cost: R${Math.round(r.totalCost).toLocaleString()}. Savings: R${Math.round(r.annualSavings).toLocaleString()}/yr. Payback: ${r.realPayback} yrs.`
+    ai_prompt:`Solar proposal for ${clientName} in ${r.locName}. ${r.panelCount}x ${r.panelModel}, ${r.invModel}, ${r.battUnits}x ${r.battModel}. DC: ${r.systemDC.toFixed(2)}kW. Evening backup: ${r.autonomy}hrs. Cost: R${Math.round(r.totalCost).toLocaleString()}. Savings: R${Math.round(r.annualSavings).toLocaleString()}/yr. Payback: ${r.realPayback} yrs.`
   }};
   try{
-    const res=await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},
-      body:JSON.stringify(payload)
-    });
+    const res=await fetch(`${SUPA_URL}/functions/v1/generate-solar-proposal`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
     const data=await res.json();
     if(data.success){
       const portalUrl=`prposal_portal.html?ai_id=${encodeURIComponent(data.ai_id)}&email=${encodeURIComponent(installer.contact_email)}`;
@@ -1312,14 +859,8 @@ async function generateProposal(){
       document.getElementById('success-card').classList.add('on');
       toast('✓ Proposal generated — opening portal');
       setTimeout(()=>{window.location.href=portalUrl;},2800);
-    } else {
-      toast('⚠ Error: '+(data.error||'Unknown error'));
-      btn.disabled=false; btn.textContent='Generate Proposal';
-    }
-  }catch(e){
-    toast('⚠ Network error: '+e.message);
-    btn.disabled=false; btn.textContent='Generate Proposal';
-  }
+    }else{toast('⚠ Error: '+(data.error||'Unknown error'));btn.disabled=false;btn.textContent='Generate Proposal';}
+  }catch(e){toast('⚠ Network error: '+e.message);btn.disabled=false;btn.textContent='Generate Proposal';}
 }
 </script>
 </body>
