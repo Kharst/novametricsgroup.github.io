@@ -506,6 +506,7 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let installer  = null;
 let calcResult = null;
+let proposalRedirectTimer = null;
 let selectedLoc = null;
 let selectedClientType = 'residential';
 
@@ -594,7 +595,7 @@ async function loadAllData() {
   if (!isNova) {
     const [cp, ci, cb] = await Promise.all([
       sbFetch(`/rest/v1/installer_panels?installer_id=eq.${instId}&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc`),
-      sbFetch(`/rest/v1/installer_inverters?installer_id=eq.${instId}&select=id,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc`),
+      sbFetch(`/rest/v1/installer_inverters?installer_id=eq.${instId}&select=id,inverter_model,brand,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc`),
       sbFetch(`/rest/v1/installer_batteries?installer_id=eq.${instId}&select=id,battery_model,usable_kwh,nominal_kw,unit_price_r&order=usable_kwh.asc`)
     ]);
     if (cp && cp.length)  { panelRows = cp; custPanels    = cp.length; }
@@ -603,7 +604,7 @@ async function loadAllData() {
   }
   const [sharedP, sharedI, sharedB] = await Promise.all([
     panelRows ? Promise.resolve(null) : sbFetch(`/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc`),
-    invRows   ? Promise.resolve(null) : sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
+    invRows   ? Promise.resolve(null) : sbFetch(`/rest/v1/InverterModels?select=id,"InverterModel","Brand","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc`),
     battRows  ? Promise.resolve(null) : sbFetch(`/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc`)
   ]);
   if (!panelRows) panelRows = sharedP;
@@ -614,8 +615,8 @@ async function loadAllData() {
     : { id:r.id, model:r['PanelModel'], watts:parseInt(r['Watts'])||0,          area:parseFloat(r['Area_sqm'])||2.0, price:parseFloat(r['UnitPrice_R'])||0 }
   ).filter(p => p.watts > 0 && p.price > 0);
   DB.inverters = (invRows || []).map(r => custInverters
-    ? { id:r.id, model:r.inverter_model,   ac:parseFloat(r.ac_continuous_kw)||0, dc:parseFloat(r.dc_max_kw)||0,       mppt:parseInt(r.mppt_count)||1,     eff:parseFloat(r.efficiency_pct)||97, price:parseFloat(r.unit_price_r)||0 }
-    : { id:r.id, model:r['InverterModel'], ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0,   mppt:parseInt(r['MPPT_count'])||1,  eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 }
+    ? { id:r.id, model:r.inverter_model,   brand:r.brand||'', ac:parseFloat(r.ac_continuous_kw)||0, dc:parseFloat(r.dc_max_kw)||0,       mppt:parseInt(r.mppt_count)||1,     eff:parseFloat(r.efficiency_pct)||97, price:parseFloat(r.unit_price_r)||0 }
+    : { id:r.id, model:r['InverterModel'], brand:r['Brand']||'', ac:parseFloat(r['ACContinuous_kW'])||0, dc:parseFloat(r['DCMax_kW'])||0,   mppt:parseInt(r['MPPT_count'])||1,  eff:parseFloat(r['Efficiency_pct'])||97, price:parseFloat(r['UnitPrice_R'])||0 }
   ).filter(i => i.ac > 0 && i.price > 0);
   DB.batteries = (battRows || []).map(r => custBatteries
     ? { id:r.id, model:r.battery_model,   usable:parseFloat(r.usable_kwh)||0, kw:parseFloat(r.nominal_kw)||5,  price:parseFloat(r.unit_price_r)||0 }
@@ -817,8 +818,112 @@ function showNoSystemFound(reasons){
 }
 function clearNoSystemAlert(){document.getElementById('no-system-alert').classList.remove('on');}
 
+
+// ── INVERTER COMPLIANCE CHECK (NRS 097-2-1) ───────────────────────────────
+// Matches installed inverter against master_inverters_compliance table.
+// Returns: { compliance_status, display_label, display_color, is_suitable_for_grid, compliance_reason }
+async function buildComplianceBlock({ brand, model }) {
+  if (!model) return {
+    compliance_status: 'UNKNOWN', display_label: '⚠ Model Unknown',
+    display_color: 'amber', is_suitable_for_grid: true,
+    compliance_reason: 'No inverter model name to check'
+  };
+
+  const sel = 'brand,invertermodel,compliancestatus,compliance_nrs_2017,compliance_nrs_2017_2_1,compliance_nrs_2024,externalprotectionrequired,compliancenotes';
+  const enc = encodeURIComponent(model.trim());
+  let rows = [];
+
+  // 1) Exact ILIKE match on invertermodel
+  try {
+    rows = await sbFetch(`/rest/v1/master_inverters_compliance?invertermodel=ilike.${enc}&select=${sel}&limit=3`);
+  } catch(e) { rows = []; }
+
+  // 2) Fallback: match on normalizedmodel
+  if (!rows || rows.length === 0) {
+    try {
+      rows = await sbFetch(`/rest/v1/master_inverters_compliance?normalizedmodel=ilike.${enc}&select=${sel}&limit=3`);
+    } catch(e) { rows = []; }
+  }
+
+  // 3) Broader: first word of model (e.g. "SUN2000" from "SUN2000-5KTL-M3")
+  if (!rows || rows.length === 0) {
+    try {
+      const firstWord = model.trim().split(/[\s\-_]/)[0];
+      const encW = encodeURIComponent('%' + firstWord + '%');
+      rows = await sbFetch(`/rest/v1/master_inverters_compliance?invertermodel=ilike.${encW}&select=${sel}&limit=10`);
+      // Prefer brand match if available
+      if (rows && rows.length > 1 && brand) {
+        const bMatch = rows.filter(r => r.brand && r.brand.toLowerCase() === brand.toLowerCase());
+        if (bMatch.length > 0) rows = bMatch;
+      }
+    } catch(e) { rows = []; }
+  }
+
+  if (!rows || rows.length === 0) {
+    return {
+      compliance_status: 'UNKNOWN',
+      display_label: '⚠ Not in NRS Register',
+      display_color: 'amber',
+      is_suitable_for_grid: true,
+      compliance_reason: 'Inverter not found in NERSA/NRS compliance register — verify with municipality before grid connection'
+    };
+  }
+
+  const rec = rows[0];
+  const isCompliant = rec.compliancestatus === 'Compliant';
+  const has2024     = rec.compliance_nrs_2024      === true;
+  const has2017_2_1 = rec.compliance_nrs_2017_2_1  === true;
+  const has2017     = rec.compliance_nrs_2017       === true;
+  const extP        = rec.externalprotectionrequired === true;
+  const extNote     = extP ? ' · External protection relay required' : '';
+
+  if (!isCompliant) {
+    return {
+      compliance_status: 'NON_COMPLIANT',
+      display_label: '✗ Non-Compliant',
+      display_color: 'red',
+      is_suitable_for_grid: false,
+      compliance_reason: rec.compliancenotes || 'Inverter does not meet NRS 097-2-1 requirements'
+    };
+  }
+  if (has2024) {
+    return {
+      compliance_status: 'NRS_2024',
+      display_label: '✓ NRS 097-2-1:2024 Compliant',
+      display_color: 'green',
+      is_suitable_for_grid: true,
+      compliance_reason: 'Meets latest NRS 097-2-1:2024 standard' + extNote
+    };
+  }
+  if (has2017_2_1) {
+    return {
+      compliance_status: 'NRS_2017_2_1',
+      display_label: '✓ NRS 097-2-1:2017/2.1 Compliant',
+      display_color: 'green',
+      is_suitable_for_grid: true,
+      compliance_reason: 'Certified to NRS 097-2-1:2017 Amendment 2.1' + extNote
+    };
+  }
+  if (has2017) {
+    return {
+      compliance_status: 'NRS_2017_LEGACY',
+      display_label: '⚠ NRS 097-2-1:2017 (Legacy)',
+      display_color: 'amber',
+      is_suitable_for_grid: true,
+      compliance_reason: 'Certified under older NRS 2017 standard — confirm municipality accepts this' + extNote
+    };
+  }
+  return {
+    compliance_status: 'COMPLIANT_PARTIAL',
+    display_label: '⚠ Compliant (Standard Unclear)',
+    display_color: 'amber',
+    is_suitable_for_grid: true,
+    compliance_reason: rec.compliancenotes || 'Compliant status recorded but NRS revision not specified'
+  };
+}
+
 // ── MAIN CALCULATION ──────────────────────────────────────────────────────
-function calculate(){
+async function calculate(){
   if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){toast('⚠ Data still loading — please wait',true);return;}
   if(!selectedLoc){toast('⚠ Please select a location first',true);return;}
   clearNoSystemAlert();
@@ -854,23 +959,23 @@ function calculate(){
   const{inv:bestInv,units:invUnits}=selectBestInverter(requiredInvAC,systemDC);
 
   // ── Regulatory Compliance Check ─────────────────────────────
-let complianceBlock = null;
+  let complianceBlock = null;
+  try {
+    complianceBlock = await buildComplianceBlock({
+      brand: bestInv.brand,
+      model: bestInv.model
+    });
+  } catch (err) {
+    console.error("Compliance check failed:", err);
+    complianceBlock = {
+      compliance_status: "UNKNOWN",
+      display_label: "Compliance Unverified",
+      display_color: "amber",
+      is_suitable_for_grid: true,
+      compliance_reason: "Could not verify compliance at this time"
+    };
+  }
 
-try {
-  complianceBlock = await buildComplianceBlock({
-    brand: bestInv.brand,
-    model: bestInv.model
-  });
-} catch (err) {
-  console.error("Compliance check failed:", err);
-  complianceBlock = {
-    compliance_status: "UNKNOWN",
-    display_label: "Compliance Unverified",
-    display_color: "amber",
-    is_suitable_for_grid: false,
-    compliance_reason: "Could not verify compliance at this time"
-  };
-}
   const invTotalAC=bestInv.ac*invUnits,invTotalDC=bestInv.dc*invUnits;
   const invTotalPrice=bestInv.price*invUnits,invTotalMPPT=bestInv.mppt*invUnits;
   const invLoadOK=invTotalAC>=requiredInvAC;
@@ -881,14 +986,14 @@ try {
   if(!bestBatt)    failReasons.push(`Battery: no model/unit-count achieves DoD ≤ 70% for ${autonomy}h backup at ${fmtN(peakLoad,1)} kW — increase backup hours or upload a larger battery model`);
   if(bestBatt&&bestBatt.totalKW<peakLoad) failReasons.push(`Battery power (${fmtN(bestBatt.totalKW,1)} kW) below peak load (${fmtN(peakLoad,1)} kW)`);
   if(!invLoadOK)   failReasons.push(`Inverter AC (${fmtN(invTotalAC,1)} kW) below required ${fmtN(requiredInvAC,1)} kW (peak × 1.3) — upload a larger inverter`);
-  
+
   // 🚫 HARD BLOCK: Non-compliant inverter
-if (complianceBlock && !complianceBlock.is_suitable_for_grid) {
-  failReasons.push(
-    `Inverter compliance failed: ${complianceBlock.display_label}. ` +
-    (complianceBlock.compliance_reason || "Not approved for grid-tied use.")
-  );
-}
+  if (complianceBlock && !complianceBlock.is_suitable_for_grid) {
+    failReasons.push(
+      `Inverter compliance failed: ${complianceBlock.display_label}. ` +
+      (complianceBlock.compliance_reason || "Not approved for grid-tied use.")
+    );
+  }
   if(failReasons.length>0){showNoSystemFound(failReasons);return;}
 
   // ── All checks passed ─────────────────────────────────────────────────
@@ -941,30 +1046,23 @@ if (complianceBlock && !complianceBlock.is_suitable_for_grid) {
 }
 
 // ── RENDER — honest colors per metric, no forcing ─────────────────────────
-// COLOR LOGIC (shown only when ALL hard gates have already passed):
-//   green  = optimal / fully compliant
-//   amber  = acceptable but worth installer attention
-//   white  = neutral info (no quality judgment)
-// RED is only used in the compliance banner via showNoSystemFound(), never here.
 function fmtR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
 function fmtN(n,d=1){return Number(n).toFixed(d);}
 
 function renderAll(r){
-  const compliance = data.compliance;
-
-if (compliance) {
-  document.getElementById('compliance-label').textContent = compliance.display_label;
-
-  const badge = document.getElementById('compliance-badge');
-  badge.textContent = compliance.display_label;
-
-  // simple color mapping
-  badge.style.backgroundColor =
-    compliance.display_color === 'green' ? '#16a34a' :
-    compliance.display_color === 'red' ? '#dc2626' :
-    compliance.display_color === 'amber' ? '#f59e0b' :
-    '#6b7280';
-}
+  const compliance = r.compliance;
+  if (compliance) {
+    const badge = document.getElementById('compliance-badge');
+    if (badge) {
+      badge.textContent = compliance.display_label;
+      badge.style.backgroundColor =
+        compliance.display_color === 'green'  ? '#16a34a' :
+        compliance.display_color === 'red'    ? '#dc2626' :
+        compliance.display_color === 'amber'  ? '#d97706' : '#6b7280';
+      badge.style.color = 'white';
+      badge.title = compliance.compliance_reason || '';
+    }
+  }
   // ── Solar tab ────────────────────────────────────────────────────────────
   // Oversizing color: optimal(green) / acceptable rounding(white) / excess(amber)
   const oversizeColor = r.oversizePct<=0.30?'green':r.oversizePct<=0.40?'white':'amber';
@@ -991,19 +1089,11 @@ if (compliance) {
   const noteParallel=r.invUnits>1?` Note: ${r.invUnits} inverters in parallel.`:'';
   set('sys-rec-sub',`Solar covers load + recharge · DoD ${fmtN(r.battDod*100,0)}% ≤ 70% ✓ · Inverter headroom +${fmtN(r.invHeadroom,1)} kW · All checks passed.${noteParallel}`);
 
-  // Battery design KPIs — all pass the gate, but show quality differences:
-  // b-verdict: Balanced=green, Conservative=green, Tight=amber
   const verdictColor = r.battHeadroomStatus==='Tight'?'amber':'green';
   setKpi('b-verdict', r.battVerdict, verdictColor);
-
-  // b-stress: DoD≤50%=green (low stress), DoD≤70%=green (normal), both are fine since gate enforced
   setKpi('b-stress', r.battStress, 'green');
   set('b-stress-sub', fmtN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
-
-  // b-risk: always green since gate passed
   setKpi('b-risk', r.battRisk, 'green');
-
-  // b-coverage: Full load=green, Most loads=green, Essential only=amber (still passes, but tighter)
   const coverageColor=r.coverage.includes('Essential')?'amber':'green';
   setKpi('b-coverage', r.coverage, coverageColor);
 
@@ -1015,7 +1105,6 @@ if (compliance) {
   set('b-usable-per',fmtN(r.battUsable,2)+' kWh');
   set('b-cap-ratio', fmtN(r.battCapRatio,2)+'x ('+r.battHeadroomStatus+')');
 
-  // Cross-system check rows — all green since gate passed
   set('b-solar-compat','✓ '+fmtN(r.expectedDailySolar,2)+' kWh produced ≥ '+fmtN(r.requiredSolarEnergy,2)+' kWh needed');
   set('b-load-compat', '✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW ≥ peak load '+fmtN(r.peakLoad,1)+' kW');
   set('b-inv-compat',  '✓ Inverter '+fmtN(r.invAC,1)+' kW AC ≥ '+fmtN(r.peakLoad*1.3,1)+' kW (peak × 1.3)');
@@ -1027,27 +1116,17 @@ if (compliance) {
   set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+'x | Ideal: 1.15x–1.35x');
 
   // ── Inverter tab ──────────────────────────────────────────────────────────
-  // i-model: always green (passed gate)
   setKpi('i-model', r.invModel, 'green');
-
-  // i-load-ok: always green (gate enforced)
   setKpi('i-load-ok','Load OK — '+fmtN(r.invAC,1)+' kW handles '+fmtN(r.peakLoad,1)+' kW peak','green');
   set('i-load-sub', r.invUnits>1?r.invUnits+'x parallel — 30% safety margin applied':'30% safety margin applied');
 
-  // i-dcac: DC/AC ratio — HONEST color:
-  //   Balanced (0.95–1.35) = green
-  //   Slightly under (0.80–0.95) = amber  — inverter a bit oversized, not ideal but compliant
-  //   Under-utilised (<0.80) = amber      — inverter significantly oversized for the array
-  //   Within limit (1.35–1.5) = amber     — approaching clipping threshold, worth noting
   const dcacColor = r.dcAcRatio>=0.95&&r.dcAcRatio<=1.35 ? 'green' : 'amber';
   setKpi('i-dcac', fmtN(r.dcAcRatio,2), dcacColor);
   set('i-dcac-sub', r.dcAcStatus);
 
-  // i-batt-support: always green (gate enforced)
   setKpi('i-batt-support','Battery OK — '+fmtN(r.battTotalKW,1)+' kW ≥ peak','green');
   set('i-batt-sub','Battery bank '+fmtN(r.battTotalKW,1)+' kW ≥ peak load '+fmtN(r.peakLoad,1)+' kW');
 
-  // MPPT: spare=green, all used=amber (no expansion room), limited/additional=amber
   const mpptColor=r.mpptStatus==='Spare inputs available'?'green':'amber';
   setKpi('i-mppt-status',r.mpptStatus,mpptColor);
   set('i-mppt-alloc',r.mpptRequired+' of '+r.mpptAvailable+' MPPT inputs allocated'+(r.invUnits>1?' ('+r.invUnits+' inverters)':''));
@@ -1116,7 +1195,10 @@ function toast(msg,isErr=false){
   setTimeout(()=>t.className='',3500);
 }
 function newCalculation(){
+  // Cancel any pending portal redirect so user can start a fresh design
+  if (proposalRedirectTimer) { clearTimeout(proposalRedirectTimer); proposalRedirectTimer = null; }
   document.getElementById('success-card').classList.remove('on');
+  calcResult = null;
   document.getElementById('btn-gen').disabled=false;
   showTab('tab-solar');
 }
@@ -1163,7 +1245,7 @@ async function generateProposal(){
       if(data.pdf_url){pdfBtn.href=data.pdf_url;pdfBtn.style.display='flex';}else pdfBtn.style.display='none';
       document.getElementById('success-card').classList.add('on');
       toast('✓ Proposal generated — opening portal');
-      setTimeout(()=>{window.location.href=portalUrl;},2800);
+      proposalRedirectTimer = setTimeout(()=>{window.location.href=portalUrl;},2800);
     }else{toast('⚠ Error: '+(data.error||'Unknown error'),true);btn.disabled=false;btn.textContent='Generate Proposal';}
   }catch(e){toast('⚠ Network error: '+e.message,true);btn.disabled=false;btn.textContent='Generate Proposal';}
 }
