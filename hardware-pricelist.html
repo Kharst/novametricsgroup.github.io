@@ -88,9 +88,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .preview-table th{background:rgba(255,255,255,.05);color:var(--muted);font-weight:600;padding:7px 10px;text-align:left;position:sticky;top:0;text-transform:uppercase;letter-spacing:.05em;font-size:10px;}
 .preview-table td{padding:6px 10px;border-top:1px solid rgba(255,255,255,.04);color:var(--text)}
 .preview-table tr:hover td{background:rgba(255,255,255,.03)}
-.td-err{color:var(--red)!important}
-.td-ok{color:var(--green)!important}
-.td-warn{color:var(--amber)!important}
 .parse-msg{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px}
 .parse-ok{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.18)}
 .parse-warn{background:rgba(251,191,36,.08);color:var(--amber);border:1px solid rgba(251,191,36,.18)}
@@ -102,6 +99,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .col-help-body code{background:rgba(255,255,255,.07);padding:1px 5px;border-radius:4px;font-size:10px;color:var(--gold)}
 .col-help-body .req{color:var(--red);font-weight:700;font-size:9px;vertical-align:middle;margin-left:2px}
 .col-help-body .opt{color:var(--muted);font-size:9px;vertical-align:middle;margin-left:2px}
+.auto-note{margin-top:10px;padding:8px 10px;border-radius:6px;background:rgba(122,200,248,.06);border:1px solid rgba(122,200,248,.18);color:var(--blue);font-size:11px;line-height:1.6}
 #toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
 #toast.show{opacity:1}#toast.err{border-color:rgba(248,113,113,.35);color:var(--red)}
 </style>
@@ -111,7 +109,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <div class="data-loading" id="dataLoading">
   <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
   <div class="dl-spinner"></div>
-  <div class="dl-msg" id="dlMsg">Loading your workspace…</div>
+  <div class="dl-msg" id="dlMsg">Loading your workspace&#8230;</div>
   <div class="dl-err" id="dlErr"></div>
 </div>
 
@@ -144,7 +142,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div class="login-box" id="panel-forgot" style="display:none">
     <div class="login-logo">N</div>
     <div class="login-title">Reset <em style="font-style:italic;color:var(--gold)">Password</em></div>
-    <div class="login-sub">Enter your email and we'll send a reset link</div>
+    <div class="login-sub">Enter your email and we&#8217;ll send a reset link</div>
     <input type="email" id="forgot-email" placeholder="Your installer email address" autocomplete="email"/>
     <div id="forgot-error" class="error-msg"></div>
     <div id="forgot-success" class="success-msg"></div>
@@ -203,15 +201,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
           <summary>&#128203; Expected CSV columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
-            <code>PanelModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. "Jinko Tiger Neo 415W")<br>
+            <code>PanelModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. &#34;Jinko Tiger Neo 415W&#34;)<br>
             <code>Watts</code> <span class="req">REQUIRED</span> &#8212; Panel power rating in watts (e.g. 415)<br>
             <code>UnitPrice_R</code> <span class="req">REQUIRED</span> &#8212; Price per panel in Rands<br>
             <br>
-            <b>Optional columns (improves accuracy):</b><br>
+            <b>Optional columns:</b><br>
             <code>Area_sqm</code> <span class="opt">optional, default 2.0</span> &#8212; Physical panel area in m&#178;<br>
-            <code>Voc_V</code> <span class="opt">optional</span> &#8212; Open-circuit voltage &#8212; used for string voltage calculations<br>
+            <code>Voc_V</code> <span class="opt">optional</span> &#8212; Open-circuit voltage for string voltage calculations<br>
             <code>Brand</code> <span class="opt">optional</span> &#8212; Manufacturer name<br>
-            <code>Warranty_Years</code> <span class="opt">optional</span> &#8212; Panel warranty period<br>
+            <code>Warranty_Years</code> <span class="opt">optional</span> &#8212; Warranty period in years<br>
             <br>
             <b>Price formats accepted:</b> <code>R12500</code>, <code>12 500</code>, <code>12,500.00</code>, <code>12500,00</code>, <code>12.5k</code>
           </div>
@@ -245,19 +243,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
           <summary>&#128203; Expected CSV columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
-            <code>InverterModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. "Deye SUN-8K-SG04LP3")<br>
+            <code>InverterModel</code> <span class="req">REQUIRED</span> &#8212; Full model name exactly as on the box (e.g. &#34;Sunsynk SUN-8K-SG04LP3-EU&#34;)<br>
+            <code>Brand</code> <span class="req">REQUIRED</span> &#8212; Manufacturer name exactly as registered (e.g. &#34;Sunsynk&#34;, &#34;Fronius&#34;) &#8212; used for NRS 097 compliance matching<br>
             <code>ACContinuous_kW</code> <span class="req">REQUIRED</span> &#8212; Continuous AC output power in kW<br>
-            <code>DCMax_kW</code> <span class="req">REQUIRED</span> &#8212; Max DC input from solar array in kW<br>
+            <code>DCMax_kW</code> <span class="req">REQUIRED</span> &#8212; Max DC input power in kW<br>
             <code>UnitPrice_R</code> <span class="req">REQUIRED</span> &#8212; Price per inverter in Rands<br>
             <br>
-            <b>Optional columns (used for compliance checks):</b><br>
+            <b>Optional columns:</b><br>
             <code>MPPT_count</code> <span class="opt">optional, default 2</span> &#8212; Number of MPPT inputs<br>
             <code>Efficiency_pct</code> <span class="opt">optional, default 97</span> &#8212; Inverter efficiency %<br>
             <code>InverterType</code> <span class="opt">optional, default Hybrid</span> &#8212; Hybrid / Grid-Tied / Off-Grid<br>
-            <code>NRS097_Compliant</code> <span class="opt">optional</span> &#8212; NRS 097-2-1 grid compliance: <code>Y</code> or <code>N</code><br>
             <br>
-            <b>Price formats accepted:</b> <code>R18000</code>, <code>18 000</code>, <code>18,000.00</code>, <code>18k</code><br>
-            <b>NRS097_Compliant:</b> enter <code>Y</code>, <code>Yes</code>, <code>TRUE</code> or <code>1</code> for compliant
+            <b>Price formats accepted:</b> <code>R18000</code>, <code>18 000</code>, <code>18,000.00</code>, <code>18k</code>
+            <div class="auto-note">
+              &#128274; <b>NRS 097-2-1 compliance is determined automatically</b> &#8212; you do not need to enter it.
+              The system matches your inverter (Brand + Model) against the South African Master Compliance Register.
+              The closer your model name matches what appears on the NRS certificate, the better the match.
+              Use the official model code where possible (e.g. &#34;SUN-8K-SG04LP3-EU&#34; not &#34;8kW Hybrid&#34;).
+            </div>
           </div>
         </details>
       </div>
@@ -289,19 +292,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
           <summary>&#128203; Expected CSV columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
-            <code>BatteryModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. "Pylontech US5000")<br>
+            <code>BatteryModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. &#34;Pylontech US5000&#34;)<br>
             <code>Usable_kWh</code> <span class="req">REQUIRED</span> &#8212; Usable energy capacity in kWh<br>
             <code>UnitPrice_R</code> <span class="req">REQUIRED</span> &#8212; Price per battery unit in Rands<br>
             <br>
-            <b>Optional columns (critical for SA compliance engine):</b><br>
+            <b>Optional columns (improves calculation accuracy):</b><br>
             <code>Nominal_kW</code> <span class="opt">optional, default 5</span> &#8212; Max continuous discharge power in kW<br>
-            <code>DoD_pct</code> <span class="opt">optional, default 85</span> &#8212; Max depth of discharge % (LiFePO4 spec = 85)<br>
+            <code>DoD_pct</code> <span class="opt">optional, default 85</span> &#8212; Max depth of discharge % &#8212; LiFePO4 = 85, lead-acid = 50<br>
             <code>RoundtripEff_pct</code> <span class="opt">optional, default 92</span> &#8212; Round-trip charge/discharge efficiency %<br>
             <code>Brand</code> <span class="opt">optional</span> &#8212; Manufacturer name<br>
-            <code>Warranty_Years</code> <span class="opt">optional</span> &#8212; Battery warranty period<br>
+            <code>Warranty_Years</code> <span class="opt">optional</span> &#8212; Warranty period in years<br>
             <br>
             <b>Price formats accepted:</b> <code>R14000</code>, <code>14 000</code>, <code>14,000.00</code>, <code>14k</code><br>
-            <b>Note:</b> If DoD_pct or RoundtripEff_pct are not supplied, the engine uses SA spec defaults (85% / 92%).
+            <b>Note:</b> If DoD_pct or RoundtripEff_pct are blank, the engine applies SA spec defaults (85% / 92%).
           </div>
         </details>
       </div>
@@ -345,11 +348,11 @@ async function sbFetch(path) {
   return res.json();
 }
 
-async function sbPost(path, body, method='POST') {
+async function sbPost(path, body) {
   const { data: { session } } = await supabaseClient.auth.getSession();
   const token = session ? session.access_token : SUPA_ANON;
   const res = await fetch(SUPA_URL + path, {
-    method,
+    method: 'POST',
     headers: {
       'apikey': SUPA_ANON, 'Authorization': 'Bearer '+token,
       'Content-Type': 'application/json', 'Accept': 'application/json',
@@ -489,15 +492,6 @@ function parsePrice(val) {
   return parseFloat(s)||0;
 }
 
-// ── BOOLEAN PARSER for NRS097_Compliant ───────────────────────────────────
-function parseBool(val) {
-  if (val===null||val===undefined||val==='') return null;
-  const s=String(val).trim().toLowerCase();
-  if (['y','yes','true','1','compliant'].includes(s)) return true;
-  if (['n','no','false','0','non-compliant','not compliant'].includes(s)) return false;
-  return null; // unknown/blank
-}
-
 // ── COLUMN DETECTOR ───────────────────────────────────────────────────────
 function findCol(headers, ...candidates) {
   const norm = h => h.toLowerCase().replace(/[\s_\-\/]/g,'');
@@ -527,7 +521,7 @@ function parseCSV(text) {
   return {headers,rows};
 }
 
-// ── HARDWARE-SPECIFIC PARSERS ──────────────────────────────────────────────
+// ── PARSERS ───────────────────────────────────────────────────────────────
 
 function parsePanels(headers, rows) {
   const mIdx = findCol(headers,'panelmodel','model','name','description','product','panel');
@@ -565,17 +559,17 @@ function parsePanels(headers, rows) {
 }
 
 function parseInverters(headers, rows) {
+  // Brand is REQUIRED for compliance matching — treat as required if column exists, warn if missing
   const mIdx   = findCol(headers,'invertermodel','model','name','description','product','inverter');
+  const bIdx   = findCol(headers,'brand','manufacturer','make');
   const acIdx  = findCol(headers,'ac_continuous','accontinuous',['ac','kw'],['output','kw'],['continuous','kw'],'ackw');
   const dcIdx  = findCol(headers,'dc_max','dcmax',['dc','kw'],['input','kw'],'dckw','mppt_kw');
   const mpptIdx= findCol(headers,'mppt_count','mpptcount','mppt','trackers','inputs');
   const effIdx = findCol(headers,'efficiency','eff_pct','effpct','eff%','efficiency%');
   const pIdx   = findCol(headers,'unitprice','unit_price','price','cost','rand','amount');
   const typeIdx= findCol(headers,'invertertype','type','invtype');
-  const nrsIdx = findCol(headers,'nrs097','nrs097compliant','nrscompliant','compliant','nrs');
-  const bIdx   = findCol(headers,'brand','manufacturer','make');
   const missing=[];
-  if (mIdx<0)  missing.push('Model');
+  if (mIdx<0)  missing.push('Model (e.g. InverterModel)');
   if (acIdx<0) missing.push('ACContinuous_kW');
   if (dcIdx<0) missing.push('DCMax_kW');
   if (pIdx<0)  missing.push('UnitPrice_R');
@@ -584,20 +578,19 @@ function parseInverters(headers, rows) {
   rows.forEach((row,i) => {
     if (row.every(c=>!c)) return;
     const model=(row[mIdx]||'').trim();
+    const brand=bIdx>=0?(row[bIdx]||'').trim()||null:null;
     const ac=parseFloat(String(row[acIdx]||'').replace(/[^\d.]/g,''))||0;
     const dc=parseFloat(String(row[dcIdx]||'').replace(/[^\d.]/g,''))||0;
     const mppt=mpptIdx>=0?(parseInt(String(row[mpptIdx]||'').replace(/[^\d]/g,''))||2):2;
     const eff=effIdx>=0?(parseFloat(String(row[effIdx]||'').replace(/[^\d.]/g,''))||97):97;
     const price=parsePrice(row[pIdx]);
     const invType=typeIdx>=0?(row[typeIdx]||'').trim()||'Hybrid':'Hybrid';
-    const nrs097=nrsIdx>=0?parseBool(row[nrsIdx]):null;
-    const brand=bIdx>=0?(row[bIdx]||'').trim()||null:null;
     if (!model) { errors.push('Row '+(i+2)+': missing model name'); return; }
     if (ac<=0)  { errors.push('Row '+(i+2)+': invalid AC kW "'+row[acIdx]+'"'); return; }
     if (dc<=0)  { errors.push('Row '+(i+2)+': invalid DC kW "'+row[dcIdx]+'"'); return; }
     if (price<=0) { errors.push('Row '+(i+2)+': invalid price "'+row[pIdx]+'"'); return; }
+    // nrs097_compliant is intentionally NOT read from CSV — compliance is system-determined
     const rec={inverter_model:model, ac_continuous_kw:ac, dc_max_kw:dc, mppt_count:mppt, efficiency_pct:eff, unit_price_r:price, inverter_type:invType};
-    if (nrs097!==null) rec.nrs097_compliant=nrs097;
     if (brand) rec.brand=brand;
     parsed.push(rec);
   });
@@ -610,7 +603,7 @@ function parseBatteries(headers, rows) {
   const kIdx  = findCol(headers,'nominal_kw','nominalkw',['nominal','kw'],['power','kw'],'kw');
   const pIdx  = findCol(headers,'unitprice','unit_price','price','cost','rand','amount');
   const dIdx  = findCol(headers,'dod_pct','dod','depthofdischarge','depth_of_discharge','maxdod');
-  const rIdx  = findCol(headers,'roundtrip','roundtripeff','rteff','efficiency','rte');
+  const rIdx  = findCol(headers,'roundtrip','roundtripeff','rteff','rte');
   const bIdx  = findCol(headers,'brand','manufacturer','make');
   const wYIdx = findCol(headers,'warranty','warrantyyr','warranty_years');
   const missing=[];
@@ -663,7 +656,8 @@ function processFile(type, text) {
     showParseMsg(type,'err','No valid rows found. Errors: '+result.errors.slice(0,3).join('; '));
     document.getElementById('btn-save-'+type).disabled=true; return;
   }
-  let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+'.';
+  let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+'.'
+  if (type==='inverters'&&result.parsed.some(r=>!r.brand)) msg+=' Tip: add a Brand column for better NRS 097 compliance matching.';
   if (result.errors.length>0) msg+=' ('+result.errors.length+' row'+(result.errors.length!==1?'s':'')+' skipped)';
   showParseMsg(type,result.errors.length>0?'warn':'ok',msg);
   document.getElementById('btn-save-'+type).disabled=result.parsed.length===0;
@@ -680,17 +674,13 @@ function renderPreview(type, rows) {
   if (!rows||rows.length===0) { wrap.innerHTML=''; return; }
   const fmtR=n=>'R '+Math.round(n).toLocaleString('en-ZA');
   let thead='', tbodyRows='';
-  function nrsCell(v) {
-    if (v===true)  return '<td class="td-ok">Yes</td>';
-    if (v===false) return '<td class="td-err">No</td>';
-    return '<td class="td-warn">?</td>';
-  }
   if (type==='panels') {
     thead='<tr><th>Model</th><th>Watts</th><th>Area m&sup2;</th><th>Voc V</th><th>Unit Price</th></tr>';
     tbodyRows=rows.map(r=>`<tr><td>${esc(r.panel_model)}</td><td>${r.watts}W</td><td>${r.area_sqm}</td><td>${r.voc_v||'&mdash;'}</td><td>${fmtR(r.unit_price_r)}</td></tr>`).join('');
   } else if (type==='inverters') {
-    thead='<tr><th>Model</th><th>AC kW</th><th>DC kW</th><th>MPPT</th><th>NRS097</th><th>Unit Price</th></tr>';
-    tbodyRows=rows.map(r=>`<tr><td>${esc(r.inverter_model)}</td><td>${r.ac_continuous_kw}</td><td>${r.dc_max_kw}</td><td>${r.mppt_count}</td>${nrsCell(r.nrs097_compliant)}<td>${fmtR(r.unit_price_r)}</td></tr>`).join('');
+    // NRS097 column deliberately excluded — compliance is system-determined, not user-entered
+    thead='<tr><th>Model</th><th>Brand</th><th>AC kW</th><th>DC kW</th><th>MPPT</th><th>Unit Price</th></tr>';
+    tbodyRows=rows.map(r=>`<tr><td>${esc(r.inverter_model)}</td><td>${esc(r.brand||'&mdash;')}</td><td>${r.ac_continuous_kw}</td><td>${r.dc_max_kw}</td><td>${r.mppt_count}</td><td>${fmtR(r.unit_price_r)}</td></tr>`).join('');
   } else if (type==='batteries') {
     thead='<tr><th>Model</th><th>Usable kWh</th><th>kW</th><th>DoD %</th><th>RT Eff %</th><th>Unit Price</th></tr>';
     tbodyRows=rows.map(r=>`<tr><td>${esc(r.battery_model)}</td><td>${r.usable_kwh}</td><td>${r.nominal_kw}</td><td>${r.dod_pct||'85*'}</td><td>${r.roundtrip_eff_pct||'92*'}</td><td>${fmtR(r.unit_price_r)}</td></tr>`).join('');
@@ -747,10 +737,12 @@ async function clearHardware(type) {
   } catch(err) { btn.disabled=false; toast('Clear failed: '+err.message, true); }
 }
 
-// ── TEMPLATE DOWNLOAD ─────────────────────────────────────────────────────
+// ── TEMPLATES ─────────────────────────────────────────────────────────────
+// NRS097_Compliant is intentionally absent from inverter template.
+// Compliance is determined automatically by matching Brand+Model against master_inverters_compliance.
 const TEMPLATES = {
   panels: 'PanelModel,Watts,Area_sqm,Voc_V,Brand,Warranty_Years,UnitPrice_R\nCanadian Solar CS6R-540MS,540,2.26,49.3,Canadian Solar,25,3200\nJinko Tiger Neo 415W,415,2.0,38.6,Jinko Solar,25,2600\nJA Solar JAM72S30-540/MR,540,2.25,49.8,JA Solar,25,3100',
-  inverters: 'InverterModel,ACContinuous_kW,DCMax_kW,MPPT_count,Efficiency_pct,InverterType,NRS097_Compliant,Brand,UnitPrice_R\nDeye SUN-5K-SG04LP3-EU,5,6.5,2,97,Hybrid,Y,Deye,12000\nSunsynk 8kW Hybrid,8,10,2,97.5,Hybrid,Y,Sunsynk,18000\nVictron MultiPlus-II 5kVA,5,6,1,96,Hybrid,N,Victron,16500',
+  inverters: 'InverterModel,Brand,ACContinuous_kW,DCMax_kW,MPPT_count,Efficiency_pct,InverterType,UnitPrice_R\nSUN-8K-SG04LP3-EU,Deye,8,10,2,97,Hybrid,18000\nSUN-5K-SG04LP3-EU,Deye,5,6.5,2,97,Hybrid,12000\nSYMO GEN24 10.0 Plus,Fronius,10,15,2,97.5,Hybrid,32000\nSM8kWLS,Sunsynk,8,16,2,97,Hybrid,20000',
   batteries: 'BatteryModel,Usable_kWh,Nominal_kW,DoD_pct,RoundtripEff_pct,Brand,Warranty_Years,UnitPrice_R\nPylontech US5000 4.8kWh,4.8,3.5,85,92,Pylontech,10,18000\nBYD Battery-Box Premium HVS 5.1kWh,5.1,5,85,95,BYD,10,24000\nCATL 10kWh LFP Module,10,5,85,92,CATL,8,38000'
 };
 
