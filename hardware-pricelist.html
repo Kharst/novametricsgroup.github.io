@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
@@ -184,9 +185,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="hw-card-body">
         <div class="status-line"><span class="status-dot dot-muted" id="dot-panels"></span><span id="status-panels">Loading&#8230;</span></div>
         <div class="upload-zone" id="zone-panels">
-          <input type="file" accept=".csv,.txt" id="file-panels" onchange="handleFile('panels',this)">
+          <input type="file" accept=".xlsx,.xls,.csv,.txt" id="file-panels" onchange="handleFile('panels',this)">
           <div class="upload-icon">&#128194;</div>
-          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+          <div class="upload-label"><b>Click or drag</b> your price list here<br>Accepts .xlsx (recommended) or .csv</div>
         </div>
         <div class="btn-row">
           <button class="btn-sm btn-save" id="btn-save-panels" disabled onclick="saveHardware('panels')">
@@ -198,7 +199,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <div id="parse-msg-panels"></div>
         <div id="preview-panels"></div>
         <details class="col-help">
-          <summary>&#128203; Expected CSV columns</summary>
+          <summary>&#128203; Expected columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
             <code>PanelModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. &#34;Jinko Tiger Neo 415W&#34;)<br>
@@ -226,9 +227,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="hw-card-body">
         <div class="status-line"><span class="status-dot dot-muted" id="dot-inverters"></span><span id="status-inverters">Loading&#8230;</span></div>
         <div class="upload-zone" id="zone-inverters">
-          <input type="file" accept=".csv,.txt" id="file-inverters" onchange="handleFile('inverters',this)">
+          <input type="file" accept=".xlsx,.xls,.csv,.txt" id="file-inverters" onchange="handleFile('inverters',this)">
           <div class="upload-icon">&#128194;</div>
-          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+          <div class="upload-label"><b>Click or drag</b> your price list here<br>Accepts .xlsx (recommended) or .csv</div>
         </div>
         <div class="btn-row">
           <button class="btn-sm btn-save" id="btn-save-inverters" disabled onclick="saveHardware('inverters')">
@@ -240,7 +241,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <div id="parse-msg-inverters"></div>
         <div id="preview-inverters"></div>
         <details class="col-help">
-          <summary>&#128203; Expected CSV columns</summary>
+          <summary>&#128203; Expected columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
             <code>InverterModel</code> <span class="req">REQUIRED</span> &#8212; Full model name exactly as on the box (e.g. &#34;Sunsynk SUN-8K-SG04LP3-EU&#34;)<br>
@@ -275,9 +276,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="hw-card-body">
         <div class="status-line"><span class="status-dot dot-muted" id="dot-batteries"></span><span id="status-batteries">Loading&#8230;</span></div>
         <div class="upload-zone" id="zone-batteries">
-          <input type="file" accept=".csv,.txt" id="file-batteries" onchange="handleFile('batteries',this)">
+          <input type="file" accept=".xlsx,.xls,.csv,.txt" id="file-batteries" onchange="handleFile('batteries',this)">
           <div class="upload-icon">&#128194;</div>
-          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+          <div class="upload-label"><b>Click or drag</b> your price list here<br>Accepts .xlsx (recommended) or .csv</div>
         </div>
         <div class="btn-row">
           <button class="btn-sm btn-save" id="btn-save-batteries" disabled onclick="saveHardware('batteries')">
@@ -289,7 +290,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <div id="parse-msg-batteries"></div>
         <div id="preview-batteries"></div>
         <details class="col-help">
-          <summary>&#128203; Expected CSV columns</summary>
+          <summary>&#128203; Expected columns</summary>
           <div class="col-help-body">
             <b>Required columns:</b><br>
             <code>BatteryModel</code> <span class="req">REQUIRED</span> &#8212; Full model name (e.g. &#34;Pylontech US5000&#34;)<br>
@@ -535,7 +536,7 @@ function parsePanels(headers, rows) {
   if (mIdx<0) missing.push('Model (e.g. PanelModel or Name)');
   if (wIdx<0) missing.push('Watts (e.g. Watts or Wp)');
   if (pIdx<0) missing.push('Price (e.g. UnitPrice_R or Cost)');
-  if (missing.length) throw new Error('Cannot find columns: '+missing.join(', ')+'. Check your CSV headers.');
+  if (missing.length) throw new Error('Cannot find columns: '+missing.join(', ')+'. Check your column headers.');
   const parsed=[], errors=[];
   rows.forEach((row,i) => {
     if (row.every(c=>!c)) return;
@@ -559,7 +560,6 @@ function parsePanels(headers, rows) {
 }
 
 function parseInverters(headers, rows) {
-  // Brand is REQUIRED for compliance matching — treat as required if column exists, warn if missing
   const mIdx   = findCol(headers,'invertermodel','model','name','description','product','inverter');
   const bIdx   = findCol(headers,'brand','manufacturer','make');
   const acIdx  = findCol(headers,'ac_continuous','accontinuous',['ac','kw'],['output','kw'],['continuous','kw'],'ackw');
@@ -589,7 +589,7 @@ function parseInverters(headers, rows) {
     if (ac<=0)  { errors.push('Row '+(i+2)+': invalid AC kW "'+row[acIdx]+'"'); return; }
     if (dc<=0)  { errors.push('Row '+(i+2)+': invalid DC kW "'+row[dcIdx]+'"'); return; }
     if (price<=0) { errors.push('Row '+(i+2)+': invalid price "'+row[pIdx]+'"'); return; }
-    // nrs097_compliant is intentionally NOT read from CSV — compliance is system-determined
+    // nrs097_compliant intentionally NOT read from file — compliance is system-determined
     const rec={inverter_model:model, ac_continuous_kw:ac, dc_max_kw:dc, mppt_count:mppt, efficiency_pct:eff, unit_price_r:price, inverter_type:invType};
     if (brand) rec.brand=brand;
     parsed.push(rec);
@@ -635,15 +635,62 @@ function parseBatteries(headers, rows) {
   return {parsed,errors};
 }
 
-// ── FILE HANDLER ──────────────────────────────────────────────────────────
+// ── FILE HANDLER — routes Excel or CSV to the right parser ────────────────
 function handleFile(type, input) {
   const file=input.files[0]; if (!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{ try { processFile(type,e.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } input.value=''; };
-  reader.onerror=()=>showParseMsg(type,'err','Error reading file.');
-  reader.readAsText(file,'UTF-8');
+  const isExcel=/\.(xlsx|xls)$/i.test(file.name);
+  if (isExcel) {
+    const reader=new FileReader();
+    reader.onload=e=>{ try { processExcel(type,e.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } input.value=''; };
+    reader.onerror=()=>showParseMsg(type,'err','Error reading file.');
+    reader.readAsArrayBuffer(file);
+  } else {
+    const reader=new FileReader();
+    reader.onload=e=>{ try { processFile(type,e.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } input.value=''; };
+    reader.onerror=()=>showParseMsg(type,'err','Error reading file.');
+    reader.readAsText(file,'UTF-8');
+  }
 }
 
+// ── EXCEL PROCESSOR ───────────────────────────────────────────────────────
+function processExcel(type, arrayBuffer) {
+  const wb=XLSX.read(arrayBuffer,{type:'array'});
+  // Try to find the right sheet by name; fall back to first sheet
+  const aliases={panels:['panel','solar','pv'],inverters:['inverter','inv'],batteries:['battery','batt']};
+  let sheetName=wb.SheetNames[0];
+  for (const name of wb.SheetNames) {
+    const lower=name.toLowerCase().trim();
+    if (aliases[type].some(a=>lower.includes(a))) { sheetName=name; break; }
+  }
+  const ws=wb.Sheets[sheetName];
+  // Convert to array-of-arrays so existing parsers work unchanged
+  const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+  if (!data||data.length<2) {
+    showParseMsg(type,'err','Sheet "'+sheetName+'" appears empty. Make sure it has a header row and at least one data row.');
+    return;
+  }
+  const headers=data[0].map(h=>String(h||'').trim());
+  const rows=data.slice(1).map(row=>
+    headers.map((_,i)=>{ const v=row[i]; return (v===undefined||v===null)?'':String(v).trim(); })
+  );
+  let result;
+  if (type==='panels')    result=parsePanels(headers,rows);
+  if (type==='inverters') result=parseInverters(headers,rows);
+  if (type==='batteries') result=parseBatteries(headers,rows);
+  pending[type]=result.parsed;
+  renderPreview(type,result.parsed);
+  if (result.errors.length>0&&result.parsed.length===0) {
+    showParseMsg(type,'err','No valid rows found. Errors: '+result.errors.slice(0,3).join('; '));
+    document.getElementById('btn-save-'+type).disabled=true; return;
+  }
+  let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+'.';
+  if (type==='inverters'&&result.parsed.some(r=>!r.brand)) msg+=' Tip: add a Brand column for better NRS 097 compliance matching.';
+  if (result.errors.length>0) msg+=' ('+result.errors.length+' row'+(result.errors.length!==1?'s':'')+' skipped)';
+  showParseMsg(type,result.errors.length>0?'warn':'ok',msg);
+  document.getElementById('btn-save-'+type).disabled=result.parsed.length===0;
+}
+
+// ── CSV PROCESSOR (unchanged) ─────────────────────────────────────────────
 function processFile(type, text) {
   const {headers,rows}=parseCSV(text);
   let result;
@@ -656,7 +703,7 @@ function processFile(type, text) {
     showParseMsg(type,'err','No valid rows found. Errors: '+result.errors.slice(0,3).join('; '));
     document.getElementById('btn-save-'+type).disabled=true; return;
   }
-  let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+'.'
+  let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+'.';
   if (type==='inverters'&&result.parsed.some(r=>!r.brand)) msg+=' Tip: add a Brand column for better NRS 097 compliance matching.';
   if (result.errors.length>0) msg+=' ('+result.errors.length+' row'+(result.errors.length!==1?'s':'')+' skipped)';
   showParseMsg(type,result.errors.length>0?'warn':'ok',msg);
@@ -737,20 +784,38 @@ async function clearHardware(type) {
   } catch(err) { btn.disabled=false; toast('Clear failed: '+err.message, true); }
 }
 
-// ── TEMPLATES ─────────────────────────────────────────────────────────────
+// ── EXCEL TEMPLATE DOWNLOAD ───────────────────────────────────────────────
+// Columns are exactly as specified — do not alter.
 // NRS097_Compliant is intentionally absent from inverter template.
 // Compliance is determined automatically by matching Brand+Model against master_inverters_compliance.
-const TEMPLATES = {
-  panels: 'PanelModel,Watts,Area_sqm,Voc_V,Brand,Warranty_Years,UnitPrice_R\nCanadian Solar CS6R-540MS,540,2.26,49.3,Canadian Solar,25,3200\nJinko Tiger Neo 415W,415,2.0,38.6,Jinko Solar,25,2600\nJA Solar JAM72S30-540/MR,540,2.25,49.8,JA Solar,25,3100',
-  inverters: 'InverterModel,Brand,ACContinuous_kW,DCMax_kW,MPPT_count,Efficiency_pct,InverterType,UnitPrice_R\nSUN-8K-SG04LP3-EU,Deye,8,10,2,97,Hybrid,18000\nSUN-5K-SG04LP3-EU,Deye,5,6.5,2,97,Hybrid,12000\nSYMO GEN24 10.0 Plus,Fronius,10,15,2,97.5,Hybrid,32000\nSM8kWLS,Sunsynk,8,16,2,97,Hybrid,20000',
-  batteries: 'BatteryModel,Usable_kWh,Nominal_kW,DoD_pct,RoundtripEff_pct,Brand,Warranty_Years,UnitPrice_R\nPylontech US5000 4.8kWh,4.8,3.5,85,92,Pylontech,10,18000\nBYD Battery-Box Premium HVS 5.1kWh,5.1,5,85,95,BYD,10,24000\nCATL 10kWh LFP Module,10,5,85,92,CATL,8,38000'
-};
-
 function downloadTemplate(type) {
-  const blob=new Blob([TEMPLATES[type]],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='nova_metrics_'+type+'_template.csv'; a.click(); URL.revokeObjectURL(url);
+  const wb=XLSX.utils.book_new();
+  const sheets={
+    panels:[
+      ['PanelModel','Watts','Area_sqm','Voc_V','Brand','Warranty_Years','UnitPrice_R'],
+      ['Canadian Solar CS6R-540MS',540,2.26,49.3,'Canadian Solar',25,3200],
+      ['Jinko Tiger Neo 415W',415,2.0,38.6,'Jinko Solar',25,2600],
+      ['JA Solar JAM72S30-540/MR',540,2.25,49.8,'JA Solar',25,3100]
+    ],
+    inverters:[
+      ['InverterModel','Brand','ACContinuous_kW','DCMax_kW','MPPT_count','Efficiency_pct','InverterType','UnitPrice_R'],
+      ['SUN-8K-SG04LP3-EU','Deye',8,10,2,97,'Hybrid',18000],
+      ['SUN-5K-SG04LP3-EU','Deye',5,6.5,2,97,'Hybrid',12000],
+      ['SYMO GEN24 10.0 Plus','Fronius',10,15,2,97.5,'Hybrid',32000],
+      ['SM8kWLS','Sunsynk',8,16,2,97,'Hybrid',20000]
+    ],
+    batteries:[
+      ['BatteryModel','Usable_kWh','Nominal_kW','DoD_pct','RoundtripEff_pct','Brand','Warranty_Years','UnitPrice_R'],
+      ['Pylontech US5000 4.8kWh',4.8,3.5,85,92,'Pylontech',10,18000],
+      ['BYD Battery-Box Premium HVS 5.1kWh',5.1,5,85,95,'BYD',10,24000],
+      ['CATL 10kWh LFP Module',10,5,85,92,'CATL',8,38000]
+    ]
+  };
+  const data=sheets[type];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  ws['!cols']=data[0].map(h=>({wch:Math.max(String(h).length,12)+4}));
+  XLSX.utils.book_append_sheet(wb,ws,type.charAt(0).toUpperCase()+type.slice(1));
+  XLSX.writeFile(wb,'nova_metrics_'+type+'_template.xlsx');
 }
 
 // ── DRAG AND DROP ─────────────────────────────────────────────────────────
@@ -761,10 +826,17 @@ function downloadTemplate(type) {
   zone.addEventListener('drop',e=>{
     e.preventDefault(); zone.classList.remove('drag-over');
     const file=e.dataTransfer.files[0]; if (!file) return;
-    if (!file.name.match(/\.(csv|txt)$/i)) { toast('Please drop a .csv or .txt file',true); return; }
-    const reader=new FileReader();
-    reader.onload=ev=>{ try { processFile(type,ev.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } };
-    reader.readAsText(file,'UTF-8');
+    if (!file.name.match(/\.(xlsx|xls|csv|txt)$/i)) { toast('Please drop an Excel (.xlsx) or CSV file',true); return; }
+    const isExcel=/\.(xlsx|xls)$/i.test(file.name);
+    if (isExcel) {
+      const reader=new FileReader();
+      reader.onload=ev=>{ try { processExcel(type,ev.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader=new FileReader();
+      reader.onload=ev=>{ try { processFile(type,ev.target.result); } catch(err) { showParseMsg(type,'err','Error: '+err.message); } };
+      reader.readAsText(file,'UTF-8');
+    }
   });
 });
 
