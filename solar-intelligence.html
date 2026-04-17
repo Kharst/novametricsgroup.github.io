@@ -824,7 +824,7 @@ function clearNoSystemAlert(){document.getElementById('no-system-alert').classLi
 // Returns: { compliance_status, display_label, display_color, is_suitable_for_grid, compliance_reason }
 async function buildComplianceBlock({ brand, model }) {
   if (!model) return {
-    compliance_status: 'UNKNOWN', display_label: '⚠ Model Unknown',
+    compliance_status: 'UNKNOWN', display_label: '\u26a0 Model Unknown',
     display_color: 'amber', is_suitable_for_grid: true,
     compliance_reason: 'No inverter model name to check'
   };
@@ -862,10 +862,10 @@ async function buildComplianceBlock({ brand, model }) {
   if (!rows || rows.length === 0) {
     return {
       compliance_status: 'UNKNOWN',
-      display_label: '⚠ Not in NRS Register',
+      display_label: '\u26a0 Not in NRS Register',
       display_color: 'amber',
       is_suitable_for_grid: true,
-      compliance_reason: 'Inverter not found in NERSA/NRS compliance register — verify with municipality before grid connection'
+      compliance_reason: 'Inverter not found in NERSA/NRS compliance register \u2014 verify with municipality before grid connection'
     };
   }
 
@@ -875,12 +875,12 @@ async function buildComplianceBlock({ brand, model }) {
   const has2017_2_1 = rec.compliance_nrs_2017_2_1  === true;
   const has2017     = rec.compliance_nrs_2017       === true;
   const extP        = rec.externalprotectionrequired === true;
-  const extNote     = extP ? ' · External protection relay required' : '';
+  const extNote     = extP ? ' \u00b7 External protection relay required' : '';
 
   if (!isCompliant) {
     return {
       compliance_status: 'NON_COMPLIANT',
-      display_label: '✗ Non-Compliant',
+      display_label: '\u2717 Non-Compliant',
       display_color: 'red',
       is_suitable_for_grid: false,
       compliance_reason: rec.compliancenotes || 'Inverter does not meet NRS 097-2-1 requirements'
@@ -889,7 +889,7 @@ async function buildComplianceBlock({ brand, model }) {
   if (has2024) {
     return {
       compliance_status: 'NRS_2024',
-      display_label: '✓ NRS 097-2-1:2024 Compliant',
+      display_label: '\u2713 NRS 097-2-1:2024 Compliant',
       display_color: 'green',
       is_suitable_for_grid: true,
       compliance_reason: 'Meets latest NRS 097-2-1:2024 standard' + extNote
@@ -898,7 +898,7 @@ async function buildComplianceBlock({ brand, model }) {
   if (has2017_2_1) {
     return {
       compliance_status: 'NRS_2017_2_1',
-      display_label: '✓ NRS 097-2-1:2017/2.1 Compliant',
+      display_label: '\u2713 NRS 097-2-1:2017/2.1 Compliant',
       display_color: 'green',
       is_suitable_for_grid: true,
       compliance_reason: 'Certified to NRS 097-2-1:2017 Amendment 2.1' + extNote
@@ -907,15 +907,15 @@ async function buildComplianceBlock({ brand, model }) {
   if (has2017) {
     return {
       compliance_status: 'NRS_2017_LEGACY',
-      display_label: '⚠ NRS 097-2-1:2017 (Legacy)',
+      display_label: '\u26a0 NRS 097-2-1:2017 (Legacy)',
       display_color: 'amber',
       is_suitable_for_grid: true,
-      compliance_reason: 'Certified under older NRS 2017 standard — confirm municipality accepts this' + extNote
+      compliance_reason: 'Certified under older NRS 2017 standard \u2014 confirm municipality accepts this' + extNote
     };
   }
   return {
     compliance_status: 'COMPLIANT_PARTIAL',
-    display_label: '⚠ Compliant (Standard Unclear)',
+    display_label: '\u26a0 Compliant (Standard Unclear)',
     display_color: 'amber',
     is_suitable_for_grid: true,
     compliance_reason: rec.compliancenotes || 'Compliant status recorded but NRS revision not specified'
@@ -959,23 +959,23 @@ async function calculate(){
   const{inv:bestInv,units:invUnits}=selectBestInverter(requiredInvAC,systemDC);
 
   // ── Regulatory Compliance Check ─────────────────────────────
-  let complianceBlock = null;
-  try {
-    complianceBlock = await buildComplianceBlock({
-      brand: bestInv.brand,
-      model: bestInv.model
-    });
-  } catch (err) {
-    console.error("Compliance check failed:", err);
-    complianceBlock = {
-      compliance_status: "UNKNOWN",
-      display_label: "Compliance Unverified",
-      display_color: "amber",
-      is_suitable_for_grid: true,
-      compliance_reason: "Could not verify compliance at this time"
-    };
-  }
+let complianceBlock = null;
 
+try {
+  complianceBlock = await buildComplianceBlock({
+    brand: bestInv.brand,
+    model: bestInv.model
+  });
+} catch (err) {
+  console.error("Compliance check failed:", err);
+  complianceBlock = {
+    compliance_status: "UNKNOWN",
+    display_label: "Compliance Unverified",
+    display_color: "amber",
+    is_suitable_for_grid: false,
+    compliance_reason: "Could not verify compliance at this time"
+  };
+}
   const invTotalAC=bestInv.ac*invUnits,invTotalDC=bestInv.dc*invUnits;
   const invTotalPrice=bestInv.price*invUnits,invTotalMPPT=bestInv.mppt*invUnits;
   const invLoadOK=invTotalAC>=requiredInvAC;
@@ -986,14 +986,14 @@ async function calculate(){
   if(!bestBatt)    failReasons.push(`Battery: no model/unit-count achieves DoD ≤ 70% for ${autonomy}h backup at ${fmtN(peakLoad,1)} kW — increase backup hours or upload a larger battery model`);
   if(bestBatt&&bestBatt.totalKW<peakLoad) failReasons.push(`Battery power (${fmtN(bestBatt.totalKW,1)} kW) below peak load (${fmtN(peakLoad,1)} kW)`);
   if(!invLoadOK)   failReasons.push(`Inverter AC (${fmtN(invTotalAC,1)} kW) below required ${fmtN(requiredInvAC,1)} kW (peak × 1.3) — upload a larger inverter`);
-
+  
   // 🚫 HARD BLOCK: Non-compliant inverter
-  if (complianceBlock && !complianceBlock.is_suitable_for_grid) {
-    failReasons.push(
-      `Inverter compliance failed: ${complianceBlock.display_label}. ` +
-      (complianceBlock.compliance_reason || "Not approved for grid-tied use.")
-    );
-  }
+if (complianceBlock && !complianceBlock.is_suitable_for_grid) {
+  failReasons.push(
+    `Inverter compliance failed: ${complianceBlock.display_label}. ` +
+    (complianceBlock.compliance_reason || "Not approved for grid-tied use.")
+  );
+}
   if(failReasons.length>0){showNoSystemFound(failReasons);return;}
 
   // ── All checks passed ─────────────────────────────────────────────────
@@ -1046,6 +1046,11 @@ async function calculate(){
 }
 
 // ── RENDER — honest colors per metric, no forcing ─────────────────────────
+// COLOR LOGIC (shown only when ALL hard gates have already passed):
+//   green  = optimal / fully compliant
+//   amber  = acceptable but worth installer attention
+//   white  = neutral info (no quality judgment)
+// RED is only used in the compliance banner via showNoSystemFound(), never here.
 function fmtR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
 function fmtN(n,d=1){return Number(n).toFixed(d);}
 
@@ -1089,11 +1094,19 @@ function renderAll(r){
   const noteParallel=r.invUnits>1?` Note: ${r.invUnits} inverters in parallel.`:'';
   set('sys-rec-sub',`Solar covers load + recharge · DoD ${fmtN(r.battDod*100,0)}% ≤ 70% ✓ · Inverter headroom +${fmtN(r.invHeadroom,1)} kW · All checks passed.${noteParallel}`);
 
+  // Battery design KPIs — all pass the gate, but show quality differences:
+  // b-verdict: Balanced=green, Conservative=green, Tight=amber
   const verdictColor = r.battHeadroomStatus==='Tight'?'amber':'green';
   setKpi('b-verdict', r.battVerdict, verdictColor);
+
+  // b-stress: DoD≤50%=green (low stress), DoD≤70%=green (normal), both are fine since gate enforced
   setKpi('b-stress', r.battStress, 'green');
   set('b-stress-sub', fmtN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
+
+  // b-risk: always green since gate passed
   setKpi('b-risk', r.battRisk, 'green');
+
+  // b-coverage: Full load=green, Most loads=green, Essential only=amber (still passes, but tighter)
   const coverageColor=r.coverage.includes('Essential')?'amber':'green';
   setKpi('b-coverage', r.coverage, coverageColor);
 
@@ -1105,6 +1118,7 @@ function renderAll(r){
   set('b-usable-per',fmtN(r.battUsable,2)+' kWh');
   set('b-cap-ratio', fmtN(r.battCapRatio,2)+'x ('+r.battHeadroomStatus+')');
 
+  // Cross-system check rows — all green since gate passed
   set('b-solar-compat','✓ '+fmtN(r.expectedDailySolar,2)+' kWh produced ≥ '+fmtN(r.requiredSolarEnergy,2)+' kWh needed');
   set('b-load-compat', '✓ Battery bank '+fmtN(r.battTotalKW,1)+' kW ≥ peak load '+fmtN(r.peakLoad,1)+' kW');
   set('b-inv-compat',  '✓ Inverter '+fmtN(r.invAC,1)+' kW AC ≥ '+fmtN(r.peakLoad*1.3,1)+' kW (peak × 1.3)');
@@ -1116,17 +1130,27 @@ function renderAll(r){
   set('b-bar-tip','Daily DoD: '+fmtN(r.battDod*100,0)+'% | Headroom: '+fmtN(r.battCapRatio,2)+'x | Ideal: 1.15x–1.35x');
 
   // ── Inverter tab ──────────────────────────────────────────────────────────
+  // i-model: always green (passed gate)
   setKpi('i-model', r.invModel, 'green');
+
+  // i-load-ok: always green (gate enforced)
   setKpi('i-load-ok','Load OK — '+fmtN(r.invAC,1)+' kW handles '+fmtN(r.peakLoad,1)+' kW peak','green');
   set('i-load-sub', r.invUnits>1?r.invUnits+'x parallel — 30% safety margin applied':'30% safety margin applied');
 
+  // i-dcac: DC/AC ratio — HONEST color:
+  //   Balanced (0.95–1.35) = green
+  //   Slightly under (0.80–0.95) = amber  — inverter a bit oversized, not ideal but compliant
+  //   Under-utilised (<0.80) = amber      — inverter significantly oversized for the array
+  //   Within limit (1.35–1.5) = amber     — approaching clipping threshold, worth noting
   const dcacColor = r.dcAcRatio>=0.95&&r.dcAcRatio<=1.35 ? 'green' : 'amber';
   setKpi('i-dcac', fmtN(r.dcAcRatio,2), dcacColor);
   set('i-dcac-sub', r.dcAcStatus);
 
+  // i-batt-support: always green (gate enforced)
   setKpi('i-batt-support','Battery OK — '+fmtN(r.battTotalKW,1)+' kW ≥ peak','green');
   set('i-batt-sub','Battery bank '+fmtN(r.battTotalKW,1)+' kW ≥ peak load '+fmtN(r.peakLoad,1)+' kW');
 
+  // MPPT: spare=green, all used=amber (no expansion room), limited/additional=amber
   const mpptColor=r.mpptStatus==='Spare inputs available'?'green':'amber';
   setKpi('i-mppt-status',r.mpptStatus,mpptColor);
   set('i-mppt-alloc',r.mpptRequired+' of '+r.mpptAvailable+' MPPT inputs allocated'+(r.invUnits>1?' ('+r.invUnits+' inverters)':''));
@@ -1195,7 +1219,6 @@ function toast(msg,isErr=false){
   setTimeout(()=>t.className='',3500);
 }
 function newCalculation(){
-  // Cancel any pending portal redirect so user can start a fresh design
   if (proposalRedirectTimer) { clearTimeout(proposalRedirectTimer); proposalRedirectTimer = null; }
   document.getElementById('success-card').classList.remove('on');
   calcResult = null;
