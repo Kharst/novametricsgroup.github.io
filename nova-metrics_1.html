@@ -132,7 +132,7 @@
       <div class="sent-state" id="forgotSent">
         <div class="sent-icon">&#9993;</div>
         <h2>Email <em>sent</em></h2>
-        <p>If an account exists for that address, a reset link has been sent. Check your inbox and spam folder — it should arrive within a minute.</p>
+        <p>If an account exists for that address, a reset link has been sent. Check your inbox and spam folder &mdash; it should arrive within a minute.</p>
         <button class="btn-primary" onclick="showLogin()"><span>Back to Sign In</span></button>
         <div class="card-footer" style="margin-top:1.75rem;">
           <span>Nova Metrics &copy; 2026</span>
@@ -145,9 +145,11 @@
   <script>
     var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+    // !! RESET_URL must match the Supabase site URL domain (novametricsgroup.com) !!
+    // Using github.io would require adding it to Supabase's allowed redirect list.
+    var RESET_URL = 'https://novametricsgroup.com/reset-password.html';
 
     window.addEventListener('DOMContentLoaded', function() {
-      // If already logged in via Supabase session, go straight to the sizing engine
       var sbClient = null;
       try {
         if (typeof supabase !== 'undefined') {
@@ -209,12 +211,8 @@
           btn.disabled = false;
           return;
         }
-
-        // Login successful — redirect to Solar Intelligence (the main app)
-        // solar-intelligence.html will pick up the Supabase session automatically
         showMsg(msg, 'loading', 'Redirecting\u2026');
         window.location.href = 'solar-intelligence.html';
-
       } catch(err) {
         showMsg(msg, 'error', 'Connection error. Please try again.');
         btn.disabled = false;
@@ -229,11 +227,25 @@
       btn.disabled = true;
       showMsg(msg,'loading','Sending reset link\u2026');
       try {
-        await fetch(SUPABASE_URL + '/auth/v1/recover', {
+        // redirect_to must be in Supabase allowed redirect URLs list.
+        // Using the custom domain (novametricsgroup.com) which matches the Supabase site URL
+        // so it is auto-allowed without needing a dashboard change.
+        var res = await fetch(SUPABASE_URL + '/auth/v1/recover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ email: email, gotrue_meta_security: {} })
+          body: JSON.stringify({
+            email: email,
+            redirect_to: RESET_URL,
+            gotrue_meta_security: {}
+          })
         });
+        if (!res.ok) {
+          var errData = await res.json().catch(function(){ return {}; });
+          var errMsg = (errData && errData.msg) || (errData && errData.error_description) || 'Failed to send reset email. Please try again.';
+          showMsg(msg,'error',errMsg);
+          btn.disabled = false;
+          return;
+        }
         document.getElementById('forgotForm').style.display = 'none';
         document.getElementById('forgotSent').style.display = 'block';
       } catch(err) {
