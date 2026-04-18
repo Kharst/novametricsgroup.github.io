@@ -53,8 +53,6 @@
     .btn-primary span { position:relative; z-index:1; }
     .btn-primary:active { transform:scale(0.99); }
     .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-    .btn-secondary { width:100%; padding:0.75rem 1rem; background:transparent; color:var(--gold-l); border:1px solid var(--line); border-radius:2px; font-family:'DM Sans',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; text-decoration:none; display:block; text-align:center; transition:background 0.2s,border-color 0.2s; margin-top:0.75rem; }
-    .btn-secondary:hover { background:rgba(184,150,46,0.08); border-color:var(--gold); }
     .msg { margin-top:1rem; font-size:0.79rem; min-height:1.1rem; letter-spacing:0.03em; text-align:center; }
     .msg.success { color:#72d4a0; } .msg.error { color:#eb7070; } .msg.loading { color:var(--muted); }
     .forgot-link { text-align:right; margin-top:-0.6rem; margin-bottom:1.4rem; }
@@ -68,19 +66,9 @@
     .sent-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
     .sent-state h2 em { font-style:italic; color:#72d4a0; }
     .sent-state p { font-size:0.84rem; color:var(--muted); line-height:1.7; margin-bottom:1.5rem; }
-    .session-bar { display:none; align-items:center; justify-content:space-between; margin-bottom:1.75rem; padding:0.6rem 0.9rem; border:1px solid rgba(184,150,46,0.18); border-radius:2px; background:rgba(184,150,46,0.06); }
-    .session-bar .su { font-size:0.72rem; color:var(--gold-l); letter-spacing:0.06em; }
-    .session-bar button { background:none; border:none; cursor:pointer; font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); transition:color 0.2s; font-family:'DM Sans',sans-serif; }
-    .session-bar button:hover { color:#eb7070; }
     .card-footer { margin-top:2rem; padding-top:1.25rem; border-top:1px solid rgba(184,150,46,0.14); display:flex; align-items:center; justify-content:space-between; }
     .card-footer span { font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.22); }
     .secure { display:flex; align-items:center; gap:5px; font-size:0.67rem; letter-spacing:0.06em; color:rgba(255,255,255,0.22); }
-    .success-state { text-align:center; padding:0.5rem 0; }
-    .success-icon { width:56px; height:56px; border-radius:50%; background:rgba(114,212,160,0.12); border:1px solid rgba(114,212,160,0.3); display:grid; place-items:center; margin:0 auto 1.25rem; font-size:1.4rem; }
-    .success-state h2 { font-family:'DM Serif Display',serif; font-weight:400; font-size:1.5rem; color:#fff; margin-bottom:0.5rem; }
-    .success-state h2 em { font-style:italic; color:#72d4a0; }
-    .success-state p { font-size:0.85rem; color:var(--muted); line-height:1.7; margin-bottom:1.75rem; }
-    .client-chip { display:inline-block; background:rgba(184,150,46,0.1); border:1px solid var(--line); border-radius:100px; padding:0.35rem 0.9rem; font-size:0.78rem; color:var(--gold-l); margin-bottom:1.75rem; }
     .hidden { display:none !important; }
   </style>
 </head>
@@ -103,7 +91,7 @@
       </div>
       <div class="field">
         <label>Password <span class="req">*</span></label>
-        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+        <input type="password" id="loginPassword" placeholder="········" autocomplete="current-password" />
       </div>
       <div class="forgot-link">
         <button onclick="showForgot()">Forgot password?</button>
@@ -152,75 +140,30 @@
         </div>
       </div>
     </div>
-
-    <!-- ADD CLIENT (shown after login) -->
-    <div id="clientScreen" class="hidden">
-      <div class="session-bar" id="sessionBar">
-        <span class="su" id="sessionUser"></span>
-        <button onclick="handleLogout()">Sign out</button>
-      </div>
-      <div id="addClientForm">
-        <h1>Add a <em>new</em> client</h1>
-        <p class="subhead">Client onboarding</p>
-        <div class="divider"></div>
-        <form id="clientForm" novalidate>
-          <div class="field">
-            <label>Client name <span class="req">*</span></label>
-            <input type="text" id="client_name" placeholder="Full name" required autocomplete="name" />
-          </div>
-          <div class="field">
-            <label>Email address <span class="req">*</span></label>
-            <input type="email" id="client_email" placeholder="client@example.com" required autocomplete="email" />
-          </div>
-          <div class="field">
-            <label>Phone number</label>
-            <input type="tel" id="client_phone" placeholder="+27 00 000 0000" autocomplete="tel" />
-          </div>
-          <div class="field">
-            <label>Address</label>
-            <input type="text" id="client_address" placeholder="Street, City, Province" autocomplete="street-address" />
-          </div>
-          <div style="margin-top:1.75rem;">
-            <button type="submit" class="btn-primary" id="submitBtn"><span>Register client</span></button>
-            <div class="msg" id="clientMsg"></div>
-          </div>
-        </form>
-        <a href="prposal_portal.html" class="btn-secondary">View proposal portal &rarr;</a>
-        <div class="card-footer">
-          <span>Nova Metrics &copy; 2026</span>
-          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
-        </div>
-      </div>
-      <div id="successState" class="success-state hidden">
-        <div class="success-icon">&#10003;</div>
-        <h2>Client <em>registered</em></h2>
-        <div class="client-chip" id="successClientName"></div>
-        <p>The client has been saved to your pipeline. Head to the proposal portal to preview and send proposals.</p>
-        <a id="portalBtn" href="prposal_portal.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;padding:0.9rem 1rem;">
-          <span>Open proposal portal &rarr;</span>
-        </a>
-        <button onclick="resetForm()" class="btn-secondary" style="margin-top:0.75rem;">Add another client</button>
-        <div class="card-footer" style="margin-top:1.75rem;">
-          <span>Nova Metrics &copy; 2026</span>
-          <div class="secure"><svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 2.5V6c0 2.2 1.7 4.1 4 4.9C8.3 10.1 10 8.2 10 6V2.5L5 1z" fill="rgba(255,255,255,0.32)"/></svg>Secured</div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>
     var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-    var currentInstaller = null;
 
     window.addEventListener('DOMContentLoaded', function() {
-      var saved = localStorage.getItem('nm_installer');
-      if (saved) {
-        try {
-          currentInstaller = JSON.parse(saved);
-          showClientScreen();
-        } catch(e) { localStorage.removeItem('nm_installer'); }
+      // If already logged in via Supabase session, go straight to the sizing engine
+      var sbClient = null;
+      try {
+        if (typeof supabase !== 'undefined') {
+          sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        }
+      } catch(e) {}
+
+      if (sbClient) {
+        sbClient.auth.getSession().then(function(result) {
+          var session = result && result.data && result.data.session;
+          if (session && session.user) {
+            window.location.href = 'solar-intelligence.html';
+          }
+        }).catch(function(){});
       }
+
       ['loginEmail','loginPassword'].forEach(function(id) {
         document.getElementById(id).addEventListener('keydown', function(e) {
           if (e.key === 'Enter') handleLogin();
@@ -255,7 +198,6 @@
       showMsg(msg,'loading','Verifying\u2026');
 
       try {
-        // Step 1: Authenticate
         var authRes = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
@@ -268,70 +210,10 @@
           return;
         }
 
-        var accessToken = authData.access_token;
-        var authUserId  = authData.user && authData.user.id;
-        var userMeta    = (authData.user && authData.user.user_metadata) || {};
-
-        // Step 2: Look up installer profile by auth_user_id OR email
-        var profileRes = await fetch(
-          SUPABASE_URL + '/rest/v1/installers?select=installer_id,installer_name,contact_email,logo_url,primary_color,accent_color,auth_user_id' +
-          '&or=(auth_user_id.eq.' + authUserId + ',contact_email.eq.' + encodeURIComponent(email) + ')&limit=1',
-          { headers: { 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken } }
-        );
-        var profiles = await profileRes.json();
-
-        // Step 3: If no profile found, auto-create one from auth metadata
-        // This handles the case where invite-installer created auth user but
-        // the installers INSERT failed silently
-        if (!profiles || !profiles.length) {
-          showMsg(msg, 'loading', 'Setting up your account\u2026');
-          var autoName = userMeta.installer_name || email.split('@')[0];
-          var createRes = await fetch(SUPABASE_URL + '/rest/v1/installers', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_ANON,
-              'Authorization': 'Bearer ' + accessToken,
-              'Prefer': 'return=representation'
-            },
-            body: JSON.stringify({
-              contact_email:   email,
-              installer_name:  autoName,
-              auth_user_id:    authUserId,
-              primary_color:   '#0A2540',
-              secondary_color: '#FFFFFF',
-              accent_color:    '#B8962E',
-              password:        null
-            })
-          });
-          var created = await createRes.json();
-          // created is an array from Supabase REST
-          profiles = Array.isArray(created) ? created : (created ? [created] : []);
-
-          if (!profiles || !profiles.length) {
-            showMsg(msg, 'error', 'Could not create your profile. Please contact Nova Metrics.');
-            btn.disabled = false;
-            return;
-          }
-        }
-
-        var profile = profiles[0];
-
-        // Backfill auth_user_id if missing (legacy records)
-        if (!profile.auth_user_id) {
-          fetch(SUPABASE_URL + '/rest/v1/installers?installer_id=eq.' + profile.installer_id, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + accessToken },
-            body: JSON.stringify({ auth_user_id: authUserId })
-          }).catch(function(){});
-        }
-
-        currentInstaller = Object.assign({}, profile, {
-          access_token: accessToken,
-          auth_user_id: authUserId
-        });
-        localStorage.setItem('nm_installer', JSON.stringify(currentInstaller));
-        showClientScreen();
+        // Login successful — redirect to Solar Intelligence (the main app)
+        // solar-intelligence.html will pick up the Supabase session automatically
+        showMsg(msg, 'loading', 'Redirecting\u2026');
+        window.location.href = 'solar-intelligence.html';
 
       } catch(err) {
         showMsg(msg, 'error', 'Connection error. Please try again.');
@@ -360,74 +242,6 @@
       }
     }
 
-    function handleLogout() {
-      localStorage.removeItem('nm_installer');
-      currentInstaller = null;
-      document.getElementById('clientScreen').classList.add('hidden');
-      document.getElementById('loginScreen').classList.remove('hidden');
-      document.getElementById('loginEmail').value    = '';
-      document.getElementById('loginPassword').value = '';
-      document.getElementById('loginMsg').textContent = '';
-      document.getElementById('loginBtn').disabled    = false;
-    }
-
-    function showClientScreen() {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('forgotPanel').style.display = 'none';
-      document.getElementById('clientScreen').classList.remove('hidden');
-      document.getElementById('sessionBar').style.display = 'flex';
-      document.getElementById('sessionUser').textContent =
-        '\u25CF ' + (currentInstaller.installer_name || currentInstaller.contact_email);
-    }
-
-    document.getElementById('clientForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      var name    = document.getElementById('client_name').value.trim();
-      var email   = document.getElementById('client_email').value.trim();
-      var phone   = document.getElementById('client_phone').value.trim();
-      var address = document.getElementById('client_address').value.trim();
-      var btn     = document.getElementById('submitBtn');
-      var msg     = document.getElementById('clientMsg');
-      if (!name)  { showMsg(msg,'error','Please enter the client name.'); return; }
-      if (!email) { showMsg(msg,'error','Please enter an email address.'); return; }
-      if (phone && !/^\+?[\d\s\-(). ]{7,20}$/.test(phone)) { showMsg(msg,'error','Please enter a valid phone number.'); return; }
-      showMsg(msg,'loading','Saving client\u2026');
-      btn.disabled = true;
-      try {
-        var res = await fetch(SUPABASE_URL + '/functions/v1/create-client', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            installer_id:   currentInstaller.installer_id,
-            client_name:    name,
-            client_email:   email,
-            client_phone:   phone   || null,
-            client_address: address || null
-          })
-        });
-        if (!res.ok) throw new Error('Server error ' + res.status);
-        var data = await res.json();
-        if (data.success) { showSuccessState(name, data.ai_id || null); }
-        else { showMsg(msg,'error', data.error || 'Something went wrong. Please try again.'); }
-      } catch(err) {
-        showMsg(msg,'error','Connection error: ' + err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    });
-
-    function showSuccessState(clientName, aiId) {
-      document.getElementById('addClientForm').classList.add('hidden');
-      document.getElementById('successState').classList.remove('hidden');
-      document.getElementById('successClientName').textContent = clientName;
-      document.getElementById('portalBtn').href = aiId ? 'prposal_portal.html?ai_id=' + aiId : 'prposal_portal.html';
-    }
-    function resetForm() {
-      document.getElementById('successState').classList.add('hidden');
-      document.getElementById('addClientForm').classList.remove('hidden');
-      document.getElementById('clientForm').reset();
-      document.getElementById('clientMsg').textContent = '';
-    }
     function showMsg(el, type, text) { el.className = 'msg ' + type; el.textContent = text; }
   </script>
 </body>
