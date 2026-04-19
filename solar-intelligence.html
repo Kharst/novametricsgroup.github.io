@@ -142,6 +142,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .ct-hint{margin-top:10px;font-size:11px;color:var(--muted);padding:8px 12px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);}
 .ct-hint.residential{border-color:rgba(122,200,248,.2);background:rgba(122,200,248,.05);color:var(--blue);}
 .ct-hint.commercial{border-color:var(--gold-border);background:rgba(255,215,0,.05);color:var(--muted);}
+/* ── NRS 097 Compliance Badge ──────────────────────────────────── */
+.comp-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em;}
+.comp-badge.green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.28);}
+.comp-badge.amber{background:rgba(251,191,36,.10);color:var(--amber);border:1px solid rgba(251,191,36,.25);}
+.comp-badge.red{background:rgba(248,113,113,.10);color:var(--red);border:1px solid rgba(248,113,113,.25);}
+.comp-dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.comp-detail{font-size:11px;color:var(--muted);padding:5px 0 8px;line-height:1.65;display:none;}
+.comp-alt{margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:none;}
+.comp-alt.on{display:block;}
 </style>
 </head>
 <body>
@@ -339,7 +348,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Headroom over Peak Load</span><span class="val" id="i-headroom">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">&#8212;</span></div>
     <div class="section-title">Regulatory Compliance</div>
-    <div class="status-row"><span class="lbl">NRS 097-2-1 Grid Connection Standard</span><span class="val">&#9888; Installer to confirm on inverter datasheet</span></div>
+    <!-- NRS 097 live compliance check — updated by renderComplianceBadge() after calculation -->
+    <div class="status-row">
+      <span class="lbl">NRS 097-2-1 Grid Connection Standard</span>
+      <span class="val" id="i-nrs097-status"><span style="color:var(--muted);font-size:11px">Run a design first &#9889;</span></span>
+    </div>
+    <div class="comp-detail" id="i-nrs097-detail"></div>
+    <div class="comp-alt" id="i-nrs097-alt"></div>
     <div class="status-row"><span class="lbl">DC/AC Ratio vs NRS 097 (target 1.3:1, max 1.5:1)</span><span class="val" id="i-dcac-nrs">&#8212;</span></div>
     <div class="status-row"><span class="lbl">NERSA SSEG Registration Required</span><span class="val" id="i-nersa">&#8212;</span></div>
     <div class="section-title">DC / AC Ratio Visual</div>
@@ -462,7 +477,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 <script>
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-// reset-password.html on the same custom domain — no Supabase allowlist change needed
 const RESET_URL = 'https://novametricsgroup.com/reset-password.html';
 const NOVA_METRICS_ID = 1;
 const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
@@ -582,6 +596,11 @@ function calculate(){
   if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){toast('&#9888; Data still loading',true);return;}
   if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
   clearNoSystemAlert();
+  // Reset compliance badge while calculating
+  set('i-nrs097-status','<span style="color:var(--muted);font-size:11px">Checking&#8230;</span>');
+  const det=document.getElementById('i-nrs097-detail');if(det){det.textContent='';det.style.display='none';}
+  const alt=document.getElementById('i-nrs097-alt');if(alt){alt.className='comp-alt';}
+
   const loadSel=document.getElementById('sel-load');
   let peakLoad,dailyUsage;
   if(loadSel.value==='custom'){peakLoad=parseFloat(document.getElementById('custom-peak').value)||3;dailyUsage=parseFloat(document.getElementById('custom-daily').value)||20;}
@@ -660,17 +679,20 @@ function calculate(){
     battStress:batteryStressLabel(batt.dod)[0],battStressSub:batteryStressLabel(batt.dod)[1],
     battDod:batt.dod,battHS:batt.headroomStatus,coverage:batt.totalKW/peakLoad<1.15?'Essential Loads':batt.totalKW/peakLoad<=1.40?'Most Loads':'Full Load',
     battTotalKW:batt.totalKW,battTotCost:batt.totalCost,
-    invModel:iModel,invUnits:iU,invAC,invDC,invEff:bInv.eff,invHeadroom:iHeadroom,invPrice,
+    invModel:iModel,invBrand:bInv.brand||'',invModelRaw:bInv.model,invUnits:iU,invAC,invDC,invEff:bInv.eff,invHeadroom:iHeadroom,invPrice,
     dcAc,dcAcTxt,dcAcColor,mpptReq,mpptAv,mpptSt,
     pCost,bosCost,hwCost,totCost,sellP,profit,cPkW,
     monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
     annCons,co2T,trees,coal,water,seg,indP,nersaCat};
   renderAll(calcResult);
+  // Async compliance check — runs after render, does not block or touch calculations
+  renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
   toast('&#10003; Compliant system designed — all SA checks passed');
 }
 
 function fN(n,d=1){return Number(n).toFixed(d);}
 function fR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 function renderAll(r){
   const osC=r.osP<=0.30?'green':r.osP<=0.40?'white':'amber';
@@ -781,13 +803,21 @@ async function loadAllData(){
   const[locRows,loadRows]=await Promise.all([sbFetch('/rest/v1/solar_locations?id=in.('+locIds+')&select=id,city,location_name,design_gti_kwh_m2_day&order=city'),sbFetch('/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc')]);
   let pRows=null,iRows=null,bRows=null,cP=0,cI=0,cB=0;
   if(!isNova){
-    const[cp,ci,cb]=await Promise.all([sbFetch('/rest/v1/installer_panels?installer_id=eq.'+instId+'&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc'),sbFetch('/rest/v1/installer_inverters?installer_id=eq.'+instId+'&select=id,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc'),sbFetch('/rest/v1/installer_batteries?installer_id=eq.'+instId+'&select=id,battery_model,usable_kwh,nominal_kw,unit_price_r&order=usable_kwh.asc')]);
+    const[cp,ci,cb]=await Promise.all([
+      sbFetch('/rest/v1/installer_panels?installer_id=eq.'+instId+'&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc'),
+      sbFetch('/rest/v1/installer_inverters?installer_id=eq.'+instId+'&select=id,brand,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc'),
+      sbFetch('/rest/v1/installer_batteries?installer_id=eq.'+instId+'&select=id,battery_model,usable_kwh,nominal_kw,unit_price_r&order=usable_kwh.asc')
+    ]);
     if(cp&&cp.length){pRows=cp;cP=cp.length;}if(ci&&ci.length){iRows=ci;cI=ci.length;}if(cb&&cb.length){bRows=cb;cB=cb.length;}
   }
-  const[sP,sI,sB]=await Promise.all([pRows?Promise.resolve(null):sbFetch('/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc'),iRows?Promise.resolve(null):sbFetch('/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc'),bRows?Promise.resolve(null):sbFetch('/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc')]);
+  const[sP,sI,sB]=await Promise.all([
+    pRows?Promise.resolve(null):sbFetch('/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc'),
+    iRows?Promise.resolve(null):sbFetch('/rest/v1/InverterModels?select=id,"Brand","InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc'),
+    bRows?Promise.resolve(null):sbFetch('/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc')
+  ]);
   if(!pRows)pRows=sP;if(!iRows)iRows=sI;if(!bRows)bRows=sB;
   DB.panels=(pRows||[]).map(r=>cP?{id:r.id,model:r.panel_model,watts:parseInt(r.watts)||0,area:parseFloat(r.area_sqm)||2.0,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['PanelModel'],watts:parseInt(r['Watts'])||0,area:parseFloat(r['Area_sqm'])||2.0,price:parseFloat(r['UnitPrice_R'])||0}).filter(p=>p.watts>0&&p.price>0);
-  DB.inverters=(iRows||[]).map(r=>cI?{id:r.id,model:r.inverter_model,ac:parseFloat(r.ac_continuous_kw)||0,dc:parseFloat(r.dc_max_kw)||0,mppt:parseInt(r.mppt_count)||1,eff:parseFloat(r.efficiency_pct)||97,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['InverterModel'],ac:parseFloat(r['ACContinuous_kW'])||0,dc:parseFloat(r['DCMax_kW'])||0,mppt:parseInt(r['MPPT_count'])||1,eff:parseFloat(r['Efficiency_pct'])||97,price:parseFloat(r['UnitPrice_R'])||0}).filter(i=>i.ac>0&&i.price>0);
+  DB.inverters=(iRows||[]).map(r=>cI?{id:r.id,brand:r.brand||'',model:r.inverter_model,ac:parseFloat(r.ac_continuous_kw)||0,dc:parseFloat(r.dc_max_kw)||0,mppt:parseInt(r.mppt_count)||1,eff:parseFloat(r.efficiency_pct)||97,price:parseFloat(r.unit_price_r)||0}:{id:r.id,brand:r['Brand']||'',model:r['InverterModel'],ac:parseFloat(r['ACContinuous_kW'])||0,dc:parseFloat(r['DCMax_kW'])||0,mppt:parseInt(r['MPPT_count'])||1,eff:parseFloat(r['Efficiency_pct'])||97,price:parseFloat(r['UnitPrice_R'])||0}).filter(i=>i.ac>0&&i.price>0);
   DB.batteries=(bRows||[]).map(r=>cB?{id:r.id,model:r.battery_model,usable:parseFloat(r.usable_kwh)||0,kw:parseFloat(r.nominal_kw)||5,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['BatteryModel'],usable:parseFloat(r['Usable_kWh'])||0,kw:parseFloat(r['Nominal_kW'])||5,price:parseFloat(r['UnitPrice_R'])||0}).filter(b=>b.usable>0&&b.price>0);
   DB.locations=(locRows||[]).map(r=>({id:r.id,city:r.city,name:r.location_name||r.city,gti:parseFloat(r.design_gti_kwh_m2_day)||4.80}));
   DB.loadProfiles=(loadRows||[]).map(r=>({id:r.id,name:r.profile_name,peak:parseFloat(r.peak_load_kw)||0,daily:parseFloat(r.daily_usage_kwh)||0}));
@@ -876,7 +906,7 @@ async function generateProposal(){
   const cN=document.getElementById('p-name').value.trim()||'Client',cE=document.getElementById('p-email').value.trim(),cPh=document.getElementById('p-phone').value.trim(),cA=document.getElementById('p-address').value.trim();
   if(!cE){toast('&#9888; Please enter client email',true);btn.disabled=false;btn.textContent='Generate Proposal';return;}
   const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;
-  const payload={record:{client_type:selectedClientType,contact_email:cE,installer_id:installer.installer_id,installer_name:installer.installer_name,logo_url:installer.logo_url||'',primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',client_name:cN,client_email:cE,client_phone:cPh,client_address:cA,location:r.locName,system_size_kw:r.sysDC,total_cost:r.totCost,annual_savings:r.annSavY1,monthly_savings:r.monthly,lifetime_savings:r.grossLT,net_lifetime_savings:r.netLT,npv:r.npv,irr:r.irr,payback_years:r.realPb,segment:r.seg,panel_model:r.panelModel,panel_number:r.pc,inverter_model:r.invModel,battery_model:r.battModel,battery_capacity_kwh:r.iKWh,battery_backup_kwh:r.battBackupKWh,required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,annual_consumption_kwh:r.annCons,annual_solar_kwh:r.annSolar,trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2T*1000,nersa_category:r.nersaCat,dc_ac_ratio:r.dcAc,specific_yield:r.specYield,ai_prompt:'Solar proposal for '+cN+' in '+r.locName+'. '+r.pc+'x '+r.panelModel+', '+r.invModel+', '+r.battUnits+'x '+r.battModel+'. DC: '+r.sysDC.toFixed(2)+'kW (DC/AC: '+r.dcAc.toFixed(2)+', target 1.3:1 NRS 097). PR: 80%, Avail: 97%, Yield: '+r.specYield.toFixed(0)+' kWh/kWp/yr. DoD '+( r.battDod*100).toFixed(0)+'% (85% LiFePO4 limit). Cost: R'+Math.round(r.totCost).toLocaleString()+'. Savings: R'+Math.round(r.annSavY1).toLocaleString()+'/yr. NPV (12%): R'+Math.round(r.npv).toLocaleString()+'. IRR: '+r.irr.toFixed(1)+'%. Payback: '+r.realPb+' yrs. NERSA: '+r.nersaCat+'.'}};
+  const payload={record:{client_type:selectedClientType,contact_email:cE,installer_id:installer.installer_id,installer_name:installer.installer_name,logo_url:installer.logo_url||'',primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',client_name:cN,client_email:cE,client_phone:cPh,client_address:cA,location:r.locName,system_size_kw:r.sysDC,total_cost:r.totCost,annual_savings:r.annSavY1,monthly_savings:r.monthly,lifetime_savings:r.grossLT,net_lifetime_savings:r.netLT,npv:r.npv,irr:r.irr,payback_years:r.realPb,segment:r.seg,panel_model:r.panelModel,panel_number:r.pc,inverter_model:r.invModel,battery_model:r.battModel,battery_capacity_kwh:r.iKWh,battery_backup_kwh:r.battBackupKWh,required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,annual_consumption_kwh:r.annCons,annual_solar_kwh:r.annSolar,trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2T*1000,nersa_category:r.nersaCat,dc_ac_ratio:r.dcAc,specific_yield:r.specYield,ai_prompt:'Solar proposal for '+cN+' in '+r.locName+'. '+r.pc+'x '+r.panelModel+', '+r.invModel+', '+r.battUnits+'x '+r.battModel+'. DC: '+r.sysDC.toFixed(2)+'kW (DC/AC: '+r.dcAc.toFixed(2)+', target 1.3:1 NRS 097). PR: 80%, Avail: 97%, Yield: '+r.specYield.toFixed(0)+' kWh/kWp/yr. DoD '+(r.battDod*100).toFixed(0)+'% (85% LiFePO4 limit). Cost: R'+Math.round(r.totCost).toLocaleString()+'. Savings: R'+Math.round(r.annSavY1).toLocaleString()+'/yr. NPV (12%): R'+Math.round(r.npv).toLocaleString()+'. IRR: '+r.irr.toFixed(1)+'%. Payback: '+r.realPb+' yrs. NERSA: '+r.nersaCat+'.'}};
   try{
     const res=await fetch(SUPA_URL+'/functions/v1/generate-solar-proposal',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
     const data=await res.json();
@@ -890,6 +920,102 @@ async function generateProposal(){
       toast('&#10003; Proposal generated');setTimeout(()=>{window.location.href=portalUrl;},2800);
     }else{toast('&#9888; Error: '+(data.error||'Unknown error'),true);btn.disabled=false;btn.textContent='Generate Proposal';}
   }catch(e){toast('&#9888; Network error: '+e.message,true);btn.disabled=false;btn.textContent='Generate Proposal';}
+}
+
+// ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
+// Calls check_inverters_compliance RPC then renders badge + optional alternative.
+// Does NOT touch any calculation, DB load, or proposal logic.
+
+async function sbRpc(fn,params){
+  const{data:{session}}=await supabaseClient.auth.getSession();
+  const token=session?session.access_token:SUPA_ANON;
+  const res=await fetch(SUPA_URL+'/rest/v1/rpc/'+fn,{
+    method:'POST',
+    headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify(params)
+  });
+  if(!res.ok)throw new Error('RPC '+fn+' -> '+res.status);
+  return res.json();
+}
+
+async function renderComplianceBadge(brand,modelRaw){
+  const statusEl=document.getElementById('i-nrs097-status');
+  const detailEl=document.getElementById('i-nrs097-detail');
+  const altEl=document.getElementById('i-nrs097-alt');
+  if(!statusEl)return;
+
+  // No brand — cannot look up
+  if(!brand&&!modelRaw){
+    statusEl.innerHTML='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Brand not on file — confirm compliance with supplier</span>';
+    return;
+  }
+
+  try{
+    const rows=await sbRpc('check_inverters_compliance',{p_brand:brand||'',p_model:modelRaw||''});
+    const c=rows&&rows[0];
+    if(!c){
+      statusEl.innerHTML='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Compliance unverified</span>';
+      return;
+    }
+
+    // Colour map: only green for COMPLIANT, never for anything else
+    const dotC=c.display_color==='green'?'var(--green)':c.display_color==='red'?'var(--red)':'var(--amber)';
+    const bClass=c.display_color==='green'?'green':c.display_color==='red'?'red':'amber';
+    statusEl.innerHTML='<span class="comp-badge '+bClass+'"><span class="comp-dot" style="background:'+dotC+'"></span>'+esc(c.display_label||'Unknown')+'</span>';
+
+    // Compliance detail paragraph
+    if(c.compliance_detail){
+      detailEl.textContent=c.compliance_detail;
+      detailEl.style.display='block';
+    }
+
+    // If NOT confirmed compliant, show alternative or register note
+    if(c.compliance_status!=='COMPLIANT'){
+      if(!c.found_in_master){
+        // Not in register at all
+        altEl.innerHTML=
+          '<strong style="color:var(--amber)">&#9888; Not in SA Compliance Register</strong><br>'+
+          'This inverter is not listed in the South African Master Inverter Compliance Register. '+
+          'It may be newly released, imported, or registered under a different trade name. '+
+          'Request the manufacturer\'s NRS 097-2-1 test certificate before commissioning on any municipal grid connection.';
+        altEl.className='comp-alt on';
+        altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
+      } else {
+        // In register but not compliant — try to find a compliant alternative from same brand
+        const alts=await findCompliantAlternative(brand);
+        if(alts&&alts.length>0){
+          const a=alts[0];
+          altEl.innerHTML=
+            '<strong style="color:var(--amber)">&#128274; NRS 097 Compliant Alternative — same brand</strong><br>'+
+            'The <strong style="color:var(--text)">'+esc(a.brand)+' '+esc(a.invertermodel)+'</strong> is confirmed compliant with '+
+            esc(a.sourcestandard||'NRS 097-2-1:2017')+'. '+
+            'This model does not appear in your uploaded price list. '+
+            'Contact your supplier to confirm availability and pricing before including it in a proposal.';
+          altEl.className='comp-alt on';
+          altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
+        }
+      }
+    } else {
+      // Compliant — hide alternative panel
+      altEl.className='comp-alt';
+      altEl.style.display='none';
+    }
+  }catch(e){
+    // Graceful fallback — never crashes the rest of the app
+    statusEl.innerHTML='<span style="color:var(--muted);font-size:11px">&#9888; Installer to confirm compliance on inverter datasheet</span>';
+  }
+}
+
+async function findCompliantAlternative(brand){
+  // Query master table for a compliant inverter from the same brand
+  try{
+    const rows=await sbFetch(
+      '/rest/v1/master_inverters_compliance?brand=ilike.'+encodeURIComponent(brand)+
+      '&compliancestatus=ilike.compliant&select=brand,invertermodel,invertertype,sourcestandard&limit=3'
+    );
+    if(rows&&rows.length>0)return rows;
+  }catch(e){}
+  return null;
 }
 </script>
 </body>
