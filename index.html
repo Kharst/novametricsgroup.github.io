@@ -198,6 +198,12 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .btn-cta-primary:hover{background:var(--gold-2);transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,145,28,.28)}
 .btn-cta-ghost{background:transparent;color:var(--light);border:1px solid var(--dim)}
 .btn-cta-ghost:hover{color:var(--white);border-color:rgba(255,255,255,.2)}
+.disclaimer-section{background:var(--black);border-top:1px solid rgba(255,255,255,.04);padding:52px 48px}
+.disclaimer-inner{max-width:900px;margin:0 auto}
+.disclaimer-title{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.disclaimer-text{font-size:12px;font-weight:300;color:var(--dim);line-height:1.85}
+.disclaimer-text p{margin-bottom:10px}
+.disclaimer-text p:last-child{margin-bottom:0}
 footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);padding:52px 48px 32px}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:44px}
 .footer-mark{width:28px;height:28px;background:var(--gold);border-radius:6px;display:grid;place-items:center;font-family:var(--serif);font-size:14px;color:var(--black)}
@@ -216,7 +222,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 @media(max-width:1100px){.hero-dashboard{display:none}.product-split{grid-template-columns:1fr}.proposal-split{grid-template-columns:1fr}.plans-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:768px){nav{padding:0 20px}.nav-links{display:none}.section{padding:64px 20px}.hero{padding:96px 20px 56px}h1{font-size:40px}.workflow-steps{grid-template-columns:1fr;gap:28px}.workflow-steps::before{display:none}.engine-grid{grid-template-columns:1fr}.product-modules{grid-template-columns:1fr}footer{padding:36px 20px 20px}.footer-grid{grid-template-columns:1fr;gap:28px}.footer-bottom{flex-direction:column;gap:10px;text-align:center}.demo-section{padding:64px 20px}.demo-caption{flex-direction:column;align-items:flex-start}}
+@media(max-width:768px){nav{padding:0 20px}.nav-links{display:none}.section{padding:64px 20px}.hero{padding:96px 20px 56px}h1{font-size:40px}.workflow-steps{grid-template-columns:1fr;gap:28px}.workflow-steps::before{display:none}.engine-grid{grid-template-columns:1fr}.product-modules{grid-template-columns:1fr}footer{padding:36px 20px 20px}.footer-grid{grid-template-columns:1fr;gap:28px}.footer-bottom{flex-direction:column;gap:10px;text-align:center}.demo-section{padding:64px 20px}.demo-caption{flex-direction:column;align-items:flex-start}.disclaimer-section{padding:36px 20px}}
 </style>
 </head>
 <body>
@@ -259,25 +265,25 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
     </div>
     <div class="hero-proof anim d5">
       <div class="proof-item"><span class="proof-dot"></span> AI-powered proposal engine</div>
-      <div class="proof-item"><span class="proof-dot"></span> NRS 097-2-1 &amp; NERSA SSEG compliant</div>
-      <div class="proof-item"><span class="proof-dot"></span> NPV, IRR &amp; 25-year financial model</div>
+      <div class="proof-item"><span class="proof-dot"></span> Designed in alignment with NRS 097-2-1 &amp; NERSA SSEG</div>
+      <div class="proof-item"><span class="proof-dot"></span> Engineering-grade 25-year financial modelling</div>
     </div>
   </div>
   <div class="hero-dashboard anim d4">
     <div class="dash-card">
       <div class="dc-label">System Design — Full House</div>
       <div class="dc-value">11.25 kW</div>
-      <div class="dc-sub">DC array · 25× Longi 450W · DC/AC 1.3:1 ✓</div>
+      <div class="dc-sub">DC array · 25× Longi 450W · DC/AC ratio: within range ✓</div>
       <div class="dc-bar"><div class="dc-fill" style="width:84%"></div></div>
       <div class="dc-row"><span class="dc-k">Battery</span><span class="dc-v">4× PowerGem 14.3kWh</span></div>
       <div class="dc-row"><span class="dc-k">Inverter</span><span class="dc-v">Fronius Symo 10.0</span></div>
     </div>
     <div class="dash-card">
-      <div class="dc-label">Financial Model — 25-year</div>
+      <div class="dc-label">Financial Model — 25-year estimate</div>
       <div class="dc-value">R 8,030</div>
-      <div class="dc-sub">Year 1 savings · NPV positive · IRR 14.2%</div>
-      <div class="dc-row"><span class="dc-k">Real payback</span><span class="dc-v" style="color:var(--gold-3)">9 years</span></div>
-      <div class="dc-row"><span class="dc-k">Battery stress</span><span class="dc-v"><span class="dc-badge">62% DoD — compliant</span></span></div>
+      <div class="dc-sub">Est. Year 1 savings · NPV positive · Strong IRR</div>
+      <div class="dc-row"><span class="dc-k">Est. real payback</span><span class="dc-v" style="color:var(--gold-3)">~9 years</span></div>
+      <div class="dc-row"><span class="dc-k">Battery design</span><span class="dc-v"><span class="dc-badge">DoD: within design range ✓</span></span></div>
     </div>
     <div class="dash-card">
       <div class="dc-label">Proposal sent · 2h ago</div>
@@ -291,8 +297,8 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
 
 <div class="marquee-strip">
   <div class="marquee-track">
-    <div class="marquee-item">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Compliance <span class="m-dot"></span> NERSA SSEG Registration <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> NERSA Tariff Escalation <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span></div>
-    <div class="marquee-item" aria-hidden="true">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Compliance <span class="m-dot"></span> NERSA SSEG Registration <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> NERSA Tariff Escalation <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span></div>
+    <div class="marquee-item">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span></div>
+    <div class="marquee-item" aria-hidden="true">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span></div>
   </div>
 </div>
 
@@ -349,39 +355,39 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
         <div class="eyebrow reveal">The Platform</div>
         <h2 class="reveal">One platform.<br><em>Every part of the deal.</em></h2>
         <p class="section-body reveal" style="margin-bottom:20px">Solar Intelligence is the operating system for solar installers. From the moment a client inquiry arrives to the moment a proposal lands in their inbox — every step is powered by structured data, not guesswork.</p>
-        <p class="section-body reveal">Built on real South African engineering standards: NRS 097-2-1 inverter compliance, NERSA SSEG registration requirements, LiFePO4 battery DoD limits, 25-year yield modelling with NERSA tariff escalation, and investment-grade NPV and IRR projections. Then automated into a branded, client-ready PDF.</p>
+        <p class="section-body reveal">Designed in alignment with South African engineering standards — including NRS 097-2-1 inverter compliance guidance, NERSA SSEG registration requirements, LiFePO4 battery design parameters, and 25-year yield modelling — then automated into a branded, client-ready PDF with engineering-grade financial projections.</p>
         <div style="margin-top:36px" class="reveal"><a href="solar-intelligence.html" class="btn-hero btn-hero-primary" style="display:inline-flex">Open the platform →</a></div>
       </div>
       <div class="product-modules">
         <div class="mod-card reveal">
           <div class="mod-icon">⚡</div>
           <div class="mod-title">System Sizing Engine</div>
-          <div class="mod-desc">Sizes solar arrays, batteries, and inverters from actual load profiles. PR 80%, 97% availability, NRS 097-2-1 DC/AC ratios (target 1.3:1, max 1.5:1), stress-validated battery selection, 365-day net yield output.</div>
+          <div class="mod-desc">Applies strict engineering thresholds to size solar arrays, batteries, and inverters from actual load profiles. Outputs are validated against South African performance benchmarks and optimised for yield, compliance alignment, and cost efficiency.</div>
         </div>
         <div class="mod-card reveal">
           <div class="mod-icon">🔋</div>
           <div class="mod-title">Battery Intelligence</div>
-          <div class="mod-desc">Selects the optimal LiFePO4 configuration against three hard gates: capacity headroom ≥110%, depth of discharge ≤85% (SA spec), and autonomy runtime guarantee. Prefers designs at ≤70% DoD for maximum cycle life. 92% round-trip efficiency applied.</div>
+          <div class="mod-desc">Selects the optimal LiFePO4 configuration through multi-gate engineering validation: capacity headroom, depth-of-discharge targets, and autonomy runtime — prioritising designs that maximise battery cycle life. Industry-standard round-trip efficiency applied throughout.</div>
         </div>
         <div class="mod-card reveal">
           <div class="mod-icon">💰</div>
           <div class="mod-title">Financial Modelling</div>
-          <div class="mod-desc">25-year projections with NERSA tariff escalation (8.76% / 8.83% / 5%), NPV at 12% discount rate, IRR, O&amp;M costs (1.25% + 0.75% insurance), battery replacement at Year 10, and net lifetime savings — investment-grade outputs.</div>
+          <div class="mod-desc">Engineering-grade 25-year financial projections using NERSA-aligned tariff escalation scenarios, NPV and IRR analysis, industry-standard O&amp;M and insurance provisions, and full battery lifecycle cost modelling. All outputs are indicative estimates subject to actual site conditions.</div>
         </div>
         <div class="mod-card reveal">
           <div class="mod-icon">📄</div>
           <div class="mod-title">AI Proposal Engine</div>
-          <div class="mod-desc">Every output feeds an AI-generated, branded PDF proposal. System specs, NPV/IRR financials, NERSA SSEG compliance status, environmental impact, and AI commentary — one click, client-ready.</div>
+          <div class="mod-desc">Every output feeds an AI-generated, branded PDF proposal. System specs, financial projections, NERSA SSEG alignment status, environmental impact, and AI commentary — one click, client-ready.</div>
         </div>
         <div class="mod-card reveal">
           <div class="mod-icon">📊</div>
           <div class="mod-title">Proposal Portal</div>
-          <div class="mod-desc">Review, download, and email proposals from a dedicated installer dashboard. Client pipeline, proposal status, email sent, viewed, and downloaded — all tracked.</div>
+          <div class="mod-desc">Review, download, and email proposals from a dedicated installer dashboard. Client pipeline, proposal status, and engagement tracking — all consolidated in one place.</div>
         </div>
         <div class="mod-card reveal">
           <div class="mod-icon">📈</div>
           <div class="mod-title">Pipeline Analytics</div>
-          <div class="mod-desc">Conversion funnel, follow-up intelligence, financial portfolio view, environmental impact aggregation, and inverter NRS compliance analysis — across your entire client base.</div>
+          <div class="mod-desc">Conversion funnel, follow-up intelligence, financial portfolio view, environmental impact aggregation, and inverter compliance alignment analysis — across your entire client base.</div>
         </div>
       </div>
     </div>
@@ -393,45 +399,45 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
     <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
       <div>
         <div class="eyebrow reveal">Decision Engineering</div>
-        <h2 class="reveal">Designed to get the<br><em>right answer</em> every time</h2>
+        <h2 class="reveal">Designed to produce the<br><em>right answer</em> every time</h2>
       </div>
-      <p class="section-body reveal" style="max-width:340px">Every number in a Nova Metrics proposal is derived from structured models. No rules of thumb. No spreadsheet estimates. Defensible SA-compliant outputs, by default.</p>
+      <p class="section-body reveal" style="max-width:340px">Every number in a Nova Metrics proposal is derived from structured engineering models — not rules of thumb or spreadsheet estimates. Defensible, repeatable, and aligned with South African standards by design.</p>
     </div>
     <div class="engine-grid">
       <div class="eng-cell reveal">
         <div class="eng-num">01</div>
         <div class="eng-title">Load-based solar sizing</div>
-        <div class="eng-desc">Solar is sized to cover daytime consumption plus overnight battery recharge — not a rough multiple of peak load. Required energy calculated using PR 80% and 97% system availability (SA spec), then matched to the smallest adequate panel configuration from your live catalogue.</div>
+        <div class="eng-desc">Solar is sized to cover daytime consumption plus overnight battery recharge — not a rough multiple of peak load. Required energy is calculated using industry-standard performance ratios and system availability benchmarks appropriate for the South African context, then matched to the most suitable panel configuration from your live catalogue.</div>
         <span class="eng-tag">Solar Array</span>
       </div>
       <div class="eng-cell reveal">
         <div class="eng-num">02</div>
-        <div class="eng-title">LiFePO4 battery compliance</div>
-        <div class="eng-desc">Three hard gates must pass: ≥110% capacity headroom, depth of discharge ≤85% (LiFePO4 SA spec hard limit), and guaranteed runtime. The engine favours designs at ≤70% DoD as the design target for maximum cycle life — 92% round-trip efficiency applied throughout.</div>
+        <div class="eng-title">LiFePO4 battery design validation</div>
+        <div class="eng-desc">The platform applies strict multi-gate engineering checks before accepting a battery configuration: capacity headroom relative to the evening load requirement, depth-of-discharge within design targets for LiFePO4 longevity, and guaranteed autonomy runtime. Designs are optimised to maximise battery cycle life. Industry-standard round-trip efficiency is applied throughout.</div>
         <span class="eng-tag">Battery</span>
       </div>
       <div class="eng-cell reveal">
         <div class="eng-num">03</div>
-        <div class="eng-title">NRS 097-2-1 inverter compliance</div>
-        <div class="eng-desc">Inverter is sized with a 30% peak load safety margin. DC/AC ratio validated against NRS 097-2-1: target 1.3:1, compliant range 1.0–1.5, hard reject above 1.5. Every uploaded inverter is also auto-matched against the South African Master Inverter Compliance Register (2,440+ certified models).</div>
+        <div class="eng-title">NRS 097-2-1 alignment check</div>
+        <div class="eng-desc">The inverter is sized with an engineering safety margin applied to peak load. The DC/AC ratio is validated in alignment with NRS 097-2-1 parameters — ensuring the design supports compliance with South African grid interconnection requirements. Every uploaded inverter is also automatically cross-referenced against the South African Master Inverter Compliance Register (2,440+ certified models).</div>
         <span class="eng-tag">Inverter · NRS 097-2-1</span>
       </div>
       <div class="eng-cell reveal">
         <div class="eng-num">04</div>
         <div class="eng-title">365-day net yield modelling</div>
-        <div class="eng-desc">Annual production applies PR 80%, 97% system availability, and 0.55%/year panel degradation. Location-specific GTI drawn from a database covering 150+ South African locations. Specific yield benchmarked against the national average of 1,700 kWh/kWp/year.</div>
+        <div class="eng-desc">Annual production estimates apply performance ratios, system availability factors, and panel degradation assumptions aligned with South African industry norms. Location-specific irradiance data is drawn from a database covering 150+ South African locations. Specific yield is benchmarked against national performance references as a quality indicator.</div>
         <span class="eng-tag">Yield</span>
       </div>
       <div class="eng-cell reveal">
         <div class="eng-num">05</div>
-        <div class="eng-title">Investment-grade financial projections</div>
-        <div class="eng-desc">Real payback calculated across 25 years using NERSA-aligned tariff escalation: 8.76% (2026), 8.83% (2027), then 5.0% per annum. NPV at 12% nominal post-tax discount rate. IRR computed via bisection. O&amp;M (1.25%/yr), insurance (0.75%/yr), and battery replacement at Year 10 (70% of original cost) all modelled.</div>
+        <div class="eng-title">Engineering-grade financial projections</div>
+        <div class="eng-desc">25-year indicative projections are built using NERSA-aligned tariff escalation scenarios, industry-standard discount rates for NPV analysis, IRR modelling, and full lifecycle costing — including maintenance provisions, insurance estimates, and battery replacement assumptions. All financial outputs are estimates and will vary based on actual site conditions, tariff changes, usage patterns, and financing structure.</div>
         <span class="eng-tag">NPV · IRR · Financials</span>
       </div>
       <div class="eng-cell reveal">
         <div class="eng-num">06</div>
         <div class="eng-title">Engagement pipeline intelligence</div>
-        <div class="eng-desc">After a proposal is sent, the platform tracks email opens, proposal views, PDF downloads, and time-on-page. Installers see a follow-up priority: Hot, Warm, Cold — so they know exactly who to call and when.</div>
+        <div class="eng-desc">After a proposal is sent, the platform tracks email opens, proposal views, PDF downloads, and estimated time-on-page — subject to user consent and applicable privacy policies. Installers see a follow-up priority signal — Hot, Warm, Cold — so they know exactly who to contact and when.</div>
         <span class="eng-tag">Analytics</span>
       </div>
     </div>
@@ -442,13 +448,13 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
   <div class="inner">
     <div class="eyebrow reveal">Installer Workflow</div>
     <h2 class="reveal">From client intake to<br><em>signed proposal</em></h2>
-    <p class="section-body reveal">A guided workflow that takes less than 5 minutes per client — from entering a load profile to a precision-engineered, AI-enhanced PDF in the client’s inbox.</p>
+    <p class="section-body reveal">A guided workflow that takes less than five minutes per client — from entering a load profile to an engineering-grade, AI-enhanced PDF in the client's inbox.</p>
     <div class="workflow-steps">
       <div class="w-step reveal"><div class="w-num">1</div><div class="w-title">Add the client</div><div class="w-desc">Enter name, email, address. Saved instantly to your pipeline. No duplicate forms.</div></div>
       <div class="w-step reveal"><div class="w-num">2</div><div class="w-title">Enter project inputs</div><div class="w-desc">Location, load profile, autonomy hours, tariff. All driven by your live component and location databases.</div></div>
-      <div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Platform designs the system</div><div class="w-desc">Optimal panels, inverter, and battery selected. NRS 097-2-1, NERSA SSEG, and LiFePO4 DoD checks all pass automatically.</div></div>
+      <div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Platform designs the system</div><div class="w-desc">Optimal panels, inverter, and battery selected. Design is validated in alignment with NRS 097-2-1, NERSA SSEG guidelines, and LiFePO4 battery parameters — automatically.</div></div>
       <div class="w-step reveal"><div class="w-num">4</div><div class="w-title">Review &amp; generate</div><div class="w-desc">Inspect all six tabs — Solar, Battery, Inverter, Financials, Environment, Proposal. Then generate the branded PDF.</div></div>
-      <div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Send &amp; track</div><div class="w-desc">Email the proposal in one click. Track opens, views, and downloads in real time from the Proposal Portal.</div></div>
+      <div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Send &amp; track</div><div class="w-desc">Email the proposal in one click. Track engagement and downloads in real time from the Proposal Portal, subject to applicable privacy policies.</div></div>
     </div>
   </div>
 </section>
@@ -460,13 +466,13 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
         <div class="eyebrow reveal">Proposal Engine</div>
         <h2 class="reveal">A proposal that<br><em>closes</em> the deal</h2>
         <p class="section-body reveal" style="margin-bottom:24px">The moment you hit Generate, the platform sends every calculated figure to our AI pipeline. It writes the technical narrative, financial commentary, and call-to-action — then renders it into a branded PDF with your company identity.</p>
-        <p class="section-body reveal">Clients receive a document that reads like it was prepared by a professional engineering firm. Because it was — by a platform built on exactly that standard.</p>
+        <p class="section-body reveal">Clients receive a document that reads like it was prepared by a professional engineering firm — because it was built on exactly that standard of structured, repeatable data.</p>
         <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> Branded with installer logo and colours</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> System specs, NPV/IRR financials, and environmental impact</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> System specs, NPV/IRR indicative financials, and environmental estimates</li>
           <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> AI-written commentary in every section</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> NERSA SSEG compliance flagged automatically</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> Delivered in seconds, tracked automatically</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> NERSA SSEG alignment status indicated automatically</li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">✓</span> Delivered in seconds, engagement tracked automatically</li>
         </ul>
       </div>
       <div class="proposal-mock reveal">
@@ -476,16 +482,16 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
         </div>
         <div class="pm-client">Solar Proposal — Fourscore</div>
         <div class="pm-stats">
-          <div class="pm-stat"><div class="pm-stat-lbl">System size</div><div class="pm-stat-val">11.25 kW</div><div class="pm-stat-sub">DC · DC/AC 1.3:1 ✓</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">Year 1 savings</div><div class="pm-stat-val">R8,030</div><div class="pm-stat-sub">vs. Eskom bill</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">NPV @ 12%</div><div class="pm-stat-val">+R34,200</div><div class="pm-stat-sub">25-year positive</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">Real payback</div><div class="pm-stat-val">9 years</div><div class="pm-stat-sub">NERSA escalation</div></div>
+          <div class="pm-stat"><div class="pm-stat-lbl">System size</div><div class="pm-stat-val">11.25 kW</div><div class="pm-stat-sub">DC · ratio within range ✓</div></div>
+          <div class="pm-stat"><div class="pm-stat-lbl">Est. Year 1 savings</div><div class="pm-stat-val">R8,030</div><div class="pm-stat-sub">vs. current Eskom bill</div></div>
+          <div class="pm-stat"><div class="pm-stat-lbl">NPV analysis</div><div class="pm-stat-val">Positive</div><div class="pm-stat-sub">25-year projection</div></div>
+          <div class="pm-stat"><div class="pm-stat-lbl">Est. real payback</div><div class="pm-stat-val">~9 years</div><div class="pm-stat-sub">Escalating tariff scenario</div></div>
         </div>
         <div class="pm-components">
           <div class="pm-comp-title">Components</div>
           <div class="pm-comp-row"><span class="pm-comp-k">Solar</span><span class="pm-comp-v">25× Longi 450W</span></div>
-          <div class="pm-comp-row"><span class="pm-comp-k">Inverter</span><span class="pm-comp-v">Fronius Symo 10.0 — NRS 097 ✓</span></div>
-          <div class="pm-comp-row"><span class="pm-comp-k">Battery</span><span class="pm-comp-v">4× PowerGem 14.3kWh · 62% DoD</span></div>
+          <div class="pm-comp-row"><span class="pm-comp-k">Inverter</span><span class="pm-comp-v">Fronius Symo 10.0 — NRS 097 aligned ✓</span></div>
+          <div class="pm-comp-row"><span class="pm-comp-k">Battery</span><span class="pm-comp-v">4× PowerGem 14.3kWh · DoD: within range ✓</span></div>
         </div>
         <div class="pm-tracking"><div class="pm-track-dot"></div> Proposal delivered · viewed 3× · PDF downloaded</div>
       </div>
@@ -498,7 +504,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
     <div style="text-align:center;max-width:560px;margin:0 auto 8px">
       <div class="eyebrow reveal" style="justify-content:center">Pricing</div>
       <h2 class="reveal">Precision-built for<br><em>serious installers</em></h2>
-      <p class="section-body reveal" style="margin:0 auto">We’re finalising our pricing tiers to make sure they’re right for the South African market. Register your interest and be first to know when plans go live.</p>
+      <p class="section-body reveal" style="margin:0 auto">We're finalising our pricing tiers to make sure they're right for the South African market. Register your interest and be first to know when plans go live.</p>
     </div>
     <div class="plans-grid">
       <div class="plan-card reveal">
@@ -511,7 +517,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
           <li>Full system sizing engine</li>
           <li>AI-generated branded PDFs</li>
           <li>Proposal Portal &amp; tracking</li>
-          <li>Email delivery &amp; analytics</li>
+          <li>Email delivery &amp; engagement analytics</li>
         </ul>
         <a href="mailto:info@novametricsgroup.com" class="btn-plan btn-plan-outline">Register interest →</a>
         <div class="plan-notify"><span class="plan-notify-dot"></span> Be notified when pricing goes live</div>
@@ -527,7 +533,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
           <li>Everything in Starter</li>
           <li>Pipeline analytics dashboard</li>
           <li>Custom hardware catalogue</li>
-          <li>Multi-location GTI database</li>
+          <li>Multi-location irradiance database</li>
           <li>Priority support</li>
         </ul>
         <a href="mailto:info@novametricsgroup.com" class="btn-plan btn-plan-gold">Register interest →</a>
@@ -535,7 +541,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
       </div>
       <div class="plan-card reveal">
         <div class="plan-tier">Enterprise</div>
-        <div class="plan-price">Let’s talk</div>
+        <div class="plan-price">Let's talk</div>
         <div class="plan-price-sub">Custom commercial terms</div>
         <div class="plan-desc">For larger installer networks that need white-label branding, API access, multi-account management, and dedicated support.</div>
         <ul class="plan-features">
@@ -557,7 +563,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
   <div class="cta-inner">
     <div class="eyebrow reveal" style="justify-content:center">Get access</div>
     <h2 class="cta-h2 reveal">Stop estimating.<br><em>Start engineering.</em></h2>
-    <p class="cta-body reveal">Nova Metrics is live and being used by solar installers today. Sign in and design your first system, or book a 20-minute demo and we’ll walk you through the platform.</p>
+    <p class="cta-body reveal">Nova Metrics is live and being used by solar installers today. Sign in and design your first system, or book a 20-minute demo and we'll walk you through the platform.</p>
     <div class="cta-actions reveal">
       <a href="solar-intelligence.html" class="btn-cta btn-cta-primary">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
@@ -568,11 +574,24 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
   </div>
 </section>
 
+<!-- DISCLAIMER -->
+<div class="disclaimer-section">
+  <div class="disclaimer-inner">
+    <div class="disclaimer-title">Important Information &amp; Disclaimers</div>
+    <div class="disclaimer-text">
+      <p><strong style="color:var(--muted)">Financial projections.</strong> All financial outputs produced by Nova Metrics — including estimated savings, payback periods, NPV, and IRR figures — are indicative projections only. They are based on the inputs provided by the user, modelled tariff escalation scenarios, and industry-standard assumptions. Actual results will vary based on real-world site conditions, actual electricity consumption, utility tariff changes, system performance, financing structure, and other factors outside Nova Metrics' control. These outputs do not constitute financial advice, and Nova Metrics makes no representation or warranty as to their accuracy or completeness. Users should seek independent financial and technical advice before making any investment decision.</p>
+      <p><strong style="color:var(--muted)">Regulatory alignment.</strong> Nova Metrics designs systems in alignment with NRS 097-2-1 and NERSA SSEG guidelines as understood at the time of platform development. The platform references the South African Master Inverter Compliance Register for informational purposes. Nova Metrics does not certify regulatory compliance on behalf of any installer, client, or installation. Regulatory requirements may change, and it remains the sole responsibility of the installer to confirm compliance with all applicable standards, municipal requirements, and utility connection conditions before any installation proceeds.</p>
+      <p><strong style="color:var(--muted)">Data &amp; privacy.</strong> Proposal engagement tracking (including email open detection, document views, and download activity) is subject to applicable privacy legislation, including POPIA (Protection of Personal Information Act, No. 4 of 2013), and requires appropriate user consent. Installers are responsible for ensuring that their use of engagement tracking features complies with all applicable data privacy obligations and their own privacy policies.</p>
+      <p><strong style="color:var(--muted)">No liability.</strong> Nova Metrics shall not be liable for any loss, damage, or claim arising from reliance on platform outputs, financial projections, or compliance-related information without independent professional verification.</p>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-grid">
     <div>
       <div class="footer-brand-row"><div class="footer-mark">N</div><div class="footer-brand-name">Nova Metrics</div></div>
-      <p class="footer-desc">Solar Intelligence — the professional SaaS platform for solar system sizing, financial modelling, and automated proposal generation. NRS 097-2-1 &amp; NERSA SSEG compliant.</p>
+      <p class="footer-desc">Solar Intelligence — the professional SaaS platform for solar system sizing, engineering-grade financial modelling, and automated proposal generation. Designed in alignment with NRS 097-2-1 &amp; NERSA SSEG guidelines.</p>
       <span style="display:inline-block;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,145,28,.28);border-radius:20px;padding:4px 10px">Solar Intelligence Platform</span>
     </div>
     <div>
@@ -605,7 +624,7 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
   </div>
   <div class="footer-bottom">
     <span>&copy; 2026 Nova Metrics. All rights reserved.</span>
-    <span>Built for solar professionals</span>
+    <span>Built for solar professionals · Financial outputs are indicative estimates only</span>
   </div>
 </footer>
 
