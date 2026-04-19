@@ -151,6 +151,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .comp-detail{font-size:11px;color:var(--muted);padding:5px 0 8px;line-height:1.65;display:none;}
 .comp-alt{margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:none;}
 .comp-alt.on{display:block;}
+/* KPI card NRS badge pulse while loading */
+.comp-kpi-checking{font-size:10px;color:var(--muted);font-style:italic;}
 </style>
 </head>
 <body>
@@ -333,7 +335,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div id="tab-inverter" class="tab-panel">
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:.95rem">&#8212;</div></div>
+      <!-- ★ CHANGE 1: id added to card, compliance badge sub-div added ★ -->
+      <div class="kpi" id="i-model-kpi">
+        <div class="label">Recommended Inverter</div>
+        <div class="value" id="i-model" style="font-size:.95rem">&#8212;</div>
+        <div class="sub" id="i-model-comp-badge" style="margin-top:8px">
+          <span class="comp-kpi-checking">&#9889; Run a design to check compliance</span>
+        </div>
+      </div>
       <div class="kpi"><div class="label">Load Handling</div><div class="value" id="i-load-ok">&#8212;</div><div class="sub" id="i-load-sub"></div></div>
       <div class="kpi"><div class="label">DC / AC Ratio</div><div class="value" id="i-dcac">&#8212;</div><div class="sub" id="i-dcac-sub"></div></div>
       <div class="kpi"><div class="label">Battery Power Check</div><div class="value" id="i-batt-support">&#8212;</div><div class="sub" id="i-batt-sub"></div></div>
@@ -348,7 +357,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Headroom over Peak Load</span><span class="val" id="i-headroom">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">&#8212;</span></div>
     <div class="section-title">Regulatory Compliance</div>
-    <!-- NRS 097 live compliance check — updated by renderComplianceBadge() after calculation -->
     <div class="status-row">
       <span class="lbl">NRS 097-2-1 Grid Connection Standard</span>
       <span class="val" id="i-nrs097-status"><span style="color:var(--muted);font-size:11px">Run a design first &#9889;</span></span>
@@ -484,7 +492,6 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let installer = null, calcResult = null, selectedLoc = null, selectedClientType = 'residential';
 
-// SA COMPLIANCE CONSTANTS
 const SYSTEM_PR           = 0.80;
 const BATT_ROUND_TRIP_EFF = 0.92;
 const SYSTEM_AVAILABILITY = 0.97;
@@ -510,7 +517,6 @@ function tariffFactor(yr){
   if(yr===3) return 1.0876*1.0883;
   return 1.0876*1.0883*Math.pow(1.05,yr-3);
 }
-
 function batteryHeadroomStatus(h){
   if(h<BATT_HEADROOM_MIN) return 'Undersized';
   if(h<BATT_HEADROOM_IDEAL_MIN) return 'Tight';
@@ -525,9 +531,9 @@ function batteryStressLabel(dod){
   return ['Non-Compliant','Exceeds LiFePO4 85% DoD limit'];
 }
 function dcAcLabel(r){
-  if(r>DC_AC_MAX)          return ['Exceeds NRS 097-2-1 limit (>1.5) — FAIL','red'];
-  if(r>1.35)               return ['Above target — within NRS 097 limit','amber'];
-  if(r>=1.15)              return ['&#10003; Compliant — meets 1.3:1 NRS 097 target','green'];
+  if(r>DC_AC_MAX)            return ['Exceeds NRS 097-2-1 limit (>1.5) — FAIL','red'];
+  if(r>1.35)                 return ['Above target — within NRS 097 limit','amber'];
+  if(r>=1.15)                return ['&#10003; Compliant — meets 1.3:1 NRS 097 target','green'];
   if(r>=DC_AC_MIN_COMPLIANT) return ['Below target — inverter oversized vs array','amber'];
   return ['Under-utilised — DC/AC < 1.0','amber'];
 }
@@ -592,12 +598,22 @@ function showNoSystemFound(reasons){
 }
 function clearNoSystemAlert(){document.getElementById('no-system-alert').classList.remove('on');}
 
+// ── helper to sync badge to KPI card ────────────────────────────────────────
+function syncKpiBadge(html, colorClass){
+  const badge=document.getElementById('i-model-comp-badge');
+  if(badge) badge.innerHTML=html;
+  const card=document.getElementById('i-model-kpi');
+  if(card && colorClass) card.className='kpi '+colorClass;
+}
+
 function calculate(){
   if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){toast('&#9888; Data still loading',true);return;}
   if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
   clearNoSystemAlert();
-  // Reset compliance badge while calculating
+
+  // Reset compliance while calculating
   set('i-nrs097-status','<span style="color:var(--muted);font-size:11px">Checking&#8230;</span>');
+  set('i-model-comp-badge','<span class="comp-kpi-checking">&#8203;Checking NRS 097&#8230;</span>');
   const det=document.getElementById('i-nrs097-detail');if(det){det.textContent='';det.style.display='none';}
   const alt=document.getElementById('i-nrs097-alt');if(alt){alt.className='comp-alt';}
 
@@ -685,7 +701,7 @@ function calculate(){
     monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
     annCons,co2T,trees,coal,water,seg,indP,nersaCat};
   renderAll(calcResult);
-  // Async compliance check — runs after render, does not block or touch calculations
+  // Async compliance — runs after render, never blocks calculations
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
   toast('&#10003; Compliant system designed — all SA checks passed');
 }
@@ -728,6 +744,7 @@ function renderAll(r){
   document.getElementById('b-bar').style.cssText='width:'+Math.min(r.battCR/1.60,1)*100+'%;background:'+bC;
   set('b-bar-tip','Daily DoD: '+fN(r.battDod*100,0)+'% | Headroom: '+fN(r.battCR,2)+'x | Ideal: 1.15x&#8211;1.35x | Max 85% DoD');
 
+  // Note: setKpi sets i-model-kpi to 'kpi green' initially; compliance badge overrides colour async
   setKpi('i-model',r.invModel,'green');
   setKpi('i-load-ok','Load OK — '+fN(r.invAC,1)+' kW handles '+fN(r.peakLoad,1)+' kW','green');
   set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+'30% safety margin applied');
@@ -923,7 +940,10 @@ async function generateProposal(){
 }
 
 // ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
-// Calls check_inverters_compliance RPC then renders badge + optional alternative.
+// Calls check_inverters_compliance RPC.
+// Renders badge in BOTH locations:
+//   1. i-model-kpi  — the KPI card at the top of the Inverter tab (instant visibility)
+//   2. i-nrs097-status — the Regulatory Compliance row (detail + alternative)
 // Does NOT touch any calculation, DB load, or proposal logic.
 
 async function sbRpc(fn,params){
@@ -944,35 +964,43 @@ async function renderComplianceBadge(brand,modelRaw){
   const altEl=document.getElementById('i-nrs097-alt');
   if(!statusEl)return;
 
-  // No brand — cannot look up
+  // ── No brand on file ──────────────────────────────────────────────────────
   if(!brand&&!modelRaw){
-    statusEl.innerHTML='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Brand not on file — confirm compliance with supplier</span>';
+    const html='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Brand not on file — confirm with supplier</span>';
+    statusEl.innerHTML=html;
+    syncKpiBadge(html,'amber');
     return;
   }
 
   try{
     const rows=await sbRpc('check_inverters_compliance',{p_brand:brand||'',p_model:modelRaw||''});
     const c=rows&&rows[0];
+
     if(!c){
-      statusEl.innerHTML='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Compliance unverified</span>';
+      const html='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Compliance unverified</span>';
+      statusEl.innerHTML=html;
+      syncKpiBadge(html,'amber');
       return;
     }
 
-    // Colour map: only green for COMPLIANT, never for anything else
-    const dotC=c.display_color==='green'?'var(--green)':c.display_color==='red'?'var(--red)':'var(--amber)';
-    const bClass=c.display_color==='green'?'green':c.display_color==='red'?'red':'amber';
-    statusEl.innerHTML='<span class="comp-badge '+bClass+'"><span class="comp-dot" style="background:'+dotC+'"></span>'+esc(c.display_label||'Unknown')+'</span>';
+    // ── Colour mapping: green ONLY for COMPLIANT ──────────────────────────
+    const dotC  = c.display_color==='green'?'var(--green)':c.display_color==='red'?'var(--red)':'var(--amber)';
+    const bClass = c.display_color==='green'?'green':c.display_color==='red'?'red':'amber';
+    const badgeHtml = '<span class="comp-badge '+bClass+'"><span class="comp-dot" style="background:'+dotC+'"></span>'+esc(c.display_label||'Unknown')+'</span>';
 
-    // Compliance detail paragraph
+    // ── Update both locations ─────────────────────────────────────────────
+    statusEl.innerHTML=badgeHtml;
+    syncKpiBadge(badgeHtml, bClass);   // ← KPI card gets the same badge + card border colour
+
+    // ── Compliance detail paragraph ───────────────────────────────────────
     if(c.compliance_detail){
       detailEl.textContent=c.compliance_detail;
       detailEl.style.display='block';
     }
 
-    // If NOT confirmed compliant, show alternative or register note
+    // ── If NOT compliant, show alternative / register note ────────────────
     if(c.compliance_status!=='COMPLIANT'){
       if(!c.found_in_master){
-        // Not in register at all
         altEl.innerHTML=
           '<strong style="color:var(--amber)">&#9888; Not in SA Compliance Register</strong><br>'+
           'This inverter is not listed in the South African Master Inverter Compliance Register. '+
@@ -981,7 +1009,6 @@ async function renderComplianceBadge(brand,modelRaw){
         altEl.className='comp-alt on';
         altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
       } else {
-        // In register but not compliant — try to find a compliant alternative from same brand
         const alts=await findCompliantAlternative(brand);
         if(alts&&alts.length>0){
           const a=alts[0];
@@ -989,25 +1016,24 @@ async function renderComplianceBadge(brand,modelRaw){
             '<strong style="color:var(--amber)">&#128274; NRS 097 Compliant Alternative — same brand</strong><br>'+
             'The <strong style="color:var(--text)">'+esc(a.brand)+' '+esc(a.invertermodel)+'</strong> is confirmed compliant with '+
             esc(a.sourcestandard||'NRS 097-2-1:2017')+'. '+
-            'This model does not appear in your uploaded price list. '+
+            'This model is not in your uploaded price list. '+
             'Contact your supplier to confirm availability and pricing before including it in a proposal.';
           altEl.className='comp-alt on';
           altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
         }
       }
     } else {
-      // Compliant — hide alternative panel
       altEl.className='comp-alt';
       altEl.style.display='none';
     }
   }catch(e){
-    // Graceful fallback — never crashes the rest of the app
-    statusEl.innerHTML='<span style="color:var(--muted);font-size:11px">&#9888; Installer to confirm compliance on inverter datasheet</span>';
+    const html='<span style="color:var(--muted);font-size:11px">&#9888; Installer to confirm compliance on datasheet</span>';
+    statusEl.innerHTML=html;
+    syncKpiBadge(html,null);
   }
 }
 
 async function findCompliantAlternative(brand){
-  // Query master table for a compliant inverter from the same brand
   try{
     const rows=await sbFetch(
       '/rest/v1/master_inverters_compliance?brand=ilike.'+encodeURIComponent(brand)+
