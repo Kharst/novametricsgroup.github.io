@@ -1,1 +1,896 @@
-SOLAR_PLACEHOLDER_SEE_NEXT_COMMIT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar Intelligence — Nova Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --surface:#112840;--surface2:#0e2035;--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+.top-nav{background:var(--navy);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.nav-icon{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-center{display:flex;align-items:center;gap:6px}
+.nav-chip{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;gap:5px;}
+.nav-chip.active{background:rgba(255,215,0,.12);border-color:var(--gold-border);color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.portal-link{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.02em;}
+.portal-link:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,215,0,.25)}
+.portal-link.ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);}
+.portal-link.ghost:hover{background:rgba(255,255,255,.12);color:var(--gold);box-shadow:none;}
+.installer-badge{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue);display:none;}
+.sign-out-link{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;}
+.sign-out-link:hover{color:var(--red)}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:32px 20px;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent);}
+.login-logo{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin:0 auto 18px;}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.02em}
+.login-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 16px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:12px;display:block;transition:border-color .2s;}
+.login-box input:focus{outline:none;border-color:var(--gold)}.login-box input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primary{background:var(--gold);color:var(--navy);border:none;padding:13px 24px;border-radius:9px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;margin-top:4px;}
+.btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
+.error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.success-msg{color:var(--green);font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.link-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px;text-align:center;width:100%;display:block;margin-top:10px;transition:color .15s;}
+.link-btn:hover{color:var(--gold)}
+.data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.data-loading.on{display:flex;}
+.dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+.dl-msg{font-size:13px;color:var(--muted)}.dl-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+#app-screen{display:none;padding:24px 28px}
+.input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+.inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
+.inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+.inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.inp-group select:focus,.inp-group input:focus{outline:none;border-color:var(--gold)}
+.loc-combo{position:relative;min-width:190px}
+.loc-combo-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 30px 9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;cursor:pointer;}
+.loc-combo-input:focus{outline:none;border-color:var(--gold)}.loc-combo-input::placeholder{color:rgba(255,255,255,.35)}
+.loc-combo-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:10px;transition:transform .2s;}
+.loc-combo.open .loc-combo-arrow{transform:translateY(-50%) rotate(180deg)}
+.loc-dd{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#0d2040;border:1px solid rgba(255,215,0,.22);border-radius:9px;max-height:230px;overflow-y:auto;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.55);}
+.loc-dd.open{display:block}
+.loc-dd-search{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;background:#0d2040;z-index:1;}
+.loc-dd-search input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:7px 10px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;}
+.loc-dd-search input:focus{outline:none;border-color:var(--gold)}.loc-dd-search input::placeholder{color:rgba(255,255,255,.3)}
+.loc-dd-list{max-height:176px;overflow-y:auto;}
+.loc-opt{padding:8px 12px;font-size:13px;color:var(--text);cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s;}
+.loc-opt:last-child{border-bottom:none}.loc-opt:hover,.loc-opt.active{background:rgba(255,215,0,.1);color:var(--gold)}
+.loc-opt mark{background:transparent;color:var(--gold);font-weight:600;}
+.loc-none{padding:10px 12px;font-size:12px;color:var(--muted);font-style:italic}
+.loc-dd-list::-webkit-scrollbar{width:4px}.loc-dd-list::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:4px}
+.btn-calc{background:var(--gold);color:var(--navy);border:none;padding:10px 26px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;white-space:nowrap;transition:all .2s;}
+.btn-calc:hover{background:#fff}
+.tabs{display:flex;gap:3px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:8px 17px;border-radius:8px 8px 0 0;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--surface);color:var(--muted);transition:.15s;font-family:'DM Sans',sans-serif;}
+.tab.active{background:var(--surface2);color:var(--gold);border-color:rgba(255,215,0,.2)}.tab:hover:not(.active){color:var(--text)}
+.tab-panel{display:none;background:var(--surface);border:1px solid var(--border);border-radius:0 13px 13px 13px;padding:22px}.tab-panel.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 10px 10px;background:var(--gold)}
+.kpi.green::after{background:var(--green)}.kpi.red::after{background:var(--red)}.kpi.amber::after{background:var(--amber)}.kpi.white::after{background:rgba(255,255,255,.2)}
+.kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:500}
+.kpi .value{font-size:1.5rem;font-weight:600;color:var(--gold);line-height:1.1;font-family:'DM Serif Display',serif}
+.kpi.green .value{color:var(--green)}.kpi.red .value{color:var(--red)}.kpi.amber .value{color:var(--amber)}.kpi.white .value{color:var(--text)}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.status-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.status-row:last-child{border-bottom:none}.status-row .lbl{color:var(--muted)}.status-row .val{font-weight:500;color:var(--text);text-align:right;max-width:65%}
+.bar-wrap{background:rgba(255,255,255,.06);border-radius:6px;height:10px;margin-top:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .4s}
+.section-title{font-size:10px;font-weight:600;color:var(--gold);margin:18px 0 10px;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.chart-wrap{width:100%;margin-top:12px;padding:14px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid var(--border)}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chart-label{font-size:11px;color:var(--muted);min-width:56px;text-align:right}
+.chart-bar-outer{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden}
+.chart-bar-inner{height:100%;border-radius:4px;transition:width .5s}
+.chart-val{font-size:11px;color:var(--text);min-width:90px}
+.client-form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.client-form input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.client-form input:focus{outline:none;border-color:var(--gold)}
+.client-form label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.tip{font-size:11px;color:var(--muted);font-style:italic;margin-top:5px}
+.proposal-strip{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-top:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.proposal-strip .info{font-size:12px;color:var(--muted);line-height:1.6}.proposal-strip .info b{color:var(--text)}
+.btn-generate{background:var(--green);color:#064e3b;border:none;padding:12px 30px;border-radius:9px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-generate:hover{background:#10b981;transform:translateY(-1px)}
+.btn-generate:disabled{background:rgba(255,255,255,.08);color:var(--muted);cursor:not-allowed;transform:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #064e3b;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-card{display:none;margin-top:18px;background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border:1px solid rgba(52,211,153,.25);border-radius:13px;padding:24px;animation:up .3s ease;}
+.success-card.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.success-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.success-icon{width:38px;height:38px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.success-title{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--text)}.success-title em{font-style:italic;color:var(--green)}
+.success-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.action-btn{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+.action-btn.primary{background:var(--gold);color:var(--navy)}.action-btn.primary:hover{background:#fff;transform:translateY(-1px)}
+.action-btn.secondary{background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue)}.action-btn.secondary:hover{background:rgba(122,200,248,.18)}
+.action-btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}.action-btn.ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.action-btn svg{width:14px;height:14px;flex-shrink:0}
+.ai-id-tag{display:inline-block;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.15);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--gold);margin-left:6px}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+#toast.show{opacity:1}#toast.err{border-color:rgba(248,113,113,.35);color:var(--red);}
+.hw-banner{display:none;margin-bottom:16px;border-radius:10px;padding:11px 16px;font-size:12px;line-height:1.5;align-items:center;gap:10px;}
+.hw-banner.on{display:flex;}.hw-banner.custom{background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.hw-banner.shared{background:rgba(255,215,0,.07);border:1px solid var(--gold-border);color:var(--muted)}.hw-banner.partial{background:rgba(122,200,248,.07);border:1px solid rgba(122,200,248,.2);color:var(--blue)}
+.hw-banner a{color:inherit;font-weight:600;text-decoration:underline dotted;}.hw-banner a:hover{opacity:.8}
+.no-system-alert{display:none;background:rgba(248,113,113,.07);border:1.5px solid rgba(248,113,113,.30);border-radius:13px;padding:22px 26px;margin-bottom:20px;}
+.no-system-alert.on{display:block;}
+.nsa-title{font-size:14px;font-weight:700;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.nsa-body{font-size:12.5px;color:var(--muted);line-height:1.7;}.nsa-body strong{color:var(--text);}
+.ct-toggle{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.ct-btn{display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;flex:1;min-width:160px;}
+.ct-btn:hover{border-color:rgba(255,255,255,.2);color:var(--text);}
+.ct-btn.active.residential{background:rgba(122,200,248,.10);border-color:rgba(122,200,248,.4);color:var(--blue);}
+.ct-btn.active.commercial{background:rgba(255,215,0,.10);border-color:var(--gold-border);color:var(--gold);}
+.ct-btn .ct-icon{font-size:20px;line-height:1;}.ct-btn .ct-title{font-weight:600;font-size:13px;display:block;}
+.ct-btn .ct-sub{font-size:10px;color:var(--muted);display:block;margin-top:1px;}.ct-btn.active .ct-sub{color:inherit;opacity:.7;}
+.ct-hint{margin-top:10px;font-size:11px;color:var(--muted);padding:8px 12px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);}
+.ct-hint.residential{border-color:rgba(122,200,248,.2);background:rgba(122,200,248,.05);color:var(--blue);}
+.ct-hint.commercial{border-color:var(--gold-border);background:rgba(255,215,0,.05);color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="data-loading" id="dataLoading">
+  <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
+  <div class="dl-spinner"></div>
+  <div class="dl-msg" id="dlMsg">Loading your workspace&#8230;</div>
+  <div class="dl-err" id="dlErr"></div>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-icon">N</div>
+    <div><div class="nav-brand-name">Nova Metrics</div><div class="nav-brand-sub">Solar Intelligence</div></div>
+  </div>
+  <div class="nav-center">
+    <div class="nav-chip active">&#9889; System Sizing Engine</div>
+    <div class="nav-chip">&#129302; AI Proposals</div>
+    <div class="nav-chip">&#128202; Analytics</div>
+  </div>
+  <div class="nav-right">
+    <div id="installer-badge" class="installer-badge"></div>
+    <a href="hardware-pricelist.html" class="portal-link ghost">&#9881; My Hardware</a>
+    <a href="prposal_portal.html" class="portal-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Proposal Portal
+    </a>
+    <button class="sign-out-link" id="sign-out-btn">Sign out</button>
+  </div>
+</nav>
+<div id="login-screen">
+  <div class="login-box" id="panel-signin">
+    <div class="login-logo">N</div>
+    <div class="login-title">Installer <em style="font-style:italic;color:var(--gold)">Login</em></div>
+    <div class="login-sub">Sign in with your Nova Metrics installer account</div>
+    <input type="email" id="login-email" placeholder="Installer email address" autocomplete="email" />
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+    <div id="login-error" class="error-msg"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="link-btn" onclick="showPanel('forgot')">Forgot password?</button>
+  </div>
+  <div class="login-box" id="panel-forgot" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Reset <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Enter your email and we&#8217;ll send a reset link</div>
+    <input type="email" id="forgot-email" placeholder="Your installer email address" autocomplete="email" />
+    <div id="forgot-error" class="error-msg"></div>
+    <div id="forgot-success" class="success-msg"></div>
+    <button class="btn-primary" id="forgot-btn" onclick="doForgotPassword()">Send Reset Link</button>
+    <button class="link-btn" onclick="showPanel('signin')">&#8592; Back to Sign In</button>
+  </div>
+  <div class="login-box" id="panel-setpass" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Set <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Choose a secure password for your account</div>
+    <input type="password" id="new-password" placeholder="New password (min 8 characters)" />
+    <input type="password" id="new-password-confirm" placeholder="Confirm new password" />
+    <div id="setpass-error" class="error-msg"></div>
+    <button class="btn-primary" id="setpass-btn" onclick="doSetPassword()">Set Password &amp; Sign In</button>
+  </div>
+</div>
+<div id="app-screen">
+  <div id="hw-source-banner" class="hw-banner"></div>
+  <div class="no-system-alert" id="no-system-alert">
+    <div class="nsa-title">&#9888; No Compliant System Found</div>
+    <div class="nsa-body" id="no-system-body">With the selected inputs and available hardware, no system meets all design requirements.</div>
+  </div>
+  <div class="input-strip">
+    <div class="inp-group">
+      <label>Location</label>
+      <div class="loc-combo" id="loc-combo">
+        <input type="text" id="loc-display" class="loc-combo-input" placeholder="Select location&#8230;" autocomplete="off" readonly />
+        <span class="loc-combo-arrow">&#9660;</span>
+        <div class="loc-dd" id="loc-dd">
+          <div class="loc-dd-search"><input type="text" id="loc-search" placeholder="&#128269;  Type to search&#8230;" autocomplete="off" /></div>
+          <div class="loc-dd-list" id="loc-dd-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="inp-group">
+      <label>Load Profile</label>
+      <select id="sel-load"><option value="">Loading&#8230;</option></select>
+    </div>
+    <div class="inp-group" id="custom-peak-wrap" style="display:none">
+      <label>Peak Load (kW)</label>
+      <input type="number" id="custom-peak" placeholder="e.g. 4" min="0.5" max="200" step="0.5" />
+    </div>
+    <div class="inp-group" id="custom-daily-wrap" style="display:none">
+      <label>Daily Usage (kWh)</label>
+      <input type="number" id="custom-daily" placeholder="e.g. 30" min="1" max="1000" step="1" />
+    </div>
+    <div class="inp-group">
+      <label>Evening Backup Hours</label>
+      <select id="sel-autonomy">
+        <option value="4">4 hrs</option><option value="6">6 hrs</option>
+        <option value="8" selected>8 hrs</option><option value="10">10 hrs</option>
+        <option value="12">12 hrs</option><option value="16">16 hrs</option>
+      </select>
+    </div>
+    <div class="inp-group">
+      <label>Tariff (R/kWh)</label>
+      <select id="sel-tariff">
+        <option value="2.15">R2.15</option><option value="2.50">R2.50</option>
+        <option value="2.75" selected>R2.75</option><option value="3.00">R3.00</option>
+        <option value="3.50">R3.50</option><option value="4.00">R4.00</option>
+      </select>
+    </div>
+    <div class="inp-group">
+      <label>Markup %</label>
+      <select id="sel-markup">
+        <option value="0">0%</option><option value="10" selected>10%</option>
+        <option value="15">15%</option><option value="20">20%</option>
+        <option value="25">25%</option><option value="30">30%</option>
+      </select>
+    </div>
+    <button class="btn-calc" onclick="calculate()">&#9889; Design System</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('tab-solar')">&#9728;&#65039; Solar Array</div>
+    <div class="tab" onclick="showTab('tab-battery')">&#128267; Battery</div>
+    <div class="tab" onclick="showTab('tab-inverter')">&#9889; Inverter</div>
+    <div class="tab" onclick="showTab('tab-financials')">&#128176; Financials</div>
+    <div class="tab" onclick="showTab('tab-enviro')">&#127807; Environment</div>
+    <div class="tab" onclick="showTab('tab-proposal')">&#128203; Generate Proposal</div>
+  </div>
+  <div id="tab-solar" class="tab-panel active">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Recommended Panel</div><div class="value" id="r-panel-model">&#8212;</div></div>
+      <div class="kpi"><div class="label">Required Solar Array (DC)</div><div class="value" id="r-req-solar">&#8212;</div></div>
+      <div class="kpi"><div class="label">Recommended DC Capacity</div><div class="value" id="r-dc-cap">&#8212;</div></div>
+      <div class="kpi"><div class="label">Panel Quantity</div><div class="value" id="r-panel-count">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Panel Rating</div><div class="value" id="r-panel-watts">&#8212;</div></div>
+      <div class="kpi"><div class="label">Est. Daily Solar Production (Net)</div><div class="value" id="r-daily-solar">&#8212;</div><div class="sub" id="r-daily-solar-sub"></div></div>
+      <div class="kpi"><div class="label">Array Oversizing (%)</div><div class="value" id="r-oversize">&#8212;</div><div class="sub" id="r-oversize-sub"></div></div>
+      <div class="kpi white"><div class="label">Roof Fit Assessment</div><div class="value" id="r-roof-fit" style="font-size:1rem">&#8212;</div><div class="sub" id="r-roof-guidance"></div></div>
+    </div>
+    <div class="section-title">Array Details</div>
+    <div class="status-row"><span class="lbl">Peak Sun Hours (Design GTI)</span><span class="val" id="r-psh">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Performance Ratio (SA spec)</span><span class="val">80%</span></div>
+    <div class="status-row"><span class="lbl">System Availability (SA spec)</span><span class="val">97%</span></div>
+    <div class="status-row"><span class="lbl">Required Solar Energy (kWh/day)</span><span class="val" id="r-req-energy">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Panel Footprint (m&#178;)</span><span class="val" id="r-footprint">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual Solar Production (Net)</span><span class="val" id="r-annual-solar">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Specific Yield (kWh/kWp/year)</span><span class="val" id="r-specific-yield">&#8212;</span></div>
+  </div>
+  <div id="tab-battery" class="tab-panel">
+    <div class="kpi-grid" style="margin-bottom:8px">
+      <div class="kpi green" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
+        <div class="label">&#9889; System Compliance &#8212; Solar &#183; Battery &#183; Inverter &#183; DC/AC &#8212; All must pass</div>
+        <div class="value" id="sys-rec-value" style="font-size:1rem">&#8212;</div>
+        <div class="sub" id="sys-rec-sub"></div>
+      </div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">&#8212;</div></div>
+      <div class="kpi"><div class="label">Daily Cycle Stress</div><div class="value" id="b-stress" style="font-size:.9rem">&#8212;</div><div class="sub" id="b-stress-sub"></div></div>
+      <div class="kpi"><div class="label">Design Risk</div><div class="value" id="b-risk" style="font-size:.9rem">&#8212;</div></div>
+      <div class="kpi"><div class="label">Battery Power During Outage</div><div class="value" id="b-coverage" style="font-size:.9rem">&#8212;</div></div>
+    </div>
+    <div class="kpi-grid" style="margin-top:0">
+      <div class="kpi white"><div class="label">Evening Energy Required</div><div class="value" id="b-needed">&#8212;</div><div class="sub">Solar-off backup period only</div></div>
+      <div class="kpi white"><div class="label">Battery Installed Capacity</div><div class="value" id="b-installed">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Battery Units</div><div class="value" id="b-units">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Runtime at Average Draw</div><div class="value" id="b-runtime">&#8212;</div></div>
+    </div>
+    <div class="section-title">Cross-System Compliance Check</div>
+    <div class="status-row"><span class="lbl">&#9728;&#65039; Solar covers daytime load + battery recharge</span><span class="val" id="b-solar-compat">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">&#128267; Battery power output &#8805; peak load</span><span class="val" id="b-load-compat">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">&#9889; Inverter AC rating &#8805; peak load &#215; 1.3 safety margin</span><span class="val" id="b-inv-compat">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">&#128260; Daily depth of discharge &#8804; 85% (LiFePO4 spec limit)</span><span class="val" id="b-dod-compat">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">&#128208; DC/AC ratio within NRS 097-2-1 range (1.0&#8211;1.5, target 1.3)</span><span class="val" id="b-dcac-compat">&#8212;</span></div>
+    <div class="section-title">Battery Model</div>
+    <div class="status-row"><span class="lbl">Selected Battery</span><span class="val" id="b-model">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Chemistry</span><span class="val">LiFePO4 &#8212; max 85% DoD</span></div>
+    <div class="status-row"><span class="lbl">Round-Trip Efficiency</span><span class="val">92% (SA spec)</span></div>
+    <div class="status-row"><span class="lbl">Capacity per Unit (Usable kWh)</span><span class="val" id="b-usable-per">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Headroom Ratio (Installed &#247; Required)</span><span class="val" id="b-cap-ratio">&#8212;</span></div>
+    <div class="section-title">Capacity Headroom</div>
+    <div class="bar-wrap"><div class="bar-fill" id="b-bar" style="width:0%;background:var(--green)"></div></div>
+    <p class="tip" id="b-bar-tip"></p>
+  </div>
+  <div id="tab-inverter" class="tab-panel">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Recommended Inverter</div><div class="value" id="i-model" style="font-size:.95rem">&#8212;</div></div>
+      <div class="kpi"><div class="label">Load Handling</div><div class="value" id="i-load-ok">&#8212;</div><div class="sub" id="i-load-sub"></div></div>
+      <div class="kpi"><div class="label">DC / AC Ratio</div><div class="value" id="i-dcac">&#8212;</div><div class="sub" id="i-dcac-sub"></div></div>
+      <div class="kpi"><div class="label">Battery Power Check</div><div class="value" id="i-batt-support">&#8212;</div><div class="sub" id="i-batt-sub"></div></div>
+    </div>
+    <div class="section-title">MPPT &amp; String Allocation</div>
+    <div class="status-row"><span class="lbl">PV String &amp; Inverter Compatibility</span><span class="val" id="i-mppt-status">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">String Allocation</span><span class="val" id="i-mppt-alloc">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">MPPT Utilisation</span><span class="val" id="i-mppt-pct">&#8212;</span></div>
+    <div class="section-title">Inverter Performance</div>
+    <div class="status-row"><span class="lbl">Inverter AC Continuous (kW)</span><span class="val" id="i-ac-kw">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Max DC Input (kW)</span><span class="val" id="i-dc-max">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Headroom over Peak Load</span><span class="val" id="i-headroom">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">&#8212;</span></div>
+    <div class="section-title">Regulatory Compliance</div>
+    <div class="status-row"><span class="lbl">NRS 097-2-1 Grid Connection Standard</span><span class="val">&#9888; Installer to confirm on inverter datasheet</span></div>
+    <div class="status-row"><span class="lbl">DC/AC Ratio vs NRS 097 (target 1.3:1, max 1.5:1)</span><span class="val" id="i-dcac-nrs">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">NERSA SSEG Registration Required</span><span class="val" id="i-nersa">&#8212;</span></div>
+    <div class="section-title">DC / AC Ratio Visual</div>
+    <div class="chart-wrap">
+      <div class="chart-row"><div class="chart-label">DC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-dc" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="bar-dc-val">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">AC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-ac" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="bar-ac-val">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">Target</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-target" style="width:0%;background:rgba(255,215,0,.3)"></div></div><div class="chart-val" id="bar-target-val">1.3:1 target</div></div>
+    </div>
+  </div>
+  <div id="tab-financials" class="tab-panel">
+    <div class="kpi-grid">
+      <div class="kpi white"><div class="label">Recommended Total System Cost</div><div class="value" id="f-total-cost">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Cost per Installed kW</div><div class="value" id="f-cost-per-kw">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Suggested Client Price</div><div class="value" id="f-sell-price">&#8212;</div></div>
+      <div class="kpi green"><div class="label">Est. Year 1 Electricity Savings</div><div class="value" id="f-annual-savings">&#8212;</div></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi white"><div class="label">Installer Profit</div><div class="value" id="f-profit">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Inverter Cost</div><div class="value" id="f-inv-cost">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Total Hardware (Panels + BOS)</div><div class="value" id="f-hw-cost">&#8212;</div></div>
+      <div class="kpi white"><div class="label">Simple Payback Period</div><div class="value" id="f-payback">&#8212;</div></div>
+    </div>
+    <div class="section-title">Cost Breakdown</div>
+    <div class="chart-wrap">
+      <div class="chart-row"><div class="chart-label">Panels</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-panels" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="cb-panels-v">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">BOS</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-bos" style="width:0%;background:var(--blue)"></div></div><div class="chart-val" id="cb-bos-v">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">Battery</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-batt" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="cb-batt-v">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa"></div></div><div class="chart-val" id="cb-inv-v">&#8212;</div></div>
+    </div>
+    <div class="section-title">25-Year Financial Model (SA Compliance Rates)</div>
+    <div class="status-row"><span class="lbl">Monthly Savings (Year 1)</span><span class="val" id="f-monthly">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual O&amp;M + Insurance (2% of capex/year)</span><span class="val" id="f-om">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Battery Replacement Cost (Year 10 @ 70%)</span><span class="val" id="f-battrep">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Real Payback (escalating tariff, incl. all costs)</span><span class="val" id="f-real-payback">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">NPV @ 12% Discount Rate (25 yr)</span><span class="val" id="f-npv">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">IRR (25-year)</span><span class="val" id="f-irr">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Gross Lifetime Savings (25 yr, escalating)</span><span class="val" id="f-lifetime">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Net Lifetime Savings (after O&amp;M + battery replacement)</span><span class="val" id="f-net-lifetime">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual ROI % (Year 1 gross)</span><span class="val" id="f-roi">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual Consumption (kWh)</span><span class="val" id="f-consumption">&#8212;</span></div>
+    <div class="section-title">Tariff Escalation Assumptions (NERSA)</div>
+    <div class="status-row"><span class="lbl">2026 Escalation</span><span class="val">8.76%</span></div>
+    <div class="status-row"><span class="lbl">2027 Escalation</span><span class="val">8.83%</span></div>
+    <div class="status-row"><span class="lbl">2028 onwards</span><span class="val">5.00% per annum (conservative)</span></div>
+  </div>
+  <div id="tab-enviro" class="tab-panel">
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="label">Annual CO&#8322; Saved</div><div class="value" id="e-co2">&#8212;</div><div class="sub">tonnes</div></div>
+      <div class="kpi green"><div class="label">Trees Equivalent</div><div class="value" id="e-trees">&#8212;</div></div>
+      <div class="kpi green"><div class="label">Coal Avoided</div><div class="value" id="e-coal">&#8212;</div><div class="sub">tonnes</div></div>
+      <div class="kpi green"><div class="label">Water Saved</div><div class="value" id="e-water">&#8212;</div><div class="sub">litres/year</div></div>
+    </div>
+    <div class="section-title">Energy Independence</div>
+    <div class="status-row"><span class="lbl">Annual Solar Production (Net)</span><span class="val" id="e-annual-solar">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual Consumption</span><span class="val" id="e-consumption">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Client Segment</span><span class="val" id="e-segment">&#8212;</span></div>
+    <div class="section-title">Solar Independence</div>
+    <div class="bar-wrap" style="height:16px"><div class="bar-fill" id="e-indep-bar" style="width:0%;background:var(--green)"></div></div>
+    <p class="tip" id="e-indep-tip" style="margin-top:8px"></p>
+  </div>
+  <div id="tab-proposal" class="tab-panel">
+    <div class="section-title">Client Details</div>
+    <div class="client-form">
+      <div><label>Client Name</label><input type="text" id="p-name" placeholder="Full name" /></div>
+      <div><label>Client Email</label><input type="email" id="p-email" placeholder="email@example.com" /></div>
+      <div><label>Client Phone</label><input type="tel" id="p-phone" placeholder="+27&#8230;" /></div>
+      <div><label>Client Address</label><input type="text" id="p-address" placeholder="Street address" /></div>
+    </div>
+    <div style="margin-top:18px">
+      <span style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:10px">Client Type</span>
+      <div class="ct-toggle">
+        <button class="ct-btn residential active" id="ct-residential" onclick="setClientType('residential')">
+          <span class="ct-icon">&#127968;</span>
+          <span><span class="ct-title">Residential</span><span class="ct-sub">4-page homeowner proposal</span></span>
+        </button>
+        <button class="ct-btn commercial" id="ct-commercial" onclick="setClientType('commercial')">
+          <span class="ct-icon">&#127970;</span>
+          <span><span class="ct-title">Commercial</span><span class="ct-sub">8-page technical proposal &#8212; NPV, IRR, NERSA</span></span>
+        </button>
+      </div>
+      <div class="ct-hint residential" id="ct-hint">&#127968; <strong>Homeowner PDF:</strong> Plain language &#8212; savings, payback, backup hours, installation steps.</div>
+    </div>
+    <div class="section-title" style="margin-top:20px">System Summary</div>
+    <div class="status-row"><span class="lbl">System</span><span class="val" id="ps-system">Run calculation first &#9889;</span></div>
+    <div class="status-row"><span class="lbl">Total Cost</span><span class="val" id="ps-cost">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Annual Savings (Year 1)</span><span class="val" id="ps-savings">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">NPV (25yr @ 12%)</span><span class="val" id="ps-npv">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Payback (real, incl. all costs)</span><span class="val" id="ps-payback">&#8212;</span></div>
+    <div class="proposal-strip">
+      <div class="info">AI-powered proposal via Nova Metrics pipeline.<br><b id="pdf-type-hint">&#127968; Homeowner PDF &#8212; clear, simple, deal-closing</b></div>
+      <button class="btn-generate" id="btn-gen" onclick="generateProposal()" disabled>Generate Proposal</button>
+    </div>
+    <div class="success-card" id="success-card">
+      <div class="success-header">
+        <div class="success-icon">&#10003;</div>
+        <div>
+          <div class="success-title">Proposal <em>created</em> successfully</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px" id="success-ai-label"></div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">The proposal has been generated and saved. Open the <strong style="color:var(--text)">Proposal Portal</strong> to review, send, or download the PDF.</div>
+      <div class="success-actions">
+        <a href="#" id="btn-open-portal" class="action-btn primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Open in Proposal Portal
+        </a>
+        <a href="#" id="btn-download-pdf" class="action-btn secondary" target="_blank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </a>
+        <button class="action-btn ghost" onclick="newCalculation()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          New System Design
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+// reset-password.html on the same custom domain — no Supabase allowlist change needed
+const RESET_URL = 'https://novametricsgroup.com/reset-password.html';
+const NOVA_METRICS_ID = 1;
+const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
+
+let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
+let installer = null, calcResult = null, selectedLoc = null, selectedClientType = 'residential';
+
+// SA COMPLIANCE CONSTANTS
+const SYSTEM_PR           = 0.80;
+const BATT_ROUND_TRIP_EFF = 0.92;
+const SYSTEM_AVAILABILITY = 0.97;
+const BATT_DOD_LIMIT      = 0.85;
+const BATT_DOD_DESIGN_GOOD= 0.70;
+const DC_AC_TARGET        = 1.30;
+const DC_AC_MIN_COMPLIANT = 1.00;
+const DC_AC_MAX           = 1.50;
+const BATT_HEADROOM_MIN       = 1.10;
+const BATT_HEADROOM_IDEAL_MIN = 1.15;
+const BATT_HEADROOM_IDEAL_MAX = 1.35;
+const BATT_HEADROOM_MAX       = 1.60;
+const OM_COST_PCT         = 0.0125;
+const INSURANCE_PCT       = 0.0075;
+const PANEL_DEGRADATION   = 0.0055;
+const BATT_REPLACEMENT_YEAR = 10;
+const BATT_REPLACEMENT_PCT  = 0.70;
+const DISCOUNT_RATE       = 0.12;
+
+function tariffFactor(yr){
+  if(yr<=1) return 1.0;
+  if(yr===2) return 1.0876;
+  if(yr===3) return 1.0876*1.0883;
+  return 1.0876*1.0883*Math.pow(1.05,yr-3);
+}
+
+function batteryHeadroomStatus(h){
+  if(h<BATT_HEADROOM_MIN) return 'Undersized';
+  if(h<BATT_HEADROOM_IDEAL_MIN) return 'Tight';
+  if(h<=BATT_HEADROOM_IDEAL_MAX) return 'Balanced';
+  if(h<=BATT_HEADROOM_MAX) return 'Conservative';
+  return 'Oversized';
+}
+function batteryStressLabel(dod){
+  if(dod<=0.50) return ['Low Stress','Excellent — extended cycle life'];
+  if(dod<=0.70) return ['Normal Cycling','Ideal LiFePO4 range'];
+  if(dod<=0.85) return ['Deep Cycling','Within 85% spec limit — above 70% design target'];
+  return ['Non-Compliant','Exceeds LiFePO4 85% DoD limit'];
+}
+function dcAcLabel(r){
+  if(r>DC_AC_MAX)          return ['Exceeds NRS 097-2-1 limit (>1.5) — FAIL','red'];
+  if(r>1.35)               return ['Above target — within NRS 097 limit','amber'];
+  if(r>=1.15)              return ['&#10003; Compliant — meets 1.3:1 NRS 097 target','green'];
+  if(r>=DC_AC_MIN_COMPLIANT) return ['Below target — inverter oversized vs array','amber'];
+  return ['Under-utilised — DC/AC < 1.0','amber'];
+}
+function calcIRR(inv,cfs){
+  let lo=-0.5,hi=5,r=0.1;
+  for(let i=0;i<200;i++){
+    let npv=-inv;
+    for(let t=0;t<cfs.length;t++) npv+=cfs[t]/Math.pow(1+r,t+1);
+    if(Math.abs(npv)<0.01) break;
+    if(npv>0) lo=r; else hi=r;
+    r=(lo+hi)/2;
+  }
+  return r*100;
+}
+
+function selectBestBattery(reqKWh, peakLoad, autonomy){
+  const cands=[], avg=Math.max(reqKWh/autonomy,0.01);
+  DB.batteries.forEach(b=>{
+    for(let u=1;u<=30;u++){
+      const iKWh=b.usable*u, tKW=b.kw*u, hr=iKWh/reqKWh, dod=reqKWh/iKWh, rt=iKWh/avg;
+      if(hr<BATT_HEADROOM_MIN||tKW<peakLoad||dod>BATT_DOD_LIMIT) continue;
+      const hP=hr<BATT_HEADROOM_IDEAL_MIN?(BATT_HEADROOM_IDEAL_MIN-hr)*10:hr>BATT_HEADROOM_IDEAL_MAX?(hr-BATT_HEADROOM_IDEAL_MAX)*10:0;
+      const oP=hr>BATT_HEADROOM_IDEAL_MAX?(hr-BATT_HEADROOM_IDEAL_MAX)*15:0;
+      const dP=dod>BATT_DOD_DESIGN_GOOD?(dod-BATT_DOD_DESIGN_GOOD)*20:0;
+      cands.push({...b,units:u,installedKWh:iKWh,totalKW:tKW,runtime:rt,headroom:hr,dod,totalCost:b.price*u,headroomStatus:batteryHeadroomStatus(hr),techScore:hP+oP+dP+(b.price*u)*0.0005});
+    }
+  });
+  if(!cands.length) return null;
+  const ord={Balanced:0,Conservative:1,Tight:2,Oversized:3,Undersized:4};
+  cands.sort((a,b)=>a.techScore-b.techScore||ord[a.headroomStatus]-ord[b.headroomStatus]||a.dod-b.dod||a.totalCost-b.totalCost);
+  return cands[0];
+}
+
+function selectBestInverter(reqAC, sysDC){
+  let bInv=null,bScore=Infinity,bUnits=1;
+  DB.inverters.forEach(inv=>{
+    for(let u=1;u<=4;u++){
+      const tAC=inv.ac*u,tDC=inv.dc*u;
+      if(tAC<reqAC||tDC<sysDC) continue;
+      const da=sysDC/tAC;
+      if(da>DC_AC_MAX) continue;
+      let s=da<0.70?150+(0.70-da)*200:da<DC_AC_MIN_COMPLIANT?80+(DC_AC_MIN_COMPLIANT-da)*80:Math.abs(da-DC_AC_TARGET)*40;
+      s+=Math.abs(tAC-reqAC)*3+(inv.price*u)*0.0005+(u-1)*25;
+      if(s<bScore){bScore=s;bInv=inv;bUnits=u;}
+    }
+  });
+  if(!bInv){bInv=DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b);bUnits=1;}
+  return{inv:bInv,units:bUnits};
+}
+
+function showNoSystemFound(reasons){
+  document.getElementById('no-system-alert').classList.add('on');
+  document.getElementById('no-system-body').innerHTML='<strong>Why no compliant system could be designed:</strong><ul style="margin:8px 0 0 16px;list-style:disc">'+reasons.map(r=>'<li>'+r+'</li>').join('')+'</ul><br>To fix: increase backup hours, choose a lighter load profile, or upload larger hardware via <strong>My Hardware</strong>.';
+  const k=document.getElementById('sys-rec-kpi');
+  k.className='kpi red';
+  set('sys-rec-value','&#10007; No Compliant System Found');
+  set('sys-rec-sub',reasons.join(' · '));
+  document.getElementById('btn-gen').disabled=true;
+  calcResult=null;
+  showTab('tab-battery');
+  toast('&#9888; No compliant system — see Battery tab',true);
+}
+function clearNoSystemAlert(){document.getElementById('no-system-alert').classList.remove('on');}
+
+function calculate(){
+  if(!DB.panels.length||!DB.inverters.length||!DB.batteries.length){toast('&#9888; Data still loading',true);return;}
+  if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
+  clearNoSystemAlert();
+  const loadSel=document.getElementById('sel-load');
+  let peakLoad,dailyUsage;
+  if(loadSel.value==='custom'){peakLoad=parseFloat(document.getElementById('custom-peak').value)||3;dailyUsage=parseFloat(document.getElementById('custom-daily').value)||20;}
+  else{const o=loadSel.options[loadSel.selectedIndex];peakLoad=parseFloat(o.dataset.peak);dailyUsage=parseFloat(o.dataset.daily);}
+  const psh=selectedLoc.gti,locName=selectedLoc.label;
+  const autonomy=parseFloat(document.getElementById('sel-autonomy').value);
+  const tariff=parseFloat(document.getElementById('sel-tariff').value);
+  const markup=parseFloat(document.getElementById('sel-markup').value)/100;
+
+  const battBackupKWh=dailyUsage*(autonomy/24);
+  const battRecharge=battBackupKWh/BATT_ROUND_TRIP_EFF;
+  const reqSolarEnergy=(dailyUsage-battBackupKWh)+battRecharge;
+  const effFactor=psh*SYSTEM_PR*SYSTEM_AVAILABILITY;
+  const reqSolarKW=reqSolarEnergy/effFactor;
+
+  let bestPanel=null,bestOs=Infinity;
+  DB.panels.forEach(p=>{const n=Math.ceil(reqSolarKW*1000/p.watts),dc=n*p.watts/1000,os=dc-reqSolarKW;if(os>=0&&os<bestOs){bestOs=os;bestPanel={...p,panelsNeeded:n,dcKW:dc};}});
+  if(!bestPanel){const p=DB.panels[DB.panels.length-1];bestPanel={...p,panelsNeeded:Math.ceil(reqSolarKW*1000/p.watts)};bestPanel.dcKW=bestPanel.panelsNeeded*p.watts/1000;}
+
+  const sysDC=bestPanel.dcKW,expDaily=sysDC*psh*SYSTEM_PR*SYSTEM_AVAILABILITY;
+  const osP=(sysDC-reqSolarKW)/reqSolarKW,annSolar=expDaily*365;
+  const specYield=annSolar/sysDC,annCons=dailyUsage*365;
+  const pc=bestPanel.panelsNeeded,fp=pc*2.2;
+  const rfd=pc<=14?['Easy Fit','Single roof plane.']:pc<=20?['Standard Fit','May use multiple sections.']:pc<=30?['Complex Layout','East/West layout recommended.']:pc<=50?['Large System','Carport or ground mount may be needed.']:['Industrial Array','Multiple sections or ground mount required.'];
+  const solarOK=expDaily>=reqSolarEnergy&&osP>=0;
+
+  const batt=selectBestBattery(battBackupKWh,peakLoad,autonomy);
+  const reqInvAC=peakLoad*1.3;
+  const{inv:bInv,units:iU}=selectBestInverter(reqInvAC,sysDC);
+  const invAC=bInv.ac*iU,invDC=bInv.dc*iU,invPrice=bInv.price*iU,invMPPT=bInv.mppt*iU;
+  const invOK=invAC>=reqInvAC,dcAc=sysDC/invAC;
+
+  const fails=[];
+  if(!solarOK) fails.push('Solar ('+fN(expDaily,2)+' kWh/day net) cannot cover daytime load + recharge ('+fN(reqSolarEnergy,2)+' kWh needed)');
+  if(!batt) fails.push('Battery: no LiFePO4 config achieves DoD &#8804; 85% for '+autonomy+'h at '+fN(peakLoad,1)+' kW — increase backup hours or upload larger batteries');
+  if(batt&&batt.totalKW<peakLoad) fails.push('Battery power ('+fN(batt.totalKW,1)+' kW) below peak load ('+fN(peakLoad,1)+' kW)');
+  if(!invOK) fails.push('Inverter AC ('+fN(invAC,1)+' kW) below required '+fN(reqInvAC,1)+' kW (peak × 1.3)');
+  if(dcAc>DC_AC_MAX) fails.push('DC/AC '+fN(dcAc,2)+' exceeds NRS 097-2-1 maximum of '+DC_AC_MAX);
+  if(fails.length>0){showNoSystemFound(fails);return;}
+
+  const [dcAcTxt,dcAcColor]=dcAcLabel(dcAc);
+  const iHeadroom=invAC-peakLoad,iModel=iU>1?iU+'x '+bInv.model+' (parallel)':bInv.model;
+  const strN=Math.ceil(pc/12),mpptReq=Math.ceil(strN/2),mpptAv=invMPPT;
+  const mpptSt=mpptReq<mpptAv?'Spare inputs available':mpptReq===mpptAv?'All inputs used':'Limited headroom';
+
+  const pCost=pc*bestPanel.price,bosCost=sysDC*3000,hwCost=pCost+bosCost;
+  const totCost=hwCost+batt.totalCost+invPrice,sellP=totCost*(1+markup),profit=sellP-totCost,cPkW=totCost/sysDC;
+  const annOM=totCost*(OM_COST_PCT+INSURANCE_PCT),battRep=batt.totalCost*BATT_REPLACEMENT_PCT;
+  const y1daily=Math.min(expDaily,dailyUsage),annSavY1=y1daily*tariff*365,simpPb=annSavY1>0?totCost/annSavY1:999;
+  const monthly=annSavY1/12,roi=(annSavY1/totCost)*100;
+
+  let cumG=0,realPb=25,npv=-totCost,grossLT=0,netLT=0;
+  const cfs=[];
+  for(let yr=1;yr<=25;yr++){
+    const deg=Math.pow(1-PANEL_DEGRADATION,yr-1),tf=tariffFactor(yr);
+    const dp=expDaily*deg,dOff=Math.min(dp,dailyUsage),yG=dOff*tariff*tf*365;
+    const yBR=yr===BATT_REPLACEMENT_YEAR?battRep:0,yNet=yG-annOM-yBR;
+    cumG+=yG;grossLT+=yG;netLT+=yNet;
+    if(cumG>=totCost&&realPb===25) realPb=yr;
+    npv+=yNet*Math.pow(1+DISCOUNT_RATE,-yr);
+    cfs.push(yNet);
+  }
+  const irr=calcIRR(totCost,cfs);
+  const co2KG=annSolar*0.895,co2T=co2KG/1000,trees=co2KG/21,coal=annSolar/2460,water=annSolar*1.8;
+  const mKWh=expDaily*30;
+  const seg=mKWh<=1500?'Low Residential':mKWh<=3000?'High Residential':mKWh<=20000?'Small Commercial':mKWh<=50000?'Large Commercial':'Industrial';
+  const indP=Math.min(annSolar/annCons,1)*100;
+  const nersaCat=sysDC<=1?'Category A (&#8804;1 kW)':sysDC<=10?'Category B (1&#8211;10 kW)':sysDC<=100?'Category C (10&#8211;100 kW) &#8212; NERSA SSEG licence required':'Category D (>100 kW) &#8212; full NERSA licence required';
+
+  calcResult={systemRecommended:true,locName,psh,peakLoad,dailyUsage,autonomy,tariff,markup,
+    reqSolarKW,reqSolarEnergy,sysDC,pc,panelModel:bestPanel.model,panelWatts:bestPanel.watts,
+    expDaily,osP,annSolar,specYield,fp,roofFit:rfd[0],roofGuidance:rfd[1],
+    battBackupKWh,iKWh:batt.installedKWh,battRuntime:batt.runtime,battModel:batt.model,
+    battUnits:batt.units,battUsable:batt.usable,battCR:batt.headroom,battRisk:batt.dod<=BATT_DOD_DESIGN_GOOD?'Low Risk':'Moderate Risk',
+    battVerdict:batt.headroomStatus==='Tight'?'Tight — within range':batt.headroomStatus==='Balanced'?'Balanced — well designed':'Conservative reserve',
+    battStress:batteryStressLabel(batt.dod)[0],battStressSub:batteryStressLabel(batt.dod)[1],
+    battDod:batt.dod,battHS:batt.headroomStatus,coverage:batt.totalKW/peakLoad<1.15?'Essential Loads':batt.totalKW/peakLoad<=1.40?'Most Loads':'Full Load',
+    battTotalKW:batt.totalKW,battTotCost:batt.totalCost,
+    invModel:iModel,invUnits:iU,invAC,invDC,invEff:bInv.eff,invHeadroom:iHeadroom,invPrice,
+    dcAc,dcAcTxt,dcAcColor,mpptReq,mpptAv,mpptSt,
+    pCost,bosCost,hwCost,totCost,sellP,profit,cPkW,
+    monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
+    annCons,co2T,trees,coal,water,seg,indP,nersaCat};
+  renderAll(calcResult);
+  toast('&#10003; Compliant system designed — all SA checks passed');
+}
+
+function fN(n,d=1){return Number(n).toFixed(d);}
+function fR(n){return 'R'+Math.round(n).toLocaleString('en-ZA');}
+
+function renderAll(r){
+  const osC=r.osP<=0.30?'green':r.osP<=0.40?'white':'amber';
+  setKpi('r-panel-model',r.panelModel,'green');setKpi('r-req-solar',fN(r.reqSolarKW,2)+' kW','green');
+  setKpi('r-dc-cap',fN(r.sysDC,2)+' kW','green');setKpi('r-panel-count',r.pc+' Panels','green');
+  set('r-panel-watts',r.panelWatts+' W');setKpi('r-daily-solar',fN(r.expDaily,2)+' kWh','green');
+  set('r-daily-solar-sub','Net (PR 80% × 97% avail)');setKpi('r-oversize',(r.osP*100).toFixed(1)+'%',osC);
+  set('r-oversize-sub',r.osP<=0.15?'Optimal sizing':r.osP<=0.30?'Safety margin':r.osP<=0.40?'Rounding — acceptable':'Excess — review layout');
+  set('r-roof-fit',r.roofFit);set('r-roof-guidance',r.roofGuidance);
+  set('r-psh',fN(r.psh,2)+' hrs/day');set('r-req-energy',fN(r.reqSolarEnergy,2)+' kWh/day');
+  set('r-footprint',fN(r.fp,1)+' m\u00B2');set('r-annual-solar',Math.round(r.annSolar).toLocaleString('en-ZA')+' kWh/yr');
+  set('r-specific-yield',fN(r.specYield,0)+' kWh/kWp/yr');
+
+  document.getElementById('sys-rec-kpi').className='kpi green';
+  set('sys-rec-value','&#10003; Compliant System — Ready to Propose');
+  set('sys-rec-sub','Solar covers load+recharge · DoD '+fN(r.battDod*100,0)+'% &#8804; 85% &#10003; · DC/AC '+fN(r.dcAc,2)+' · All SA checks passed'+(r.invUnits>1?' · '+r.invUnits+'x inverters parallel':''));
+
+  setKpi('b-verdict',r.battVerdict,r.battHS==='Tight'?'amber':'green');
+  setKpi('b-stress',r.battStress,r.battDod<=BATT_DOD_DESIGN_GOOD?'green':'amber');
+  set('b-stress-sub',fN(r.battDod*100,0)+'% DoD — '+r.battStressSub);
+  setKpi('b-risk',r.battRisk,r.battDod<=BATT_DOD_DESIGN_GOOD?'green':'amber');
+  setKpi('b-coverage',r.coverage,r.coverage.includes('Essential')?'amber':'green');
+  set('b-needed',fN(r.battBackupKWh,2)+' kWh');set('b-installed',fN(r.iKWh,2)+' kWh');
+  set('b-units',r.battUnits+' unit'+(r.battUnits>1?'s':''));set('b-runtime',fN(r.battRuntime,1)+' hrs');
+  set('b-model',r.battModel);set('b-usable-per',fN(r.battUsable,2)+' kWh');
+  set('b-cap-ratio',fN(r.battCR,2)+'x ('+r.battHS+')');
+  set('b-solar-compat','&#10003; '+fN(r.expDaily,2)+' kWh net &#8805; '+fN(r.reqSolarEnergy,2)+' kWh needed');
+  set('b-load-compat','&#10003; Battery '+fN(r.battTotalKW,1)+' kW &#8805; peak '+fN(r.peakLoad,1)+' kW');
+  set('b-inv-compat','&#10003; Inverter '+fN(r.invAC,1)+' kW &#8805; '+fN(r.peakLoad*1.3,1)+' kW (peak &#215; 1.3)');
+  set('b-dod-compat',r.battDod<=BATT_DOD_DESIGN_GOOD?'&#10003; '+fN(r.battDod*100,0)+'% DoD &#8804; 70% — optimal cycling':'&#10003; '+fN(r.battDod*100,0)+'% DoD — within 85% LiFePO4 limit (amber)');
+  set('b-dcac-compat',r.dcAc>=DC_AC_MIN_COMPLIANT?'&#10003; DC/AC '+fN(r.dcAc,2)+' — '+r.dcAcTxt:'&#9888; DC/AC '+fN(r.dcAc,2)+' — inverter oversized vs array');
+  const bC=r.battHS==='Tight'?'var(--amber)':'var(--green)';
+  document.getElementById('b-bar').style.cssText='width:'+Math.min(r.battCR/1.60,1)*100+'%;background:'+bC;
+  set('b-bar-tip','Daily DoD: '+fN(r.battDod*100,0)+'% | Headroom: '+fN(r.battCR,2)+'x | Ideal: 1.15x&#8211;1.35x | Max 85% DoD');
+
+  setKpi('i-model',r.invModel,'green');
+  setKpi('i-load-ok','Load OK — '+fN(r.invAC,1)+' kW handles '+fN(r.peakLoad,1)+' kW','green');
+  set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+'30% safety margin applied');
+  setKpi('i-dcac',fN(r.dcAc,2),r.dcAcColor);set('i-dcac-sub',r.dcAcTxt);
+  setKpi('i-batt-support','Battery OK — '+fN(r.battTotalKW,1)+' kW &#8805; peak','green');
+  set('i-batt-sub','Battery '+fN(r.battTotalKW,1)+' kW &#8805; peak '+fN(r.peakLoad,1)+' kW');
+  const mpC=r.mpptSt==='Spare inputs available'?'green':'amber';
+  setKpi('i-mppt-status',r.mpptSt,mpC);
+  set('i-mppt-alloc',r.mpptReq+' of '+r.mpptAv+' MPPT inputs'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
+  set('i-mppt-pct',fN(r.mpptReq/r.mpptAv*100,0)+'%');
+  set('i-ac-kw',fN(r.invAC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
+  set('i-dc-max',fN(r.invDC,1)+' kW'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
+  set('i-headroom',(r.invHeadroom>0?'+':'')+fN(r.invHeadroom,1)+' kW');set('i-eff',fN(r.invEff,1)+'%');
+  set('i-dcac-nrs',r.dcAc>=1.15&&r.dcAc<=DC_AC_MAX?'&#10003; '+fN(r.dcAc,2)+' — within NRS 097-2-1 range':'&#9888; '+fN(r.dcAc,2)+' — review vs NRS 097 (target 1.3)');
+  set('i-nersa','&#9888; Registration required — '+r.nersaCat);
+  const mx=Math.max(r.sysDC,r.invAC)*1.1;
+  document.getElementById('bar-dc').style.width=(r.sysDC/mx*100)+'%';set('bar-dc-val',fN(r.sysDC,2)+' kW');
+  document.getElementById('bar-ac').style.width=(r.invAC/mx*100)+'%';set('bar-ac-val',fN(r.invAC,1)+' kW');
+  const tDC=r.invAC*DC_AC_TARGET;
+  document.getElementById('bar-target').style.width=Math.min(tDC/mx*100,100)+'%';set('bar-target-val',fN(tDC,2)+' kW (1.3:1)');
+
+  set('f-total-cost',fR(r.totCost));set('f-cost-per-kw',fR(r.cPkW));set('f-sell-price',fR(r.sellP));
+  set('f-annual-savings',fR(r.annSavY1));set('f-profit',fR(r.profit));set('f-inv-cost',fR(r.invPrice));
+  set('f-hw-cost',fR(r.hwCost));set('f-payback',fN(r.simpPb,1)+' year payback');set('f-monthly',fR(r.monthly));
+  set('f-om',fR(r.annOM)+'/yr');set('f-battrep',fR(r.battRep)+' (Year '+BATT_REPLACEMENT_YEAR+')');
+  set('f-real-payback',r.realPb+' years');
+  set('f-npv',(r.npv>=0?'+':'')+fR(r.npv)+' '+(r.npv>=0?'&#10003; Positive NPV':'&#9888; Negative NPV'));
+  set('f-irr',fN(r.irr,1)+'%'+(r.irr>12?' &#10003; Exceeds 12% hurdle':' &#9888; Below 12% hurdle'));
+  set('f-lifetime',fR(r.grossLT));set('f-net-lifetime',fR(r.netLT));
+  set('f-roi',fN(r.roi,1)+'% (Year 1)');set('f-consumption',Math.round(r.annCons).toLocaleString('en-ZA')+' kWh');
+  const mx2=Math.max(r.pCost,r.bosCost,r.battTotCost,r.invPrice);
+  setBar('cb-panels',r.pCost/mx2*100,'cb-panels-v',fR(r.pCost));setBar('cb-bos',r.bosCost/mx2*100,'cb-bos-v',fR(r.bosCost));
+  setBar('cb-batt',r.battTotCost/mx2*100,'cb-batt-v',fR(r.battTotCost));setBar('cb-inv',r.invPrice/mx2*100,'cb-inv-v',fR(r.invPrice));
+
+  set('e-co2',fN(r.co2T,2));set('e-trees',Math.round(r.trees).toLocaleString('en-ZA'));
+  set('e-coal',fN(r.coal,2));set('e-water',Math.round(r.water).toLocaleString('en-ZA'));
+  set('e-annual-solar',Math.round(r.annSolar).toLocaleString('en-ZA')+' kWh');
+  set('e-consumption',Math.round(r.annCons).toLocaleString('en-ZA')+' kWh');set('e-segment',r.seg);
+  document.getElementById('e-indep-bar').style.width=r.indP+'%';
+  set('e-indep-tip','Solar supplies approx. '+fN(r.indP,0)+'% of annual energy needs.');
+
+  set('ps-system',r.pc+'x '+r.panelModel+' | '+r.invModel+' | '+r.battUnits+'x '+r.battModel);
+  set('ps-cost',fR(r.totCost));set('ps-savings',fR(r.annSavY1)+'/year (Year 1)');
+  set('ps-npv',(r.npv>=0?'+':'')+fR(r.npv)+' @ 12%');set('ps-payback',r.realPb+' years (incl. all costs)');
+  document.getElementById('btn-gen').disabled=false;
+}
+
+function set(id,v){const e=document.getElementById(id);if(e)e.innerHTML=v;}
+function setKpi(id,v,c){const e=document.getElementById(id);if(!e)return;e.innerHTML=v;const k=e.closest('.kpi');if(k)k.className='kpi '+c;}
+function setBar(bid,p,vid,v){const b=document.getElementById(bid);if(b)b.style.width=Math.max(p,2)+'%';set(vid,v);}
+function toast(msg,isErr=false){const t=document.getElementById('toast');t.innerHTML=msg;t.className=isErr?'show err':'show';setTimeout(()=>t.className='',3500);}
+function newCalculation(){document.getElementById('success-card').classList.remove('on');document.getElementById('btn-gen').disabled=false;showTab('tab-solar');}
+
+function setClientType(type){
+  selectedClientType=type;
+  document.getElementById('ct-residential').classList.toggle('active',type==='residential');
+  document.getElementById('ct-commercial').classList.toggle('active',type==='commercial');
+  const h=document.getElementById('ct-hint'),p=document.getElementById('pdf-type-hint');
+  if(type==='residential'){h.className='ct-hint residential';h.innerHTML='&#127968; <strong>Homeowner PDF:</strong> Plain language &#8212; savings, payback, backup hours.';if(p)p.textContent='&#127968; Homeowner PDF';}
+  else{h.className='ct-hint commercial';h.innerHTML='&#127970; <strong>Commercial PDF:</strong> Full technical proposal &#8212; NPV, IRR, Section 12B, NERSA.';if(p)p.textContent='&#127970; Commercial PDF';}
+}
+function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getElementById('panel-'+p).style.display=p===name?'block':'none';});}
+supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
+async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
+(async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}})();
+async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
+function showLoadingOverlay(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
+function hideLoadingOverlay(){document.getElementById('dataLoading').classList.remove('on');}
+function showDataError(err){document.getElementById('dlMsg').textContent='Failed to load data';document.getElementById('dlErr').textContent=String(err);document.getElementById('dlErr').style.display='block';}
+async function loadAllData(){
+  const instId=installer.installer_id,isNova=instId===NOVA_METRICS_ID;
+  const locIds=await getInstallerLocationIds(instId);
+  const[locRows,loadRows]=await Promise.all([sbFetch('/rest/v1/solar_locations?id=in.('+locIds+')&select=id,city,location_name,design_gti_kwh_m2_day&order=city'),sbFetch('/rest/v1/load_profiles?select=id,profile_name,peak_load_kw,daily_usage_kwh&order=sort_order.asc')]);
+  let pRows=null,iRows=null,bRows=null,cP=0,cI=0,cB=0;
+  if(!isNova){
+    const[cp,ci,cb]=await Promise.all([sbFetch('/rest/v1/installer_panels?installer_id=eq.'+instId+'&select=id,panel_model,watts,area_sqm,unit_price_r&order=watts.asc'),sbFetch('/rest/v1/installer_inverters?installer_id=eq.'+instId+'&select=id,inverter_model,ac_continuous_kw,dc_max_kw,mppt_count,efficiency_pct,unit_price_r&order=ac_continuous_kw.asc'),sbFetch('/rest/v1/installer_batteries?installer_id=eq.'+instId+'&select=id,battery_model,usable_kwh,nominal_kw,unit_price_r&order=usable_kwh.asc')]);
+    if(cp&&cp.length){pRows=cp;cP=cp.length;}if(ci&&ci.length){iRows=ci;cI=ci.length;}if(cb&&cb.length){bRows=cb;cB=cb.length;}
+  }
+  const[sP,sI,sB]=await Promise.all([pRows?Promise.resolve(null):sbFetch('/rest/v1/PanelModels?select=id,"PanelModel","Watts","Area_sqm","UnitPrice_R"&order="Watts".asc'),iRows?Promise.resolve(null):sbFetch('/rest/v1/InverterModels?select=id,"InverterModel","ACContinuous_kW","DCMax_kW","MPPT_count","Efficiency_pct","UnitPrice_R"&order="ACContinuous_kW".asc'),bRows?Promise.resolve(null):sbFetch('/rest/v1/BatteryModels_DB?select=id,"BatteryModel","Usable_kWh","Nominal_kW","UnitPrice_R"&order="Usable_kWh".asc')]);
+  if(!pRows)pRows=sP;if(!iRows)iRows=sI;if(!bRows)bRows=sB;
+  DB.panels=(pRows||[]).map(r=>cP?{id:r.id,model:r.panel_model,watts:parseInt(r.watts)||0,area:parseFloat(r.area_sqm)||2.0,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['PanelModel'],watts:parseInt(r['Watts'])||0,area:parseFloat(r['Area_sqm'])||2.0,price:parseFloat(r['UnitPrice_R'])||0}).filter(p=>p.watts>0&&p.price>0);
+  DB.inverters=(iRows||[]).map(r=>cI?{id:r.id,model:r.inverter_model,ac:parseFloat(r.ac_continuous_kw)||0,dc:parseFloat(r.dc_max_kw)||0,mppt:parseInt(r.mppt_count)||1,eff:parseFloat(r.efficiency_pct)||97,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['InverterModel'],ac:parseFloat(r['ACContinuous_kW'])||0,dc:parseFloat(r['DCMax_kW'])||0,mppt:parseInt(r['MPPT_count'])||1,eff:parseFloat(r['Efficiency_pct'])||97,price:parseFloat(r['UnitPrice_R'])||0}).filter(i=>i.ac>0&&i.price>0);
+  DB.batteries=(bRows||[]).map(r=>cB?{id:r.id,model:r.battery_model,usable:parseFloat(r.usable_kwh)||0,kw:parseFloat(r.nominal_kw)||5,price:parseFloat(r.unit_price_r)||0}:{id:r.id,model:r['BatteryModel'],usable:parseFloat(r['Usable_kWh'])||0,kw:parseFloat(r['Nominal_kW'])||5,price:parseFloat(r['UnitPrice_R'])||0}).filter(b=>b.usable>0&&b.price>0);
+  DB.locations=(locRows||[]).map(r=>({id:r.id,city:r.city,name:r.location_name||r.city,gti:parseFloat(r.design_gti_kwh_m2_day)||4.80}));
+  DB.loadProfiles=(loadRows||[]).map(r=>({id:r.id,name:r.profile_name,peak:parseFloat(r.peak_load_kw)||0,daily:parseFloat(r.daily_usage_kwh)||0}));
+  DB.hwSource={cP,cI,cB,isNova};
+  populateDropdowns();
+}
+async function getInstallerLocationIds(id){try{const r=await sbFetch('/rest/v1/installer_locations?installer_id=eq.'+id+'&select=location_id');if(r&&r.length)return r.map(x=>x.location_id).join(',');}catch(e){}const a=await sbFetch('/rest/v1/solar_locations?select=id');return(a||[]).map(r=>r.id).join(',')||'0';}
+function setupLocCombo(locs){
+  const combo=document.getElementById('loc-combo'),disp=document.getElementById('loc-display'),dd=document.getElementById('loc-dd'),srch=document.getElementById('loc-search'),list=document.getElementById('loc-dd-list');
+  const all=locs.map(l=>({id:l.id,gti:l.gti,label:l.city+(l.name&&l.name!==l.city?' \u2013 '+l.name:'')}));
+  function openDD(){dd.classList.add('open');combo.classList.add('open');srch.value='';renderList('');setTimeout(()=>srch.focus(),50);}
+  function closeDD(){dd.classList.remove('open');combo.classList.remove('open');}
+  function renderList(q){
+    const ql=q.trim().toLowerCase(),fi=ql?all.filter(it=>it.label.toLowerCase().includes(ql)):all;
+    if(!fi.length){list.innerHTML='<div class="loc-none">No locations match</div>';return;}
+    list.innerHTML=fi.map(it=>{const h=ql?it.label.replace(new RegExp('('+ql.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>'):it.label;return'<div class="loc-opt" data-id="'+it.id+'" data-gti="'+it.gti+'" data-label="'+it.label.replace(/"/g,'&quot;')+'">'+h+'</div>';}).join('');
+    list.querySelectorAll('.loc-opt').forEach(el=>{el.addEventListener('click',()=>{selectedLoc={id:el.dataset.id,gti:parseFloat(el.dataset.gti)||4.80,label:el.dataset.label};disp.value=selectedLoc.label;closeDD();});});
+  }
+  disp.addEventListener('click',()=>dd.classList.contains('open')?closeDD():openDD());
+  srch.addEventListener('input',()=>renderList(srch.value));
+  document.addEventListener('click',e=>{if(!combo.contains(e.target))closeDD();});
+  srch.addEventListener('keydown',e=>{if(e.key==='Escape')closeDD();});
+  if(all.length){selectedLoc=all[0];disp.value=selectedLoc.label;}
+}
+function populateDropdowns(){
+  setupLocCombo(DB.locations);
+  const ls=document.getElementById('sel-load');
+  ls.innerHTML=DB.loadProfiles.map(p=>'<option value="'+p.id+'" data-peak="'+p.peak+'" data-daily="'+p.daily+'">'+p.name+'</option>').join('')+'<option value="custom" data-peak="0" data-daily="0">Custom\u2026</option>';
+  ls.onchange=function(){const c=this.value==='custom';document.getElementById('custom-peak-wrap').style.display=c?'flex':'none';document.getElementById('custom-daily-wrap').style.display=c?'flex':'none';};
+}
+function showApp(){
+  document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';
+  const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';
+  showHwBanner();
+}
+function showHwBanner(){
+  const banner=document.getElementById('hw-source-banner');if(!banner||!DB.hwSource)return;
+  const{cP,cI,cB,isNova}=DB.hwSource;const allC=cP>0&&cI>0&&cB>0,someC=cP>0||cI>0||cB>0;
+  if(isNova){banner.className='hw-banner shared on';banner.innerHTML='&#127775; <span><b>Nova Metrics Demo</b> &#8212; using shared hardware database.</span>';return;}
+  if(allC){banner.className='hw-banner custom on';banner.innerHTML='&#10003; <span><b>Custom pricing active</b> &#8212; '+cP+' panels, '+cI+' inverters, '+cB+' batteries. <a href="hardware-pricelist.html">Update \u2192</a></span>';}
+  else if(someC){const u=[],f=[];if(cP>0)u.push(cP+' panels');else f.push('panels');if(cI>0)u.push(cI+' inverters');else f.push('inverters');if(cB>0)u.push(cB+' batteries');else f.push('batteries');banner.className='hw-banner partial on';banner.innerHTML='&#9889; <span><b>Partial custom pricing</b> &#8212; '+u.join(', ')+' custom; '+f.join(', ')+' from shared DB. <a href="hardware-pricelist.html">Upload missing \u2192</a></span>';}
+  else{banner.className='hw-banner shared on';banner.innerHTML='&#9888; <span><b>Using shared hardware database</b> &#8212; <a href="hardware-pricelist.html">upload your pricelist \u2192</a></span>';}
+}
+document.getElementById('sign-out-btn').addEventListener('click',async function(){await supabaseClient.auth.signOut();window.location.href='nova-metrics_1.html';});
+async function doLogin(){
+  const eEl=document.getElementById('login-email'),pEl=document.getElementById('login-password'),errEl=document.getElementById('login-error'),btn=document.getElementById('login-btn');
+  const email=eEl.value.trim().toLowerCase(),pass=pEl.value;errEl.textContent='';
+  if(!email){errEl.textContent='Please enter your email.';eEl.focus();return;}
+  if(!pass){errEl.textContent='Please enter your password.';pEl.focus();return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Signing in\u2026';
+  const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error){errEl.textContent=error.message==='Invalid login credentials'?'Incorrect email or password.':error.message;pEl.value='';pEl.focus();btn.disabled=false;btn.textContent='Sign In';return;}
+  try{showLoadingOverlay('Loading your workspace\u2026');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const ls=document.getElementById('login-screen');if(ls&&ls.style.display!=='none'){const ap=['signin','forgot','setpass'].find(p=>document.getElementById('panel-'+p).style.display!=='none');if(ap==='signin')doLogin();if(ap==='forgot')doForgotPassword();if(ap==='setpass')doSetPassword();}}});
+async function doForgotPassword(){
+  const email=document.getElementById('forgot-email').value.trim().toLowerCase(),errEl=document.getElementById('forgot-error'),sucEl=document.getElementById('forgot-success'),btn=document.getElementById('forgot-btn');
+  errEl.textContent='';sucEl.textContent='';
+  if(!email){errEl.textContent='Please enter your email address.';return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Sending\u2026';
+  const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:RESET_URL});
+  btn.disabled=false;btn.textContent='Send Reset Link';
+  if(error)errEl.textContent=error.message;else sucEl.textContent='\u2713 Reset link sent! Check your inbox and spam folder.';
+}
+async function doSetPassword(){
+  const pass=document.getElementById('new-password').value,confirm=document.getElementById('new-password-confirm').value,errEl=document.getElementById('setpass-error'),btn=document.getElementById('setpass-btn');
+  errEl.textContent='';
+  if(pass.length<8){errEl.textContent='Password must be at least 8 characters.';return;}
+  if(pass!==confirm){errEl.textContent='Passwords do not match.';return;}
+  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Setting password\u2026';
+  const{data,error}=await supabaseClient.auth.updateUser({password:pass});
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';return;}
+  try{showLoadingOverlay('Setting up your workspace\u2026');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}
+}
+function showTab(id){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs=['tab-solar','tab-battery','tab-inverter','tab-financials','tab-enviro','tab-proposal'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+}
+async function generateProposal(){
+  if(!calcResult||!calcResult.systemRecommended){toast('&#9888; Only compliant systems can generate proposals',true);return;}
+  const r=calcResult,btn=document.getElementById('btn-gen');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Generating\u2026';
+  const cN=document.getElementById('p-name').value.trim()||'Client',cE=document.getElementById('p-email').value.trim(),cPh=document.getElementById('p-phone').value.trim(),cA=document.getElementById('p-address').value.trim();
+  if(!cE){toast('&#9888; Please enter client email',true);btn.disabled=false;btn.textContent='Generate Proposal';return;}
+  const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;
+  const payload={record:{client_type:selectedClientType,contact_email:cE,installer_id:installer.installer_id,installer_name:installer.installer_name,logo_url:installer.logo_url||'',primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',client_name:cN,client_email:cE,client_phone:cPh,client_address:cA,location:r.locName,system_size_kw:r.sysDC,total_cost:r.totCost,annual_savings:r.annSavY1,monthly_savings:r.monthly,lifetime_savings:r.grossLT,net_lifetime_savings:r.netLT,npv:r.npv,irr:r.irr,payback_years:r.realPb,segment:r.seg,panel_model:r.panelModel,panel_number:r.pc,inverter_model:r.invModel,battery_model:r.battModel,battery_capacity_kwh:r.iKWh,battery_backup_kwh:r.battBackupKWh,required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,annual_consumption_kwh:r.annCons,annual_solar_kwh:r.annSolar,trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2T*1000,nersa_category:r.nersaCat,dc_ac_ratio:r.dcAc,specific_yield:r.specYield,ai_prompt:'Solar proposal for '+cN+' in '+r.locName+'. '+r.pc+'x '+r.panelModel+', '+r.invModel+', '+r.battUnits+'x '+r.battModel+'. DC: '+r.sysDC.toFixed(2)+'kW (DC/AC: '+r.dcAc.toFixed(2)+', target 1.3:1 NRS 097). PR: 80%, Avail: 97%, Yield: '+r.specYield.toFixed(0)+' kWh/kWp/yr. DoD '+( r.battDod*100).toFixed(0)+'% (85% LiFePO4 limit). Cost: R'+Math.round(r.totCost).toLocaleString()+'. Savings: R'+Math.round(r.annSavY1).toLocaleString()+'/yr. NPV (12%): R'+Math.round(r.npv).toLocaleString()+'. IRR: '+r.irr.toFixed(1)+'%. Payback: '+r.realPb+' yrs. NERSA: '+r.nersaCat+'.'}};
+  try{
+    const res=await fetch(SUPA_URL+'/functions/v1/generate-solar-proposal',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
+    const data=await res.json();
+    if(data.success){
+      const portalUrl='prposal_portal.html?ai_id='+encodeURIComponent(data.ai_id)+'&email='+encodeURIComponent(installer.contact_email);
+      document.getElementById('success-ai-label').innerHTML='AI Proposal ID <span class="ai-id-tag">'+data.ai_id+'</span>';
+      document.getElementById('btn-open-portal').href=portalUrl;
+      const pdfBtn=document.getElementById('btn-download-pdf');
+      if(data.pdf_url){pdfBtn.href=data.pdf_url;pdfBtn.style.display='flex';}else pdfBtn.style.display='none';
+      document.getElementById('success-card').classList.add('on');
+      toast('&#10003; Proposal generated');setTimeout(()=>{window.location.href=portalUrl;},2800);
+    }else{toast('&#9888; Error: '+(data.error||'Unknown error'),true);btn.disabled=false;btn.textContent='Generate Proposal';}
+  }catch(e){toast('&#9888; Network error: '+e.message,true);btn.disabled=false;btn.textContent='Generate Proposal';}
+}
+</script>
+</body>
+</html>
