@@ -1,1 +1,337 @@
-HW_PLACEHOLDER_SEE_NEXT_COMMIT
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hardware Pricelist — Nova Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --surface:#112840;--surface2:#0e2035;--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+.top-nav{background:var(--navy);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.nav-brand{display:flex;align-items:center;gap:11px}
+.nav-icon{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-right{display:flex;align-items:center;gap:12px}
+.portal-link{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:9px;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.02em;}
+.portal-link:hover{background:#fff;transform:translateY(-1px)}
+.installer-badge{font-size:11px;font-weight:500;padding:5px 12px;border-radius:20px;background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.2);color:var(--blue);display:none;}
+.sign-out-link{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px;}
+.sign-out-link:hover{color:var(--red)}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:32px 20px;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:420px;text-align:center;position:relative;overflow:hidden;}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent);}
+.login-logo{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin:0 auto 18px;}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:.02em}
+.login-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 16px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:12px;display:block;transition:border-color .2s;}
+.login-box input:focus{outline:none;border-color:var(--gold)}.login-box input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primary{background:var(--gold);color:var(--navy);border:none;padding:13px 24px;border-radius:9px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;margin-top:4px;}
+.btn-primary:hover:not(:disabled){background:#fff;transform:translateY(-1px)}.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
+.error-msg{color:#f87171;font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.success-msg{color:var(--green);font-size:12px;margin-top:8px;min-height:18px;text-align:left;padding:0 2px}
+.login-spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+.link-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px;text-align:center;width:100%;display:block;margin-top:10px;transition:color .15s;}
+.link-btn:hover{color:var(--gold)}
+.data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.data-loading.on{display:flex;}
+.dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+.dl-msg{font-size:13px;color:var(--muted)}.dl-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+#app-screen{display:none;padding:28px}
+.page-header{margin-bottom:24px}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text)}
+.page-sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+.nova-banner{background:rgba(255,215,0,.07);border:1px solid var(--gold-border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+.nova-banner-icon{font-size:24px;flex-shrink:0}
+.nova-banner-text{font-size:13px;color:var(--muted);line-height:1.6}
+.nova-banner-text b{color:var(--gold)}
+.hw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+.hw-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;position:relative;}
+.hw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.hw-card.panels::before{background:var(--gold)}
+.hw-card.inverters::before{background:var(--green)}
+.hw-card.batteries::before{background:var(--blue)}
+.hw-card-header{padding:18px 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.hw-card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.hw-card-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.05em}
+.badge-custom{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.badge-shared{background:rgba(255,215,0,.1);color:var(--amber);border:1px solid rgba(255,215,0,.2)}
+.hw-card-body{padding:18px 20px}
+.status-line{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green)}.dot-amber{background:var(--amber)}.dot-muted{background:var(--muted)}
+.upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:14px;}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--gold);background:var(--gold-dim)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:24px;margin-bottom:6px}
+.upload-label{font-size:12px;color:var(--muted);line-height:1.5}
+.upload-label b{color:var(--text)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.btn-sm{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn-save{background:var(--green);color:#064e3b}.btn-save:hover{background:#10b981}
+.btn-save:disabled{background:rgba(255,255,255,.08);color:var(--muted);cursor:not-allowed}
+.btn-clear{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}.btn-clear:hover{background:rgba(248,113,113,.18)}
+.btn-clear:disabled{opacity:.4;cursor:not-allowed}
+.btn-template{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)}.btn-template:hover{color:var(--text);background:rgba(255,255,255,.1)}
+.btn-spinner{display:inline-block;width:11px;height:11px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+.preview-wrap{max-height:220px;overflow-y:auto;border-radius:8px;border:1px solid var(--border);margin-top:10px;}
+.preview-wrap::-webkit-scrollbar{width:4px}.preview-wrap::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:4px}
+.preview-table{width:100%;border-collapse:collapse;font-size:11px;}
+.preview-table th{background:rgba(255,255,255,.05);color:var(--muted);font-weight:600;padding:7px 10px;text-align:left;position:sticky;top:0;text-transform:uppercase;letter-spacing:.05em;font-size:10px;}
+.preview-table td{padding:6px 10px;border-top:1px solid rgba(255,255,255,.04);color:var(--text)}
+.preview-table tr:hover td{background:rgba(255,255,255,.03)}
+.parse-msg{font-size:12px;margin-top:8px;padding:8px 12px;border-radius:7px}
+.parse-ok{background:rgba(52,211,153,.08);color:var(--green);border:1px solid rgba(52,211,153,.18)}
+.parse-warn{background:rgba(251,191,36,.08);color:var(--amber);border:1px solid rgba(251,191,36,.18)}
+.parse-err{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.18)}
+.col-help{margin-top:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border)}
+.col-help summary{font-size:11px;color:var(--muted);cursor:pointer;user-select:none}
+.col-help summary:hover{color:var(--text)}
+.col-help-body{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8}
+.col-help-body code{background:rgba(255,255,255,.07);padding:1px 5px;border-radius:4px;font-size:10px;color:var(--gold)}
+.col-help-body .req{color:var(--red);font-weight:700;font-size:9px;vertical-align:middle;margin-left:2px}
+.col-help-body .opt{color:var(--muted);font-size:9px;vertical-align:middle;margin-left:2px}
+.auto-note{margin-top:10px;padding:8px 10px;border-radius:6px;background:rgba(122,200,248,.06);border:1px solid rgba(122,200,248,.18);color:var(--blue);font-size:11px;line-height:1.6}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);}
+#toast.show{opacity:1}#toast.err{border-color:rgba(248,113,113,.35);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="data-loading" id="dataLoading">
+  <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
+  <div class="dl-spinner"></div>
+  <div class="dl-msg" id="dlMsg">Loading your workspace&#8230;</div>
+  <div class="dl-err" id="dlErr"></div>
+</div>
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-icon">N</div>
+    <div><div class="nav-brand-name">Nova Metrics</div><div class="nav-brand-sub">Hardware Pricelist</div></div>
+  </div>
+  <div class="nav-right">
+    <div id="installer-badge" class="installer-badge"></div>
+    <a href="solar-intelligence.html" class="portal-link">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Solar Intelligence
+    </a>
+    <button class="sign-out-link" id="sign-out-btn">Sign out</button>
+  </div>
+</nav>
+<div id="login-screen">
+  <div class="login-box" id="panel-signin">
+    <div class="login-logo">N</div>
+    <div class="login-title">Installer <em style="font-style:italic;color:var(--gold)">Login</em></div>
+    <div class="login-sub">Sign in with your Nova Metrics installer account</div>
+    <input type="email" id="login-email" placeholder="Installer email address" autocomplete="email"/>
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password"/>
+    <div id="login-error" class="error-msg"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="link-btn" onclick="showPanel('forgot')">Forgot password?</button>
+  </div>
+  <div class="login-box" id="panel-forgot" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Reset <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Enter your email and we&#8217;ll send a reset link</div>
+    <input type="email" id="forgot-email" placeholder="Your installer email address" autocomplete="email"/>
+    <div id="forgot-error" class="error-msg"></div>
+    <div id="forgot-success" class="success-msg"></div>
+    <button class="btn-primary" id="forgot-btn" onclick="doForgotPassword()">Send Reset Link</button>
+    <button class="link-btn" onclick="showPanel('signin')">&#8592; Back to Sign In</button>
+  </div>
+  <div class="login-box" id="panel-setpass" style="display:none">
+    <div class="login-logo">N</div>
+    <div class="login-title">Set <em style="font-style:italic;color:var(--gold)">Password</em></div>
+    <div class="login-sub">Choose a secure password for your account</div>
+    <input type="password" id="new-password" placeholder="New password (min 8 characters)"/>
+    <input type="password" id="new-password-confirm" placeholder="Confirm new password"/>
+    <div id="setpass-error" class="error-msg"></div>
+    <button class="btn-primary" id="setpass-btn" onclick="doSetPassword()">Set Password &amp; Sign In</button>
+  </div>
+</div>
+<div id="app-screen">
+  <div class="page-header">
+    <div class="page-title">&#9881; Hardware Pricelist</div>
+    <div class="page-sub">Upload your own panel, inverter and battery price lists. Your data stays private &#8212; only you can see it. The Solar Intelligence engine will use your prices and specs for accurate, compliant proposals.</div>
+  </div>
+  <div id="nova-banner" class="nova-banner" style="display:none">
+    <div class="nova-banner-icon">&#127775;</div>
+    <div class="nova-banner-text"><b>Nova Metrics Demo Account</b> &#8212; this account uses the shared Nova Metrics hardware database for demonstration purposes. Custom uploads are available for all other installer accounts.</div>
+  </div>
+  <div class="hw-grid">
+    <!-- PANELS -->
+    <div class="hw-card panels" id="card-panels">
+      <div class="hw-card-header">
+        <div class="hw-card-title">&#9728;&#65039; Solar Panels</div>
+        <span id="badge-panels" class="hw-card-badge badge-shared">SHARED DB</span>
+      </div>
+      <div class="hw-card-body">
+        <div class="status-line"><span class="status-dot dot-muted" id="dot-panels"></span><span id="status-panels">Loading&#8230;</span></div>
+        <div class="upload-zone" id="zone-panels">
+          <input type="file" accept=".csv,.txt" id="file-panels" onchange="handleFile('panels',this)">
+          <div class="upload-icon">&#128194;</div>
+          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm btn-save" id="btn-save-panels" disabled onclick="saveHardware('panels')"><span class="btn-spinner" id="spin-panels" style="display:none"></span>Save</button>
+          <button class="btn-sm btn-clear" id="btn-clear-panels" disabled onclick="clearHardware('panels')">&#128465; Clear</button>
+          <button class="btn-sm btn-template" onclick="downloadTemplate('panels')">&#11015; Template</button>
+        </div>
+        <div id="parse-msg-panels"></div>
+        <div id="preview-panels"></div>
+        <details class="col-help">
+          <summary>&#128203; Expected CSV columns</summary>
+          <div class="col-help-body">
+            <b>Required:</b><br>
+            <code>PanelModel</code> <span class="req">REQ</span> &#8212; Full model name<br>
+            <code>Watts</code> <span class="req">REQ</span> &#8212; Power rating in watts<br>
+            <code>UnitPrice_R</code> <span class="req">REQ</span> &#8212; Price per panel in Rands<br><br>
+            <b>Optional:</b><br>
+            <code>Area_sqm</code> <span class="opt">default 2.0</span> &#8212; Panel area in m&#178;<br>
+            <code>Voc_V</code> <span class="opt">optional</span> &#8212; Open-circuit voltage<br>
+            <code>Brand</code> <span class="opt">optional</span><br>
+            <code>Warranty_Years</code> <span class="opt">optional</span><br><br>
+            <b>Price formats:</b> <code>R12500</code>, <code>12 500</code>, <code>12,500.00</code>, <code>12.5k</code>
+          </div>
+        </details>
+      </div>
+    </div>
+    <!-- INVERTERS -->
+    <div class="hw-card inverters" id="card-inverters">
+      <div class="hw-card-header">
+        <div class="hw-card-title">&#9889; Inverters</div>
+        <span id="badge-inverters" class="hw-card-badge badge-shared">SHARED DB</span>
+      </div>
+      <div class="hw-card-body">
+        <div class="status-line"><span class="status-dot dot-muted" id="dot-inverters"></span><span id="status-inverters">Loading&#8230;</span></div>
+        <div class="upload-zone" id="zone-inverters">
+          <input type="file" accept=".csv,.txt" id="file-inverters" onchange="handleFile('inverters',this)">
+          <div class="upload-icon">&#128194;</div>
+          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm btn-save" id="btn-save-inverters" disabled onclick="saveHardware('inverters')"><span class="btn-spinner" id="spin-inverters" style="display:none"></span>Save</button>
+          <button class="btn-sm btn-clear" id="btn-clear-inverters" disabled onclick="clearHardware('inverters')">&#128465; Clear</button>
+          <button class="btn-sm btn-template" onclick="downloadTemplate('inverters')">&#11015; Template</button>
+        </div>
+        <div id="parse-msg-inverters"></div>
+        <div id="preview-inverters"></div>
+        <details class="col-help">
+          <summary>&#128203; Expected CSV columns</summary>
+          <div class="col-help-body">
+            <b>Required:</b><br>
+            <code>InverterModel</code> <span class="req">REQ</span> &#8212; Full model name exactly as on the box<br>
+            <code>Brand</code> <span class="req">REQ</span> &#8212; Manufacturer name &#8212; used for NRS 097 compliance matching<br>
+            <code>ACContinuous_kW</code> <span class="req">REQ</span> &#8212; Continuous AC output in kW<br>
+            <code>DCMax_kW</code> <span class="req">REQ</span> &#8212; Max DC input in kW<br>
+            <code>UnitPrice_R</code> <span class="req">REQ</span> &#8212; Price per inverter in Rands<br><br>
+            <b>Optional:</b><br>
+            <code>MPPT_count</code> <span class="opt">default 2</span><br>
+            <code>Efficiency_pct</code> <span class="opt">default 97</span><br>
+            <code>InverterType</code> <span class="opt">default Hybrid</span><br><br>
+            <b>Price formats:</b> <code>R18000</code>, <code>18 000</code>, <code>18k</code>
+            <div class="auto-note">&#128274; <b>NRS 097-2-1 compliance is determined automatically</b> by matching Brand + Model against the SA Master Compliance Register. Use the official model code from the datasheet for best results.</div>
+          </div>
+        </details>
+      </div>
+    </div>
+    <!-- BATTERIES -->
+    <div class="hw-card batteries" id="card-batteries">
+      <div class="hw-card-header">
+        <div class="hw-card-title">&#128267; Batteries</div>
+        <span id="badge-batteries" class="hw-card-badge badge-shared">SHARED DB</span>
+      </div>
+      <div class="hw-card-body">
+        <div class="status-line"><span class="status-dot dot-muted" id="dot-batteries"></span><span id="status-batteries">Loading&#8230;</span></div>
+        <div class="upload-zone" id="zone-batteries">
+          <input type="file" accept=".csv,.txt" id="file-batteries" onchange="handleFile('batteries',this)">
+          <div class="upload-icon">&#128194;</div>
+          <div class="upload-label"><b>Click or drag</b> a CSV file here<br>Accepted: .csv, .txt</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-sm btn-save" id="btn-save-batteries" disabled onclick="saveHardware('batteries')"><span class="btn-spinner" id="spin-batteries" style="display:none"></span>Save</button>
+          <button class="btn-sm btn-clear" id="btn-clear-batteries" disabled onclick="clearHardware('batteries')">&#128465; Clear</button>
+          <button class="btn-sm btn-template" onclick="downloadTemplate('batteries')">&#11015; Template</button>
+        </div>
+        <div id="parse-msg-batteries"></div>
+        <div id="preview-batteries"></div>
+        <details class="col-help">
+          <summary>&#128203; Expected CSV columns</summary>
+          <div class="col-help-body">
+            <b>Required:</b><br>
+            <code>BatteryModel</code> <span class="req">REQ</span> &#8212; Full model name<br>
+            <code>Usable_kWh</code> <span class="req">REQ</span> &#8212; Usable energy capacity in kWh<br>
+            <code>UnitPrice_R</code> <span class="req">REQ</span> &#8212; Price per unit in Rands<br><br>
+            <b>Optional (improves accuracy):</b><br>
+            <code>Nominal_kW</code> <span class="opt">default 5</span> &#8212; Max discharge power in kW<br>
+            <code>DoD_pct</code> <span class="opt">default 85</span> &#8212; Max DoD % &#8212; LiFePO4 = 85<br>
+            <code>RoundtripEff_pct</code> <span class="opt">default 92</span> &#8212; Round-trip efficiency %<br>
+            <code>Brand</code> <span class="opt">optional</span><br>
+            <code>Warranty_Years</code> <span class="opt">optional</span><br><br>
+            <b>Price formats:</b> <code>R14000</code>, <code>14 000</code>, <code>14k</code><br>
+            If DoD_pct or RoundtripEff_pct are blank, SA spec defaults (85% / 92%) apply.
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+// Same custom domain as Supabase site URL — auto-allowed, no dashboard changes needed
+const RESET_URL = 'https://novametricsgroup.com/reset-password.html';
+const NOVA_METRICS_ID = 1;
+const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
+let installer = null;
+const pending = { panels: null, inverters: null, batteries: null };
+
+function showPanel(name){['signin','forgot','setpass'].forEach(p=>document.getElementById('panel-'+p).style.display=p===name?'block':'none');}
+supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
+async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
+async function sbPost(path,body){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{method:'POST',headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});if(!res.ok){const t=await res.text();throw new Error(t||res.status);}return true;}
+(async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoading('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadHardwareStatus();hideLoading();showApp();}catch(e){showLoadErr(e);}}})();
+async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found.');installer=rows[0];}
+function showLoading(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
+function hideLoading(){document.getElementById('dataLoading').classList.remove('on');}
+function showLoadErr(err){document.getElementById('dlMsg').textContent='Failed to load';document.getElementById('dlErr').textContent=String(err);document.getElementById('dlErr').style.display='block';}
+function showApp(){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';if(installer.installer_id===NOVA_METRICS_ID){document.getElementById('nova-banner').style.display='flex';['panels','inverters','batteries'].forEach(t=>{document.getElementById('zone-'+t).style.opacity='0.4';document.getElementById('zone-'+t).style.pointerEvents='none';document.getElementById('btn-save-'+t).disabled=true;document.getElementById('btn-clear-'+t).disabled=true;});}}
+async function loadHardwareStatus(){if(installer.installer_id===NOVA_METRICS_ID){const[p,i,b]=await Promise.all([sbFetch('/rest/v1/PanelModels?select=id'),sbFetch('/rest/v1/InverterModels?select=id'),sbFetch('/rest/v1/BatteryModels_DB?select=id')]);setStatus('panels',(p||[]).length,'shared');setStatus('inverters',(i||[]).length,'shared');setStatus('batteries',(b||[]).length,'shared');return;}const id=installer.installer_id;const[p,i,b]=await Promise.all([sbFetch('/rest/v1/installer_panels?installer_id=eq.'+id+'&select=id'),sbFetch('/rest/v1/installer_inverters?installer_id=eq.'+id+'&select=id'),sbFetch('/rest/v1/installer_batteries?installer_id=eq.'+id+'&select=id')]);const pc=(p||[]).length,ic=(i||[]).length,bc=(b||[]).length;setStatus('panels',pc,pc>0?'custom':'none');setStatus('inverters',ic,ic>0?'custom':'none');setStatus('batteries',bc,bc>0?'custom':'none');document.getElementById('btn-clear-panels').disabled=pc===0;document.getElementById('btn-clear-inverters').disabled=ic===0;document.getElementById('btn-clear-batteries').disabled=bc===0;}
+function setStatus(type,count,mode){const s=document.getElementById('status-'+type),bg=document.getElementById('badge-'+type),d=document.getElementById('dot-'+type);if(mode==='shared'){s.textContent=count+' items - using Nova Metrics shared database';bg.textContent='SHARED DB';bg.className='hw-card-badge badge-shared';d.className='status-dot dot-amber';}else if(mode==='custom'){s.textContent=count+' items - using your custom pricing';bg.textContent='CUSTOM';bg.className='hw-card-badge badge-custom';d.className='status-dot dot-green';}else{s.textContent='No custom data - will fall back to shared database';bg.textContent='SHARED DB';bg.className='hw-card-badge badge-shared';d.className='status-dot dot-muted';}}
+async function doLogin(){const email=document.getElementById('login-email').value.trim().toLowerCase(),pass=document.getElementById('login-password').value,errEl=document.getElementById('login-error'),btn=document.getElementById('login-btn');errEl.textContent='';if(!email){errEl.textContent='Please enter your email.';return;}if(!pass){errEl.textContent='Please enter your password.';return;}btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Signing in\u2026';const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});if(error){errEl.textContent=error.message==='Invalid login credentials'?'Incorrect email or password.':error.message;btn.disabled=false;btn.textContent='Sign In';return;}try{showLoading('Loading your workspace\u2026');await loadInstallerProfile(data.user.email);await loadHardwareStatus();hideLoading();showApp();}catch(e){showLoadErr(e);}}
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const ls=document.getElementById('login-screen');if(!ls||ls.style.display==='none')return;const active=['signin','forgot','setpass'].find(p=>document.getElementById('panel-'+p).style.display!=='none');if(active==='signin')doLogin();if(active==='forgot')doForgotPassword();if(active==='setpass')doSetPassword();});
+async function doForgotPassword(){const email=document.getElementById('forgot-email').value.trim().toLowerCase(),errEl=document.getElementById('forgot-error'),sucEl=document.getElementById('forgot-success'),btn=document.getElementById('forgot-btn');errEl.textContent='';sucEl.textContent='';if(!email){errEl.textContent='Please enter your email address.';return;}btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Sending\u2026';const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:RESET_URL});btn.disabled=false;btn.textContent='Send Reset Link';if(error)errEl.textContent=error.message;else sucEl.textContent='\u2713 Reset link sent! Check your inbox and spam folder.';}
+async function doSetPassword(){const pass=document.getElementById('new-password').value,confirm=document.getElementById('new-password-confirm').value,errEl=document.getElementById('setpass-error'),btn=document.getElementById('setpass-btn');errEl.textContent='';if(pass.length<8){errEl.textContent='Password must be at least 8 characters.';return;}if(pass!==confirm){errEl.textContent='Passwords do not match.';return;}btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Setting password\u2026';const{data,error}=await supabaseClient.auth.updateUser({password:pass});if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';return;}try{showLoading('Setting up your workspace\u2026');await loadInstallerProfile(data.user.email);await loadHardwareStatus();hideLoading();showApp();}catch(e){showLoadErr(e);}}
+document.getElementById('sign-out-btn').addEventListener('click',async()=>{await supabaseClient.auth.signOut();window.location.href='solar-intelligence.html';});
+function parsePrice(val){if(!val&&val!==0)return 0;let s=String(val).trim();if(!s)return 0;s=s.replace(/^(ZAR|R)\s*/i,'').trim();if(/^[\d.,\s]+[kK]$/.test(s))return Math.round(parseFloat(s.slice(0,-1).replace(/[\s,]/g,''))*1000)||0;s=s.replace(/\s/g,'');if(!s)return 0;const hC=s.includes(','),hD=s.includes('.'),dC=(s.match(/\./g)||[]).length,cC=(s.match(/,/g)||[]).length;if(!hC&&!hD)return parseFloat(s)||0;if(hD&&!hC){if(dC===1)return parseFloat(s)||0;return parseFloat(s.replace(/\./g,''))||0;}if(hC&&!hD){if(cC===1){const p=s.split(',');if(p[1].length===2)return parseFloat(p[0]+'.'+p[1])||0;return parseFloat(s.replace(/,/g,''))||0;}return parseFloat(s.replace(/,/g,''))||0;}if(hC&&hD){if(s.lastIndexOf('.')>s.lastIndexOf(','))return parseFloat(s.replace(/,/g,''))||0;return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;}return parseFloat(s)||0;}
+function findCol(headers,...candidates){const n=h=>h.toLowerCase().replace(/[\s_\-\/]/g,'');for(const c of candidates){const ps=Array.isArray(c)?c.map(n):[n(c)];for(const[i,h]of headers.entries()){if(ps.every(p=>n(h).includes(p)))return i;}}return -1;}
+function parseCSV(text){const lines=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());if(lines.length<2)throw new Error('File must have at least a header row and one data row.');function sr(line){const cells=[];let cur='',inQ=false;for(const ch of line){if(ch==='"'){inQ=!inQ;continue;}if((ch===','||ch==='\t')&&!inQ){cells.push(cur.trim());cur='';continue;}cur+=ch;}cells.push(cur.trim());return cells;}const headers=sr(lines[0]);return{headers,rows:lines.slice(1).map(sr)};}
+function parsePanels(headers,rows){const mI=findCol(headers,'panelmodel','model','name','description','product','panel'),wI=findCol(headers,'watt','wp',['power','w'],'rating','pmax'),aI=findCol(headers,'area','m2','sqm','size'),pI=findCol(headers,'unitprice','unit_price','price','cost','rand','amount'),vI=findCol(headers,'voc','voc_v','opencircuit'),bI=findCol(headers,'brand','manufacturer','make'),wYI=findCol(headers,'warranty','warrantyyr','warranty_years');const m=[];if(mI<0)m.push('Model');if(wI<0)m.push('Watts');if(pI<0)m.push('Price');if(m.length)throw new Error('Cannot find columns: '+m.join(', '));const parsed=[],errors=[];rows.forEach((r,i)=>{if(r.every(c=>!c))return;const mo=(r[mI]||'').trim(),wa=parseInt(String(r[wI]||'').replace(/[^\d]/g,''))||0,ar=aI>=0?(parseFloat(String(r[aI]||'').replace(/[^\d.]/g,''))||2.0):2.0,pr=parsePrice(r[pI]),vo=vI>=0?(parseFloat(String(r[vI]||'').replace(/[^\d.]/g,''))||null):null,br=bI>=0?(r[bI]||'').trim()||null:null,wy=wYI>=0?(parseInt(String(r[wYI]||'').replace(/[^\d]/g,''))||null):null;if(!mo){errors.push('Row '+(i+2)+': missing model');return;}if(wa<=0){errors.push('Row '+(i+2)+': invalid watts');return;}if(pr<=0){errors.push('Row '+(i+2)+': invalid price');return;}const rec={panel_model:mo,watts:wa,area_sqm:ar,unit_price_r:pr};if(vo)rec.voc_v=vo;if(br)rec.brand=br;if(wy)rec.warranty_years=wy;parsed.push(rec);});return{parsed,errors};}
+function parseInverters(headers,rows){const mI=findCol(headers,'invertermodel','model','name','description','product','inverter'),bI=findCol(headers,'brand','manufacturer','make'),acI=findCol(headers,'ac_continuous','accontinuous',['ac','kw'],['output','kw'],'ackw'),dcI=findCol(headers,'dc_max','dcmax',['dc','kw'],['input','kw'],'dckw'),mpI=findCol(headers,'mppt_count','mpptcount','mppt','trackers','inputs'),efI=findCol(headers,'efficiency','eff_pct','effpct'),pI=findCol(headers,'unitprice','unit_price','price','cost','rand','amount'),tI=findCol(headers,'invertertype','type','invtype');const m=[];if(mI<0)m.push('Model');if(acI<0)m.push('ACContinuous_kW');if(dcI<0)m.push('DCMax_kW');if(pI<0)m.push('UnitPrice_R');if(m.length)throw new Error('Cannot find columns: '+m.join(', '));const parsed=[],errors=[];rows.forEach((r,i)=>{if(r.every(c=>!c))return;const mo=(r[mI]||'').trim(),br=bI>=0?(r[bI]||'').trim()||null:null,ac=parseFloat(String(r[acI]||'').replace(/[^\d.]/g,''))||0,dc=parseFloat(String(r[dcI]||'').replace(/[^\d.]/g,''))||0,mp=mpI>=0?(parseInt(String(r[mpI]||'').replace(/[^\d]/g,''))||2):2,ef=efI>=0?(parseFloat(String(r[efI]||'').replace(/[^\d.]/g,''))||97):97,pr=parsePrice(r[pI]),it=tI>=0?(r[tI]||'').trim()||'Hybrid':'Hybrid';if(!mo){errors.push('Row '+(i+2)+': missing model');return;}if(ac<=0){errors.push('Row '+(i+2)+': invalid AC kW');return;}if(dc<=0){errors.push('Row '+(i+2)+': invalid DC kW');return;}if(pr<=0){errors.push('Row '+(i+2)+': invalid price');return;}const rec={inverter_model:mo,ac_continuous_kw:ac,dc_max_kw:dc,mppt_count:mp,efficiency_pct:ef,unit_price_r:pr,inverter_type:it};if(br)rec.brand=br;parsed.push(rec);});return{parsed,errors};}
+function parseBatteries(headers,rows){const mI=findCol(headers,'batterymodel','model','name','description','product','battery'),uI=findCol(headers,'usable_kwh','usablekwh',['usable','kwh'],'capacity_kwh','kwh','capacity'),kI=findCol(headers,'nominal_kw','nominalkw',['nominal','kw'],['power','kw'],'kw'),pI=findCol(headers,'unitprice','unit_price','price','cost','rand','amount'),dI=findCol(headers,'dod_pct','dod','depthofdischarge','maxdod'),rI=findCol(headers,'roundtrip','roundtripeff','rteff','rte'),bI=findCol(headers,'brand','manufacturer','make'),wYI=findCol(headers,'warranty','warrantyyr','warranty_years');const m=[];if(mI<0)m.push('Model');if(uI<0)m.push('Usable_kWh');if(pI<0)m.push('UnitPrice_R');if(m.length)throw new Error('Cannot find columns: '+m.join(', '));const parsed=[],errors=[];rows.forEach((r,i)=>{if(r.every(c=>!c))return;const mo=(r[mI]||'').trim(),us=parseFloat(String(r[uI]||'').replace(/[^\d.]/g,''))||0,kw=kI>=0?(parseFloat(String(r[kI]||'').replace(/[^\d.]/g,''))||5):5,pr=parsePrice(r[pI]),dod=dI>=0?(parseFloat(String(r[dI]||'').replace(/[^\d.]/g,''))||null):null,rte=rI>=0?(parseFloat(String(r[rI]||'').replace(/[^\d.]/g,''))||null):null,br=bI>=0?(r[bI]||'').trim()||null:null,wy=wYI>=0?(parseInt(String(r[wYI]||'').replace(/[^\d]/g,''))||null):null;if(!mo){errors.push('Row '+(i+2)+': missing model');return;}if(us<=0){errors.push('Row '+(i+2)+': invalid usable kWh');return;}if(pr<=0){errors.push('Row '+(i+2)+': invalid price');return;}const rec={battery_model:mo,usable_kwh:us,nominal_kw:kw,unit_price_r:pr};if(dod!==null&&dod>0&&dod<=100)rec.dod_pct=dod;if(rte!==null&&rte>0&&rte<=100)rec.roundtrip_eff_pct=rte;if(br)rec.brand=br;if(wy)rec.warranty_years=wy;parsed.push(rec);});return{parsed,errors};}
+function handleFile(type,input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{processFile(type,e.target.result);}catch(err){showParseMsg(type,'err','Error: '+err.message);}input.value='';};reader.onerror=()=>showParseMsg(type,'err','Error reading file.');reader.readAsText(file,'UTF-8');}
+function processFile(type,text){const{headers,rows}=parseCSV(text);let result;if(type==='panels')result=parsePanels(headers,rows);if(type==='inverters')result=parseInverters(headers,rows);if(type==='batteries')result=parseBatteries(headers,rows);pending[type]=result.parsed;renderPreview(type,result.parsed);if(result.errors.length>0&&result.parsed.length===0){showParseMsg(type,'err','No valid rows. Errors: '+result.errors.slice(0,3).join('; '));document.getElementById('btn-save-'+type).disabled=true;return;}let msg='Parsed '+result.parsed.length+' valid row'+(result.parsed.length!==1?'s':'')+ '.';if(type==='inverters'&&result.parsed.some(r=>!r.brand))msg+=' Tip: add Brand column for better NRS 097 compliance matching.';if(result.errors.length>0)msg+=' ('+result.errors.length+' skipped)';showParseMsg(type,result.errors.length>0?'warn':'ok',msg);document.getElementById('btn-save-'+type).disabled=result.parsed.length===0;}
+function showParseMsg(type,level,msg){const el=document.getElementById('parse-msg-'+type);el.className='parse-msg parse-'+level;el.textContent=msg;}
+function renderPreview(type,rows){const wrap=document.getElementById('preview-'+type);if(!rows||rows.length===0){wrap.innerHTML='';return;}const fR=n=>'R '+Math.round(n).toLocaleString('en-ZA');let thead='',tbody='';if(type==='panels'){thead='<tr><th>Model</th><th>Watts</th><th>Area m&#178;</th><th>Voc V</th><th>Price</th></tr>';tbody=rows.map(r=>'<tr><td>'+esc(r.panel_model)+'</td><td>'+r.watts+'W</td><td>'+r.area_sqm+'</td><td>'+(r.voc_v||'&mdash;')+'</td><td>'+fR(r.unit_price_r)+'</td></tr>').join('');}else if(type==='inverters'){thead='<tr><th>Model</th><th>Brand</th><th>AC kW</th><th>DC kW</th><th>MPPT</th><th>Price</th></tr>';tbody=rows.map(r=>'<tr><td>'+esc(r.inverter_model)+'</td><td>'+esc(r.brand||'&mdash;')+'</td><td>'+r.ac_continuous_kw+'</td><td>'+r.dc_max_kw+'</td><td>'+r.mppt_count+'</td><td>'+fR(r.unit_price_r)+'</td></tr>').join('');}else if(type==='batteries'){thead='<tr><th>Model</th><th>Usable kWh</th><th>kW</th><th>DoD %</th><th>RT Eff %</th><th>Price</th></tr>';tbody=rows.map(r=>'<tr><td>'+esc(r.battery_model)+'</td><td>'+r.usable_kwh+'</td><td>'+r.nominal_kw+'</td><td>'+(r.dod_pct||'85*')+'</td><td>'+(r.roundtrip_eff_pct||'92*')+'</td><td>'+fR(r.unit_price_r)+'</td></tr>').join('');}wrap.innerHTML='<div class="preview-wrap"><table class="preview-table"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function saveHardware(type){if(!pending[type]||pending[type].length===0)return;const rows=pending[type].map(r=>({...r,installer_id:installer.installer_id}));const btn=document.getElementById('btn-save-'+type),spin=document.getElementById('spin-'+type);btn.disabled=true;spin.style.display='inline-block';const tbl={panels:'installer_panels',inverters:'installer_inverters',batteries:'installer_batteries'}[type];try{const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;await fetch(SUPA_URL+'/rest/v1/'+tbl+'?installer_id=eq.'+installer.installer_id,{method:'DELETE',headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token}});for(let i=0;i<rows.length;i+=50)await sbPost('/rest/v1/'+tbl,rows.slice(i,i+50));pending[type]=null;spin.style.display='none';document.getElementById('btn-clear-'+type).disabled=false;setStatus(type,rows.length,'custom');showParseMsg(type,'ok','Saved '+rows.length+' '+type+'.');toast(rows.length+' '+type+' saved');}catch(err){spin.style.display='none';btn.disabled=false;showParseMsg(type,'err','Save failed: '+err.message);toast('Save failed: '+err.message,true);}}
+async function clearHardware(type){if(!confirm('Delete all your custom '+type+'? You will fall back to the shared database.'))return;const tbl={panels:'installer_panels',inverters:'installer_inverters',batteries:'installer_batteries'}[type],btn=document.getElementById('btn-clear-'+type);btn.disabled=true;try{const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+'/rest/v1/'+tbl+'?installer_id=eq.'+installer.installer_id,{method:'DELETE',headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token}});if(!res.ok&&res.status!==204)throw new Error('HTTP '+res.status);setStatus(type,0,'none');document.getElementById('preview-'+type).innerHTML='';document.getElementById('parse-msg-'+type).className='';document.getElementById('parse-msg-'+type).textContent='';document.getElementById('btn-save-'+type).disabled=true;pending[type]=null;toast('Custom '+type+' cleared');}catch(err){btn.disabled=false;toast('Clear failed: '+err.message,true);}}
+const TEMPLATES={
+  panels:'PanelModel,Watts,Area_sqm,Voc_V,Brand,Warranty_Years,UnitPrice_R\nCanadian Solar CS6R-540MS,540,2.26,49.3,Canadian Solar,25,3200\nJinko Tiger Neo 415W,415,2.0,38.6,Jinko Solar,25,2600',
+  inverters:'InverterModel,Brand,ACContinuous_kW,DCMax_kW,MPPT_count,Efficiency_pct,InverterType,UnitPrice_R\nSUN-8K-SG04LP3-EU,Deye,8,10,2,97,Hybrid,18000\nSYMO GEN24 10.0 Plus,Fronius,10,15,2,97.5,Hybrid,32000\nSM8kWLS,Sunsynk,8,16,2,97,Hybrid,20000',
+  batteries:'BatteryModel,Usable_kWh,Nominal_kW,DoD_pct,RoundtripEff_pct,Brand,Warranty_Years,UnitPrice_R\nPylontech US5000 4.8kWh,4.8,3.5,85,92,Pylontech,10,18000\nBYD Battery-Box Premium HVS 5.1kWh,5.1,5,85,95,BYD,10,24000'
+};
+function downloadTemplate(type){const b=new Blob([TEMPLATES[type]],{type:'text/csv;charset=utf-8;'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='nova_metrics_'+type+'_template.csv';a.click();URL.revokeObjectURL(u);}
+['panels','inverters','batteries'].forEach(type=>{const z=document.getElementById('zone-'+type);z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over');});z.addEventListener('dragleave',()=>z.classList.remove('drag-over'));z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(!f)return;if(!f.name.match(/\.(csv|txt)$/i)){toast('Please drop a .csv or .txt file',true);return;}const r=new FileReader();r.onload=ev=>{try{processFile(type,ev.target.result);}catch(err){showParseMsg(type,'err','Error: '+err.message);}};r.readAsText(f,'UTF-8');});});
+function toast(msg,isErr=false){const t=document.getElementById('toast');t.textContent=msg;t.className=isErr?'err show':'show';clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
