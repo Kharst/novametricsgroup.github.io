@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nova Metrics — Installer Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -91,7 +92,7 @@
       </div>
       <div class="field">
         <label>Password <span class="req">*</span></label>
-        <input type="password" id="loginPassword" placeholder="········" autocomplete="current-password" />
+        <input type="password" id="loginPassword" placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="current-password" />
       </div>
       <div class="forgot-link">
         <button onclick="showForgot()">Forgot password?</button>
@@ -145,18 +146,20 @@
   <script>
     var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-    // !! RESET_URL must match the Supabase site URL domain (novametricsgroup.com) !!
-    // Using github.io would require adding it to Supabase's allowed redirect list.
+    // Reset link must land on reset-password.html, NOT the marketing homepage.
+    // This URL must also be in Supabase > Auth > URL Configuration > Redirect URLs.
     var RESET_URL = 'https://novametricsgroup.com/reset-password.html';
 
-    window.addEventListener('DOMContentLoaded', function() {
-      var sbClient = null;
-      try {
-        if (typeof supabase !== 'undefined') {
-          sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-        }
-      } catch(e) {}
+    // sbClient is global so handleForgot() can use the SDK (not raw fetch).
+    var sbClient = null;
+    try {
+      if (typeof supabase !== 'undefined') {
+        sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      }
+    } catch(e) {}
 
+    window.addEventListener('DOMContentLoaded', function() {
+      // Redirect already-authenticated users straight to the app.
       if (sbClient) {
         sbClient.auth.getSession().then(function(result) {
           var session = result && result.data && result.data.session;
@@ -166,10 +169,11 @@
         }).catch(function(){});
       }
 
-      ['loginEmail','loginPassword'].forEach(function(id) {
-        document.getElementById(id).addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') handleLogin();
-        });
+      document.getElementById('loginEmail').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleLogin();
+      });
+      document.getElementById('loginPassword').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleLogin();
       });
       document.getElementById('forgotEmail').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') handleForgot();
@@ -181,7 +185,11 @@
       document.getElementById('forgotPanel').style.display = 'block';
       document.getElementById('forgotForm').style.display  = 'block';
       document.getElementById('forgotSent').style.display  = 'none';
-      document.getElementById('forgotEmail').value = document.getElementById('loginEmail').value;
+      document.getElementById('forgotMsg').textContent = '';
+      document.getElementById('forgotMsg').className = 'msg';
+      // Pre-fill email if user already typed it on the login screen.
+      var loginEmail = document.getElementById('loginEmail').value.trim();
+      if (loginEmail) document.getElementById('forgotEmail').value = loginEmail;
       document.getElementById('forgotEmail').focus();
     }
     function showLogin() {
@@ -195,10 +203,9 @@
       var password = document.getElementById('loginPassword').value;
       var btn      = document.getElementById('loginBtn');
       var msg      = document.getElementById('loginMsg');
-      if (!email || !password) { showMsg(msg,'error','Please enter your email and password.'); return; }
+      if (!email || !password) { showMsg(msg, 'error', 'Please enter your email and password.'); return; }
       btn.disabled = true;
-      showMsg(msg,'loading','Verifying\u2026');
-
+      showMsg(msg, 'loading', 'Verifying\u2026');
       try {
         var authRes = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
           method: 'POST',
@@ -219,38 +226,30 @@
       }
     }
 
+    // Uses Supabase SDK (not raw fetch) so redirectTo is correctly included
+    // in the email link. Without this, Supabase falls back to the default
+    // Site URL (novametricsgroup.com homepage) and the token gets consumed
+    // there, causing the "otp_expired" error the user sees.
     async function handleForgot() {
       var email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       var btn   = document.getElementById('forgotBtn');
       var msg   = document.getElementById('forgotMsg');
-      if (!email) { showMsg(msg,'error','Please enter your email address.'); return; }
+      if (!email) { showMsg(msg, 'error', 'Please enter your email address.'); return; }
+      if (!sbClient) { showMsg(msg, 'error', 'Client not ready — please refresh and try again.'); return; }
       btn.disabled = true;
-      showMsg(msg,'loading','Sending reset link\u2026');
+      btn.querySelector('span').textContent = 'Sending\u2026';
       try {
-        // redirect_to must be in Supabase allowed redirect URLs list.
-        // Using the custom domain (novametricsgroup.com) which matches the Supabase site URL
-        // so it is auto-allowed without needing a dashboard change.
-        var res = await fetch(SUPABASE_URL + '/auth/v1/recover', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({
-            email: email,
-            redirect_to: RESET_URL,
-            gotrue_meta_security: {}
-          })
+        var result = await sbClient.auth.resetPasswordForEmail(email, {
+          redirectTo: RESET_URL
         });
-        if (!res.ok) {
-          var errData = await res.json().catch(function(){ return {}; });
-          var errMsg = (errData && errData.msg) || (errData && errData.error_description) || 'Failed to send reset email. Please try again.';
-          showMsg(msg,'error',errMsg);
-          btn.disabled = false;
-          return;
-        }
+        // Always show the sent screen regardless of whether the email exists.
+        // This prevents user-enumeration (attackers can't probe which emails are registered).
         document.getElementById('forgotForm').style.display = 'none';
         document.getElementById('forgotSent').style.display = 'block';
       } catch(err) {
-        showMsg(msg,'error','Connection error. Please try again.');
+        showMsg(msg, 'error', 'Connection error. Please try again.');
         btn.disabled = false;
+        btn.querySelector('span').textContent = 'Send Reset Link';
       }
     }
 
