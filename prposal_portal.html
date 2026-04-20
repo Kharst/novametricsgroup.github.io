@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <!--
   Nova Metrics — Proposal Portal
+  STATUS: Sidebar redesigned — search, filter tabs, sorting, pagination,
+          status badges, needs-attention logic, instant send-status updates.
 -->
 <html lang="en">
 <head>
@@ -15,6 +17,7 @@
   --gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.18);
   --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
   --sidebar-w:300px;--wa:#25D366;
+  --green:#34d399;--red:#f87171;--blue:#7ac8f8;--amber:#fbbf24;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden;}
@@ -24,30 +27,72 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .boot-msg{font-size:13px;color:var(--muted);}
 .boot-spinner{width:22px;height:22px;border:2px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Sidebar ────────────────────────────────────────────── */
 .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:linear-gradient(180deg,#0d2240 0%,#0B1F3A 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.brand{display:flex;align-items:center;gap:12px;padding:22px 20px 18px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.brand{display:flex;align-items:center;gap:12px;padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .brand-icon{width:36px;height:36px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
 .brand-name{font-size:14px;font-weight:600;white-space:nowrap;}
 .brand-sub{font-size:10px;color:var(--gold);letter-spacing:.09em;text-transform:uppercase;}
-.s-sec{padding:18px 16px 6px;flex-shrink:0;}
-.s-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;padding:0 4px;}
-.inst-card{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:11px;padding:11px 13px;}
-.inst-av{width:34px;height:34px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--navy);flex-shrink:0;}
-.inst-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.inst-email{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
-.c-list-section{display:flex;flex-direction:column;flex:1;overflow:hidden;padding:6px 0 0;}
-.c-list-header{padding:14px 20px 8px;flex-shrink:0;}
-.c-list{flex:1;overflow-y:auto;padding:0 10px;}
-.c-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s;margin-bottom:3px;border:1px solid transparent;gap:8px;}
+.s-sec{padding:12px 14px 8px;flex-shrink:0;}
+.s-lbl{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:8px;padding:0 2px;}
+.inst-card{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:10px;padding:9px 11px;}
+.inst-av{width:32px;height:32px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--navy);flex-shrink:0;}
+.inst-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inst-email{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:195px;}
+
+/* ── Search ──────────────────────────────────────────────── */
+.sidebar-search-wrap{padding:10px 12px 5px;flex-shrink:0;}
+.sidebar-search{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 11px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.sidebar-search:focus{outline:none;border-color:rgba(255,215,0,.4);}
+.sidebar-search::placeholder{color:rgba(255,255,255,.25);}
+
+/* ── Filter tabs ─────────────────────────────────────────── */
+.sidebar-ftabs{display:flex;gap:2px;padding:4px 12px 4px;flex-shrink:0;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.sidebar-ftabs::-webkit-scrollbar{display:none;}
+.ftab{padding:5px 9px;border-radius:6px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:.15s;position:relative;}
+.ftab.active{background:rgba(255,215,0,.12);color:var(--gold);}
+.ftab:hover:not(.active){background:rgba(255,255,255,.05);color:var(--text);}
+.ftab-dot{width:5px;height:5px;background:#f87171;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:middle;}
+
+/* ── Sort bar ────────────────────────────────────────────── */
+.sidebar-sortbar{display:flex;align-items:center;gap:3px;padding:2px 12px 8px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.sort-lbl{font-size:9.5px;color:var(--muted);flex-shrink:0;margin-right:2px;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+.sort-btn{padding:3px 8px;border-radius:5px;font-size:9.5px;font-weight:600;letter-spacing:.03em;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:.15s;text-transform:uppercase;}
+.sort-btn.active{background:rgba(255,255,255,.08);color:var(--text);}
+.sort-btn:hover:not(.active){color:var(--text);}
+
+/* ── Client list section ─────────────────────────────────── */
+.c-list-section{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.c-list-header{padding:10px 16px 5px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.c-list{flex:1;overflow-y:auto;padding:2px 8px;}
+.loading-row{padding:14px 16px;font-size:12px;color:var(--muted);text-align:center;}
+
+/* ── Compact client row ──────────────────────────────────── */
+.c-row{display:flex;align-items:center;padding:8px 10px;border-radius:9px;cursor:pointer;transition:background .15s;margin-bottom:2px;border:1px solid transparent;gap:7px;position:relative;}
 .c-row:hover{background:var(--card);}
 .c-row.active{background:var(--gold-dim);border-color:var(--gold-border);}
+.c-row.needs-att{border-color:rgba(251,191,36,.22);}
+.c-attn{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:1px;}
 .c-info{flex:1;min-width:0;}
-.c-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.c-email{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.badge{font-size:9px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
-.b-none{background:rgba(255,255,255,.07);color:var(--muted);}
-.b-ready{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);}
-.loading-row{padding:14px 16px;font-size:12px;color:var(--muted);text-align:center;}
+.c-name{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c-meta{font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* ── Status badges ───────────────────────────────────────── */
+.badge{font-size:9px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.sb-none{background:rgba(255,255,255,.07);color:var(--muted);}
+.sb-generated{background:rgba(255,215,0,.14);color:#FFD700;border:1px solid rgba(255,215,0,.2);}
+.sb-sent{background:rgba(156,163,175,.12);color:#9ca3af;border:1px solid rgba(156,163,175,.2);}
+.sb-viewed{background:rgba(122,200,248,.14);color:#7ac8f8;border:1px solid rgba(122,200,248,.2);}
+.sb-accepted{background:rgba(52,211,153,.14);color:#34d399;border:1px solid rgba(52,211,153,.2);}
+.sb-rejected{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.2);}
+
+/* ── Load more ───────────────────────────────────────────── */
+.load-more-wrap{padding:8px 12px 10px;flex-shrink:0;}
+.load-more-btn{width:100%;padding:7px;border-radius:7px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:.15s;}
+.load-more-btn:hover{background:rgba(255,255,255,.1);color:var(--text);}
+
+/* ── Main area ───────────────────────────────────────────── */
 .main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;}
 .t-tabs{display:flex;gap:4px;}
@@ -80,9 +125,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ch-meta{display:flex;gap:14px;margin-top:7px;flex-wrap:wrap;}
 .ch-mi{font-size:12px;color:rgba(255,255,255,.48);display:flex;align-items:center;gap:5px;}
 .ch-mi strong{color:rgba(255,255,255,.82);font-weight:500;}
+/* Pill status in detail header */
 .pill{padding:6px 16px;border-radius:30px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;}
-.pill.r{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
-.pill.p{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
+.pill.r,.pill.accepted{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
+.pill.p,.pill.none{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
+.pill.generated{background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.25);}
+.pill.sent{background:rgba(156,163,175,.15);color:#9ca3af;border:1px solid rgba(156,163,175,.25);}
+.pill.viewed{background:rgba(122,200,248,.15);color:#7ac8f8;border:1px solid rgba(122,200,248,.25);}
+.pill.rejected{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.25);}
+/* Needs-attention banner inside detail */
+.attn-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:9px;}
+.attn-banner.on{display:flex;}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
 .s-card{background:#fff;border-radius:13px;padding:17px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .s-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(10,37,64,.08);}
@@ -129,6 +182,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ab-check{width:22px;height:22px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
 .ab-close{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:16px;padding:0 4px;line-height:1;}
 .ab-close:hover{color:#6b7280;}
+
+/* ── Analytics dashboard ─────────────────────────────────── */
 #analyticsTab{overflow:hidden;flex-direction:column;}
 .dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -185,6 +240,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .fp-hot{color:#dc2626;font-weight:600;}.fp-warm{color:#d97706;font-weight:600;}
 .fp-cold{color:#2563eb;font-weight:600;}.fp-wait{color:#6b7280;}
 .fp-closed{color:#16a34a;font-weight:600;}
+
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
@@ -206,6 +262,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <div class="brand-icon">N</div>
     <div><div class="brand-name">Nova Metrics</div><div class="brand-sub">Proposal Portal</div></div>
   </div>
+
   <div class="s-sec">
     <div class="s-lbl">Installer Account</div>
     <div class="inst-card">
@@ -216,9 +273,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
     </div>
   </div>
+
+  <!-- ── Search ── -->
+  <div class="sidebar-search-wrap">
+    <input type="text" class="sidebar-search" id="sidebarSearch" placeholder="🔍  Search client name / email…" autocomplete="off" />
+  </div>
+
+  <!-- ── Filter tabs ── -->
+  <div class="sidebar-ftabs" id="sidebarFtabs">
+    <button class="ftab active" data-tab="all">All</button>
+    <button class="ftab" data-tab="needs_action" id="ftab-needs-action">⚠ Action</button>
+    <button class="ftab" data-tab="sent">Sent</button>
+    <button class="ftab" data-tab="viewed">Viewed</button>
+    <button class="ftab" data-tab="won">Won</button>
+  </div>
+
+  <!-- ── Sort bar ── -->
+  <div class="sidebar-sortbar">
+    <span class="sort-lbl">Sort:</span>
+    <button class="sort-btn active" data-sort="newest">Newest</button>
+    <button class="sort-btn" data-sort="oldest">Oldest</button>
+    <button class="sort-btn" data-sort="value">Value</button>
+  </div>
+
+  <!-- ── Client list ── -->
   <div class="c-list-section">
-    <div class="c-list-header"><div class="s-lbl" id="clientCount">Loading…</div></div>
-    <div class="c-list" id="clientList"><div class="loading-row">Loading clients…</div></div>
+    <div class="c-list-header">
+      <div class="s-lbl" id="clientCount">Loading…</div>
+    </div>
+    <div class="c-list" id="clientList">
+      <div class="loading-row">Loading clients…</div>
+    </div>
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+      <button class="load-more-btn" id="loadMoreBtn">Load more ↓</button>
+    </div>
   </div>
 </aside>
 
@@ -258,6 +346,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
 
     <div class="detail" id="detailPanel">
+      <!-- Needs-attention alert inside detail -->
+      <div class="attn-banner" id="attnBanner">
+        <span style="font-size:16px">⚠️</span>
+        <span id="attnMsg">This proposal needs follow-up.</span>
+      </div>
+
       <div class="ch">
         <div class="ch-l">
           <div class="ch-av" id="chAv">?</div>
@@ -328,11 +422,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
             Download PDF
           </button>
           <button class="dl-btn-email" id="sendBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Email to Client
           </button>
           <button class="dl-btn-wa" id="waBtn">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
             Send via WhatsApp
           </button>
         </div>
@@ -340,6 +434,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     </div>
   </div>
 
+  <!-- ── Analytics tab (UNCHANGED) ── -->
   <div class="tab-content" id="analyticsTab">
     <div class="dash-shell">
       <div class="dash-topbar">
@@ -370,19 +465,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 </main>
 
 <script>
+/* ── Constants ─────────────────────────────────────────────── */
 var SUPA='https://zloxcqrhkcohheeixfns.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 var PDF_FN=SUPA+'/functions/v1/proposal-view/';
 var DOWNLOAD_FN=SUPA+'/functions/v1/proposal-download/';
 var SESSION_KEY='nm_installer_session';
-var installer=null,allClients=[],dashLoaded=false;
+var PAGE_SIZE=20;
+var MS_24H=24*60*60*1000;
+var MS_3D=3*24*60*60*1000;
+
+/* ── State ─────────────────────────────────────────────────── */
+var installer=null, allClients=[], dashLoaded=false;
+var searchQuery='', activeFilterTab='all', sortMode='newest', displayCount=PAGE_SIZE;
+var activeDetailIdx=-1;
 var params=new URLSearchParams(window.location.search);
 var urlAiId=params.get('ai_id');
 var urlEmail=(params.get('email')||'').toLowerCase().trim();
 var activeDashTab='system';
 
-var sb = supabase.createClient(SUPA, ANON);
+var sb=supabase.createClient(SUPA,ANON);
 
+/* ── Tab switching ─────────────────────────────────────────── */
 function switchTab(tab){
   var isA=tab==='analytics';
   document.getElementById('proposalsTab').classList.toggle('on',!isA);
@@ -402,13 +506,512 @@ function switchDashTab(name){
   if(pane)pane.classList.add('on');
 }
 
+/* ── Status helpers ────────────────────────────────────────── */
+function getProposalStatus(ai){
+  if(!ai||!ai.pdf_url) return null;
+  var ps=ai.proposal_status;
+  // Normalise — anything unknown defaults to 'generated'
+  if(!ps||!['generated','sent','viewed','accepted','rejected'].includes(ps)) return 'generated';
+  return ps;
+}
+function getStatusInfo(client){
+  var ps=getProposalStatus(client.ai);
+  if(!ps) return{label:'None',cls:'sb-none'};
+  switch(ps){
+    case 'generated': return{label:'Generated',cls:'sb-generated'};
+    case 'sent':      return{label:'Sent',cls:'sb-sent'};
+    case 'viewed':    return{label:'Viewed',cls:'sb-viewed'};
+    case 'accepted':  return{label:'Won',cls:'sb-accepted'};
+    case 'rejected':  return{label:'Rejected',cls:'sb-rejected'};
+    default:          return{label:'Ready',cls:'sb-generated'};
+  }
+}
+function getPillClass(ps){
+  switch(ps){
+    case 'generated': return 'generated';
+    case 'sent':      return 'sent';
+    case 'viewed':    return 'viewed';
+    case 'accepted':  return 'accepted';
+    case 'rejected':  return 'rejected';
+    default:          return ps?'r':'p';
+  }
+}
+function getPillLabel(ps,hasPdf){
+  if(!hasPdf) return 'No Proposal';
+  switch(ps){
+    case 'generated': return 'Generated';
+    case 'sent':      return 'Sent';
+    case 'viewed':    return 'Viewed';
+    case 'accepted':  return 'Won';
+    case 'rejected':  return 'Rejected';
+    default:          return 'Proposal Ready';
+  }
+}
+
+/* ── Needs-attention logic ─────────────────────────────────── */
+function needsAttention(client){
+  var ai=client.ai;
+  if(!ai||!ai.pdf_url) return false;
+  var ps=getProposalStatus(ai);
+  var now=Date.now();
+  // Generated but not sent for >24 h
+  if(ps==='generated'){
+    var created=ai.created_at?new Date(ai.created_at).getTime():0;
+    if(now-created>MS_24H) return true;
+  }
+  // Sent but no view after 3 days
+  if(ps==='sent'){
+    var sentAt=ai.sent_at||ai.email_sent_at;
+    if(sentAt&&(now-new Date(sentAt).getTime())>MS_3D) return true;
+  }
+  return false;
+}
+function attnMessage(client){
+  var ai=client.ai;
+  var ps=getProposalStatus(ai);
+  var now=Date.now();
+  if(ps==='generated'){
+    var created=ai.created_at?new Date(ai.created_at).getTime():0;
+    var hrs=Math.round((now-created)/3600000);
+    return '⚠️ Proposal generated '+hrs+'h ago but not yet sent. Send it now to keep momentum.';
+  }
+  if(ps==='sent'){
+    var sentAt=ai.sent_at||ai.email_sent_at;
+    var days=Math.round((now-new Date(sentAt).getTime())/86400000);
+    return '⚠️ Sent '+days+' days ago but not viewed yet. Consider a follow-up call or resend.';
+  }
+  return '';
+}
+
+/* ── Filter + sort ─────────────────────────────────────────── */
+function filterAndSortClients(){
+  var q=searchQuery.trim().toLowerCase();
+  var filtered=allClients.filter(function(c){
+    var name=((c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'').toLowerCase();
+    var email=((c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'').toLowerCase();
+    if(q&&!name.includes(q)&&!email.includes(q)) return false;
+    var ps=getProposalStatus(c.ai);
+    switch(activeFilterTab){
+      case 'needs_action': return needsAttention(c);
+      case 'sent':         return ps==='sent';
+      case 'viewed':       return ps==='viewed';
+      case 'won':          return ps==='accepted';
+    }
+    return true;
+  });
+  filtered.sort(function(a,b){
+    if(sortMode==='value'){
+      var av=a.ai?parseFloat(a.ai.total_cost)||0:0;
+      var bv=b.ai?parseFloat(b.ai.total_cost)||0:0;
+      return bv-av;
+    }
+    var ad=a.ai?new Date(a.ai.created_at).getTime():0;
+    var bd=b.ai?new Date(b.ai.created_at).getTime():0;
+    return sortMode==='oldest'?ad-bd:bd-ad;
+  });
+  return filtered;
+}
+function countNeedsAction(){
+  return allClients.filter(needsAttention).length;
+}
+
+/* ── Render sidebar client list ────────────────────────────── */
+function renderClientList(){
+  var list=document.getElementById('clientList');
+  var visible=filterAndSortClients();
+  var needsCount=countNeedsAction();
+
+  // Update "Needs Action" tab dot
+  var naTab=document.getElementById('ftab-needs-action');
+  if(naTab){
+    naTab.innerHTML='⚠ Action'+(needsCount>0?' <span class="ftab-dot"></span>':'');
+  }
+
+  // Count label
+  var totalAll=allClients.length;
+  var shown=Math.min(displayCount,visible.length);
+  document.getElementById('clientCount').textContent=
+    totalAll+' Client'+(totalAll!==1?'s':'')+
+    (activeFilterTab!=='all'||searchQuery?' · '+visible.length+' shown':'');
+
+  list.innerHTML='';
+  if(!visible.length){
+    list.innerHTML='<div class="loading-row">'+(searchQuery?'No clients match your search.':activeFilterTab==='needs_action'?'No proposals need attention right now. 🎉':'No clients in this category yet.')+'</div>';
+    document.getElementById('loadMoreWrap').style.display='none';
+    return;
+  }
+
+  visible.slice(0,shown).forEach(function(c,i){
+    var originalIdx=allClients.indexOf(c);
+    var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
+    var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'';
+    var loc=(c.ai&&c.ai.location)||(c.lead&&c.lead.address)||'';
+    var cost=c.ai?parseFloat(c.ai.total_cost)||0:0;
+    var meta=[loc,cost?'R '+fmtK(cost):''].filter(Boolean).join(' · ');
+    var si=getStatusInfo(c);
+    var isAttn=needsAttention(c);
+
+    var row=document.createElement('div');
+    row.className='c-row'+(isAttn?' needs-att':'');
+    row.dataset.idx=originalIdx;
+
+    var attnDot=isAttn?'<div class="c-attn" title="Needs follow-up"></div>':'';
+    var se=email.length>26?email.slice(0,24)+'…':email;
+
+    row.innerHTML=
+      attnDot+
+      '<div class="c-info">'+
+        '<div class="c-name">'+esc(name)+'</div>'+
+        '<div class="c-meta">'+esc(meta||se)+'</div>'+
+      '</div>'+
+      '<span class="badge '+si.cls+'">'+si.label+'</span>';
+
+    row.addEventListener('click',function(){pick(originalIdx,row);});
+    list.appendChild(row);
+  });
+
+  // Load more
+  var lmw=document.getElementById('loadMoreWrap');
+  var lmb=document.getElementById('loadMoreBtn');
+  if(visible.length>shown){
+    lmw.style.display='block';
+    lmb.textContent='Load more ('+(visible.length-shown)+' remaining)';
+    lmb.onclick=function(){displayCount+=PAGE_SIZE;renderClientList();};
+  } else {
+    lmw.style.display='none';
+  }
+}
+
+/* ── Update send status in sidebar immediately ─────────────── */
+async function markAsSent(aiId,method){
+  var nowIso=new Date().toISOString();
+  var patch={proposal_status:'sent',sent_at:nowIso};
+  if(method==='email') patch.email_sent_at=nowIso;
+
+  // 1. Optimistic local update
+  allClients.forEach(function(c){
+    if(c.ai&&String(c.ai.ai_id)===String(aiId)){
+      c.ai.proposal_status='sent';
+      c.ai.sent_at=nowIso;
+      if(method==='email') c.ai.email_sent_at=nowIso;
+    }
+  });
+  renderClientList();
+
+  // 2. Persist to Supabase
+  try{
+    var sess=await sb.auth.getSession();
+    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
+    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(aiId),{
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':ANON,
+        'Authorization':'Bearer '+token,
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(patch)
+    });
+  }catch(e){console.warn('Status update failed:',e);}
+
+  // 3. Update pill badge in detail header
+  var pill=document.getElementById('chPill');
+  if(pill){pill.className='pill sent';pill.textContent='Sent';}
+  // Remove attn banner since we just sent
+  var ab=document.getElementById('attnBanner');
+  if(ab) ab.classList.remove('on');
+}
+
+/* ── Boot & auth ───────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded',boot);
+
+async function boot(){
+  try{
+    var r=await sb.auth.getSession();
+    var session=r.data&&r.data.session;
+    if(session&&session.user&&session.user.email){
+      var email=session.user.email.toLowerCase().trim();
+      var res=await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        {headers:{apikey:ANON,'Authorization':'Bearer '+session.access_token}});
+      var rows=await res.json();
+      if(rows&&rows.length){installer=rows[0];showPortal();return;}
+    }
+  }catch(e){}
+
+  var saved=localStorage.getItem(SESSION_KEY);
+  if(saved){try{installer=JSON.parse(saved);}catch(e){}}
+  if(installer){showPortal();return;}
+
+  if(urlEmail){
+    try{
+      var res2=await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
+        {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+      var rows2=await res2.json();
+      if(rows2&&rows2.length){installer=rows2[0];showPortal();return;}
+    }catch(e){}
+  }
+
+  window.location.href='solar-intelligence.html';
+}
+
+function showPortal(){
+  document.getElementById('bootScreen').classList.add('hidden');
+  var av=(installer.installer_name||'N').charAt(0).toUpperCase();
+  document.getElementById('instAv').textContent=av;
+  document.getElementById('instName').textContent=installer.installer_name||'Installer';
+  document.getElementById('instEmail').textContent=installer.contact_email||'';
+  document.getElementById('navInstallerName').textContent=installer.installer_name||'Nova Metrics';
+  if(params.get('tab')==='analytics')switchTab('analytics');
+  initSidebarControls();
+  loadClients();
+  if(urlAiId)document.getElementById('arrivalBanner').classList.add('on');
+}
+
+/* ── Wire sidebar controls ─────────────────────────────────── */
+function initSidebarControls(){
+  // Search
+  document.getElementById('sidebarSearch').addEventListener('input',function(){
+    searchQuery=this.value;
+    displayCount=PAGE_SIZE;
+    renderClientList();
+  });
+
+  // Filter tabs
+  document.getElementById('sidebarFtabs').addEventListener('click',function(e){
+    var btn=e.target.closest('.ftab');
+    if(!btn) return;
+    document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    activeFilterTab=btn.dataset.tab;
+    displayCount=PAGE_SIZE;
+    renderClientList();
+  });
+
+  // Sort buttons
+  document.querySelector('.sidebar-sortbar').addEventListener('click',function(e){
+    var btn=e.target.closest('.sort-btn');
+    if(!btn) return;
+    document.querySelectorAll('.sort-btn').forEach(function(t){t.classList.remove('active');});
+    btn.classList.add('active');
+    sortMode=btn.dataset.sort;
+    displayCount=PAGE_SIZE;
+    renderClientList();
+  });
+}
+
+document.getElementById('signOutBtn').addEventListener('click',async function(){
+  try{await sb.auth.signOut();}finally{
+    localStorage.removeItem(SESSION_KEY);
+    window.location.href='solar-intelligence.html';
+  }
+});
+
+/* ── Load clients from Supabase ────────────────────────────── */
+async function loadClients(){
+  var instId=installer.installer_id;
+  try{
+    // Load leads
+    var leadsRes=await fetch(
+      SUPA+'/rest/v1/leads?installer_id=eq.'+instId+
+      '&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',
+      {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var leads=await leadsRes.json();
+    var seen={},unique=[];
+    (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
+
+    // Load ai_results (now includes proposal_status, sent_at)
+    var aiRes=await fetch(
+      SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+
+      '&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,'+
+      'status,proposal_status,sent_at,'+
+      'system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,'+
+      'annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,'+
+      'annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,'+
+      'pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,'+
+      'client_engaged,created_at&order=created_at.desc',
+      {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var aiRows=await aiRes.json();
+
+    // Deduplicate ai rows by email (best record wins)
+    var aiByEmail={};
+    (aiRows||[]).forEach(function(r){
+      var k=(r.client_email||'').toLowerCase().trim();
+      if(!k) return;
+      if(!aiByEmail[k]){aiByEmail[k]=r;return;}
+      var cur=aiByEmail[k];
+      var rHasPdf=!!r.pdf_url, curHasPdf=!!cur.pdf_url;
+      var rKnown=r.client_segment&&r.client_segment!=='Unknown'&&r.status==='completed';
+      var curKnown=cur.client_segment&&cur.client_segment!=='Unknown'&&cur.status==='completed';
+      if(rHasPdf&&rKnown&&(!curHasPdf||!curKnown)) aiByEmail[k]=r;
+      else if(rHasPdf&&!curHasPdf) aiByEmail[k]=r;
+    });
+
+    // Merge leads + ai rows
+    allClients=unique.map(function(l){
+      var k=(l.client_email||'').toLowerCase().trim();
+      return{lead:l,ai:aiByEmail[k]||null};
+    });
+    Object.keys(aiByEmail).forEach(function(k){
+      var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});
+      if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});
+    });
+
+    renderClientList();
+
+    // Auto-select from URL param
+    if(urlAiId){
+      var idx=allClients.findIndex(function(c){return c.ai&&String(c.ai.ai_id)===String(urlAiId);});
+      if(idx<0) idx=allClients.findIndex(function(c){return c.ai&&c.ai.pdf_url;});
+      if(idx>=0){
+        var rows=document.querySelectorAll('.c-row');
+        var matchRow=Array.from(rows).find(function(r){return parseInt(r.dataset.idx)===idx;});
+        if(matchRow) pick(idx,matchRow);
+        var c=allClients[idx];
+        var cname=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'your client';
+        document.getElementById('arrivalClientName').textContent=cname;
+        return;
+      }
+    }
+    document.getElementById('emptyState').style.display='flex';
+  }catch(err){
+    document.getElementById('clientList').innerHTML='<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
+    document.getElementById('clientCount').textContent='Error';
+    document.getElementById('emptyState').style.display='flex';
+  }
+}
+
+/* ── Pick a client (show detail panel) ────────────────────── */
+function pick(idx,rowEl){
+  if(!document.getElementById('proposalsTab').classList.contains('on'))switchTab('proposals');
+  document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
+  if(rowEl) rowEl.classList.add('active');
+  activeDetailIdx=idx;
+
+  var c=allClients[idx];
+  var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
+  var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
+  var phone=(c.ai&&c.ai.client_phone)||(c.lead&&c.lead.client_phone)||'';
+  var has=!!(c.ai&&c.ai.pdf_url);
+  var ai=c.ai;
+
+  document.getElementById('emptyState').style.display='none';
+  var panel=document.getElementById('detailPanel');
+  panel.classList.remove('on');void panel.offsetWidth;panel.classList.add('on');
+
+  // Needs-attention banner inside detail
+  var attnEl=document.getElementById('attnBanner');
+  var attnMsgEl=document.getElementById('attnMsg');
+  var isAttn=needsAttention(c);
+  attnEl.classList.toggle('on',isAttn);
+  if(isAttn&&attnMsgEl) attnMsgEl.textContent=attnMessage(c);
+
+  s('chAv',init(name));s('chNm',name);s('chEm',email);
+  s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
+  s('chSeg',has?(ai.client_segment||'—'):'—');
+  s('chDt',ai?fmtDate(ai.created_at):'—');
+  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}
+  else{document.getElementById('chPhoneRow').style.display='none';}
+
+  // Status pill
+  var ps=has?getProposalStatus(ai):null;
+  var pill=document.getElementById('chPill');
+  pill.textContent=getPillLabel(ps,has);
+  pill.className='pill '+getPillClass(ps);
+
+  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
+  if(!has) return;
+
+  s('stKw',round(ai.system_size_kw,2));s('stPanels',(ai.panel_number||'—')+'x '+(ai.panel_model||'—'));
+  s('stAnnual',fmt(ai.annual_savings));s('stCost',fmt(ai.total_cost));
+  s('stMonthlySub','R '+fmt(ai.monthly_savings)+' / month saving');s('stPayback',ai.payback_years||'—');
+  s('spPanel',ai.panel_model||'—');s('spCount',(ai.panel_number||'—')+' units');
+  s('spKw',round(ai.system_size_kw,2)+' kW DC');s('spInv',ai.inverter_model||'—');
+  s('spBatt',ai.battery_model||'—');s('spBkwh',(ai.battery_capacity_kwh||'—')+' kWh');
+  s('spLoad',(ai.required_load_kw||'—')+' kW');s('spAuto',(ai.required_autonomy_hrs||'—')+' hours');
+  s('spCost','R '+fmt(ai.total_cost));s('spMon','R '+fmt(ai.monthly_savings)+' / month');
+  s('spAnn','R '+fmt(ai.annual_savings)+' / year');s('spLife','R '+fmt(ai.lifetime_savings));
+  s('spSol',fmt(Math.round(ai.annual_solar_kwh||0))+' kWh / year');
+  s('spCO2',round(ai.annual_co2_saved,1)+' tons / year');s('spCoal',round(ai.coal_avoided_tons,1)+' tons / year');
+  s('spTree',fmt(Math.round(ai.trees_equivalent||0))+' trees');
+  s('dlTitle','Ready to send to '+name.split(' ')[0]);
+  s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
+
+  // Download button
+  document.getElementById('dlBtn').onclick=function(){
+    window.open(DOWNLOAD_FN+ai.ai_id+'?source=installer','_blank');
+  };
+
+  // ── Email to Client ──────────────────────────────────────
+  var emailSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  var sendBtn=document.getElementById('sendBtn');
+  sendBtn.innerHTML=emailSvg+' Email to Client';
+  sendBtn.disabled=false;
+  sendBtn.onclick=async function(){
+    sendBtn.disabled=true;sendBtn.textContent='Sending…';
+    try{
+      var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':ANON},
+        body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})
+      });
+      var data=await res.json();
+      if(res.ok&&data.success){
+        // ★ Update status immediately
+        await markAsSent(ai.ai_id,'email');
+        sendBtn.innerHTML='✓ Sent!';
+        setTimeout(function(){sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;},3000);
+      }else{
+        alert('Failed to send email: '+(data.error||'Unknown error'));
+        sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;
+      }
+    }catch(err){
+      alert('Connection error: '+err.message);
+      sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;
+    }
+  };
+
+  // ── Send via WhatsApp ────────────────────────────────────
+  var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+  var waBtn=document.getElementById('waBtn');
+  waBtn.classList.remove('sent');
+  waBtn.innerHTML=waSvg+' Send via WhatsApp';
+  waBtn.disabled=false;
+  waBtn.onclick=async function(){
+    waBtn.disabled=true;waBtn.textContent='Opening…';
+    try{
+      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':ANON},
+        body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})
+      });
+      var data=await res.json();
+      if(res.ok&&data.success&&data.wa_url){
+        window.open(data.wa_url,'_blank');
+        // ★ Update status immediately
+        await markAsSent(ai.ai_id,'whatsapp');
+        waBtn.classList.add('sent');waBtn.innerHTML=waSvg+' Sent via WhatsApp';
+        setTimeout(function(){waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;},4000);
+      }else{
+        alert('Could not open WhatsApp: '+(data.error||'Unknown error'));
+        waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;
+      }
+    }catch(err){
+      alert('Connection error: '+err.message);
+      waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;
+    }
+  };
+}
+
+/* ── Analytics (unchanged) ─────────────────────────────────── */
 async function loadAnalytics(forceRefresh){
   if(dashLoaded&&!forceRefresh)return;
   dashLoaded=true;
   document.getElementById('dashLoading').style.display='flex';
   document.getElementById('dashBody').style.display='none';
   try{
-    var res=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+installer.installer_id+'&select=ai_id,client_name,client_email,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,annual_consumption_kwh,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,client_engaged,created_at,pdf_url,status&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var res=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+installer.installer_id+
+      '&select=ai_id,client_name,client_email,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,annual_consumption_kwh,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,client_engaged,created_at,pdf_url,status&order=created_at.desc',
+      {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var rows=await res.json();
     if(!Array.isArray(rows))rows=[];
     renderAllDashTabs(rows);
@@ -458,200 +1061,20 @@ function renderAllDashTabs(rows){
   else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var daysSince=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var status,fup,fupClass;if(r.client_engaged){status='Engaged';fup='Closed';fupClass='fp-closed';}else if(r.pdf_downloaded_at){status='Downloaded';fup='Hot - follow up now';fupClass='fp-hot';}else if(r.proposal_viewed_at&&daysSince>=2){status='Viewed';fup='Hot - follow up now';fupClass='fp-hot';}else if(r.email_opened_at&&daysSince>=3){status='Opened';fup='Warm - follow up soon';fupClass='fp-warm';}else if(daysSince>=7){status='Sent';fup='Cold - resend or call';fupClass='fp-cold';}else{status='Sent';fup='Waiting';fupClass='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong><br><span style="font-size:11px;color:#9ca3af">'+esc(r.client_email||'')+'</span></td><td>'+esc(r.location||'—')+'</td><td>'+status+'</td><td class="'+fupClass+'">'+fup+'</td><td>'+(daysSince!==null?daysSince+'d ago':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
 }
 
+/* ── Utility helpers ───────────────────────────────────────── */
 function avg(arr,key){var vals=arr.map(function(r){return parseFloat(r[key])||0;});return vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;}
 function sum(arr,key){return arr.reduce(function(a,r){return a+(parseFloat(r[key])||0);},0);}
 function mode(arr,key){var counts={};arr.forEach(function(r){var v=r[key];if(v)counts[v]=(counts[v]||0)+1;});var best=null,best_n=0;Object.keys(counts).forEach(function(k){if(counts[k]>best_n){best_n=counts[k];best=k;}});return best;}
 function pct(n,dn){return dn>0?((n/dn)*100).toFixed(1)+'%':'—';}
 function fmtK(v){if(!v||isNaN(v))return'—';if(v>=1000000)return(v/1000000).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'k';return Math.round(v).toString();}
 function d(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===null||v===undefined)?'—':v;}
+function s(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===null||v===undefined)?'—':v;}
 function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fmt(v){var n=parseFloat(String(v||0).replace(/[\s,]/g,''));return isNaN(n)?(v||'—'):n.toLocaleString('en-ZA');}
 function round(v,dp){var n=parseFloat(v);return isNaN(n)?'—':n.toFixed(dp||0);}
 function fmtDate(iso){if(!iso)return'—';var dt=new Date(iso);return isNaN(dt)?'—':dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
-function s(id,v){var e=document.getElementById(id);if(e)e.textContent=(v===null||v===undefined)?'—':v;}
 function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=show?(dv||'block'):'none';}
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
-
-window.addEventListener('DOMContentLoaded', boot);
-
-async function boot() {
-  try {
-    var r = await sb.auth.getSession();
-    var session = r.data && r.data.session;
-    if (session && session.user && session.user.email) {
-      var email = session.user.email.toLowerCase().trim();
-      var res = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
-        {headers:{apikey:ANON,'Authorization':'Bearer '+session.access_token}});
-      var rows = await res.json();
-      if (rows && rows.length) { installer = rows[0]; showPortal(); return; }
-    }
-  } catch(e) {}
-
-  var saved = localStorage.getItem(SESSION_KEY);
-  if (saved) { try { installer = JSON.parse(saved); } catch(e) {} }
-  if (installer) { showPortal(); return; }
-
-  if (urlEmail) {
-    try {
-      var res2 = await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',
-        {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-      var rows2 = await res2.json();
-      if (rows2 && rows2.length) { installer = rows2[0]; showPortal(); return; }
-    } catch(e) {}
-  }
-
-  window.location.href = 'solar-intelligence.html';
-}
-
-function showPortal(){
-  document.getElementById('bootScreen').classList.add('hidden');
-  var av=(installer.installer_name||'N').charAt(0).toUpperCase();
-  document.getElementById('instAv').textContent=av;
-  document.getElementById('instName').textContent=installer.installer_name||'Installer';
-  document.getElementById('instEmail').textContent=installer.contact_email||'';
-  document.getElementById('navInstallerName').textContent=installer.installer_name||'Nova Metrics';
-  if(params.get('tab')==='analytics')switchTab('analytics');
-  loadClients();
-  if(urlAiId)document.getElementById('arrivalBanner').classList.add('on');
-}
-
-document.getElementById('signOutBtn').addEventListener('click', async function () {
-  try { await sb.auth.signOut(); } finally {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.href = 'solar-intelligence.html';
-  }
-});
-
-async function loadClients(){
-  var instId=installer.installer_id;
-  try{
-    var leadsRes=await fetch(SUPA+'/rest/v1/leads?installer_id=eq.'+instId+'&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-    var leads=await leadsRes.json();
-    var seen={},unique=[];
-    (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-    var aiRows=await aiRes.json();
-
-    var aiByEmail={};
-    (aiRows||[]).forEach(function(r){
-      var k=(r.client_email||'').toLowerCase().trim();
-      if(!k) return;
-      if(!aiByEmail[k]){ aiByEmail[k]=r; return; }
-      var cur=aiByEmail[k];
-      var rHasPdf=!!r.pdf_url, curHasPdf=!!cur.pdf_url;
-      var rKnown=r.client_segment&&r.client_segment!=='Unknown'&&r.status==='completed';
-      var curKnown=cur.client_segment&&cur.client_segment!=='Unknown'&&cur.status==='completed';
-      if(rHasPdf&&rKnown&&(!curHasPdf||!curKnown)) aiByEmail[k]=r;
-      else if(rHasPdf&&!curHasPdf) aiByEmail[k]=r;
-    });
-
-    allClients=unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
-    Object.keys(aiByEmail).forEach(function(k){var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});if(!exists)allClients.push({lead:null,ai:aiByEmail[k]});});
-    renderClientList();
-    if(urlAiId){
-      var idx=allClients.findIndex(function(c){return c.ai&&String(c.ai.ai_id)===String(urlAiId);});
-      if(idx<0) idx=allClients.findIndex(function(c){return c.ai&&c.ai.pdf_url;});
-      if(idx>=0){var rows2=document.querySelectorAll('.c-row');if(rows2[idx])pick(idx,rows2[idx]);var c=allClients[idx];var cname=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'your client';document.getElementById('arrivalClientName').textContent=cname;return;}
-    }
-    document.getElementById('emptyState').style.display='flex';
-  }catch(err){
-    document.getElementById('clientList').innerHTML='<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
-    document.getElementById('clientCount').textContent='Error';
-    document.getElementById('emptyState').style.display='flex';
-  }
-}
-
-function renderClientList(){
-  var list=document.getElementById('clientList');list.innerHTML='';
-  var count=allClients.length;
-  document.getElementById('clientCount').textContent=count+' Client'+(count!==1?'s':'');
-  allClients.forEach(function(c,i){
-    var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
-    var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'';
-    var has=!!(c.ai&&c.ai.pdf_url);
-    var row=document.createElement('div');
-    row.className='c-row';row.dataset.idx=i;
-    var se=email.length>26?email.slice(0,24)+'…':email;
-    row.innerHTML='<div class="c-info"><div class="c-name">'+esc(name)+'</div><div class="c-email">'+esc(se)+'</div></div><span class="badge '+(has?'b-ready':'b-none')+'">'+(has?'Ready':'None')+'</span>';
-    row.addEventListener('click',function(){pick(i,row);});
-    list.appendChild(row);
-  });
-  if(count===0)list.innerHTML='<div class="loading-row">No clients yet — generate a proposal in Solar Intelligence to get started</div>';
-}
-
-function pick(idx,rowEl){
-  if(!document.getElementById('proposalsTab').classList.contains('on'))switchTab('proposals');
-  document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
-  rowEl.classList.add('active');
-  var c=allClients[idx];
-  var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
-  var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
-  var phone=(c.ai&&c.ai.client_phone)||(c.lead&&c.lead.client_phone)||'';
-  var has=!!(c.ai&&c.ai.pdf_url),ai=c.ai;
-  document.getElementById('emptyState').style.display='none';
-  var panel=document.getElementById('detailPanel');
-  panel.classList.remove('on');void panel.offsetWidth;panel.classList.add('on');
-  s('chAv',init(name));s('chNm',name);s('chEm',email);
-  s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
-  s('chSeg',has?(ai.client_segment||'—'):'—');
-  s('chDt',ai?fmtDate(ai.created_at):'—');
-  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}
-  else{document.getElementById('chPhoneRow').style.display='none';}
-  var pill=document.getElementById('chPill');
-  pill.textContent=has?'Proposal Ready':'No Proposal';pill.className=has?'pill r':'pill p';
-  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
-  if(!has)return;
-  s('stKw',round(ai.system_size_kw,2));s('stPanels',(ai.panel_number||'—')+'x '+(ai.panel_model||'—'));
-  s('stAnnual',fmt(ai.annual_savings));s('stCost',fmt(ai.total_cost));
-  s('stMonthlySub','R '+fmt(ai.monthly_savings)+' / month saving');s('stPayback',ai.payback_years||'—');
-  s('spPanel',ai.panel_model||'—');s('spCount',(ai.panel_number||'—')+' units');
-  s('spKw',round(ai.system_size_kw,2)+' kW DC');s('spInv',ai.inverter_model||'—');
-  s('spBatt',ai.battery_model||'—');s('spBkwh',(ai.battery_capacity_kwh||'—')+' kWh');
-  s('spLoad',(ai.required_load_kw||'—')+' kW');s('spAuto',(ai.required_autonomy_hrs||'—')+' hours');
-  s('spCost','R '+fmt(ai.total_cost));s('spMon','R '+fmt(ai.monthly_savings)+' / month');
-  s('spAnn','R '+fmt(ai.annual_savings)+' / year');s('spLife','R '+fmt(ai.lifetime_savings));
-  s('spSol',fmt(Math.round(ai.annual_solar_kwh||0))+' kWh / year');
-  s('spCO2',round(ai.annual_co2_saved,1)+' tons / year');s('spCoal',round(ai.coal_avoided_tons,1)+' tons / year');
-  s('spTree',fmt(Math.round(ai.trees_equivalent||0))+' trees');
-  s('dlTitle','Ready to send to '+name.split(' ')[0]);
-  s('dlSub','Generated '+fmtDate(ai.created_at)+' · AI-powered PDF proposal'+(phone?' · '+phone:''));
-
-  document.getElementById('dlBtn').onclick=function(){
-    window.open(DOWNLOAD_FN+ai.ai_id+'?source=installer','_blank');
-  };
-
-  var sendBtn=document.getElementById('sendBtn');
-  sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';
-  sendBtn.disabled=false;
-  sendBtn.onclick=async function(){
-    sendBtn.disabled=true;sendBtn.textContent='Sending…';
-    try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});
-      var data=await res.json();
-      if(res.ok&&data.success){sendBtn.textContent='Sent!';setTimeout(function(){sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;},3000);}
-      else{alert('Failed to send email: '+(data.error||'Unknown error'));sendBtn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Email to Client';sendBtn.disabled=false;}
-    }catch(err){alert('Connection error: '+err.message);sendBtn.innerHTML='Email to Client';sendBtn.disabled=false;}
-  };
-
-  var waBtn=document.getElementById('waBtn');
-  waBtn.classList.remove('sent');
-  var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
-  waBtn.innerHTML=waSvg+' Send via WhatsApp';
-  waBtn.disabled=false;
-  waBtn.onclick=async function(){
-    waBtn.disabled=true;waBtn.textContent='Opening…';
-    try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})});
-      var data=await res.json();
-      if(res.ok&&data.success&&data.wa_url){
-        window.open(data.wa_url,'_blank');
-        waBtn.classList.add('sent');waBtn.innerHTML=waSvg+' Sent via WhatsApp';
-        setTimeout(function(){waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;},4000);
-      }else{alert('Could not open WhatsApp: '+(data.error||'Unknown error'));waBtn.innerHTML=waSvg+' Send via WhatsApp';waBtn.disabled=false;}
-    }catch(err){alert('Connection error: '+err.message);waBtn.innerHTML='Send via WhatsApp';waBtn.disabled=false;}
-  };
-}
 </script>
 </body>
 </html>
