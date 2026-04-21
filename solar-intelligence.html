@@ -50,7 +50,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 .dl-msg{font-size:13px;color:var(--muted)}.dl-err{font-size:12px;color:var(--red);margin-top:4px;display:none;}
 #app-screen{display:none;padding:24px 28px}
-.input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+.input-strip{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 22px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
 .inp-group{display:flex;flex-direction:column;gap:5px;min-width:150px}
 .inp-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
 .inp-group select,.inp-group input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:9px 12px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
@@ -151,8 +151,55 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .comp-detail{font-size:11px;color:var(--muted);padding:5px 0 8px;line-height:1.65;display:none;}
 .comp-alt{margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:none;}
 .comp-alt.on{display:block;}
-/* KPI card NRS badge pulse while loading */
 .comp-kpi-checking{font-size:10px;color:var(--muted);font-style:italic;}
+
+/* ── Load Builder ────────────────────────────────────────────────── */
+.lb-trigger{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap;min-width:180px;height:38px;}
+.lb-trigger:hover{border-color:rgba(255,215,0,.4);color:var(--gold);}
+.lb-trigger.has-items{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.07);color:var(--gold);}
+.lb-trigger .lb-kw{font-weight:700;font-family:'DM Serif Display',serif;font-size:15px;}
+.lb-panel{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:20px 22px;margin-bottom:16px;display:none;}
+.lb-panel.open{display:block;animation:up .2s ease;}
+.lb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.lb-heading{display:flex;align-items:center;gap:10px;}
+.lb-title{font-size:11px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;}
+.lb-total-badge{background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.25);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--gold);font-weight:600;white-space:nowrap;}
+.lb-warn{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:7px 12px;font-size:11px;color:var(--red);margin-bottom:10px;display:none;}
+.lb-warn.on{display:block;}
+.lb-section-hd{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin:12px 0 8px;}
+.lb-templates{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+.lb-tpl{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;}
+.lb-tpl:hover{border-color:rgba(255,215,0,.35);color:var(--gold);background:rgba(255,215,0,.06);}
+.lb-catalog{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.lb-chip{display:flex;align-items:center;gap:5px;padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:.15s;position:relative;}
+.lb-chip:hover{border-color:rgba(255,215,0,.35);color:var(--text);background:rgba(255,215,0,.06);}
+.lb-chip-icon{font-size:15px;line-height:1;}
+.lb-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#0a1c34;border:1px solid rgba(255,215,0,.22);border-radius:7px;padding:6px 10px;font-size:10.5px;color:var(--muted);white-space:nowrap;z-index:50;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.5);}
+.lb-chip:hover .lb-tip{display:block;}
+.lb-items{display:flex;flex-direction:column;gap:6px;}
+.lb-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:8px 12px;flex-wrap:wrap;}
+.lb-item-icon{font-size:16px;flex-shrink:0;}
+.lb-item-name{font-size:12.5px;font-weight:500;color:var(--text);min-width:110px;flex:1;}
+.lb-field{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.lb-field input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:4px 7px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;text-align:right;transition:border-color .15s;}
+.lb-field input:focus{outline:none;border-color:var(--gold);}
+.lb-field input.lb-watts{width:68px;}
+.lb-field input.lb-hours{width:46px;}
+.lb-unit{font-size:10px;color:var(--muted);}
+.lb-qty{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.lb-qty-btn{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--text);font-size:15px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:.15s;flex-shrink:0;padding:0;}
+.lb-qty-btn:hover{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.4);color:var(--gold);}
+.lb-qty-val{min-width:22px;text-align:center;font-size:13px;font-weight:600;color:var(--text);}
+.lb-item-contrib{font-size:11px;color:var(--gold);min-width:78px;text-align:right;font-weight:500;flex-shrink:0;}
+.lb-item-del{width:22px;height:22px;border-radius:50%;border:1px solid rgba(248,113,113,.2);background:transparent;color:rgba(248,113,113,.6);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.15s;font-family:'DM Sans',sans-serif;padding:0;}
+.lb-item-del:hover{background:rgba(248,113,113,.1);color:var(--red);border-color:var(--red);}
+.lb-empty{font-size:12px;color:var(--muted);font-style:italic;padding:8px 0;}
+.lb-footer{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+.lb-totals{display:flex;gap:18px;flex-wrap:wrap;}
+.lb-total-item{font-size:11px;color:var(--muted);}
+.lb-total-item b{color:var(--text);font-weight:600;}
+.lb-clear{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:5px;transition:.15s;}
+.lb-clear:hover{color:var(--red);}
 </style>
 </head>
 <body>
@@ -219,6 +266,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="nsa-title">&#9888; No Compliant System Found</div>
     <div class="nsa-body" id="no-system-body">With the selected inputs and available hardware, no system meets all design requirements.</div>
   </div>
+
+  <!-- ── Main input strip ── -->
   <div class="input-strip">
     <div class="inp-group">
       <label>Location</label>
@@ -231,17 +280,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         </div>
       </div>
     </div>
+    <!-- ★ LOAD BUILDER TRIGGER (replaces old Load Profile dropdown) ★ -->
     <div class="inp-group">
-      <label>Load Profile</label>
-      <select id="sel-load"><option value="">Loading&#8230;</option></select>
-    </div>
-    <div class="inp-group" id="custom-peak-wrap" style="display:none">
-      <label>Peak Load (kW)</label>
-      <input type="number" id="custom-peak" placeholder="e.g. 4" min="0.5" max="200" step="0.5" />
-    </div>
-    <div class="inp-group" id="custom-daily-wrap" style="display:none">
-      <label>Daily Usage (kWh)</label>
-      <input type="number" id="custom-daily" placeholder="e.g. 30" min="1" max="1000" step="1" />
+      <label>Load Builder</label>
+      <button class="lb-trigger" id="lb-trigger" onclick="toggleLoadBuilder()">
+        ⚡&nbsp;<span id="lb-trigger-label">Add Appliances…</span>
+      </button>
     </div>
     <div class="inp-group">
       <label>Evening Backup Hours</label>
@@ -269,6 +313,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     </div>
     <button class="btn-calc" onclick="calculate()">&#9889; Design System</button>
   </div>
+
+  <!-- ★ LOAD BUILDER PANEL ★ -->
+  <div class="lb-panel" id="lb-panel">
+    <div class="lb-top">
+      <div class="lb-heading">
+        <span class="lb-title">⚡ Load Builder</span>
+      </div>
+      <span class="lb-total-badge" id="lb-total-badge">Total: 0.00 kW peak · 0.0 kWh/day</span>
+    </div>
+    <div class="lb-warn" id="lb-warn"></div>
+
+    <div class="lb-section-hd">Quick Templates</div>
+    <div class="lb-templates" id="lb-templates"></div>
+
+    <div class="lb-section-hd">Add Appliance</div>
+    <div class="lb-catalog" id="lb-catalog"></div>
+
+    <div class="lb-section-hd" style="margin-top:16px">Your Load</div>
+    <div class="lb-items" id="lb-items">
+      <div class="lb-empty">No appliances added yet — click a template or appliance above.</div>
+    </div>
+
+    <div class="lb-footer">
+      <div class="lb-totals">
+        <div class="lb-total-item">Peak Load: <b id="lb-peak-total">0.00 kW</b></div>
+        <div class="lb-total-item">Daily Usage: <b id="lb-daily-total">0.0 kWh</b></div>
+        <div class="lb-total-item" style="font-size:10px;color:var(--muted);align-self:flex-end">Peak = simultaneous · Daily = Σ(W × qty × h/day)</div>
+      </div>
+      <button class="lb-clear" onclick="lbClear()">Clear all</button>
+    </div>
+  </div>
+
   <div class="tabs">
     <div class="tab active" onclick="showTab('tab-solar')">&#9728;&#65039; Solar Array</div>
     <div class="tab" onclick="showTab('tab-battery')">&#128267; Battery</div>
@@ -335,7 +411,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
   <div id="tab-inverter" class="tab-panel">
     <div class="kpi-grid">
-      <!-- ★ CHANGE 1: id added to card, compliance badge sub-div added ★ -->
       <div class="kpi" id="i-model-kpi">
         <div class="label">Recommended Inverter</div>
         <div class="value" id="i-model" style="font-size:.95rem">&#8212;</div>
@@ -586,7 +661,7 @@ function selectBestInverter(reqAC, sysDC){
 
 function showNoSystemFound(reasons){
   document.getElementById('no-system-alert').classList.add('on');
-  document.getElementById('no-system-body').innerHTML='<strong>Why no compliant system could be designed:</strong><ul style="margin:8px 0 0 16px;list-style:disc">'+reasons.map(r=>'<li>'+r+'</li>').join('')+'</ul><br>To fix: increase backup hours, choose a lighter load profile, or upload larger hardware via <strong>My Hardware</strong>.';
+  document.getElementById('no-system-body').innerHTML='<strong>Why no compliant system could be designed:</strong><ul style="margin:8px 0 0 16px;list-style:disc">'+reasons.map(r=>'<li>'+r+'</li>').join('')+'</ul><br>To fix: increase backup hours, reduce appliances in the Load Builder, or upload larger hardware via <strong>My Hardware</strong>.';
   const k=document.getElementById('sys-rec-kpi');
   k.className='kpi red';
   set('sys-rec-value','&#10007; No Compliant System Found');
@@ -598,7 +673,6 @@ function showNoSystemFound(reasons){
 }
 function clearNoSystemAlert(){document.getElementById('no-system-alert').classList.remove('on');}
 
-// ── helper to sync badge to KPI card ────────────────────────────────────────
 function syncKpiBadge(html, colorClass){
   const badge=document.getElementById('i-model-comp-badge');
   if(badge) badge.innerHTML=html;
@@ -611,16 +685,20 @@ function calculate(){
   if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
   clearNoSystemAlert();
 
+  // ★ Read from Load Builder instead of old dropdown
+  const {peakLoad,dailyUsage}=getLoadBuilderValues();
+  if(!peakLoad||!dailyUsage){
+    toast('&#9888; Add appliances in the Load Builder first',true);
+    document.getElementById('lb-panel').classList.add('open');
+    return;
+  }
+
   // Reset compliance while calculating
   set('i-nrs097-status','<span style="color:var(--muted);font-size:11px">Checking&#8230;</span>');
   set('i-model-comp-badge','<span class="comp-kpi-checking">&#8203;Checking NRS 097&#8230;</span>');
   const det=document.getElementById('i-nrs097-detail');if(det){det.textContent='';det.style.display='none';}
   const alt=document.getElementById('i-nrs097-alt');if(alt){alt.className='comp-alt';}
 
-  const loadSel=document.getElementById('sel-load');
-  let peakLoad,dailyUsage;
-  if(loadSel.value==='custom'){peakLoad=parseFloat(document.getElementById('custom-peak').value)||3;dailyUsage=parseFloat(document.getElementById('custom-daily').value)||20;}
-  else{const o=loadSel.options[loadSel.selectedIndex];peakLoad=parseFloat(o.dataset.peak);dailyUsage=parseFloat(o.dataset.daily);}
   const psh=selectedLoc.gti,locName=selectedLoc.label;
   const autonomy=parseFloat(document.getElementById('sel-autonomy').value);
   const tariff=parseFloat(document.getElementById('sel-tariff').value);
@@ -701,7 +779,6 @@ function calculate(){
     monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
     annCons,co2T,trees,coal,water,seg,indP,nersaCat};
   renderAll(calcResult);
-  // Async compliance — runs after render, never blocks calculations
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
   toast('&#10003; Compliant system designed — all SA checks passed');
 }
@@ -744,7 +821,6 @@ function renderAll(r){
   document.getElementById('b-bar').style.cssText='width:'+Math.min(r.battCR/1.60,1)*100+'%;background:'+bC;
   set('b-bar-tip','Daily DoD: '+fN(r.battDod*100,0)+'% | Headroom: '+fN(r.battCR,2)+'x | Ideal: 1.15x&#8211;1.35x | Max 85% DoD');
 
-  // Note: setKpi sets i-model-kpi to 'kpi green' initially; compliance badge overrides colour async
   setKpi('i-model',r.invModel,'green');
   setKpi('i-load-ok','Load OK — '+fN(r.invAC,1)+' kW handles '+fN(r.peakLoad,1)+' kW','green');
   set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+'30% safety margin applied');
@@ -859,12 +935,13 @@ function setupLocCombo(locs){
   srch.addEventListener('keydown',e=>{if(e.key==='Escape')closeDD();});
   if(all.length){selectedLoc=all[0];disp.value=selectedLoc.label;}
 }
+
+// ★ populateDropdowns now initialises Load Builder instead of the old sel-load dropdown
 function populateDropdowns(){
   setupLocCombo(DB.locations);
-  const ls=document.getElementById('sel-load');
-  ls.innerHTML=DB.loadProfiles.map(p=>'<option value="'+p.id+'" data-peak="'+p.peak+'" data-daily="'+p.daily+'">'+p.name+'</option>').join('')+'<option value="custom" data-peak="0" data-daily="0">Custom\u2026</option>';
-  ls.onchange=function(){const c=this.value==='custom';document.getElementById('custom-peak-wrap').style.display=c?'flex':'none';document.getElementById('custom-daily-wrap').style.display=c?'flex':'none';};
+  initLoadBuilderTemplates(DB.loadProfiles);
 }
+
 function showApp(){
   document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';
   const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';
@@ -923,7 +1000,7 @@ async function generateProposal(){
   const cN=document.getElementById('p-name').value.trim()||'Client',cE=document.getElementById('p-email').value.trim(),cPh=document.getElementById('p-phone').value.trim(),cA=document.getElementById('p-address').value.trim();
   if(!cE){toast('&#9888; Please enter client email',true);btn.disabled=false;btn.textContent='Generate Proposal';return;}
   const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;
-  const payload={record:{client_type:selectedClientType,contact_email:cE,installer_id:installer.installer_id,installer_name:installer.installer_name,logo_url:installer.logo_url||'',primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',client_name:cN,client_email:cE,client_phone:cPh,client_address:cA,location:r.locName,system_size_kw:r.sysDC,total_cost:r.totCost,annual_savings:r.annSavY1,monthly_savings:r.monthly,lifetime_savings:r.grossLT,net_lifetime_savings:r.netLT,npv:r.npv,irr:r.irr,payback_years:r.realPb,segment:r.seg,panel_model:r.panelModel,panel_number:r.pc,inverter_model:r.invModel,battery_model:r.battModel,battery_capacity_kwh:r.iKWh,battery_backup_kwh:r.battBackupKWh,required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,annual_consumption_kwh:r.annCons,annual_solar_kwh:r.annSolar,trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2T*1000,nersa_category:r.nersaCat,dc_ac_ratio:r.dcAc,specific_yield:r.specYield,ai_prompt:'Solar proposal for '+cN+' in '+r.locName+'. '+r.pc+'x '+r.panelModel+', '+r.invModel+', '+r.battUnits+'x '+r.battModel+'. DC: '+r.sysDC.toFixed(2)+'kW (DC/AC: '+r.dcAc.toFixed(2)+', target 1.3:1 NRS 097). PR: 80%, Avail: 97%, Yield: '+r.specYield.toFixed(0)+' kWh/kWp/yr. DoD '+(r.battDod*100).toFixed(0)+'% (85% LiFePO4 limit). Cost: R'+Math.round(r.totCost).toLocaleString()+'. Savings: R'+Math.round(r.annSavY1).toLocaleString()+'/yr. NPV (12%): R'+Math.round(r.npv).toLocaleString()+'. IRR: '+r.irr.toFixed(1)+'%. Payback: '+r.realPb+' yrs. NERSA: '+r.nersaCat+'.'}};
+  const payload={record:{client_type:selectedClientType,contact_email:cE,installer_id:installer.installer_id,installer_name:installer.installer_name,logo_url:installer.logo_url||'',primary_color:installer.primary_color||'#0B1F3A',secondary_color:installer.secondary_color||'#FFFFFF',accent_color:installer.accent_color||'#F0B429',contact_number:installer.contact_number||'',client_name:cN,client_email:cE,client_phone:cPh,client_address:cA,location:r.locName,system_size_kw:r.sysDC,total_cost:r.totCost,annual_savings:r.annSavY1,monthly_savings:r.monthly,lifetime_savings:r.grossLT,net_lifetime_savings:r.netLT,npv:r.npv,irr:r.irr,payback_years:r.realPb,segment:r.seg,panel_model:r.panelModel,panel_number:r.pc,inverter_model:r.invModel,battery_model:r.battModel,battery_capacity_kwh:r.iKWh,battery_backup_kwh:r.battBackupKWh,required_load_kw:r.peakLoad,required_autonomy_hours:r.autonomy,annual_consumption_kwh:r.annCons,annual_solar_kwh:r.annSolar,trees_equivalent:r.trees,coal_avoided_tons:r.coal,annual_co2_saved:r.co2T*1000,nersa_category:r.nersaCat,dc_ac_ratio:r.dcAc,specific_yield:r.specYield,ai_prompt:'Solar proposal for '+cN+' in '+r.locName+'. '+r.pc+'x '+r.panelModel+', '+r.invModel+', '+r.battUnits+'x '+r.battModel+'. DC: '+r.sysDC.toFixed(2)+'kW (DC/AC: '+r.dcAc.toFixed(2)+', target 1.3:1 NRS 097). PR: 80%, Avail: 97%, Yield: '+r.specYield.toFixed(0)+' kWh/kWp/yr. DoD '+(r.battDod*100).toFixed(0)+'% (85% LiFePO4 limit). Cost: R'+Math.round(r.totCost).toLocaleString()+'. Savings: R'+Math.round(r.annSavY1).toLocaleString()+'/yr. NPV (12%): R'+Math.round(r.npv).toLocaleString()+'. IRR: '+r.irr.toFixed(1)+'%. Payback: '+r.realPb+' yrs. NERSA: '+r.nersaCat+'.'}}; 
   try{
     const res=await fetch(SUPA_URL+'/functions/v1/generate-solar-proposal',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
     const data=await res.json();
@@ -939,13 +1016,171 @@ async function generateProposal(){
   }catch(e){toast('&#9888; Network error: '+e.message,true);btn.disabled=false;btn.textContent='Generate Proposal';}
 }
 
-// ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
-// Calls check_inverters_compliance RPC.
-// Renders badge in BOTH locations:
-//   1. i-model-kpi  — the KPI card at the top of the Inverter tab (instant visibility)
-//   2. i-nrs097-status — the Regulatory Compliance row (detail + alternative)
-// Does NOT touch any calculation, DB load, or proposal logic.
+// ══════════════════════════════════════════════════════════════════
+// ★ LOAD BUILDER — replaces the fixed Load Profile dropdown
+// ══════════════════════════════════════════════════════════════════
 
+// Appliance catalog — extend freely by adding objects here
+const APPLIANCE_CATALOG=[
+  {id:'lights',    name:'Lights',           icon:'💡', watts:50,   hours:6,   tip:'LED ~10W each; set quantity to number of bulbs'},
+  {id:'tv',        name:'TV / Monitor',     icon:'📺', watts:120,  hours:5,   tip:'Smart TV 80–150W, monitor ~30W'},
+  {id:'fridge',    name:'Fridge',           icon:'🧊', watts:150,  hours:24,  tip:'Runs 24h cycling; ~150W average draw'},
+  {id:'geyser',    name:'Geyser',           icon:'🚿', watts:3000, hours:3,   tip:'Standard 3kW element, ~3h/day'},
+  {id:'ac',        name:'Air Conditioner',  icon:'❄️', watts:1200, hours:6,   tip:'Inverter AC 1–2kW; size to room'},
+  {id:'stove',     name:'Electric Stove',   icon:'🍳', watts:2000, hours:1,   tip:'2–3kW per plate; ~1h average usage'},
+  {id:'pool',      name:'Pool Pump',        icon:'🏊', watts:750,  hours:6,   tip:'0.5–1.5kW; run 6–8h/day'},
+  {id:'washing',   name:'Washing Machine',  icon:'🫧', watts:500,  hours:1,   tip:'Front loader ~500W per cycle'},
+  {id:'microwave', name:'Microwave',        icon:'📡', watts:1000, hours:0.5, tip:'~1kW; short bursts'},
+  {id:'dishwasher',name:'Dishwasher',       icon:'🍽', watts:1200, hours:1,   tip:'~1.2kW per wash cycle'},
+  {id:'computer',  name:'Desktop PC',       icon:'💻', watts:200,  hours:8,   tip:'PC + monitor ~150–300W'},
+  {id:'security',  name:'Security System',  icon:'🔒', watts:50,   hours:24,  tip:'CCTV + alarm ~50W continuous'},
+  {id:'gate',      name:'Gate Motor',       icon:'🚪', watts:200,  hours:0.1, tip:'~200W brief open/close cycles'},
+  {id:'custom',    name:'Custom Load',      icon:'⚡', watts:500,  hours:2,   tip:'Add any unlisted appliance'},
+];
+
+// Quick templates — pre-populate the builder with a common load set
+const LB_TEMPLATES=[
+  {name:'Lights Only',     items:[{id:'lights',qty:10,watts:50,hours:6}]},
+  {name:'Basic Home',      items:[{id:'lights',qty:8,watts:50,hours:5},{id:'tv',qty:1,watts:120,hours:4},{id:'fridge',qty:1,watts:150,hours:24}]},
+  {name:'Full Household',  items:[{id:'lights',qty:12,watts:50,hours:5},{id:'tv',qty:1,watts:120,hours:4},{id:'fridge',qty:1,watts:150,hours:24},{id:'geyser',qty:1,watts:3000,hours:3},{id:'washing',qty:1,watts:500,hours:1}]},
+  {name:'Home + Pool',     items:[{id:'lights',qty:10,watts:50,hours:5},{id:'fridge',qty:1,watts:150,hours:24},{id:'pool',qty:1,watts:750,hours:6},{id:'tv',qty:1,watts:120,hours:4}]},
+  {name:'Home + AC',       items:[{id:'lights',qty:10,watts:50,hours:5},{id:'fridge',qty:1,watts:150,hours:24},{id:'geyser',qty:1,watts:3000,hours:3},{id:'ac',qty:1,watts:1200,hours:6},{id:'tv',qty:1,watts:120,hours:4}]},
+  {name:'Small Office',    items:[{id:'lights',qty:20,watts:50,hours:9},{id:'computer',qty:4,watts:200,hours:8},{id:'ac',qty:1,watts:1200,hours:8},{id:'fridge',qty:1,watts:150,hours:24}]},
+];
+
+let lbItems=[]; // {id, name, icon, watts, qty, hours}
+
+function lbApp(id){return APPLIANCE_CATALOG.find(a=>a.id===id);}
+
+function initLoadBuilderTemplates(dbProfiles){
+  // Render built-in templates (DB profiles used as data source for custom extras if desired)
+  const tplEl=document.getElementById('lb-templates');
+  if(tplEl) tplEl.innerHTML=LB_TEMPLATES.map((t,i)=>`<button class="lb-tpl" onclick="lbApplyTemplate(${i})">${t.name}</button>`).join('');
+  renderLbCatalog();
+  renderLbItems();
+  lbUpdateSummary();
+  lbUpdateTrigger();
+}
+
+function toggleLoadBuilder(){
+  document.getElementById('lb-panel').classList.toggle('open');
+}
+
+function lbApplyTemplate(idx){
+  const t=LB_TEMPLATES[idx];if(!t)return;
+  lbItems=t.items.map(it=>{
+    const cat=lbApp(it.id)||APPLIANCE_CATALOG[APPLIANCE_CATALOG.length-1];
+    return{id:it.id,name:cat.name,icon:cat.icon,watts:it.watts,qty:it.qty,hours:it.hours};
+  });
+  renderLbItems();lbUpdateSummary();lbUpdateTrigger();
+}
+
+function renderLbCatalog(){
+  const c=document.getElementById('lb-catalog');if(!c)return;
+  c.innerHTML=APPLIANCE_CATALOG.map(a=>`<button class="lb-chip" onclick="lbAdd('${a.id}')"><span class="lb-chip-icon">${a.icon}</span><span>${a.name}</span><span class="lb-tip">${a.tip}</span></button>`).join('');
+}
+
+function lbAdd(id){
+  const cat=lbApp(id);if(!cat)return;
+  const existing=lbItems.find(it=>it.id===id&&id!=='custom');
+  if(existing){existing.qty++;renderLbItems();lbUpdateSummary();lbUpdateTrigger();return;}
+  lbItems.push({id:cat.id,name:cat.name,icon:cat.icon,watts:cat.watts,qty:1,hours:cat.hours});
+  renderLbItems();lbUpdateSummary();lbUpdateTrigger();
+}
+
+function lbRemove(idx){lbItems.splice(idx,1);renderLbItems();lbUpdateSummary();lbUpdateTrigger();}
+
+function lbQty(idx,delta){
+  lbItems[idx].qty=Math.max(1,lbItems[idx].qty+delta);
+  renderLbItems();lbUpdateSummary();lbUpdateTrigger();
+}
+
+function lbSetWatts(idx,val){
+  lbItems[idx].watts=Math.max(1,parseFloat(val)||1);
+  lbUpdateSummary();lbUpdateTrigger();
+  // re-render contrib only — lightweight
+  document.querySelectorAll('.lb-item-contrib')[idx].textContent=
+    (lbItems[idx].qty)+'x → '+(lbItems[idx].watts*lbItems[idx].qty/1000).toFixed(2)+' kW';
+}
+
+function lbSetHours(idx,val){
+  lbItems[idx].hours=Math.min(24,Math.max(0.1,parseFloat(val)||1));
+  lbUpdateSummary();lbUpdateTrigger();
+}
+
+function renderLbItems(){
+  const c=document.getElementById('lb-items');if(!c)return;
+  if(!lbItems.length){c.innerHTML='<div class="lb-empty">No appliances added yet — click a template or appliance above.</div>';return;}
+  c.innerHTML=lbItems.map((it,i)=>{
+    const contrib=(it.watts*it.qty/1000).toFixed(2);
+    return`<div class="lb-item">
+      <span class="lb-item-icon">${it.icon}</span>
+      <span class="lb-item-name">${it.name}</span>
+      <div class="lb-field">
+        <input type="number" class="lb-watts" value="${it.watts}" min="1" max="50000" step="1"
+          oninput="lbSetWatts(${i},this.value)"
+          onchange="lbItems[${i}].watts=Math.max(1,parseFloat(this.value)||1);renderLbItems();lbUpdateSummary();lbUpdateTrigger();" />
+        <span class="lb-unit">W</span>
+      </div>
+      <div class="lb-qty">
+        <button class="lb-qty-btn" onclick="lbQty(${i},-1)">−</button>
+        <span class="lb-qty-val">${it.qty}</span>
+        <button class="lb-qty-btn" onclick="lbQty(${i},+1)">+</button>
+      </div>
+      <div class="lb-field">
+        <input type="number" class="lb-hours" value="${it.hours}" min="0.1" max="24" step="0.5"
+          onchange="lbItems[${i}].hours=Math.min(24,Math.max(0.1,parseFloat(this.value)||1));renderLbItems();lbUpdateSummary();lbUpdateTrigger();" />
+        <span class="lb-unit">h/day</span>
+      </div>
+      <span class="lb-item-contrib">${it.qty}× → ${contrib} kW</span>
+      <button class="lb-item-del" onclick="lbRemove(${i})" title="Remove">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function lbUpdateSummary(){
+  const peakKW=lbItems.reduce((s,it)=>s+it.watts*it.qty/1000,0);
+  const dailyKWh=lbItems.reduce((s,it)=>s+it.watts*it.qty*it.hours/1000,0);
+  const badge=document.getElementById('lb-total-badge');
+  if(badge) badge.textContent='Total: '+peakKW.toFixed(2)+' kW peak · '+dailyKWh.toFixed(1)+' kWh/day';
+  const pt=document.getElementById('lb-peak-total');if(pt)pt.textContent=peakKW.toFixed(2)+' kW';
+  const dt=document.getElementById('lb-daily-total');if(dt)dt.textContent=dailyKWh.toFixed(1)+' kWh';
+  const warn=document.getElementById('lb-warn');
+  if(warn){
+    if(peakKW>50){warn.textContent='⚠ Very high load ('+peakKW.toFixed(1)+' kW) — confirm quantities. This is industrial-scale.';warn.classList.add('on');}
+    else if(peakKW>25){warn.textContent='⚠ Large load ('+peakKW.toFixed(1)+' kW) — commercial scale. Confirm appliances are correct.';warn.classList.add('on');}
+    else warn.classList.remove('on');
+  }
+}
+
+function lbUpdateTrigger(){
+  const btn=document.getElementById('lb-trigger');
+  const lbl=document.getElementById('lb-trigger-label');
+  if(!lbl)return;
+  if(lbItems.length){
+    const peakKW=lbItems.reduce((s,it)=>s+it.watts*it.qty/1000,0);
+    lbl.innerHTML=`<span class="lb-kw">${peakKW.toFixed(2)} kW</span> — ${lbItems.length} appliance${lbItems.length!==1?'s':''}`;
+    btn.classList.add('has-items');
+  }else{
+    lbl.textContent='Add Appliances…';
+    btn.classList.remove('has-items');
+  }
+}
+
+function lbClear(){lbItems=[];renderLbItems();lbUpdateSummary();lbUpdateTrigger();}
+
+// ★ Called by calculate() — returns peakLoad (kW) and dailyUsage (kWh)
+function getLoadBuilderValues(){
+  if(!lbItems.length)return{peakLoad:0,dailyUsage:0};
+  const peakLoad=parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty/1000,0).toFixed(2));
+  const dailyUsage=parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty*it.hours/1000,0).toFixed(2));
+  return{peakLoad,dailyUsage};
+}
+// ══════════════════════════════════════════════════════════════════
+// END LOAD BUILDER
+// ══════════════════════════════════════════════════════════════════
+
+// ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
 async function sbRpc(fn,params){
   const{data:{session}}=await supabaseClient.auth.getSession();
   const token=session?session.access_token:SUPA_ANON;
@@ -964,81 +1199,48 @@ async function renderComplianceBadge(brand,modelRaw){
   const altEl=document.getElementById('i-nrs097-alt');
   if(!statusEl)return;
 
-  // ── No brand on file ──────────────────────────────────────────────────────
   if(!brand&&!modelRaw){
     const html='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Brand not on file — confirm with supplier</span>';
-    statusEl.innerHTML=html;
-    syncKpiBadge(html,'amber');
-    return;
+    statusEl.innerHTML=html;syncKpiBadge(html,'amber');return;
   }
 
   try{
     const rows=await sbRpc('check_inverters_compliance',{p_brand:brand||'',p_model:modelRaw||''});
     const c=rows&&rows[0];
-
     if(!c){
       const html='<span class="comp-badge amber"><span class="comp-dot" style="background:var(--amber)"></span>&#9888; Compliance unverified</span>';
-      statusEl.innerHTML=html;
-      syncKpiBadge(html,'amber');
-      return;
+      statusEl.innerHTML=html;syncKpiBadge(html,'amber');return;
     }
-
-    // ── Colour mapping: green ONLY for COMPLIANT ──────────────────────────
     const dotC  = c.display_color==='green'?'var(--green)':c.display_color==='red'?'var(--red)':'var(--amber)';
     const bClass = c.display_color==='green'?'green':c.display_color==='red'?'red':'amber';
     const badgeHtml = '<span class="comp-badge '+bClass+'"><span class="comp-dot" style="background:'+dotC+'"></span>'+esc(c.display_label||'Unknown')+'</span>';
-
-    // ── Update both locations ─────────────────────────────────────────────
     statusEl.innerHTML=badgeHtml;
-    syncKpiBadge(badgeHtml, bClass);   // ← KPI card gets the same badge + card border colour
-
-    // ── Compliance detail paragraph ───────────────────────────────────────
-    if(c.compliance_detail){
-      detailEl.textContent=c.compliance_detail;
-      detailEl.style.display='block';
-    }
-
-    // ── If NOT compliant, show alternative / register note ────────────────
+    syncKpiBadge(badgeHtml, bClass);
+    if(c.compliance_detail){detailEl.textContent=c.compliance_detail;detailEl.style.display='block';}
     if(c.compliance_status!=='COMPLIANT'){
       if(!c.found_in_master){
-        altEl.innerHTML=
-          '<strong style="color:var(--amber)">&#9888; Not in SA Compliance Register</strong><br>'+
-          'This inverter is not listed in the South African Master Inverter Compliance Register. '+
-          'It may be newly released, imported, or registered under a different trade name. '+
-          'Request the manufacturer\'s NRS 097-2-1 test certificate before commissioning on any municipal grid connection.';
+        altEl.innerHTML='<strong style="color:var(--amber)">&#9888; Not in SA Compliance Register</strong><br>This inverter is not listed in the South African Master Inverter Compliance Register. It may be newly released, imported, or registered under a different trade name. Request the manufacturer\'s NRS 097-2-1 test certificate before commissioning on any municipal grid connection.';
         altEl.className='comp-alt on';
         altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
       } else {
         const alts=await findCompliantAlternative(brand);
         if(alts&&alts.length>0){
           const a=alts[0];
-          altEl.innerHTML=
-            '<strong style="color:var(--amber)">&#128274; NRS 097 Compliant Alternative — same brand</strong><br>'+
-            'The <strong style="color:var(--text)">'+esc(a.brand)+' '+esc(a.invertermodel)+'</strong> is confirmed compliant with '+
-            esc(a.sourcestandard||'NRS 097-2-1:2017')+'. '+
-            'This model is not in your uploaded price list. '+
-            'Contact your supplier to confirm availability and pricing before including it in a proposal.';
+          altEl.innerHTML='<strong style="color:var(--amber)">&#128274; NRS 097 Compliant Alternative — same brand</strong><br>The <strong style="color:var(--text)">'+esc(a.brand)+' '+esc(a.invertermodel)+'</strong> is confirmed compliant with '+esc(a.sourcestandard||'NRS 097-2-1:2017')+'. This model is not in your uploaded price list. Contact your supplier to confirm availability and pricing before including it in a proposal.';
           altEl.className='comp-alt on';
           altEl.style.cssText='background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);margin-top:4px;padding:11px 14px;border-radius:8px;font-size:11px;color:var(--muted);line-height:1.7;display:block';
         }
       }
-    } else {
-      altEl.className='comp-alt';
-      altEl.style.display='none';
-    }
+    } else {altEl.className='comp-alt';altEl.style.display='none';}
   }catch(e){
     const html='<span style="color:var(--muted);font-size:11px">&#9888; Installer to confirm compliance on datasheet</span>';
-    statusEl.innerHTML=html;
-    syncKpiBadge(html,null);
+    statusEl.innerHTML=html;syncKpiBadge(html,null);
   }
 }
 
 async function findCompliantAlternative(brand){
   try{
-    const rows=await sbFetch(
-      '/rest/v1/master_inverters_compliance?brand=ilike.'+encodeURIComponent(brand)+
-      '&compliancestatus=ilike.compliant&select=brand,invertermodel,invertertype,sourcestandard&limit=3'
-    );
+    const rows=await sbFetch('/rest/v1/master_inverters_compliance?brand=ilike.'+encodeURIComponent(brand)+'&compliancestatus=ilike.compliant&select=brand,invertermodel,invertertype,sourcestandard&limit=3');
     if(rows&&rows.length>0)return rows;
   }catch(e){}
   return null;
