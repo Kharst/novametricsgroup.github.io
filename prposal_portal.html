@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-  Nova Metrics — Proposal Portal  v5
-  Won = client clicks Accept on view.html (client_engaged=true / proposal_status='accepted')
+  Nova Metrics — Proposal Portal  v6
+  Won = client clicks Accept on view.html (proposal-view?track=accept)
   Responsive: fits at 100% zoom on 1280px laptops — no zoom required
 -->
 <html lang="en">
@@ -16,7 +16,7 @@
   --navy:#0B1F3A;--navy2:#112640;--navy3:#1a3455;
   --gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.18);
   --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
-  --sidebar-w:260px;--wa:#25D366;
+  --sidebar-w:240px;--wa:#25D366;
   --green:#34d399;--red:#f87171;--blue:#7ac8f8;--amber:#fbbf24;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -30,50 +30,50 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 
 /* ── Sidebar ── */
 .sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:linear-gradient(180deg,#0d2240 0%,#0B1F3A 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.brand{display:flex;align-items:center;gap:10px;padding:14px 12px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.brand-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
-.brand-name{font-size:13px;font-weight:600;white-space:nowrap;}
+.brand{display:flex;align-items:center;gap:9px;padding:11px 10px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.brand-icon{width:30px;height:30px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0;}
+.brand-name{font-size:12px;font-weight:600;white-space:nowrap;}
 .brand-sub{font-size:9px;color:var(--gold);letter-spacing:.09em;text-transform:uppercase;}
-.s-sec{padding:10px 12px 6px;flex-shrink:0;}
-.s-lbl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:6px;padding:0 2px;}
-.inst-card{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:9px;padding:8px 10px;}
-.inst-av{width:28px;height:28px;border-radius:7px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;}
-.inst-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.inst-email{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-sec{padding:8px 10px 5px;flex-shrink:0;}
+.s-lbl{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:5px;padding:0 2px;}
+.inst-card{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:8px;padding:7px 9px;}
+.inst-av{width:26px;height:26px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);flex-shrink:0;}
+.inst-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inst-email{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-.sidebar-search-wrap{padding:8px 10px 4px;flex-shrink:0;}
-.sidebar-search{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:7px 10px;border-radius:7px;font-size:11.5px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.sidebar-search-wrap{padding:7px 9px 3px;flex-shrink:0;}
+.sidebar-search{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:6px 9px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
 .sidebar-search:focus{outline:none;border-color:rgba(255,215,0,.4);}
 .sidebar-search::placeholder{color:rgba(255,255,255,.25);}
 
-.sidebar-ftabs{display:flex;gap:2px;padding:4px 10px;flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
+.sidebar-ftabs{display:flex;gap:2px;padding:3px 9px;flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
 .sidebar-ftabs::-webkit-scrollbar{display:none;}
-.ftab{padding:4px 7px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:.15s;}
+.ftab{padding:3px 6px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;white-space:nowrap;transition:.15s;}
 .ftab.active{background:rgba(255,215,0,.12);color:var(--gold);}
 .ftab:hover:not(.active){background:rgba(255,255,255,.05);color:var(--text);}
 .ftab-dot{width:5px;height:5px;background:#f87171;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:middle;}
 
-.sidebar-sortbar{display:flex;align-items:center;gap:2px;padding:2px 10px 6px;flex-shrink:0;border-bottom:1px solid var(--border);}
+.sidebar-sortbar{display:flex;align-items:center;gap:2px;padding:2px 9px 5px;flex-shrink:0;border-bottom:1px solid var(--border);}
 .sort-lbl{font-size:9px;color:var(--muted);flex-shrink:0;margin-right:2px;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
-.sort-btn{padding:3px 7px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:.03em;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:.15s;text-transform:uppercase;}
+.sort-btn{padding:3px 6px;border-radius:4px;font-size:9px;font-weight:600;letter-spacing:.03em;border:none;cursor:pointer;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:.15s;text-transform:uppercase;}
 .sort-btn.active{background:rgba(255,255,255,.08);color:var(--text);}
 .sort-btn:hover:not(.active){color:var(--text);}
 
 .c-list-section{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-.c-list-header{padding:8px 14px 4px;flex-shrink:0;}
-.c-list{flex:1;overflow-y:auto;padding:2px 6px;}
+.c-list-header{padding:6px 12px 3px;flex-shrink:0;}
+.c-list{flex:1;overflow-y:auto;padding:2px 5px;}
 .loading-row{padding:12px 14px;font-size:12px;color:var(--muted);text-align:center;}
 
-.c-row{display:flex;align-items:center;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:2px;border:1px solid transparent;gap:6px;}
+.c-row{display:flex;align-items:center;padding:6px 7px;border-radius:7px;cursor:pointer;transition:background .15s;margin-bottom:2px;border:1px solid transparent;gap:5px;}
 .c-row:hover{background:var(--card);}
 .c-row.active{background:var(--gold-dim);border-color:var(--gold-border);}
 .c-row.needs-att{border-color:rgba(251,191,36,.22);}
 .c-attn{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;}
 .c-info{flex:1;min-width:0;}
-.c-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.c-meta{font-size:9.5px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c-name{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.c-meta{font-size:9px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-.badge{font-size:8.5px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.badge{font-size:8px;font-weight:700;letter-spacing:.04em;padding:2px 5px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
 .sb-none{background:rgba(255,255,255,.07);color:var(--muted);}
 .sb-generated{background:rgba(255,215,0,.14);color:#FFD700;border:1px solid rgba(255,215,0,.2);}
 .sb-sent{background:rgba(156,163,175,.12);color:#9ca3af;border:1px solid rgba(156,163,175,.2);}
@@ -81,23 +81,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sb-accepted{background:rgba(52,211,153,.14);color:#34d399;border:1px solid rgba(52,211,153,.2);}
 .sb-rejected{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.2);}
 
-.load-more-wrap{padding:6px 10px 8px;flex-shrink:0;}
-.load-more-btn{width:100%;padding:6px;border-radius:6px;font-size:10.5px;font-weight:600;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:.15s;}
+.load-more-wrap{padding:5px 9px 7px;flex-shrink:0;}
+.load-more-btn{width:100%;padding:5px;border-radius:6px;font-size:10px;font-weight:600;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:.15s;}
 .load-more-btn:hover{background:rgba(255,255,255,.1);color:var(--text);}
 
 /* ── Main ── */
 .main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
-.topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;flex-wrap:wrap;}
+.topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;flex-wrap:wrap;}
 .t-tabs{display:flex;gap:3px;}
-.t-btn{padding:6px 13px;border-radius:7px;font-size:12px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.t-btn{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;transition:all .15s;font-family:'DM Sans',sans-serif;}
 .t-btn.on{background:var(--navy);color:#fff;}
-.t-right{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;}
-.nav-a{font-size:11.5px;color:#6b7280;text-decoration:none;white-space:nowrap;}.nav-a.hi{color:var(--navy);font-weight:500;}
-.sign-out-btn{font-size:11.5px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.t-right{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+.nav-a{font-size:11px;color:#6b7280;text-decoration:none;white-space:nowrap;}.nav-a.hi{color:var(--navy);font-weight:500;}
+.sign-out-btn{font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
 .sign-out-btn:hover{color:#ef4444;}
-.new-calc-topbtn{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:7px;background:var(--navy);color:#fff;font-size:11.5px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
+.new-calc-topbtn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;background:var(--navy);color:#fff;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
 .new-calc-topbtn:hover{background:#1e3a5f;}
-.new-calc-topbtn svg{width:11px;height:11px;flex-shrink:0;}
+.new-calc-topbtn svg{width:10px;height:10px;flex-shrink:0;}
 .tab-content{display:none;flex:1;flex-direction:column;overflow:hidden;}
 .tab-content.on{display:flex;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
@@ -107,189 +107,220 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .e-cta:hover{background:#1e3a5f;transform:translateY(-1px);}
 
 /* ── Detail panel ── */
-.detail{flex:1;overflow-y:auto;padding:14px 18px;display:none;flex-direction:column;gap:12px;animation:up .22s ease;}
+.detail{flex:1;overflow-y:auto;overflow-x:hidden;padding:12px 14px;display:none;flex-direction:column;gap:10px;animation:up .22s ease;}
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
 /* ── Client header card ── */
-.ch{background:var(--navy);border-radius:14px;padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;gap:12px;flex-wrap:wrap;}
+.ch{background:var(--navy);border-radius:12px;padding:13px 16px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;gap:10px;flex-wrap:wrap;}
 .ch::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.07) 0%,transparent 60%);pointer-events:none;}
-.ch-l{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
-.ch-av{width:44px;height:44px;border-radius:12px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:18px;color:var(--navy);flex-shrink:0;}
-.ch-nm{font-size:16px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px;}
-.ch-sub{font-size:11px;color:rgba(255,255,255,.42);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ch-meta{display:flex;gap:6px 12px;margin-top:6px;flex-wrap:wrap;}
-.ch-mi{font-size:11px;color:rgba(255,255,255,.48);display:flex;align-items:center;gap:4px;min-width:0;}
-.ch-mi strong{color:rgba(255,255,255,.82);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;display:inline-block;}
-.pill{padding:5px 13px;border-radius:30px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;white-space:nowrap;}
+.ch-l{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.ch-av{width:40px;height:40px;border-radius:10px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:16px;color:var(--navy);flex-shrink:0;}
+.ch-nm{font-size:15px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:340px;}
+.ch-sub{font-size:10.5px;color:rgba(255,255,255,.42);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ch-meta{display:flex;gap:5px 10px;margin-top:5px;flex-wrap:wrap;}
+.ch-mi{font-size:10.5px;color:rgba(255,255,255,.48);display:flex;align-items:center;gap:3px;min-width:0;}
+.ch-mi strong{color:rgba(255,255,255,.82);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;display:inline-block;}
+.pill{padding:4px 11px;border-radius:30px;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;align-self:flex-start;white-space:nowrap;}
 .pill.p,.pill.none{background:rgba(255,255,255,.07);color:rgba(255,255,255,.32);border:1px solid rgba(255,255,255,.1);}
 .pill.generated{background:rgba(255,215,0,.15);color:#FFD700;border:1px solid rgba(255,215,0,.25);}
 .pill.sent{background:rgba(156,163,175,.15);color:#9ca3af;border:1px solid rgba(156,163,175,.25);}
 .pill.viewed{background:rgba(122,200,248,.15);color:#7ac8f8;border:1px solid rgba(122,200,248,.25);}
 .pill.accepted{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);}
 .pill.rejected{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.25);}
-.attn-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:9px;padding:9px 13px;font-size:11.5px;color:var(--amber);display:none;align-items:center;gap:8px;}
+.attn-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--amber);display:none;align-items:center;gap:8px;}
 .attn-banner.on{display:flex;}
 
-/* ── Tracking strip — fixed layout ── */
-.tracking-strip{background:#fff;border-radius:12px;border:1px solid #e8ecf0;padding:12px 14px;display:flex;gap:0;align-items:flex-start;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.tev{flex:1;min-width:54px;text-align:center;position:relative;}
-.tev+.tev::before{content:'';position:absolute;left:0;top:12px;width:100%;height:2px;background:#e8ecf0;z-index:0;}
-.tev-dot{width:24px;height:24px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:11px;position:relative;z-index:1;border:2px solid #e8ecf0;background:#f9fafb;flex-shrink:0;}
+/* ── Tracking strip — zero-overlap layout ── */
+.tracking-strip{
+  background:#fff;border-radius:12px;border:1px solid #e8ecf0;
+  padding:12px 6px 10px;
+  display:flex;gap:0;align-items:flex-start;
+  max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.tev{
+  flex:1;min-width:0;width:0;        /* flex shrink below content size */
+  text-align:center;position:relative;
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 3px;overflow:hidden;     /* contain labels inside cell */
+}
+/* Left half of connecting line (from previous dot to this dot) */
+.tev:not(:first-child)::before{
+  content:'';position:absolute;top:10px;left:0;width:50%;
+  height:2px;background:#e8ecf0;z-index:0;
+}
+/* Right half of connecting line (from this dot to next dot) */
+.tev:not(:last-child)::after{
+  content:'';position:absolute;top:10px;right:0;left:50%;
+  height:2px;background:#e8ecf0;z-index:0;
+}
+.tev-dot{
+  width:22px;height:22px;border-radius:50%;
+  margin-bottom:5px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+  position:relative;z-index:1;
+  border:2px solid #e8ecf0;background:#f9fafb;flex-shrink:0;
+}
 .tev-dot.done{background:#ecfdf5;border-color:#22c55e;}
-.tev-lbl{font-size:8.5px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;padding:0 2px;}
+.tev-lbl{
+  font-size:8px;font-weight:600;color:#9ca3af;
+  text-transform:uppercase;letter-spacing:.04em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  width:100%;display:block;          /* width:100% enables ellipsis */
+}
 .tev-lbl.done{color:#16a34a;}
-.tev-time{font-size:8px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;padding:0 2px;}
+.tev-time{
+  font-size:7.5px;color:#9ca3af;margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  width:100%;display:block;
+}
 
-/* ── Won banner (read-only, from client accept) ── */
-.won-badge-row{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:#166534;}
+/* ── Won banner (read-only — client accepted via view page) ── */
+.won-badge-row{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:10px;font-size:12px;color:#166534;}
 .won-badge-icon{font-size:18px;flex-shrink:0;}
-.won-override-link{margin-left:auto;font-size:10.5px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:underline;white-space:nowrap;padding:0;}
-.won-override-link:hover{color:#6b7280;}
 
-/* ── Manual override row (hidden by default, installer only) ── */
-.manual-override-row{background:#f9fafb;border:1px dashed #d1d5db;border-radius:9px;padding:10px 14px;display:none;align-items:center;gap:10px;flex-wrap:wrap;}
-.manual-override-row.on{display:flex;}
-.mo-label{font-size:11.5px;color:#6b7280;flex:1;min-width:140px;}
+/* ── Manual override row (installer marks Won/Rejected verbally) ── */
+.manual-override-row{background:#f9fafb;border:1px dashed #d1d5db;border-radius:9px;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.mo-label{font-size:11px;color:#6b7280;flex:1;min-width:120px;}
 .mo-label strong{color:#374151;}
-.mo-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid transparent;white-space:nowrap;}
+.mo-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid transparent;white-space:nowrap;}
 .mo-btn-accept{background:rgba(34,197,94,.1);color:#16a34a;border-color:rgba(34,197,94,.3);}
 .mo-btn-accept:hover{background:rgba(34,197,94,.2);}
 .mo-btn-reject{background:rgba(248,113,113,.07);color:#dc2626;border-color:rgba(248,113,113,.25);}
 .mo-btn-reject:hover{background:rgba(248,113,113,.15);}
 
 /* ── Stats ── */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .stats>*{min-width:0;}
-.s-card{background:#fff;border-radius:12px;padding:14px 15px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
+.s-card{background:#fff;border-radius:11px;padding:12px 13px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
 .s-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(10,37,64,.07);}
-.s-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px;}
+.s-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 11px 11px;}
 .cg::after{background:var(--gold);}.cgn::after{background:#22c55e;}.cbl::after{background:#3b82f6;}.ctl::after{background:#14b8a6;}
-.s-lbl2{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:5px;}
-.s-val{font-size:19px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1.15;}
-.s-unit{font-size:12px;font-weight:400;color:#6b7280;}
-.s-sub2{font-size:10.5px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-lbl2{font-size:9.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:4px;}
+.s-val{font-size:18px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1.15;}
+.s-unit{font-size:11px;font-weight:400;color:#6b7280;}
+.s-sub2{font-size:10px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* ── Spec cards ── */
-.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;}
+.specs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
 .specs>*{min-width:0;}
-.sp-card{background:#fff;border-radius:12px;padding:15px 17px;border:1px solid #e8ecf0;}
-.sp-title{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:11px;display:flex;align-items:center;gap:6px;}
+.sp-card{background:#fff;border-radius:12px;padding:13px 15px;border:1px solid #e8ecf0;}
+.sp-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .dot{width:6px;height:6px;border-radius:50%;}.dot.g{background:var(--gold);}.dot.gn{background:#22c55e;}
-.sp-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:12px;gap:8px;}
+.sp-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:11.5px;gap:6px;}
 .sp-row:last-child{border-bottom:none;}
-.sk{color:#6b7280;flex-shrink:0;}.sv{color:var(--navy);font-weight:500;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:56%;}
-.no-prop{background:#fff;border-radius:12px;padding:18px 20px;border:1.5px dashed #d1d5db;display:flex;align-items:center;gap:14px;}
-.np-ic{width:38px;height:38px;background:#f3f4f6;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.np-t{font-size:13px;font-weight:500;color:#374151;}.np-s{font-size:11.5px;color:#9ca3af;margin-top:2px;}
-.np-cta{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:7px 15px;border-radius:7px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
+.sk{color:#6b7280;flex-shrink:0;}.sv{color:var(--navy);font-weight:500;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%;}
+.no-prop{background:#fff;border-radius:12px;padding:16px 18px;border:1.5px dashed #d1d5db;display:flex;align-items:center;gap:12px;}
+.np-ic{width:36px;height:36px;background:#f3f4f6;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.np-t{font-size:13px;font-weight:500;color:#374151;}.np-s{font-size:11px;color:#9ca3af;margin-top:2px;}
+.np-cta{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:6px 14px;border-radius:7px;background:var(--navy);color:#fff;font-size:11.5px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
 .np-cta:hover{background:#1e3a5f;}
 
 /* ── Download / send card ── */
-.dl{background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);border-radius:14px;border:1px solid var(--gold-border);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;gap:14px;flex-wrap:wrap;}
-.dl::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
+.dl{background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);border-radius:13px;border:1px solid var(--gold-border);padding:15px 18px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;gap:12px;flex-wrap:wrap;}
+.dl::before{content:'';position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
 .dl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,rgba(255,215,0,.2) 100%);}
 .dl-left{min-width:0;flex:1;}
-.dl-eyebrow{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
-.dl-eyebrow::before{content:'';width:16px;height:1px;background:var(--gold);display:inline-block;}
-.dl-ti{font-size:15px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.dl-su{font-size:11px;color:rgba(255,255,255,.42);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.dl-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
-.dl-btn{display:flex;align-items:center;gap:7px;background:var(--gold);color:var(--navy);border:none;border-radius:9px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
+.dl-eyebrow{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.dl-eyebrow::before{content:'';width:14px;height:1px;background:var(--gold);display:inline-block;}
+.dl-ti{font-size:14px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dl-su{font-size:10.5px;color:rgba(255,255,255,.42);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dl-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap;}
+.dl-btn{display:flex;align-items:center;gap:6px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:8px 13px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 6px 18px rgba(255,215,0,.3);}
-.dl-btn svg{width:13px;height:13px;flex-shrink:0;}
-.dl-btn-email{display:flex;align-items:center;gap:7px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:9px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
+.dl-btn svg{width:12px;height:12px;flex-shrink:0;}
+.dl-btn-email{display:flex;align-items:center;gap:6px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);border-radius:8px;padding:8px 13px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn-email:hover{background:rgba(34,197,94,.25);transform:translateY(-2px);}
-.dl-btn-wa{display:flex;align-items:center;gap:7px;background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.35);border-radius:9px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
+.dl-btn-wa{display:flex;align-items:center;gap:6px;background:rgba(37,211,102,.15);color:#25D366;border:1px solid rgba(37,211,102,.35);border-radius:8px;padding:8px 13px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);}
 .dl-btn-wa.sent{background:rgba(37,211,102,.3);border-color:#25D366;}
-.arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:9px 22px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0;}
+.arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:8px 18px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
-.ab-text{font-size:12px;color:#374151;display:flex;align-items:center;gap:7px;}
+.ab-text{font-size:11.5px;color:#374151;display:flex;align-items:center;gap:7px;}
 .ab-text strong{color:var(--navy);}
-.ab-check{width:20px;height:20px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
-.ab-close{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:15px;padding:0 4px;line-height:1;}
+.ab-check{width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;}
+.ab-close{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:14px;padding:0 4px;line-height:1;}
 
 /* ── Booking card ── */
-.booking-card{background:linear-gradient(135deg,#ecfdf5 0%,#f0fdf4 100%);border:1.5px solid #86efac;border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;}
-.booking-card::before{content:'';position:absolute;top:-18px;right:-18px;width:90px;height:90px;border-radius:50%;background:rgba(34,197,94,.07);}
-.booking-header{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
-.booking-icon{width:34px;height:34px;background:rgba(34,197,94,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.booking-card{background:linear-gradient(135deg,#ecfdf5 0%,#f0fdf4 100%);border:1.5px solid #86efac;border-radius:13px;padding:16px 18px;position:relative;overflow:hidden;}
+.booking-card::before{content:'';position:absolute;top:-18px;right:-18px;width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,.07);}
+.booking-header{display:flex;align-items:center;gap:9px;margin-bottom:12px;}
+.booking-icon{width:32px;height:32px;background:rgba(34,197,94,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .booking-title{font-size:14px;font-weight:600;color:#14532d;font-family:'DM Serif Display',serif;}
-.booking-sub{font-size:11.5px;color:#166534;margin-top:2px;}
+.booking-sub{font-size:11px;color:#166534;margin-top:2px;}
 .booking-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .bk-group{display:flex;flex-direction:column;gap:4px;}
 .bk-label{font-size:10px;font-weight:600;color:#166534;text-transform:uppercase;letter-spacing:.06em;}
-.bk-input{background:#fff;border:1.5px solid #bbf7d0;color:#14532d;padding:8px 11px;border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:border-color .2s;width:100%;}
+.bk-input{background:#fff;border:1.5px solid #bbf7d0;color:#14532d;padding:7px 10px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;transition:border-color .2s;width:100%;}
 .bk-input:focus{outline:none;border-color:#22c55e;}
 .bk-notes{grid-column:1/-1;}
-.bk-textarea{background:#fff;border:1.5px solid #bbf7d0;color:#14532d;padding:8px 11px;border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:64px;width:100%;transition:border-color .2s;}
+.bk-textarea{background:#fff;border:1.5px solid #bbf7d0;color:#14532d;padding:7px 10px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:56px;width:100%;transition:border-color .2s;}
 .bk-textarea:focus{outline:none;border-color:#22c55e;}
-.bk-actions{margin-top:12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
-.bk-save{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;background:#16a34a;color:#fff;font-size:12.5px;font-weight:700;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .2s;}
+.bk-actions{margin-top:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.bk-save{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;background:#16a34a;color:#fff;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .2s;}
 .bk-save:hover{background:#15803d;transform:translateY(-1px);}
 .bk-save:disabled{background:#9ca3af;cursor:not-allowed;transform:none;}
-.bk-confirmed{font-size:11.5px;color:#15803d;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);padding:7px 13px;border-radius:7px;display:none;align-items:center;gap:5px;}
+.bk-confirmed{font-size:11px;color:#15803d;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);padding:6px 12px;border-radius:7px;display:none;align-items:center;gap:5px;}
 .bk-confirmed.on{display:flex;}
-.bk-existing{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:9px 12px;font-size:11.5px;color:#166534;margin-bottom:11px;display:none;}
+.bk-existing{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:8px 11px;font-size:11px;color:#166534;margin-bottom:10px;display:none;}
 .bk-existing.on{display:block;}
 
 /* ── Analytics ── */
 #analyticsTab{overflow:hidden;flex-direction:column;}
 .dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px;}
+.dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px;}
 .dash-stabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
 .dash-stabs::-webkit-scrollbar{display:none;}
-.dash-stab{padding:5px 11px;border-radius:6px;font-size:11.5px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.dash-stab{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;}
 .dash-stab.on{background:#0B1F3A;color:#fff;}
 .dash-stab:hover:not(.on){background:#f3f4f6;}
-.dash-refresh{padding:5px 10px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;}
+.dash-refresh{padding:5px 9px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:4px;}
 .dash-refresh:hover{background:#e5e7eb;}
 .dash-updated{font-size:10px;color:#9ca3af;}
-.dash-body{flex:1;overflow-y:auto;padding:16px 20px;}
+.dash-body{flex:1;overflow-y:auto;padding:14px 16px;}
 .dash-loading{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 .dash-spin{width:26px;height:26px;border:2px solid rgba(11,31,58,.1);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
-.stab-pane{display:none;flex-direction:column;gap:14px;}
+.stab-pane{display:none;flex-direction:column;gap:12px;}
 .stab-pane.on{display:flex;}
-.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;}
 .g4>*{min-width:0;}
-.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;}
 .g3>*{min-width:0;}
-.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px;}
 .g2>*{min-width:0;}
-.kpi{background:#fff;border-radius:11px;padding:14px 16px;border:1px solid #e8ecf0;position:relative;overflow:hidden;min-width:0;}
-.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 11px 11px;}
+.kpi{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e8ecf0;position:relative;overflow:hidden;min-width:0;}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 10px 10px;}
 .kpi.gold::after{background:#FFD700;}.kpi.green::after{background:#22c55e;}.kpi.blue::after{background:#3b82f6;}
 .kpi.teal::after{background:#14b8a6;}.kpi.purple::after{background:#8b5cf6;}.kpi.orange::after{background:#f97316;}
-.kpi-lbl{font-size:9.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:5px;}
-.kpi-val{font-size:22px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1;}
-.kpi-sub{font-size:10.5px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.white-card{background:#fff;border-radius:11px;padding:15px 17px;border:1px solid #e8ecf0;min-width:0;}
-.wc-title{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.wc-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:12px;gap:8px;}
+.kpi-lbl{font-size:9.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:4px;}
+.kpi-val{font-size:20px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1;}
+.kpi-sub{font-size:10px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.white-card{background:#fff;border-radius:10px;padding:13px 15px;border:1px solid #e8ecf0;min-width:0;}
+.wc-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.wc-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:11.5px;gap:6px;}
 .wc-row:last-child{border-bottom:none;}
 .wc-k{color:#6b7280;flex-shrink:0;}.wc-v{color:var(--navy);font-weight:500;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:55%;}
-.dark-card{background:linear-gradient(135deg,#0B1F3A 0%,#14294a 100%);border-radius:11px;padding:15px 17px;color:#fff;position:relative;overflow:hidden;min-width:0;}
-.dark-card::before{content:'';position:absolute;top:-18px;right:-18px;width:90px;height:90px;border-radius:50%;background:rgba(255,215,0,.06);}
-.dc-title{font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.dark-card{background:linear-gradient(135deg,#0B1F3A 0%,#14294a 100%);border-radius:10px;padding:13px 15px;color:#fff;position:relative;overflow:hidden;min-width:0;}
+.dark-card::before{content:'';position:absolute;top:-18px;right:-18px;width:80px;height:80px;border-radius:50%;background:rgba(255,215,0,.06);}
+.dc-title{font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .dc-item{text-align:center;min-width:0;}
-.dc-val{font-size:18px;font-weight:600;font-family:'DM Serif Display',serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dc-val{font-size:16px;font-weight:600;font-family:'DM Serif Display',serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dc-lbl{font-size:8.5px;color:rgba(255,255,255,.45);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
-.pipe-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.pipe-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
 .pipe-row:last-child{margin-bottom:0;}
-.pipe-lbl{font-size:11px;color:#6b7280;width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pipe-lbl{font-size:11px;color:#6b7280;width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pipe-bar-wrap{flex:1;height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden;min-width:0;}
 .pipe-bar{height:100%;border-radius:3px;transition:width .6s ease;}
-.pipe-num{font-size:11px;font-weight:600;color:var(--navy);width:26px;text-align:right;flex-shrink:0;}
-.pipe-pct{font-size:9.5px;color:#9ca3af;width:32px;text-align:right;flex-shrink:0;}
-.rate-row{display:flex;gap:8px;flex-wrap:wrap;}
-.rate-pill{background:#f9fafb;border:1px solid #e8ecf0;border-radius:8px;padding:9px 12px;flex:1;min-width:110px;}
+.pipe-num{font-size:11px;font-weight:600;color:var(--navy);width:24px;text-align:right;flex-shrink:0;}
+.pipe-pct{font-size:9.5px;color:#9ca3af;width:30px;text-align:right;flex-shrink:0;}
+.rate-row{display:flex;gap:7px;flex-wrap:wrap;}
+.rate-pill{background:#f9fafb;border:1px solid #e8ecf0;border-radius:8px;padding:8px 11px;flex:1;min-width:100px;}
 .rp-lbl{font-size:9.5px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
-.rp-val{font-size:17px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;margin-top:3px;}
+.rp-val{font-size:16px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;margin-top:3px;}
 .ft{width:100%;border-collapse:collapse;table-layout:fixed;}
-.ft th{font-size:9.5px;color:#9ca3af;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1px solid #f3f4f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ft td{font-size:11.5px;padding:9px 12px;border-bottom:1px solid #f9fafb;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ft th{font-size:9.5px;color:#9ca3af;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:1px solid #f3f4f6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ft td{font-size:11px;padding:8px 10px;border-bottom:1px solid #f9fafb;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ft tr:last-child td{border-bottom:none;}
 .ft tr:hover td{background:#fafbfc;}
 .fp-hot{color:#dc2626;font-weight:600;}.fp-warm{color:#d97706;font-weight:600;}
@@ -301,24 +332,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
 
 /* ── Responsive breakpoints ── */
+@media(max-width:1400px){
+  .specs{grid-template-columns:repeat(2,1fr);}
+}
 @media(max-width:1280px){
-  :root{--sidebar-w:240px;}
-  .detail{padding:12px 14px;}
+  :root{--sidebar-w:220px;}
+  .detail{padding:10px 12px;gap:9px;}
   .stats{grid-template-columns:repeat(2,1fr);}
+  .specs{grid-template-columns:1fr;}
+  .ch-nm{max-width:280px;}
 }
 @media(max-width:1024px){
-  :root{--sidebar-w:220px;}
-  .specs{grid-template-columns:1fr;}
+  :root{--sidebar-w:200px;}
   .g4{grid-template-columns:repeat(2,1fr);}
+  .topbar{padding:7px 10px;}
+  .dl{padding:12px 14px;}
 }
 @media(max-width:900px){
   .dl{flex-direction:column;align-items:flex-start;}
   .booking-grid{grid-template-columns:1fr;}
+  .stats{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:700px){
   .sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}
   .main{margin-bottom:56px;}
   :root{--sidebar-w:100%;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .specs{grid-template-columns:1fr;}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -364,7 +404,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   </div>
   <div class="c-list-section">
     <div class="c-list-header"><div class="s-lbl" id="clientCount">Loading…</div></div>
-    <div class="c-list" id="clientList"><div class="loading-row">Loading…</div></div>
+    <div class="c-list" id="clientList"><div class="loading-row">Loading clients…</div></div>
     <div class="load-more-wrap" id="loadMoreWrap" style="display:none">
       <button class="load-more-btn" id="loadMoreBtn">Load more ↓</button>
     </div>
@@ -390,7 +430,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <div class="arrival-banner" id="arrivalBanner">
     <div class="ab-text">
       <div class="ab-check">✓</div>
-      <span>Proposal generated — <strong id="arrivalClientName">your client</strong>'s proposal is ready.</span>
+      <span>Proposal generated — <strong id="arrivalClientName">your client</strong>'s proposal is highlighted below.</span>
     </div>
     <button class="ab-close" onclick="document.getElementById('arrivalBanner').classList.remove('on')">✕</button>
   </div>
@@ -427,7 +467,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="pill p" id="chPill">No Proposal</div>
       </div>
 
-      <!-- Tracking timeline -->
+      <!-- Tracking timeline: Generated → Sent → Opened → Viewed → Won -->
       <div class="tracking-strip" id="trackingStrip" style="display:none">
         <div class="tev">
           <div class="tev-dot" id="tev-dot-generated">📄</div>
@@ -456,22 +496,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- Won badge (client accepted) -->
+      <!-- Won banner: only shown when client clicked Accept on their proposal view page -->
       <div id="wonBadgeRow" style="display:none">
         <div class="won-badge-row">
           <span class="won-badge-icon">🏆</span>
           <div>
             <div style="font-weight:600;font-size:12.5px">Client Accepted — Site Visit Required</div>
-            <div style="font-size:11.5px;color:#166534;margin-top:2px">Client clicked Accept on their proposal. Fill in the site visit details below to assign this job.</div>
+            <div style="font-size:11px;color:#166534;margin-top:2px">Client clicked <em>Accept Proposal</em> on their proposal page. Complete the site visit booking below.</div>
           </div>
-          <button class="won-override-link" onclick="toggleManualOverride()">Manual override ▾</button>
         </div>
       </div>
 
-      <!-- Manual override row (for proposals not yet accepted by client) -->
+      <!-- Manual override: shown for all non-terminal proposals (verbal acceptance/rejection) -->
       <div id="manualOverrideRow" style="display:none">
-        <div class="manual-override-row" id="manualOverrideInner">
-          <span class="mo-label"><strong>Installer override:</strong> manually update outcome if client accepted/rejected verbally.</span>
+        <div class="manual-override-row">
+          <span class="mo-label"><strong>Installer override:</strong> mark outcome if client accepted or rejected verbally.</span>
           <button class="mo-btn mo-btn-accept" onclick="markAsWon()">🏆 Mark Won</button>
           <button class="mo-btn mo-btn-reject" onclick="markAsRejected()">✕ Rejected</button>
         </div>
@@ -487,10 +526,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
 
       <div class="stats" id="statsRow" style="display:none">
-        <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW</span></div><div class="s-sub2" id="stPanels">—</div></div>
-        <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom</div></div>
+        <div class="s-card cg"><div class="s-lbl2">System Size</div><div class="s-val"><span id="stKw">—</span><span class="s-unit"> kW DC</span></div><div class="s-sub2" id="stPanels">—</div></div>
+        <div class="s-card cgn"><div class="s-lbl2">Annual Saving</div><div class="s-val">R <span id="stAnnual">—</span></div><div class="s-sub2">vs. Eskom bill</div></div>
         <div class="s-card cbl"><div class="s-lbl2">System Cost</div><div class="s-val">R <span id="stCost">—</span></div><div class="s-sub2" id="stMonthlySub">—</div></div>
-        <div class="s-card ctl"><div class="s-lbl2">Payback</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
+        <div class="s-card ctl"><div class="s-lbl2">Payback Period</div><div class="s-val"><span id="stPayback">—</span><span class="s-unit"> yrs</span></div><div class="s-sub2">Escalating tariff</div></div>
       </div>
 
       <div class="specs" id="specsRow" style="display:none">
@@ -507,14 +546,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
         <div class="sp-card">
           <div class="sp-title"><div class="dot gn"></div>Financial &amp; Environmental</div>
-          <div class="sp-row"><span class="sk">System Cost</span><span class="sv" id="spCost">—</span></div>
+          <div class="sp-row"><span class="sk">Total System Cost</span><span class="sv" id="spCost">—</span></div>
           <div class="sp-row"><span class="sk">Monthly Saving</span><span class="sv" id="spMon">—</span></div>
           <div class="sp-row"><span class="sk">Annual Saving</span><span class="sv" id="spAnn">—</span></div>
-          <div class="sp-row"><span class="sk">25-yr Lifetime</span><span class="sv" id="spLife">—</span></div>
-          <div class="sp-row"><span class="sk">Annual Solar</span><span class="sv" id="spSol">—</span></div>
+          <div class="sp-row"><span class="sk">25-yr Lifetime Saving</span><span class="sv" id="spLife">—</span></div>
+          <div class="sp-row"><span class="sk">Annual Solar Yield</span><span class="sv" id="spSol">—</span></div>
           <div class="sp-row"><span class="sk">CO₂ Avoided</span><span class="sv" id="spCO2">—</span></div>
           <div class="sp-row"><span class="sk">Coal Avoided</span><span class="sv" id="spCoal">—</span></div>
-          <div class="sp-row"><span class="sk">Trees Equiv.</span><span class="sv" id="spTree">—</span></div>
+          <div class="sp-row"><span class="sk">Trees Equivalent</span><span class="sv" id="spTree">—</span></div>
         </div>
       </div>
 
@@ -530,17 +569,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
             Download PDF
           </button>
           <button class="dl-btn-email" id="sendBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Email to Client
           </button>
           <button class="dl-btn-wa" id="waBtn">
-            <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
             WhatsApp
           </button>
         </div>
       </div>
 
-      <!-- Booking card — only for Won -->
+      <!-- Booking card: ONLY shown when proposal_status = 'accepted' (client clicked Accept) -->
       <div class="booking-card" id="bookingCard" style="display:none">
         <div class="booking-header">
           <div class="booking-icon">🗓️</div>
@@ -566,7 +605,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
         <div class="bk-actions">
           <button class="bk-save" id="bkSaveBtn" onclick="saveBooking()">📅 Confirm Site Visit</button>
-          <div class="bk-confirmed" id="bkConfirmed">✓ Site visit saved — job assigned!</div>
+          <div class="bk-confirmed" id="bkConfirmed">✓ Site visit saved successfully!</div>
         </div>
       </div>
 
@@ -578,10 +617,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
     <div class="dash-shell">
       <div class="dash-topbar">
         <div class="dash-stabs">
-          <button class="dash-stab on" onclick="switchDashTab('system')">☀️ System</button>
+          <button class="dash-stab on" onclick="switchDashTab('system')">☀️ System Size</button>
           <button class="dash-stab" onclick="switchDashTab('battery')">🔋 Battery</button>
           <button class="dash-stab" onclick="switchDashTab('financials')">💰 Financials</button>
-          <button class="dash-stab" onclick="switchDashTab('environmental')">🌱 Environment</button>
+          <button class="dash-stab" onclick="switchDashTab('environmental')">🌱 Environmental</button>
           <button class="dash-stab" onclick="switchDashTab('inverter')">⚡ Inverter</button>
           <button class="dash-stab" onclick="switchDashTab('pipeline')">📊 Pipeline</button>
         </div>
@@ -592,12 +631,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
       <div class="dash-loading" id="dashLoading"><div class="dash-spin"></div><div style="font-size:12px;color:#6b7280">Loading analytics…</div></div>
       <div class="dash-body" id="dashBody" style="display:none">
-        <div class="stab-pane on" id="pane-system"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels / system</div></div><div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Top)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy</span><span class="wc-v" id="sAutonomy">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:12px;color:#374151"></div></div></div></div>
-        <div class="stab-pane" id="pane-battery"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Top Battery</div><div class="kpi-val" id="bTopModel" style="font-size:13px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Systems</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Battery Cost</div></div></div></div></div></div>
-        <div class="stab-pane" id="pane-financials"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals</div></div></div></div></div></div>
-        <div class="stab-pane" id="pane-environmental"><div class="g4"><div class="kpi green"><div class="kpi-lbl">CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equiv.</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Avg Per-Proposal Impact</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equiv.</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equiv.</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Yr</div></div></div></div></div></div>
-        <div class="stab-pane" id="pane-inverter"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter</div><div class="kpi-val" id="iTopModel" style="font-size:13px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95–1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Summary</div><div class="wc-row"><span class="wc-k">Top Model</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Req. AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:12px;color:#374151"></div></div></div></div>
-        <div class="stab-pane" id="pane-pipeline"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">generated</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Won</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">client accepted</div></div></div><div class="rate-row" id="pRateRow"></div><div class="white-card"><div class="wc-title"><div class="dot g"></div>Pipeline Funnel</div><div id="pFunnel"></div></div><div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:11px 14px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th style="width:22%">Client</th><th style="width:15%">Location</th><th style="width:10%">Status</th><th style="width:22%">Follow-Up</th><th style="width:10%">Days</th><th style="width:21%">Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">Loading…</td></tr></tbody></table></div></div>
+        <div class="stab-pane on" id="pane-system"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div><div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels per system</div></div><div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day est.</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:12px;color:#374151"></div></div></div></div>
+        <div class="stab-pane" id="pane-battery"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:13px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-financials"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-environmental"><div class="g4"><div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Total Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div></div></div></div></div>
+        <div class="stab-pane" id="pane-inverter"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:13px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95-1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div><div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:12px;color:#374151"></div></div></div></div>
+        <div class="stab-pane" id="pane-pipeline"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Won</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">client accepted</div></div></div><div class="rate-row" id="pRateRow"></div><div class="white-card"><div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div><div id="pFunnel"></div></div><div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:10px 14px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:10px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th style="width:22%">Client</th><th style="width:15%">Location</th><th style="width:10%">Status</th><th style="width:22%">Follow-Up</th><th style="width:10%">Days Sent</th><th style="width:21%">System Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">Loading…</td></tr></tbody></table></div></div>
       </div>
     </div>
   </div>
@@ -621,7 +660,6 @@ var urlAiId=params.get('ai_id');
 var urlEmail=(params.get('email')||'').toLowerCase().trim();
 var activeDashTab='system';
 var sb=supabase.createClient(SUPA,ANON);
-var _manualOverrideVisible=false;
 
 function switchTab(tab){
   var isA=tab==='analytics';
@@ -641,22 +679,18 @@ function switchDashTab(name){
   var pane=document.getElementById('pane-'+name);
   if(pane)pane.classList.add('on');
 }
-function toggleManualOverride(){
-  _manualOverrideVisible=!_manualOverrideVisible;
-  var row=document.getElementById('manualOverrideInner');
-  if(row) row.classList.toggle('on',_manualOverrideVisible);
-  document.getElementById('manualOverrideRow').style.display=_manualOverrideVisible?'block':'none';
-}
 
 /* ── Status derivation — timestamps are ground truth ── */
 function getProposalStatus(ai){
   if(!ai||!ai.pdf_url) return null;
-  if(ai.client_engaged||ai.proposal_status==='accepted') return 'accepted';
+  /* Won: ONLY when client explicitly accepted OR installer manual override */
+  if(ai.proposal_status==='accepted'||ai.client_engaged) return 'accepted';
   if(ai.proposal_status==='rejected') return 'rejected';
+  /* Multi-state: viewed if any view/open timestamp exists */
   if(ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
+  /* Sent: any send timestamp */
   if(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at) return 'sent';
-  var ps=ai.proposal_status;
-  if(ps&&['generated','sent','viewed'].includes(ps)) return ps;
+  /* Generated: PDF exists but nothing sent yet */
   return 'generated';
 }
 function getStatusInfo(c){
@@ -697,15 +731,15 @@ function attnMessage(c){
   return '';
 }
 
-/* ── Filter tabs — cumulative ── */
+/* ── Filter tabs — cumulative (a proposal can match multiple tabs) ── */
 function clientMatchesTab(c,tab){
   var ai=c.ai;
   switch(tab){
     case 'all': return true;
     case 'needs_action': return needsAttention(c);
-    case 'sent': return!!(ai&&(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at));
+    case 'sent':   return!!(ai&&(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at));
     case 'viewed': return!!(ai&&(ai.email_opened_at||ai.proposal_viewed_at));
-    case 'won': return!!(ai&&(ai.client_engaged||ai.proposal_status==='accepted'));
+    case 'won':    return!!(ai&&(ai.client_engaged||ai.proposal_status==='accepted'));
     default: return true;
   }
 }
@@ -786,12 +820,12 @@ async function markAsSent(aiId,method){
   tevSet('sent',new Date().toISOString(),'Sent');
 }
 
-/* ── Mark as Won (manual installer override only) ── */
+/* ── Mark Won (installer verbal override only — primary path is client Accept button) ── */
 async function markAsWon(){
   if(!activeAiId) return;
   var c=allClients[activeDetailIdx];
   var cname=(c&&c.ai&&c.ai.client_name)||(c&&c.lead&&c.lead.client_name)||'this client';
-  if(!confirm('Manually mark proposal Won for '+cname+'?\n\nUse this only if the client accepted verbally. Primary trigger is the client Accept button on the proposal view page.')) return;
+  if(!confirm('Manually mark proposal Won for '+cname+'?\n\nUse this only if the client accepted verbally. The primary trigger is the Accept button on the client\'s proposal page.')) return;
   var nowIso=new Date().toISOString();
   var patch={client_engaged:true,proposal_status:'accepted',won_at:nowIso};
   if(c&&c.ai) Object.assign(c.ai,patch);
@@ -943,7 +977,6 @@ function pick(idx,rowEl){
   document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
   if(rowEl) rowEl.classList.add('active');
   activeDetailIdx=idx;
-  _manualOverrideVisible=false;
 
   var c=allClients[idx];
   var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
@@ -981,7 +1014,8 @@ function pick(idx,rowEl){
     tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');
     tevSet('opened',ai.email_opened_at,'Opened');
     tevSet('viewed',ai.proposal_viewed_at,'Viewed');
-    tevSet('won',ai.won_at||(ai.client_engaged?ai.proposal_viewed_at:null),'Won');
+    /* Won: ONLY stamped when client accepts OR installer manually marks Won */
+    tevSet('won',ai.won_at||null,'Won');
   }
 
   vis('noPropRow',!has,'flex');
@@ -989,13 +1023,13 @@ function pick(idx,rowEl){
   vis('specsRow',has,'grid');
   vis('dlRow',has,'flex');
 
-  /* Won badge (client accepted) vs manual override row */
+  /* Won banner: ONLY for accepted proposals (client clicked Accept) */
   var isAccepted=(ps==='accepted');
   var isTerminal=(ps==='accepted'||ps==='rejected');
   document.getElementById('wonBadgeRow').style.display=(has&&isAccepted)?'block':'none';
-  document.getElementById('manualOverrideRow').style.display='none';
-
-  /* Booking card */
+  /* Manual override: shown for non-terminal proposals so installer can mark verbal outcome */
+  document.getElementById('manualOverrideRow').style.display=(has&&!isTerminal)?'block':'none';
+  /* Booking card: ONLY when Won */
   document.getElementById('bookingCard').style.display=(has&&isAccepted)?'block':'none';
 
   if(!has) return;
@@ -1040,7 +1074,7 @@ function pick(idx,rowEl){
   document.getElementById('dlBtn').onclick=function(){window.open(DOWNLOAD_FN+ai.ai_id+'?source=installer','_blank');};
 
   /* Email */
-  var emailSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  var emailSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
   var sendBtn=document.getElementById('sendBtn');
   sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;
   sendBtn.onclick=async function(){
@@ -1054,7 +1088,7 @@ function pick(idx,rowEl){
   };
 
   /* WhatsApp */
-  var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
+  var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
   var waBtn=document.getElementById('waBtn');
   waBtn.classList.remove('sent');waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;
   waBtn.onclick=async function(){
