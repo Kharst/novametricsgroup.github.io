@@ -7,32 +7,38 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,sans-serif;background:#0B1F3A;color:#f0f4f8;min-height:100vh;display:flex;flex-direction:column}
-/* ── HEADER ── */
-.header{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:10px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-icon{width:34px;height:34px;background:#B8962E;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#0B1F3A}
 .brand-name{font-size:14px;font-weight:600}
 .brand-sub{font-size:10px;color:#B8962E;letter-spacing:.1em;text-transform:uppercase}
-.header-right{display:flex;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:inherit;white-space:nowrap}
 .btn-gold{background:#B8962E;color:#0B1F3A}.btn-gold:hover{background:#d4ac3a;transform:translateY(-1px)}
 .btn-ghost{background:rgba(255,255,255,.07);color:#f0f4f8;border:1px solid rgba(255,255,255,.1)}.btn-ghost:hover{background:rgba(255,255,255,.12)}
-/* ── STATES ── */
+.btn-accept{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 4px 14px rgba(34,197,94,.3)}
+.btn-accept:hover{background:linear-gradient(135deg,#15803d,#14532d);transform:translateY(-2px);box-shadow:0 6px 22px rgba(34,197,94,.45)}
+.btn-accept:disabled{background:#374151;box-shadow:none;cursor:not-allowed;transform:none;opacity:.7}
+.accepted-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:#34d399;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600}
 .state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:32px;text-align:center}
 .state.hidden{display:none}
 .spinner{width:36px;height:36px;border:3px solid rgba(184,150,46,.2);border-top-color:#B8962E;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.state-icon{font-size:40px;margin-bottom:4px}
+.state-icon{font-size:48px;margin-bottom:4px}
 .state-title{font-size:1.3rem;font-weight:600}
-.state-sub{font-size:13px;color:#7a95af;max-width:400px;line-height:1.6}
-/* ── PDF FRAME ── */
+.state-sub{font-size:13px;color:#7a95af;max-width:440px;line-height:1.7}
+.accept-confirm-card{background:rgba(52,211,153,.07);border:1.5px solid rgba(52,211,153,.3);border-radius:16px;padding:22px 28px;max-width:460px;margin-top:4px;text-align:left}
+.acc-card-title{font-size:13px;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.acc-card-steps{list-style:none;display:flex;flex-direction:column;gap:8px}
+.acc-card-steps li{font-size:13px;color:#a7f3d0;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.acc-step-num{width:20px;height:20px;border-radius:50%;background:rgba(52,211,153,.2);color:#34d399;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 #pdf-container{flex:1;display:none;flex-direction:column}
-.pdf-toolbar{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.pdf-toolbar{background:#0d2240;border-bottom:1px solid rgba(255,255,255,.07);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:10px}
 .proposal-info{font-size:12px;color:#7a95af}
 .proposal-info strong{color:#f0f4f8}
+.toolbar-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
-/* ── MOBILE FALLBACK ── */
-#mobile-fallback{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;gap:16px}
+#mobile-fallback{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;gap:14px}
 </style>
 </head>
 <body>
@@ -46,9 +52,11 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
     </div>
   </div>
   <div class="header-right" id="header-actions" style="display:none">
-    <button class="btn btn-ghost" id="btn-download" onclick="triggerDownload()">
-      ⬇ Download PDF
-    </button>
+    <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
+    <button class="btn btn-accept" id="btn-accept-hdr" onclick="acceptProposal()">✅ Accept This Proposal</button>
+  </div>
+  <div class="header-right" id="header-accepted" style="display:none">
+    <div class="accepted-badge">🏆 Proposal Accepted</div>
   </div>
 </header>
 
@@ -66,11 +74,29 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
   <div class="state-sub" id="error-msg">This proposal link may have expired or is incorrect. Please contact your installer.</div>
 </div>
 
+<!-- Accepted ✓ -->
+<div class="state hidden" id="state-accepted">
+  <div class="state-icon">🏆</div>
+  <div class="state-title" style="color:#34d399">Proposal Accepted!</div>
+  <div class="state-sub">Thank you — your installer has been notified and will contact you shortly to schedule a site visit.</div>
+  <div class="accept-confirm-card">
+    <div class="acc-card-title">📋 What happens next?</div>
+    <ul class="acc-card-steps">
+      <li><span class="acc-step-num">1</span>Your installer reviews the accepted proposal</li>
+      <li><span class="acc-step-num">2</span>A site visit is booked — typically within 1–2 business days</li>
+      <li><span class="acc-step-num">3</span>Site assessment &amp; final installation date confirmed</li>
+    </ul>
+  </div>
+</div>
+
 <!-- PDF viewer (desktop) -->
 <div id="pdf-container">
   <div class="pdf-toolbar">
     <div class="proposal-info">Solar Proposal — <strong id="info-name">—</strong> — <strong id="info-loc">—</strong></div>
-    <button class="btn btn-gold" onclick="triggerDownload()">⬇ Download PDF</button>
+    <div class="toolbar-btns">
+      <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
+      <button class="btn btn-accept" id="btn-accept-toolbar" onclick="acceptProposal()">✅ Accept This Proposal</button>
+    </div>
   </div>
   <iframe id="pdf-frame" title="Solar Proposal"></iframe>
 </div>
@@ -79,8 +105,9 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
 <div id="mobile-fallback">
   <div class="state-icon">📄</div>
   <div class="state-title">Your Solar Proposal is Ready</div>
-  <div class="state-sub">Tap the button below to open your personalised solar report.</div>
-  <a id="mobile-open-btn" class="btn btn-gold" href="#" target="_blank">Open Proposal PDF</a>
+  <div class="state-sub">Review the proposal, then tap Accept when you're ready to proceed.</div>
+  <a id="mobile-open-btn" class="btn btn-gold" href="#" style="width:100%;max-width:320px;justify-content:center">📄 Open Proposal PDF</a>
+  <button class="btn btn-accept" id="btn-accept-mobile" onclick="acceptProposal()" style="width:100%;max-width:320px;justify-content:center">✅ Accept This Proposal</button>
 </div>
 
 <script>
@@ -89,13 +116,15 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 
 const params = new URLSearchParams(window.location.search);
 const aiId   = params.get('id');
-let   signedUrl = null; // used only for iframe display
 
-function show(id) {
-  ['state-loading','state-error','pdf-container','mobile-fallback']
+const ACCEPT_BTN_IDS = ['btn-accept-hdr','btn-accept-toolbar','btn-accept-mobile'];
+
+function showState(id) {
+  ['state-loading','state-error','state-accepted','pdf-container','mobile-fallback']
     .forEach(s => {
       const el = document.getElementById(s);
-      if (el) el.style.display = s === id ? 'flex' : 'none';
+      if (!el) return;
+      el.style.display = s === id ? 'flex' : 'none';
     });
 }
 
@@ -103,12 +132,8 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth < 640;
 }
 
-// ── Download via proxy — never exposes raw storage URL ──────────────────────
 function triggerDownload() {
   if (!aiId) return;
-  // The proposal-download edge function handles tracking + streams PDF bytes.
-  // The URL the user sees is /functions/v1/proposal-download/{id} — no bucket
-  // name, no file path, no storage token.
   const a = document.createElement('a');
   a.href = `${SUPA_URL}/functions/v1/proposal-download/${aiId}`;
   a.download = '';
@@ -117,55 +142,100 @@ function triggerDownload() {
   document.body.removeChild(a);
 }
 
+function showAccepted() {
+  showState('state-accepted');
+  document.getElementById('header-actions').style.display = 'none';
+  document.getElementById('header-accepted').style.display = 'flex';
+}
+
+async function acceptProposal() {
+  if (!aiId) return;
+  ACCEPT_BTN_IDS.forEach(id => {
+    const b = document.getElementById(id);
+    if (b) { b.disabled = true; b.textContent = 'Processing…'; }
+  });
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/ai_results?ai_id=eq.${encodeURIComponent(aiId)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPA_ANON,
+          'Authorization': `Bearer ${SUPA_ANON}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          client_engaged: true,
+          proposal_status: 'accepted',
+          won_at: new Date().toISOString()
+        })
+      }
+    );
+    if (res.ok || res.status === 204) {
+      showAccepted();
+    } else {
+      ACCEPT_BTN_IDS.forEach(id => {
+        const b = document.getElementById(id);
+        if (b) { b.disabled = false; b.textContent = '✅ Accept This Proposal'; }
+      });
+      alert('Could not save your response. Please try again or contact your installer.');
+    }
+  } catch(e) {
+    ACCEPT_BTN_IDS.forEach(id => {
+      const b = document.getElementById(id);
+      if (b) { b.disabled = false; b.textContent = '✅ Accept This Proposal'; }
+    });
+    alert('Network error. Please check your connection and try again.');
+  }
+}
+
 async function boot() {
   if (!aiId) {
     document.getElementById('error-msg').textContent = 'No proposal ID in the link. Please use the link from your email.';
-    show('state-error');
+    showState('state-error');
     return;
   }
-
   try {
-    // Call edge function in JSON mode — records the view and returns a signed URL
-    // for the iframe (the iframe src is never navigated to by the user).
-    const res = await fetch(
+    // Check if already accepted first
+    const chk = await fetch(
+      `${SUPA_URL}/rest/v1/ai_results?ai_id=eq.${encodeURIComponent(aiId)}&select=proposal_status,client_engaged`,
+      { headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` } }
+    );
+    const chkData = await chk.json();
+    const row = chkData && chkData[0];
+    if (row && (row.client_engaged || row.proposal_status === 'accepted')) {
+      showAccepted();
+      return;
+    }
+    // Load proposal via edge function (records view)
+    const res  = await fetch(
       `${SUPA_URL}/functions/v1/proposal-view/${aiId}?format=json`,
       { headers: { apikey: SUPA_ANON } }
     );
     const data = await res.json();
-
     if (!res.ok || data.error) {
       document.getElementById('error-msg').textContent =
         data.error || 'Could not load proposal. Please try again or contact your installer.';
-      show('state-error');
+      showState('state-error');
       return;
     }
-
-    signedUrl = data.signed_url;
-
-    // Show proposal info
     if (data.client_name) document.getElementById('info-name').textContent = data.client_name;
     if (data.location)    document.getElementById('info-loc').textContent  = data.location;
-
     document.getElementById('header-actions').style.display = 'flex';
-
     if (isMobile()) {
-      // On mobile: download button triggers the proxy directly
       const mobileBtn = document.getElementById('mobile-open-btn');
       mobileBtn.href = `${SUPA_URL}/functions/v1/proposal-download/${aiId}`;
       mobileBtn.removeAttribute('target');
       mobileBtn.download = '';
-      document.getElementById('mobile-fallback').style.display = 'flex';
-      document.getElementById('state-loading').style.display = 'none';
+      showState('mobile-fallback');
     } else {
-      // Desktop: embed PDF in iframe (signedUrl is internal — not shown to user)
-      document.getElementById('pdf-frame').src = signedUrl;
-      document.getElementById('pdf-container').style.display = 'flex';
-      document.getElementById('state-loading').style.display = 'none';
+      document.getElementById('pdf-frame').src = data.signed_url;
+      showState('pdf-container');
     }
-
   } catch(e) {
     document.getElementById('error-msg').textContent = 'Network error. Please check your connection and try again.';
-    show('state-error');
+    showState('state-error');
   }
 }
 
