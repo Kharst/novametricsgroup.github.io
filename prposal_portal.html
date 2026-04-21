@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   Nova Metrics — Proposal Portal
-  v3: status derived from event timestamps; cumulative sent/viewed tabs;
-      booking scheduler for Won proposals; refresh-safe status persistence.
+  v4: fixed tracking-strip overlap; multi-state status badges; explicit
+      "Mark as Won" button; site-visit auto-trigger on Won; whatsapp_sent_at tracking.
 -->
 <html lang="en">
 <head>
@@ -134,15 +134,71 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .attn-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--amber);display:none;align-items:center;gap:9px;}
 .attn-banner.on{display:flex;}
 
-/* ── Tracking timeline strip ── */
-.tracking-strip{background:#fff;border-radius:13px;border:1px solid #e8ecf0;padding:14px 18px;display:flex;gap:0;align-items:center;overflow:hidden;}
-.tev{flex:1;text-align:center;position:relative;}
-.tev+.tev::before{content:'';position:absolute;left:0;top:16px;width:100%;height:2px;background:#e8ecf0;z-index:0;}
-.tev-dot{width:28px;height:28px;border-radius:50%;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:13px;position:relative;z-index:1;border:2px solid #e8ecf0;background:#f9fafb;}
+/* ─────────────────────────────────────────────────────────────
+   ★ Tracking timeline strip — FIXED: no overlap, flex-start
+   ───────────────────────────────────────────────────────────── */
+.tracking-strip{
+  background:#fff;border-radius:13px;border:1px solid #e8ecf0;
+  padding:14px 16px;
+  display:flex;gap:0;
+  align-items:flex-start;   /* ← was center; flex-start prevents vertical drift */
+  overflow-x:auto;          /* ← was hidden; allow scroll on tiny screens */
+  -webkit-overflow-scrolling:touch;
+}
+.tev{
+  flex:1;
+  min-width:58px;           /* ← prevents crushing on narrow widths */
+  text-align:center;
+  position:relative;
+}
+/* Connector line between steps */
+.tev+.tev::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:13px;                 /* ← center of 26px dot */
+  width:100%;
+  height:2px;
+  background:#e8ecf0;
+  z-index:0;
+}
+.tev-dot{
+  width:26px;height:26px;
+  border-radius:50%;
+  margin:0 auto 6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+  position:relative;z-index:1;
+  border:2px solid #e8ecf0;background:#f9fafb;
+  flex-shrink:0;            /* ← don't let dot squish */
+}
 .tev-dot.done{background:#ecfdf5;border-color:#22c55e;}
-.tev-lbl{font-size:9.5px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;}
+.tev-lbl{
+  font-size:9px;font-weight:600;color:#9ca3af;
+  text-transform:uppercase;letter-spacing:.04em;
+  white-space:nowrap;       /* ← prevents label wrapping that caused overlap */
+  overflow:hidden;text-overflow:ellipsis;
+  display:block;padding:0 3px;
+}
 .tev-lbl.done{color:#16a34a;}
-.tev-time{font-size:9px;color:#9ca3af;margin-top:2px;}
+.tev-time{
+  font-size:8.5px;color:#9ca3af;
+  margin-top:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:block;padding:0 3px;
+}
+
+/* ── Won / Rejected action row ── */
+.won-actions-row{background:#fff;border-radius:13px;border:1px solid #e8ecf0;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.won-actions-label{font-size:12px;color:#6b7280;flex:1;min-width:160px;}
+.won-actions-label strong{color:var(--navy);}
+.won-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;transition:all .2s;border:1.5px solid transparent;white-space:nowrap;}
+.won-btn-accept{background:rgba(34,197,94,.12);color:#16a34a;border-color:rgba(34,197,94,.35);}
+.won-btn-accept:hover{background:rgba(34,197,94,.24);transform:translateY(-1px);box-shadow:0 4px 12px rgba(34,197,94,.15);}
+.won-btn-reject{background:rgba(248,113,113,.08);color:#dc2626;border-color:rgba(248,113,113,.3);}
+.won-btn-reject:hover{background:rgba(248,113,113,.18);transform:translateY(-1px);}
+.won-badge-row{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#166534;}
+.won-badge-icon{font-size:20px;flex-shrink:0;}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
 .s-card{background:#fff;border-radius:13px;padding:17px 18px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
@@ -276,6 +332,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
 @media(max-width:900px){:root{--sidebar-w:240px;}.stats{grid-template-columns:repeat(2,1fr);}.specs{grid-template-columns:1fr;}.booking-grid{grid-template-columns:1fr;}}
+@media(max-width:600px){.tracking-strip{padding:10px 8px;}.tev{min-width:48px;}.tev-lbl{font-size:7.5px;letter-spacing:.02em;}.tev-time{font-size:7.5px;}}
 @media(max-width:700px){.sidebar{width:100%;min-width:unset;position:fixed;bottom:0;left:0;right:0;z-index:100;flex-direction:row;height:56px;overflow:hidden;border-right:none;border-top:1px solid var(--border);}.main{margin-bottom:56px;}:root{--sidebar-w:100%;}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -383,7 +440,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="pill p" id="chPill">No Proposal</div>
       </div>
 
-      <!-- Tracking timeline — shown when proposal exists -->
+      <!-- ★ Tracking timeline — FIXED layout, no overlap ★ -->
       <div class="tracking-strip" id="trackingStrip" style="display:none">
         <div class="tev" id="tev-generated">
           <div class="tev-dot" id="tev-dot-generated">📄</div>
@@ -409,6 +466,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <div class="tev-dot" id="tev-dot-won">🏆</div>
           <div class="tev-lbl" id="tev-lbl-won">Won</div>
           <div class="tev-time" id="tev-time-won"></div>
+        </div>
+      </div>
+
+      <!-- ★ Won / Rejected actions — shown for active proposals that are not yet terminal ★ -->
+      <div id="wonActionsRow" style="display:none">
+        <div class="won-actions-row">
+          <span class="won-actions-label">
+            <strong>Update outcome:</strong> did the client explicitly accept or decline this proposal?
+          </span>
+          <button class="won-btn won-btn-accept" onclick="markAsWon()">🏆 Mark as Won</button>
+          <button class="won-btn won-btn-reject" onclick="markAsRejected()">✕ Mark as Rejected</button>
+        </div>
+      </div>
+
+      <!-- Won confirmation banner (shown after marking Won, replaces action row) -->
+      <div id="wonBadgeRow" style="display:none">
+        <div class="won-badge-row">
+          <span class="won-badge-icon">🏆</span>
+          <div>
+            <div style="font-weight:600;font-size:13px">Proposal Won — Site Visit Required</div>
+            <div style="font-size:12px;color:#166534;margin-top:2px">Fill in the site visit details below and confirm to assign this job to your team.</div>
+          </div>
         </div>
       </div>
 
@@ -475,7 +554,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- ★ Site-visit booking — shown only when status = Won ★ -->
+      <!-- ★ Site-visit booking — shown when status = Won (accepted) ★ -->
       <div class="booking-card" id="bookingCard" style="display:none">
         <div class="booking-header">
           <div class="booking-icon">🗓️</div>
@@ -501,7 +580,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
         <div class="bk-actions">
           <button class="bk-save" id="bkSaveBtn" onclick="saveBooking()">📅 Confirm Site Visit</button>
-          <div class="bk-confirmed" id="bkConfirmed">✓ Site visit saved successfully!</div>
+          <div class="bk-confirmed" id="bkConfirmed">✓ Site visit saved — task assigned to your team!</div>
         </div>
       </div>
 
@@ -579,19 +658,25 @@ function switchDashTab(name){
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   ★ STATUS DERIVATION — timestamps are ground truth, not proposal_status
-   The backend sets email_opened_at and proposal_viewed_at correctly but
-   never promotes proposal_status from 'sent' → 'viewed'. We derive here.
+   ★ STATUS DERIVATION
+   Rules:
+     accepted  → client_engaged=true OR proposal_status='accepted'  (explicit only)
+     rejected  → proposal_status='rejected'                         (explicit only)
+     viewed    → proposal_viewed_at OR email_opened_at timestamp
+     sent      → email_sent_at OR whatsapp_sent_at OR sent_at
+     generated → has pdf_url but nothing sent yet
    ─────────────────────────────────────────────────────────────────────*/
 function getProposalStatus(ai){
   if(!ai||!ai.pdf_url) return null;
-  // Priority order: most advanced event wins
-  if(ai.client_engaged)                                   return 'accepted';
-  if(ai.proposal_viewed_at||ai.email_opened_at)           return 'viewed';
-  if(ai.email_sent_at||ai.sent_at)                        return 'sent';
-  // Fallback: stored field (covers manual overrides like 'rejected')
+  // Terminal states — only set by explicit installer action
+  if(ai.client_engaged||ai.proposal_status==='accepted') return 'accepted';
+  if(ai.proposal_status==='rejected') return 'rejected';
+  // Derive from event timestamps
+  if(ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
+  if(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at) return 'sent';
+  // Fallback: stored field
   var ps=ai.proposal_status;
-  if(ps&&['generated','sent','viewed','accepted','rejected'].includes(ps)) return ps;
+  if(ps&&['generated','sent','viewed'].includes(ps)) return ps;
   return 'generated';
 }
 function getStatusInfo(c){
@@ -621,13 +706,14 @@ function needsAttention(c){
   var ai=c.ai;
   if(!ai||!ai.pdf_url) return false;
   var ps=getProposalStatus(ai);
+  if(ps==='accepted'||ps==='rejected') return false;
   var now=Date.now();
   if(ps==='generated'){
     var created=ai.created_at?new Date(ai.created_at).getTime():0;
     return(now-created)>MS_24H;
   }
   if(ps==='sent'){
-    var sentAt=ai.sent_at||ai.email_sent_at;
+    var sentAt=ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at;
     return!!(sentAt&&(now-new Date(sentAt).getTime())>MS_3D);
   }
   return false;
@@ -639,7 +725,7 @@ function attnMessage(c){
     return '⚠️ Proposal generated '+hrs+'h ago but not yet sent. Send it now to keep momentum.';
   }
   if(ps==='sent'){
-    var sentAt=ai.sent_at||ai.email_sent_at;
+    var sentAt=ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at;
     var days=Math.round((now-new Date(sentAt).getTime())/86400000);
     return '⚠️ Sent '+days+' days ago but not viewed yet. Consider a follow-up call or resend.';
   }
@@ -647,11 +733,11 @@ function attnMessage(c){
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   ★ FILTER TABS — cumulative
-   Sent tab  : shows all proposals that have EVER been sent
-               (includes viewed, accepted, rejected — they were all sent first)
-   Viewed tab: shows proposals that have been opened or viewed
-   Won tab   : accepted only
+   ★ FILTER TABS — cumulative multi-state classification
+   Sent tab   : any proposal with an email_sent_at OR whatsapp_sent_at OR sent_at
+                (cumulative — includes viewed, accepted, rejected)
+   Viewed tab : any proposal with email_opened_at OR proposal_viewed_at
+   Won tab    : ONLY proposals explicitly marked Won (client_engaged=true OR 'accepted')
    ─────────────────────────────────────────────────────────────────────*/
 function clientMatchesTab(c,tab){
   var ai=c.ai;
@@ -659,13 +745,14 @@ function clientMatchesTab(c,tab){
     case 'all':          return true;
     case 'needs_action': return needsAttention(c);
     case 'sent':
-      // Cumulative: any record with an email_sent_at OR sent_at
-      return!!(ai&&(ai.email_sent_at||ai.sent_at));
+      // Cumulative: ever sent via any channel
+      return!!(ai&&(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at));
     case 'viewed':
-      // Cumulative: any record with an opened or viewed timestamp
+      // Cumulative: ever opened or viewed
       return!!(ai&&(ai.email_opened_at||ai.proposal_viewed_at));
     case 'won':
-      return getProposalStatus(ai)==='accepted';
+      // Exclusive: only explicitly accepted proposals
+      return!!(ai&&(ai.client_engaged||ai.proposal_status==='accepted'));
     default: return true;
   }
 }
@@ -734,15 +821,20 @@ function renderClientList(){
   }else{lmw.style.display='none';}
 }
 
-/* ── Mark sent — optimistic update + DB persist ── */
+/* ─────────────────────────────────────────────────────────────────────
+   ★ MARK AS SENT — optimistic update + DB persist
+   ─────────────────────────────────────────────────────────────────────*/
 async function markAsSent(aiId,method){
   var nowIso=new Date().toISOString();
   var patch={proposal_status:'sent',sent_at:nowIso};
-  if(method==='email') patch.email_sent_at=nowIso;
+  if(method==='email')     patch.email_sent_at=nowIso;
+  if(method==='whatsapp')  patch.whatsapp_sent_at=nowIso;
+  // Optimistic local update
   allClients.forEach(function(c){
     if(c.ai&&String(c.ai.ai_id)===String(aiId)){
-      c.ai.proposal_status='sent';c.ai.sent_at=nowIso;
-      if(method==='email') c.ai.email_sent_at=nowIso;
+      Object.assign(c.ai,{proposal_status:'sent',sent_at:nowIso});
+      if(method==='email')    c.ai.email_sent_at=nowIso;
+      if(method==='whatsapp') c.ai.whatsapp_sent_at=nowIso;
     }
   });
   renderClientList();
@@ -757,6 +849,84 @@ async function markAsSent(aiId,method){
   }catch(e){console.warn('Status persist failed:',e);}
   var pill=document.getElementById('chPill');
   if(pill){pill.className='pill sent';pill.textContent='Sent';}
+  document.getElementById('attnBanner').classList.remove('on');
+  // Update timeline
+  var sentTs=nowIso;
+  tevSet('sent',sentTs,'Sent');
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   ★ MARK AS WON — EXPLICIT ACCEPTANCE ONLY
+   Triggers the site-visit workflow automatically.
+   ─────────────────────────────────────────────────────────────────────*/
+async function markAsWon(){
+  if(!activeAiId){alert('No active proposal selected.');return;}
+  var c=allClients[activeDetailIdx];
+  var clientName=(c&&c.ai&&c.ai.client_name)||(c&&c.lead&&c.lead.client_name)||'this client';
+  if(!confirm('Mark this proposal as Won for '+clientName+'?\n\nThis will trigger a site visit workflow and assign the job to your team.')){return;}
+  var nowIso=new Date().toISOString();
+  var patch={client_engaged:true,proposal_status:'accepted',won_at:nowIso};
+  // Optimistic local update
+  if(c&&c.ai) Object.assign(c.ai,patch);
+  renderClientList();
+  // Persist to DB
+  try{
+    var sess=await sb.auth.getSession();
+    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
+    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},
+      body:JSON.stringify(patch)
+    });
+  }catch(e){console.warn('Won persist failed:',e);}
+  // Update UI immediately — no refresh needed
+  var pill=document.getElementById('chPill');
+  if(pill){pill.className='pill accepted';pill.textContent='Won ✓';}
+  tevSet('won',nowIso,'Won');
+  document.getElementById('wonActionsRow').style.display='none';
+  document.getElementById('wonBadgeRow').style.display='block';
+  document.getElementById('attnBanner').classList.remove('on');
+  // Show and auto-scroll to site-visit booking card
+  var bk=document.getElementById('bookingCard');
+  if(bk){
+    bk.style.display='block';
+    var bkEx=document.getElementById('bkExisting');
+    if(bkEx){bkEx.className='bk-existing';}
+    document.getElementById('bkConfirmed').classList.remove('on');
+    document.getElementById('bkDate').value='';
+    document.getElementById('bkTime').value='';
+    document.getElementById('bkNotes').value='';
+    setTimeout(function(){
+      bk.scrollIntoView({behavior:'smooth',block:'nearest'});
+      document.getElementById('bkDate').focus();
+    },200);
+  }
+}
+
+/* ── Mark as Rejected — explicit only ── */
+async function markAsRejected(){
+  if(!activeAiId){alert('No active proposal selected.');return;}
+  var c=allClients[activeDetailIdx];
+  var clientName=(c&&c.ai&&c.ai.client_name)||(c&&c.lead&&c.lead.client_name)||'this client';
+  if(!confirm('Mark this proposal as Rejected for '+clientName+'?')){return;}
+  var nowIso=new Date().toISOString();
+  var patch={proposal_status:'rejected',client_engaged:false,rejected_at:nowIso};
+  if(c&&c.ai) Object.assign(c.ai,patch);
+  renderClientList();
+  try{
+    var sess=await sb.auth.getSession();
+    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
+    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},
+      body:JSON.stringify(patch)
+    });
+  }catch(e){console.warn('Rejected persist failed:',e);}
+  var pill=document.getElementById('chPill');
+  if(pill){pill.className='pill rejected';pill.textContent='Rejected';}
+  document.getElementById('wonActionsRow').style.display='none';
+  document.getElementById('wonBadgeRow').style.display='none';
+  document.getElementById('bookingCard').style.display='none';
   document.getElementById('attnBanner').classList.remove('on');
 }
 
@@ -832,22 +1002,22 @@ async function loadClients(){
       'annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,'+
       'annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,'+
       'pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,'+
-      'client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,created_at'+
+      'whatsapp_sent_at,client_engaged,'+
+      'site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,'+
+      'won_at,rejected_at,created_at'+
       '&order=created_at.desc',
       {headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
 
-    /* Deduplication: prefer record with pdf_url, and within those prefer the
-       one with the most tracking events (email_sent_at > email_opened_at …) */
+    /* Deduplication: prefer record with pdf_url and most tracking events */
     var aiByEmail={};
     (aiRows||[]).forEach(function(r){
       var k=(r.client_email||'').toLowerCase().trim();
       if(!k) return;
       if(!aiByEmail[k]){aiByEmail[k]=r;return;}
       var cur=aiByEmail[k];
-      // Score by tracking richness (higher = more data = prefer)
       function score(x){
-        return(x.pdf_url?100:0)+(x.email_sent_at||x.sent_at?10:0)+
+        return(x.pdf_url?100:0)+(x.email_sent_at||x.sent_at||x.whatsapp_sent_at?10:0)+
                (x.email_opened_at?5:0)+(x.proposal_viewed_at?5:0)+(x.client_engaged?20:0);
       }
       if(score(r)>score(cur)) aiByEmail[k]=r;
@@ -924,13 +1094,29 @@ function pick(idx,rowEl){
   ts.style.display=has?'flex':'none';
   if(has){
     tevSet('generated',ai.created_at,'Generated');
-    tevSet('sent',ai.email_sent_at||ai.sent_at,'Sent');
+    tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');
     tevSet('opened',ai.email_opened_at,'Opened');
     tevSet('viewed',ai.proposal_viewed_at,'Viewed');
-    tevSet('won',ai.client_engaged?ai.proposal_viewed_at:null,'Won'); // no dedicated timestamp yet
+    tevSet('won',ai.won_at||(ai.client_engaged?ai.proposal_viewed_at:null),'Won');
   }
 
-  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
+  vis('noPropRow',!has,'flex');
+  vis('statsRow',has,'grid');
+  vis('specsRow',has,'grid');
+  vis('dlRow',has,'flex');
+
+  /* ★ Won / Rejected action row logic:
+     - Show action row when proposal has PDF AND status is NOT yet terminal (accepted/rejected)
+     - Hide both action row and won badge when no proposal
+     - Show won badge when already accepted */
+  var wonActEl=document.getElementById('wonActionsRow');
+  var wonBadgeEl=document.getElementById('wonBadgeRow');
+  if(wonActEl&&wonBadgeEl){
+    var isTerminal=(ps==='accepted'||ps==='rejected');
+    var isAccepted=(ps==='accepted');
+    wonActEl.style.display=(has&&!isTerminal)?'block':'none';
+    wonBadgeEl.style.display=(has&&isAccepted)?'block':'none';
+  }
 
   /* Booking card — only for Won */
   var bk=document.getElementById('bookingCard');
@@ -1028,7 +1214,7 @@ function fmtShortDate(iso){
   return d.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
 }
 
-/* ── Save booking ── */
+/* ── Save booking / site visit ── */
 async function saveBooking(){
   if(!activeAiId){alert('No active proposal selected.');return;}
   var date=document.getElementById('bkDate').value;
