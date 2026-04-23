@@ -146,7 +146,6 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
   <div class="pdf-toolbar">
     <div class="proposal-info">Solar Proposal — <strong id="info-name">—</strong> · <strong id="info-loc">—</strong></div>
     <div class="toolbar-btns">
-      <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
     </div>
   </div>
   <iframe id="pdf-frame" title="Solar Proposal"></iframe>
@@ -262,7 +261,7 @@ async function boot() {
     );
     const chkData = await chk.json();
     const row = chkData && chkData[0];
-    if (row && (row.client_engaged || row.proposal_status === 'accepted')) {
+    if (row && row.proposal_status === 'accepted') {
       showWon();
       return;
     }
