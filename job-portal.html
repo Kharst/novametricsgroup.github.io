@@ -1212,7 +1212,7 @@ async function loadJobs() {
     document.getElementById('sync-status').textContent = '⬤ syncing...';
     document.getElementById('sync-status').style.color = 'var(--amber)';
     const data = await sbGet('ai_results',
-      `select=ai_id,client_name,client_address,system_size_kw,battery_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
+      `select=ai_id,client_name,client_address,system_size_kw,battery_capacity_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
       `&job_status=neq.lead&job_status=neq.quoted&order=created_at.desc`
     );
     jobs = data || [];
@@ -1343,7 +1343,7 @@ function renderJobHeader() {
   document.getElementById('jh-name').textContent = j.client_name || '—';
   document.getElementById('jh-ref').textContent = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address || '—'}`;
   document.getElementById('jh-kw').textContent = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
-  document.getElementById('jh-battery').textContent = j.battery_kwh ? `${j.battery_kwh} kWh` : '—';
+  document.getElementById('jh-battery').textContent = j.battery_capacity_kwh ? `${j.battery_capacity_kwh} kWh` : '—';
   document.getElementById('jh-address').textContent = j.client_address || '—';
   const sl = STAGE_LABELS[j.job_status] || j.job_status || '—';
   document.getElementById('jh-stage').textContent = sl;
@@ -1481,7 +1481,7 @@ function prefillForms() {
     setVal('sv-shading', String(v.shading_issues));
     setVal('sv-shadingnotes', v.shading_notes);
     setVal('sv-kw', v.recommended_system_kw);
-    setVal('sv-battery', v.recommended_battery_kwh);
+    setVal('sv-battery', v.recommended_battery_capacity_kwh);
     setVal('sv-notes', v.additional_notes);
   }
 
@@ -1497,10 +1497,10 @@ function prefillForms() {
     setVal('inst-inverterbrand', inst.inverter_brand);
     setVal('inst-inverterkw', inst.inverter_kw);
     setVal('inst-batterybrand', inst.battery_brand);
-    setVal('inst-batterykwh', inst.battery_kwh);
+    setVal('inst-batterykwh', inst.battery_capacity_kwh);
     setVal('inst-batteryqty', inst.battery_qty);
     setVal('comp-kw', inst.final_system_kw);
-    setVal('comp-battery', inst.final_battery_kwh);
+    setVal('comp-battery', inst.final_battery_capacity_kwh);
     setVal('comp-punchlist', inst.punch_list);
     setVal('comp-inspector', inst.inspector_name);
     setVal('comp-inspdate', inst.inspector_signed_at ? inst.inspector_signed_at.slice(0,10) : '');
@@ -1669,7 +1669,7 @@ async function _saveSiteVisit(complete) {
     shading_issues: getVal('sv-shading') === 'true',
     shading_notes: getVal('sv-shadingnotes'),
     recommended_system_kw: parseFloat(getVal('sv-kw')) || null,
-    recommended_battery_kwh: parseFloat(getVal('sv-battery')) || null,
+    recommended_battery_capacity_kwh: parseFloat(getVal('sv-battery')) || null,
     additional_notes: getVal('sv-notes'),
     completed_at: complete ? new Date().toISOString() : null,
   };
@@ -1723,7 +1723,7 @@ async function _saveInstallPrep(schedule) {
     inverter_brand: getVal('inst-inverterbrand'),
     inverter_kw: parseFloat(getVal('inst-inverterkw')) || null,
     battery_brand: getVal('inst-batterybrand'),
-    battery_kwh: parseFloat(getVal('inst-batterykwh')) || null,
+    battery_capacity_kwh: parseFloat(getVal('inst-batterykwh')) || null,
     battery_qty: parseInt(getVal('inst-batteryqty')) || null,
     install_checklist: collectChecklist(),
   };
@@ -1779,7 +1779,7 @@ async function completeInstallation() {
 
   const compData = {
     final_system_kw: parseFloat(getVal('comp-kw')) || null,
-    final_battery_kwh: parseFloat(getVal('comp-battery')) || null,
+    final_battery_capacity_kwh: parseFloat(getVal('comp-battery')) || null,
     punch_list: getVal('comp-punchlist'),
     inspector_name: getVal('comp-inspector'),
     inspector_signed_at: getVal('comp-inspdate') ? new Date(getVal('comp-inspdate')).toISOString() : new Date().toISOString(),
@@ -1851,7 +1851,7 @@ function renderHandoverDoc() {
   const v = currentVisit;
 
   const totalKwp = inst?.final_system_kw || v?.recommended_system_kw || j?.system_size_kw || '—';
-  const totalBattery = inst?.final_battery_kwh || v?.recommended_battery_kwh || j?.battery_kwh || '—';
+  const totalBattery = inst?.final_battery_capacity_kwh || v?.recommended_battery_capacity_kwh || j?.battery_capacity_kwh || '—';
   const now = new Date().toLocaleDateString('en-ZA', { day: '2-digit', month: 'long', year: 'numeric' });
 
   document.getElementById('handover-doc').innerHTML = `
@@ -1873,7 +1873,7 @@ function renderHandoverDoc() {
         <div class="hd-row"><span class="hd-row-key">Battery Storage</span><span class="hd-row-val">${totalBattery} kWh</span></div>
         <div class="hd-row"><span class="hd-row-key">Panels</span><span class="hd-row-val">${inst?.panels_qty || '—'} × ${inst?.panels_brand || '—'} ${inst?.panels_watt || '—'}W</span></div>
         <div class="hd-row"><span class="hd-row-key">Inverter</span><span class="hd-row-val">${inst?.inverter_brand || '—'} ${inst?.inverter_kw || '—'} kW</span></div>
-        <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty || '—'} × ${inst?.battery_brand || '—'} ${inst?.battery_kwh || '—'} kWh</span></div>
+        <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty || '—'} × ${inst?.battery_brand || '—'} ${inst?.battery_capacity_kwh || '—'} kWh</span></div>
         <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase || '—'} phase</span></div>
       </div>
     </div>
