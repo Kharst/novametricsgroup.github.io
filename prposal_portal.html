@@ -683,9 +683,11 @@ function switchDashTab(name){
 /* ── Status derivation — timestamps are ground truth ── */
 function getProposalStatus(ai){
   if(!ai||!ai.pdf_url) return null;
-  if(ai.proposal_status==='accepted'||ai.client_engaged) return 'accepted';
+  // WON = only explicit acceptance. client_engaged alone (set by download) does NOT count as won.
+  if(ai.proposal_status==='accepted') return 'accepted';
   if(ai.proposal_status==='rejected') return 'rejected';
-  if(ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
+  // PDF downloaded = client has seen it. Show as "viewed", never as won.
+  if(ai.pdf_downloaded_at||ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
   if(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at) return 'sent';
   return 'generated';
 }
@@ -1171,7 +1173,7 @@ function renderAllDashTabs(rows){
   d('iTopModel',topInv||'—');d('iAvgRatio',completed.length?avgRatio.toFixed(2):'—');d('iAvgDC',completed.length?avgDCkW.toFixed(2)+' kW':'—');d('iAvgPeak',completed.length?avgPeakLoad.toFixed(1)+' kW':'—');
   d('iModel',topInv||'—');d('iRatio',completed.length?avgRatio.toFixed(2):'—');d('iReqAC',completed.length?(avgPeakLoad*1.3).toFixed(1)+' kW':'—');d('iDC',completed.length?avgDCkW.toFixed(2)+' kW':'—');d('iPeak',completed.length?avgPeakLoad.toFixed(1)+' kW':'—');
   document.getElementById('iRatioStatus').innerHTML=completed.length?'<div class="wc-row"><span class="wc-k">Avg Ratio</span><span class="wc-v"><strong style="color:'+ratioColor+'">'+avgRatio.toFixed(2)+'</strong></span></div><div class="wc-row"><span class="wc-k">Status</span><span class="wc-v"><span style="color:'+ratioColor+';font-weight:600">'+ratioStatus+'</span></span></div><div class="wc-row"><span class="wc-k">NRS 097 Margin</span><span class="wc-v">30% applied</span></div><div class="wc-row"><span class="wc-k">SANS 10142-1</span><span class="wc-v">0.95–1.35 balanced</span></div>':'<div style="color:#9ca3af;font-size:11px;padding:4px 0">No data yet</div>';
-  var total=rows.length,generated=rows.filter(function(r){return r.status==='completed'||r.pdf_url;}).length,sent=rows.filter(function(r){return r.email_sent_at;}).length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){return r.client_engaged;}).length;
+  var total=rows.length,generated=rows.filter(function(r){return r.status==='completed'||r.pdf_url;}).length,sent=rows.filter(function(r){return r.email_sent_at;}).length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){return r.proposal_status==='accepted';}).length;
   d('pTotal',total);d('pGenerated',generated);d('pSent',sent);d('pEngaged',engaged);
   var rates=[{lbl:'Lead→Proposal',val:pct(generated,total)},{lbl:'Email Open',val:pct(opened,sent)},{lbl:'View Rate',val:pct(viewed,sent)},{lbl:'Download',val:pct(downloaded,sent)},{lbl:'Won Rate',val:pct(engaged,sent)}];
   document.getElementById('pRateRow').innerHTML=rates.map(function(r){return'<div class="rate-pill"><div class="rp-lbl">'+r.lbl+'</div><div class="rp-val">'+r.val+'</div></div>';}).join('');
@@ -1181,7 +1183,7 @@ function renderAllDashTabs(rows){
   var sentRows=rows.filter(function(r){return r.email_sent_at;}).slice(0,20);
   d('pTableCount',sentRows.length+' sent');
   if(!sentRows.length){document.getElementById('pFollowTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:14px">No proposals sent yet</td></tr>';}
-  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var ds=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var st,fu,fc;if(r.client_engaged){st='Won';fu='Closed';fc='fp-closed';}else if(r.pdf_downloaded_at){st='DL';fu='Hot — call now';fc='fp-hot';}else if(r.proposal_viewed_at&&ds>=2){st='Viewed';fu='Hot — call now';fc='fp-hot';}else if(r.email_opened_at&&ds>=3){st='Opened';fu='Warm — follow up';fc='fp-warm';}else if(ds>=7){st='Sent';fu='Cold — resend';fc='fp-cold';}else{st='Sent';fu='Waiting';fc='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong></td><td>'+esc(r.location||'—')+'</td><td>'+st+'</td><td class="'+fc+'">'+fu+'</td><td>'+(ds!==null?ds+'d':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
+  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var ds=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var st,fu,fc;if(r.proposal_status==='accepted'){st='Won';fu='Closed';fc='fp-closed';}else if(r.pdf_downloaded_at){st='DL';fu='Hot — call now';fc='fp-hot';}else if(r.proposal_viewed_at&&ds>=2){st='Viewed';fu='Hot — call now';fc='fp-hot';}else if(r.email_opened_at&&ds>=3){st='Opened';fu='Warm — follow up';fc='fp-warm';}else if(ds>=7){st='Sent';fu='Cold — resend';fc='fp-cold';}else{st='Sent';fu='Waiting';fc='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong></td><td>'+esc(r.location||'—')+'</td><td>'+st+'</td><td class="'+fc+'">'+fu+'</td><td>'+(ds!==null?ds+'d':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
 }
 
 function avg(arr,key){var v=arr.map(function(r){return parseFloat(r[key])||0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:0;}
