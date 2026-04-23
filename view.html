@@ -142,13 +142,11 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
   <!-- Nudge banner above PDF -->
   <div class="accept-nudge" id="accept-nudge">
     <div class="accept-nudge-text">Review your proposal below, then <strong>Accept</strong> to notify your installer and begin the site visit process.</div>
-    <button class="btn btn-accept" id="btn-accept-nudge" onclick="acceptProposal()">✅ Accept This Proposal</button>
   </div>
   <div class="pdf-toolbar">
     <div class="proposal-info">Solar Proposal — <strong id="info-name">—</strong> · <strong id="info-loc">—</strong></div>
     <div class="toolbar-btns">
       <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
-      <button class="btn btn-accept" id="btn-accept-toolbar" onclick="acceptProposal()">✅ Accept This Proposal</button>
     </div>
   </div>
   <iframe id="pdf-frame" title="Solar Proposal"></iframe>
