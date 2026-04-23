@@ -1146,8 +1146,8 @@
 const SUPA_URL = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
   
-let SB_URL = localStorage.getItem('si_sb_url') || '';
-let SB_KEY = localStorage.getItem('si_sb_key') || '';
+let SB_URL = SUPA_URL;
+let SB_KEY = SUPA_ANON;
 let jobs = [];
 let currentJob = null;
 let currentInstall = null;
@@ -1212,7 +1212,7 @@ async function loadJobs() {
     document.getElementById('sync-status').textContent = '⬤ syncing...';
     document.getElementById('sync-status').style.color = 'var(--amber)';
     const data = await sbGet('ai_results',
-      `select=ai_id,client_name,address,system_size_kw,battery_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
+      `select=ai_id,client_name,client_address,system_size_kw,battery_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
       `&job_status=neq.lead&job_status=neq.quoted&order=created_at.desc`
     );
     jobs = data || [];
@@ -1260,7 +1260,7 @@ function renderSidebar() {
       activeFilter === 'installation' ? installStatuses.includes(j.job_status) :
       activeFilter === 'handed_over' ? j.job_status === 'handed_over' :
       j.job_status === activeFilter;
-    const searchStr = `${j.client_name||''} ${j.address||''} ${j.ai_id||''}`.toLowerCase();
+    const searchStr = `${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
     return matchFilter && (!search || searchStr.includes(search));
   });
 
@@ -1283,7 +1283,7 @@ function renderSidebar() {
     const label = STAGE_LABELS[stage] || stage;
     card.innerHTML = `
       <div class="job-card-name">${j.client_name || 'Unnamed'}</div>
-      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${j.address?.slice(0,28) || '—'}</div>
+      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${j.client_address?.slice(0,28) || '—'}</div>
       <div class="job-card-meta">
         <span class="job-card-kw">${kw}</span>
         <span class="stage-pill stage--${stage}">${label}</span>
@@ -1341,10 +1341,10 @@ async function refreshCurrentJob() {
 function renderJobHeader() {
   const j = currentJob;
   document.getElementById('jh-name').textContent = j.client_name || '—';
-  document.getElementById('jh-ref').textContent = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.address || '—'}`;
+  document.getElementById('jh-ref').textContent = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address || '—'}`;
   document.getElementById('jh-kw').textContent = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
   document.getElementById('jh-battery').textContent = j.battery_kwh ? `${j.battery_kwh} kWh` : '—';
-  document.getElementById('jh-address').textContent = j.address || '—';
+  document.getElementById('jh-address').textContent = j.client_address || '—';
   const sl = STAGE_LABELS[j.job_status] || j.job_status || '—';
   document.getElementById('jh-stage').textContent = sl;
 }
@@ -1862,7 +1862,7 @@ function renderHandoverDoc() {
       <div>
         <div class="hd-section-title">Customer Details</div>
         <div class="hd-row"><span class="hd-row-key">Name</span><span class="hd-row-val">${j?.client_name || '—'}</span></div>
-        <div class="hd-row"><span class="hd-row-key">Address</span><span class="hd-row-val">${j?.address || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Address</span><span class="hd-row-val">${j?.client_address || '—'}</span></div>
         <div class="hd-row"><span class="hd-row-key">Municipality</span><span class="hd-row-val">${v?.municipality || '—'}</span></div>
         <div class="hd-row"><span class="hd-row-key">Meter Type</span><span class="hd-row-val">${v?.meter_type || '—'}</span></div>
         <div class="hd-row"><span class="hd-row-key">Grid Ref</span><span class="hd-row-val">${v?.grid_ref_number || '—'}</span></div>
@@ -2002,13 +2002,7 @@ function getVal(id) {
 // INIT
 // ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Pre-fill config if stored
-  if (!SB_URL || !SB_KEY) {
-    openConfig();
-  } else {
-    loadJobs();
-  }
-
+  loadJobs();
   // Auto-refresh every 60s
   setInterval(loadJobs, 60000);
 });
