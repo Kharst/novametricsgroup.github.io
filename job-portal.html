@@ -4,936 +4,2011 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solar Intelligence — Job Portal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --navy:#0B1F3A;--navy2:#112640;--navy3:#1a3455;
-  --gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.18);
-  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
-  --green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
-  --sidebar-w:230px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);height:100vh;display:flex;overflow:hidden}
-.boot{position:fixed;inset:0;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:9999}
-.boot.hidden{display:none}
-.boot-icon{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif}
-.boot-spin{width:22px;height:22px;border:2px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.boot-msg{font-size:13px;color:var(--muted)}
+  :root {
+    --bg:       #0d0f12;
+    --surface:  #141820;
+    --panel:    #1a1f2e;
+    --border:   #252d3d;
+    --border2:  #2e3a50;
+    --amber:    #f5a623;
+    --amber2:   #ffc85a;
+    --green:    #2ecc8a;
+    --green2:   #1a7a52;
+    --red:      #e05252;
+    --blue:     #4a9eff;
+    --muted:    #4a5568;
+    --text:     #c8d4e8;
+    --text2:    #8a9ab8;
+    --text3:    #5a6a85;
+    --white:    #eef2fa;
+    --mono:     'IBM Plex Mono', monospace;
+    --sans:     'IBM Plex Sans', sans-serif;
+  }
 
-/* sidebar */
-.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:linear-gradient(180deg,#0d2240,var(--navy));border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.brand{display:flex;align-items:center;gap:9px;padding:10px;border-bottom:1px solid var(--border);flex-shrink:0}
-.brand-icon{width:28px;height:28px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0}
-.brand-name{font-size:12px;font-weight:600}
-.brand-sub{font-size:9px;color:var(--gold);letter-spacing:.09em;text-transform:uppercase}
-.inst-sec{padding:7px 10px 4px;flex-shrink:0}
-.inst-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:4px;padding:0 2px}
-.inst-card{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.05);border:1px solid var(--gold-border);border-radius:8px;padding:6px 8px}
-.inst-av{width:24px;height:24px;border-radius:6px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--navy);flex-shrink:0}
-.inst-name{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.stage-tabs{padding:8px 10px 4px;flex-shrink:0}
-.stage-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:5px;padding:0 2px}
-.stab{display:flex;align-items:center;justify-content:space-between;padding:5px 9px;border-radius:7px;cursor:pointer;transition:background .15s;margin-bottom:2px;border:1px solid transparent}
-.stab:hover{background:var(--card)}
-.stab.active{background:var(--gold-dim);border-color:var(--gold-border)}
-.stab-left{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:500;color:var(--muted)}
-.stab.active .stab-left{color:var(--gold)}
-.stab:hover .stab-left{color:var(--text)}
-.stab-icon{font-size:13px;flex-shrink:0}
-.stab-count{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--muted)}
-.stab.active .stab-count{background:rgba(255,215,0,.15);color:var(--gold)}
-.stab-count.has-jobs{background:rgba(255,215,0,.12);color:var(--gold)}
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
 
-.job-list-sec{flex:1;display:flex;flex-direction:column;overflow:hidden;border-top:1px solid var(--border);margin-top:4px}
-.job-list-hdr{padding:6px 12px 3px;flex-shrink:0;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.job-list{flex:1;overflow-y:auto;padding:2px 6px 8px}
-.job-row{padding:7px 9px;border-radius:8px;cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:background .15s}
-.job-row:hover{background:var(--card)}
-.job-row.active{background:var(--gold-dim);border-color:var(--gold-border)}
-.jr-name{font-size:11.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.jr-meta{font-size:9.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.jr-badge{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.04em;padding:2px 6px;border-radius:20px;text-transform:uppercase;margin-top:3px}
-.jb-sv_scheduled{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
-.jb-sv_completed{background:rgba(122,200,248,.15);color:var(--blue);border:1px solid rgba(122,200,248,.25)}
-.jb-inst_scheduled{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.2)}
-.jb-in_progress{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.25)}
-.jb-completed{background:rgba(52,211,153,.18);color:#4ade80;border:1px solid rgba(52,211,153,.3)}
-.no-jobs{padding:16px 12px;font-size:11px;color:var(--muted);text-align:center;font-style:italic}
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-logo span { color: var(--text2); font-weight: 400; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .config-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .config-btn:hover { border-color: var(--amber); color: var(--amber); }
 
-/* main */
-.main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden}
-.topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px}
-.topbar-left{display:flex;align-items:center;gap:8px}
-.topbar-title{font-size:13px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif}
-.topbar-sub{font-size:10.5px;color:#6b7280}
-.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.nav-a{font-size:11px;color:#6b7280;text-decoration:none;white-space:nowrap}
-.nav-a.hi{color:var(--navy);font-weight:500}
-.nav-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap}
-.nav-btn.dark{background:var(--navy);color:#fff}.nav-btn.dark:hover{background:#1e3a5f}
-.nav-btn.green{background:#16a34a;color:#fff}.nav-btn.green:hover{background:#15803d}
-.sign-out-btn{font-size:11px;color:#9ca3af;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif}
-.sign-out-btn:hover{color:#ef4444}
+  /* ── LAYOUT ── */
+  .layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
 
-.content{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 300px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .badge-count {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--amber);
+    color: #000;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .search-box {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .search-box input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 4px;
+    outline: none;
+  }
+  .search-box input:focus { border-color: var(--amber); }
+  .search-box input::placeholder { color: var(--text3); }
 
-/* empty */
-.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#9ca3af}
-.es-icon{font-size:40px}
-.es-title{font-size:14px;font-weight:500;color:#374151}
-.es-sub{font-size:12px;color:#9ca3af;text-align:center;max-width:300px}
+  .filter-tabs {
+    display: flex;
+    padding: 8px 16px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .filter-tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  .filter-tab.active, .filter-tab:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.08); }
 
-/* job header */
-.job-header{background:var(--navy);border-radius:12px;padding:12px 15px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;position:relative;overflow:hidden}
-.job-header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.06) 0%,transparent 60%);pointer-events:none}
-.jh-l{display:flex;align-items:center;gap:10px}
-.jh-av{width:38px;height:38px;border-radius:9px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:15px;color:var(--navy);flex-shrink:0}
-.jh-name{font-size:15px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif}
-.jh-sub{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:2px}
-.jh-meta{display:flex;gap:10px;margin-top:5px;flex-wrap:wrap}
-.jh-mi{font-size:10px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:3px}
-.jh-mi strong{color:rgba(255,255,255,.75);font-weight:500}
-.jh-pill{padding:4px 11px;border-radius:30px;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;align-self:flex-start;flex-shrink:0}
-.jh-pill.sv_scheduled{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
-.jh-pill.sv_completed{background:rgba(122,200,248,.15);color:var(--blue);border:1px solid rgba(122,200,248,.3)}
-.jh-pill.inst_scheduled{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
-.jh-pill.in_progress{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.25)}
-.jh-pill.completed{background:rgba(52,211,153,.18);color:#4ade80;border:1px solid rgba(52,211,153,.3)}
+  .job-list { flex: 1; overflow-y: auto; }
+  .job-list::-webkit-scrollbar { width: 4px; }
+  .job-list::-webkit-scrollbar-track { background: transparent; }
+  .job-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-/* pipeline tracker */
-.pipe-track{background:#fff;border-radius:10px;border:1px solid #e8ecf0;padding:8px 8px 7px;display:flex;overflow-x:auto}
-.pt-step{flex:1;min-width:60px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;padding:0 4px}
-.pt-step:not(:first-child)::before{content:'';position:absolute;top:10px;left:0;width:50%;height:2px;background:#e8ecf0;z-index:0}
-.pt-step:not(:last-child)::after{content:'';position:absolute;top:10px;right:0;left:50%;height:2px;background:#e8ecf0;z-index:0}
-.pt-dot{width:21px;height:21px;border-radius:50%;margin-bottom:4px;display:flex;align-items:center;justify-content:center;font-size:9px;position:relative;z-index:1;border:2px solid #e8ecf0;background:#f9fafb;flex-shrink:0}
-.pt-dot.done{background:#ecfdf5;border-color:#22c55e}
-.pt-dot.active{background:#fef9c3;border-color:#eab308;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(234,179,8,.4)}50%{box-shadow:0 0 0 5px rgba(234,179,8,0)}}
-.pt-lbl{font-size:7.5px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.pt-lbl.done{color:#16a34a}
-.pt-lbl.active{color:#a16207}
-.pt-time{font-size:7px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  .job-card {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+  }
+  .job-card:hover { background: var(--panel); }
+  .job-card.active { background: rgba(245,166,35,0.07); border-left: 2px solid var(--amber); }
+  .job-card-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--white);
+    margin-bottom: 3px;
+  }
+  .job-card-ref {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+  .job-card-meta { display: flex; justify-content: space-between; align-items: center; }
+  .job-card-kw { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+  .stage-pill {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-/* system summary cards */
-.sys-summary{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.sc{background:#fff;border-radius:9px;padding:9px 11px;border:1px solid #e8ecf0;position:relative;overflow:hidden}
-.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 9px 9px}
-.sc.gold::after{background:var(--gold)}.sc.green::after{background:#22c55e}.sc.blue::after{background:#3b82f6}.sc.teal::after{background:#14b8a6}
-.sc-lbl{font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;font-weight:500;margin-bottom:3px}
-.sc-val{font-size:16px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;line-height:1.1}
-.sc-sub{font-size:9.5px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stage--site_visit_scheduled  { background: rgba(74,158,255,0.15); color: var(--blue); }
+  .stage--site_visit_complete   { background: rgba(74,158,255,0.25); color: var(--blue); }
+  .stage--installation_scheduled{ background: rgba(245,166,35,0.15); color: var(--amber); }
+  .stage--installation_in_progress{ background: rgba(245,166,35,0.25); color: var(--amber2); }
+  .stage--installation_complete { background: rgba(46,204,138,0.15); color: var(--green); }
+  .stage--handed_over           { background: rgba(46,204,138,0.3);  color: var(--green); }
+  .stage--accepted              { background: rgba(138,154,184,0.15); color: var(--text2); }
+  .stage--lead, .stage--quoted  { background: rgba(90,106,133,0.15); color: var(--text3); }
 
-/* action panels */
-.action-panel{background:#fff;border-radius:11px;border:1px solid #e8ecf0;padding:14px 16px}
-.ap-header{display:flex;align-items:center;gap:9px;margin-bottom:14px}
-.ap-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.ap-icon.amber{background:rgba(251,191,36,.12);}
-.ap-icon.blue{background:rgba(59,130,246,.1);}
-.ap-icon.green{background:rgba(34,197,94,.1);}
-.ap-icon.gold{background:rgba(255,215,0,.12);}
-.ap-icon.purple{background:rgba(139,92,246,.1);}
-.ap-title{font-size:13px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif}
-.ap-sub{font-size:10.5px;color:#6b7280;margin-top:1px}
-.ap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ap-grid.cols1{grid-template-columns:1fr}
-.ap-group{display:flex;flex-direction:column;gap:4px}
-.ap-group.full{grid-column:1/-1}
-.ap-label{font-size:9.5px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.06em}
-.ap-input{background:#f9fafb;border:1.5px solid #e5e9ef;color:#1f2937;padding:8px 10px;border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;width:100%;transition:border-color .2s}
-.ap-input:focus{outline:none;border-color:#3b82f6;background:#fff}
-.ap-input::placeholder{color:#9ca3af}
-.ap-select{background:#f9fafb;border:1.5px solid #e5e9ef;color:#1f2937;padding:8px 10px;border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;width:100%;transition:border-color .2s;cursor:pointer}
-.ap-select:focus{outline:none;border-color:#3b82f6;background:#fff}
-.ap-textarea{background:#f9fafb;border:1.5px solid #e5e9ef;color:#1f2937;padding:8px 10px;border-radius:7px;font-size:12.5px;font-family:'DM Sans',sans-serif;width:100%;resize:vertical;min-height:58px;transition:border-color .2s}
-.ap-textarea:focus{outline:none;border-color:#3b82f6;background:#fff}
-.ap-row-inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.ap-toggle{display:flex;gap:6px}
-.ap-tog-btn{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;border:1.5px solid #e5e9ef;background:#f9fafb;color:#6b7280;cursor:pointer;transition:all .15s}
-.ap-tog-btn.on{background:#0B1F3A;color:#fff;border-color:#0B1F3A}
-.ap-actions{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
-.ap-btn{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .2s;white-space:nowrap}
-.ap-btn.primary{background:#0B1F3A;color:#fff}.ap-btn.primary:hover{background:#1e3a5f;transform:translateY(-1px)}
-.ap-btn.success{background:#16a34a;color:#fff}.ap-btn.success:hover{background:#15803d;transform:translateY(-1px)}
-.ap-btn.amber{background:#d97706;color:#fff}.ap-btn.amber:hover{background:#b45309;transform:translateY(-1px)}
-.ap-btn.danger{background:rgba(220,38,38,.1);color:#dc2626;border:1px solid rgba(220,38,38,.25)}.ap-btn.danger:hover{background:rgba(220,38,38,.18)}
-.ap-btn:disabled{background:#e5e9ef;color:#9ca3af;cursor:not-allowed;transform:none}
-.ap-spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+  .empty-state {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--text3);
+    font-size: 12px;
+  }
 
-/* existing data summary box */
-.data-box{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:9px 12px;font-size:11px;color:#0c4a6e;line-height:1.6;margin-bottom:10px}
-.data-box.green{background:#f0fdf4;border-color:#bbf7d0;color:#14532d}
-.data-box.amber{background:#fffbeb;border-color:#fde68a;color:#78350f}
-.data-box strong{font-weight:600}
+  /* ── MAIN CONTENT ── */
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  .main::-webkit-scrollbar { width: 6px; }
+  .main::-webkit-scrollbar-track { background: transparent; }
+  .main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-/* progress log */
-.log-section{background:#fff;border-radius:10px;border:1px solid #e8ecf0;padding:12px 14px}
-.log-title{font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy);margin-bottom:10px}
-.log-entries{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;max-height:220px;overflow-y:auto}
-.log-entry{display:flex;gap:8px;align-items:flex-start}
-.log-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:3px}
-.log-body{flex:1}
-.log-text{font-size:11.5px;color:#374151;line-height:1.5}
-.log-time{font-size:9px;color:#9ca3af;margin-top:1px}
-.log-empty{font-size:11px;color:#9ca3af;font-style:italic;padding:4px 0}
-.log-add{display:flex;gap:6px}
-.log-add textarea{flex:1;background:#f9fafb;border:1.5px solid #e5e9ef;color:#1f2937;padding:7px 10px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;resize:none;height:38px;transition:border-color .2s}
-.log-add textarea:focus{outline:none;border-color:#3b82f6;background:#fff}
-.log-add button{padding:7px 14px;border-radius:7px;background:#0B1F3A;color:#fff;font-size:11.5px;font-weight:700;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0}
-.log-add button:hover{background:#1e3a5f}
+  .placeholder-screen {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--text3);
+  }
+  .placeholder-screen svg { opacity: 0.2; }
+  .placeholder-screen h3 { font-family: var(--mono); font-size: 14px; color: var(--text2); }
+  .placeholder-screen p { font-size: 12px; }
 
-/* handover card */
-.handover-card{background:linear-gradient(135deg,var(--navy),#14294a);border-radius:12px;padding:16px 18px;color:#fff;position:relative;overflow:hidden}
-.handover-card::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,215,0,.05)}
-.handover-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),rgba(255,215,0,.2))}
-.hc-eyebrow{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:4px}
-.hc-title{font-size:16px;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:3px}
-.hc-sub{font-size:10.5px;color:rgba(255,255,255,.45);margin-bottom:14px}
-.hc-specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.hc-spec{background:rgba(255,255,255,.06);border-radius:8px;padding:8px 10px}
-.hc-spec-lbl{font-size:8.5px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-.hc-spec-val{font-size:14px;font-weight:600;font-family:'DM Serif Display',serif}
-.hc-savings{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px}
-.hc-savings-lbl{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
-.hc-savings-val{font-size:18px;font-weight:700;color:var(--green);font-family:'DM Serif Display',serif}
-.hc-savings-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
-.hc-actions{display:flex;gap:8px;flex-wrap:wrap}
-.hc-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;border:none;cursor:pointer;transition:all .2s;text-decoration:none}
-.hc-btn.gold{background:var(--gold);color:var(--navy)}.hc-btn.gold:hover{background:#fff}
-.hc-btn.ghost{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.12)}.hc-btn.ghost:hover{background:rgba(255,255,255,.12)}
+  /* ── JOB HEADER ── */
+  .job-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 28px;
+    display: none;
+  }
+  .job-header.visible { display: block; }
+  .jh-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .jh-name { font-size: 20px; font-weight: 600; color: var(--white); }
+  .jh-ref { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .jh-actions { display: flex; gap: 8px; }
+  .jh-stats { display: flex; gap: 24px; }
+  .stat-item { }
+  .stat-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-value { font-family: var(--mono); font-size: 13px; color: var(--amber); font-weight: 600; margin-top: 2px; }
 
-/* gate blocker */
-.gate-block{background:rgba(248,113,113,.06);border:1.5px solid rgba(248,113,113,.25);border-radius:10px;padding:14px 16px;text-align:center}
-.gb-icon{font-size:24px;margin-bottom:8px}
-.gb-title{font-size:13px;font-weight:600;color:#dc2626;margin-bottom:4px}
-.gb-sub{font-size:11.5px;color:#6b7280;line-height:1.6}
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    padding: 16px 28px;
+    border-bottom: 1px solid var(--border);
+    gap: 0;
+    overflow-x: auto;
+    background: var(--bg);
+  }
+  .pipe-step {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .pipe-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+  .pipe-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border2);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    transition: all 0.2s;
+  }
+  .pipe-dot.done { border-color: var(--green); background: rgba(46,204,138,0.1); color: var(--green); }
+  .pipe-dot.active { border-color: var(--amber); background: rgba(245,166,35,0.1); color: var(--amber); box-shadow: 0 0 12px rgba(245,166,35,0.3); }
+  .pipe-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-align: center; max-width: 60px; line-height: 1.2; }
+  .pipe-label.done { color: var(--green); }
+  .pipe-label.active { color: var(--amber); }
+  .pipe-arrow { width: 32px; height: 2px; background: var(--border2); flex-shrink: 0; }
+  .pipe-arrow.done { background: var(--green2); }
 
-/* toast */
-#toast{position:fixed;bottom:18px;right:18px;background:var(--navy2);border:1px solid rgba(52,211,153,.3);color:var(--green);padding:11px 18px;border-radius:9px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-#toast.show{opacity:1}
-#toast.err{border-color:rgba(248,113,113,.3);color:var(--red)}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:4px}
-.main::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12)}
-.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+  /* ── STAGE PANELS ── */
+  .stage-panels { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .panel-header:hover { background: rgba(255,255,255,0.03); }
+  .panel-title-group { display: flex; align-items: center; gap: 10px; }
+  .panel-step-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    background: var(--border);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+  .panel.current .panel-step-num { background: rgba(245,166,35,0.2); color: var(--amber); }
+  .panel.done .panel-step-num { background: rgba(46,204,138,0.1); color: var(--green); }
+  .panel-title { font-weight: 600; font-size: 14px; color: var(--white); }
+  .panel-status-badge { }
+  .panel-toggle { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
+  .panel.open .panel-toggle { transform: rotate(180deg); }
+  .panel-body { display: none; padding: 20px; }
+  .panel.open .panel-body { display: block; }
+  .panel.locked { opacity: 0.5; pointer-events: none; }
+  .panel.locked .panel-header { cursor: not-allowed; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .form-full { grid-column: 1 / -1; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .form-input, .form-select, .form-textarea {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--amber); }
+  .form-select { appearance: none; cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 70px; }
+  .form-input:disabled, .form-select:disabled, .form-textarea:disabled {
+    opacity: 0.5; cursor: not-allowed;
+  }
+
+  /* toggle switch */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--border2);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle.on { background: var(--green); }
+  .toggle.on::after { transform: translateX(16px); }
+  .toggle-label { font-size: 12px; color: var(--text2); }
+
+  /* Checklist */
+  .checklist { display: flex; flex-direction: column; gap: 6px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: border-color 0.15s;
+  }
+  .check-item.checked { border-color: var(--green2); background: rgba(46,204,138,0.04); }
+  .check-item input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+  .check-item-label { flex: 1; font-size: 12px; color: var(--text2); }
+  .check-item.checked .check-item-label { color: var(--text3); text-decoration: line-through; }
+  .check-item-notes {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 4px 8px;
+    border-radius: 3px;
+    width: 140px;
+  }
+
+  /* Buttons */
+  .btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+  }
+  .btn-primary { background: var(--amber); color: #000; }
+  .btn-primary:hover { background: var(--amber2); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { filter: brightness(1.1); }
+  .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-danger { background: transparent; border: 1px solid var(--red); color: var(--red); }
+  .btn-danger:hover { background: rgba(224,82,82,0.1); }
+
+  .btn-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+  /* Section divider */
+  .section-sep {
+    margin: 20px 0;
+    border: none;
+    border-top: 1px solid var(--border);
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  /* Info card */
+  .info-card {
+    background: rgba(74,158,255,0.07);
+    border: 1px solid rgba(74,158,255,0.2);
+    border-radius: 5px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--blue);
+    margin-bottom: 16px;
+  }
+  .info-card.warning { background: rgba(245,166,35,0.07); border-color: rgba(245,166,35,0.2); color: var(--amber); }
+  .info-card.success { background: rgba(46,204,138,0.07); border-color: rgba(46,204,138,0.2); color: var(--green); }
+
+  /* Completed panel summary */
+  .completed-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .cs-item { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 10px 12px; }
+  .cs-key { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; margin-bottom: 3px; }
+  .cs-val { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+
+  /* Activity log */
+  .activity-log {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .activity-log-header {
+    background: var(--panel);
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .log-entry {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 11px;
+  }
+  .log-time { font-family: var(--mono); color: var(--text3); flex-shrink: 0; }
+  .log-msg { color: var(--text2); }
+  .log-stage { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 2px; background: var(--border); color: var(--text3); flex-shrink: 0; }
+
+  /* Handover document */
+  .handover-doc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+  }
+  .hd-logo { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
+  .hd-title { font-size: 20px; font-weight: 300; color: var(--text); margin-bottom: 20px; letter-spacing: -0.01em; }
+  .hd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .hd-section-title { font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .hd-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .hd-row-key { color: var(--text3); }
+  .hd-row-val { font-family: var(--mono); color: var(--text2); }
+  .hd-warranty { margin-top: 16px; }
+  .warranty-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--text2); }
+  .warranty-item::before { content: '✓'; color: var(--green); font-size: 11px; }
+  .hd-sign-block { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+  .sign-line { border-bottom: 1px solid var(--border2); padding-top: 40px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+  /* Config modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 28px;
+    width: 420px;
+    max-width: 95vw;
+  }
+  .modal-title { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--amber); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  /* toast */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 10px 16px;
+    border-radius: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    min-width: 220px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--red); color: var(--red); }
+  .toast.info { border-color: var(--blue); color: var(--blue); }
+
+  /* print */
+  @media print {
+    .topbar, .sidebar, .pipeline, .btn-row, .config-btn, .stage-panels > *:not(.panel.print-target) { display: none !important; }
+    .layout { height: auto; }
+    .main { overflow: visible; }
+    .handover-doc { border: none; padding: 0; }
+    body { background: #fff; color: #000; }
+    .hd-row-val, .hd-section-title, .stat-value, .hd-logo { color: #000 !important; }
+    .hd-row-key, .sign-line { color: #555 !important; }
+  }
 </style>
 </head>
 <body>
 
-<div class="boot" id="bootScreen">
-  <div class="boot-icon">N</div>
-  <div class="boot-spin"></div>
-  <div class="boot-msg" id="bootMsg">Opening Job Portal…</div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    ◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span>
+  </div>
+  <div class="topbar-right">
+    <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ offline</span>
+    <button class="config-btn" onclick="openConfig()">⚙ CONFIGURE</button>
+  </div>
 </div>
 
-<aside class="sidebar">
-  <div class="brand">
-    <div class="brand-icon">N</div>
-    <div><div class="brand-name">Nova Metrics</div><div class="brand-sub">Job Portal</div></div>
-  </div>
-  <div class="inst-sec">
-    <div class="inst-lbl">Account</div>
-    <div class="inst-card">
-      <div class="inst-av" id="instAv">N</div>
-      <div style="min-width:0">
-        <div class="inst-name" id="instName">—</div>
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Active Jobs</span>
+      <span class="badge-count" id="job-count">0</span>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search name, ref, address..." oninput="filterJobs()">
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+      <button class="filter-tab" data-filter="site_visit_scheduled" onclick="setFilter(this,'site_visit_scheduled')">Visit</button>
+      <button class="filter-tab" data-filter="installation" onclick="setFilter(this,'installation')">Install</button>
+      <button class="filter-tab" data-filter="handed_over" onclick="setFilter(this,'handed_over')">Done</button>
+    </div>
+    <div class="job-list" id="job-list">
+      <div class="empty-state" id="empty-sidebar">
+        <div style="font-size:24px;margin-bottom:8px">📋</div>
+        Configure Supabase to load jobs
       </div>
     </div>
   </div>
-  <div class="stage-tabs">
-    <div class="stage-lbl">Pipeline Stages</div>
-    <div class="stab active" onclick="setStage('all')" id="stab-all">
-      <div class="stab-left"><span class="stab-icon">📋</span>All Active Jobs</div>
-      <span class="stab-count" id="cnt-all">0</span>
-    </div>
-    <div class="stab" onclick="setStage('site_visit_scheduled')" id="stab-site_visit_scheduled">
-      <div class="stab-left"><span class="stab-icon">🗓️</span>Site Visit Due</div>
-      <span class="stab-count" id="cnt-site_visit_scheduled">0</span>
-    </div>
-    <div class="stab" onclick="setStage('site_visit_completed')" id="stab-site_visit_completed">
-      <div class="stab-left"><span class="stab-icon">🔍</span>Site Visit Done</div>
-      <span class="stab-count" id="cnt-site_visit_completed">0</span>
-    </div>
-    <div class="stab" onclick="setStage('installation_scheduled')" id="stab-installation_scheduled">
-      <div class="stab-left"><span class="stab-icon">⚙️</span>Install Scheduled</div>
-      <span class="stab-count" id="cnt-installation_scheduled">0</span>
-    </div>
-    <div class="stab" onclick="setStage('installation_in_progress')" id="stab-installation_in_progress">
-      <div class="stab-left"><span class="stab-icon">🔧</span>In Progress</div>
-      <span class="stab-count" id="cnt-installation_in_progress">0</span>
-    </div>
-    <div class="stab" onclick="setStage('completed')" id="stab-completed">
-      <div class="stab-left"><span class="stab-icon">✅</span>Completed</div>
-      <span class="stab-count" id="cnt-completed">0</span>
-    </div>
-  </div>
-  <div class="job-list-sec">
-    <div class="job-list-hdr" id="jobListHdr">Loading…</div>
-    <div class="job-list" id="jobList"><div class="no-jobs">Loading jobs…</div></div>
-  </div>
-</aside>
 
-<main class="main">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div>
-        <div class="topbar-title">🏗 Job Execution Portal</div>
-        <div class="topbar-sub">Manage installations from site visit to handover</div>
+  <!-- MAIN -->
+  <div class="main" id="main-content">
+
+    <!-- Placeholder -->
+    <div class="placeholder-screen" id="placeholder">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <rect x="8" y="8" width="48" height="48" rx="4" stroke="#4a5568" stroke-width="2"/>
+        <path d="M20 32h24M20 40h16" stroke="#4a5568" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="32" cy="22" r="4" stroke="#4a5568" stroke-width="2"/>
+      </svg>
+      <h3>Select a Job</h3>
+      <p>Choose a job from the sidebar to open its workspace</p>
+    </div>
+
+    <!-- Job Workspace (hidden until job selected) -->
+    <div id="job-workspace" style="display:none; flex-direction:column; flex:1">
+
+      <!-- Job Header -->
+      <div class="job-header visible" id="job-header">
+        <div class="jh-top">
+          <div>
+            <div class="jh-name" id="jh-name">—</div>
+            <div class="jh-ref" id="jh-ref">—</div>
+          </div>
+          <div class="jh-actions">
+            <button class="btn btn-ghost" onclick="refreshCurrentJob()">↻ Refresh</button>
+            <button class="btn btn-ghost" onclick="printHandover()">⎙ Print Handover</button>
+          </div>
+        </div>
+        <div class="jh-stats">
+          <div class="stat-item"><div class="stat-label">System Size</div><div class="stat-value" id="jh-kw">—</div></div>
+          <div class="stat-item"><div class="stat-label">Battery</div><div class="stat-value" id="jh-battery">—</div></div>
+          <div class="stat-item"><div class="stat-label">Address</div><div class="stat-value" id="jh-address" style="font-size:11px;color:var(--text2)">—</div></div>
+          <div class="stat-item"><div class="stat-label">Stage</div><div class="stat-value" id="jh-stage">—</div></div>
+        </div>
       </div>
+
+      <!-- Pipeline -->
+      <div class="pipeline" id="pipeline">
+        <div class="pipe-step">
+          <div class="pipe-node" onclick="jumpToPanel(0)">
+            <div class="pipe-dot" id="pdot-0">1</div>
+            <div class="pipe-label" id="plbl-0">Site Visit</div>
+          </div>
+          <div class="pipe-arrow" id="parr-0"></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-node" onclick="jumpToPanel(1)">
+            <div class="pipe-dot" id="pdot-1">2</div>
+            <div class="pipe-label" id="plbl-1">Installation Prep</div>
+          </div>
+          <div class="pipe-arrow" id="parr-1"></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-node" onclick="jumpToPanel(2)">
+            <div class="pipe-dot" id="pdot-2">3</div>
+            <div class="pipe-label" id="plbl-2">Installation</div>
+          </div>
+          <div class="pipe-arrow" id="parr-2"></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-node" onclick="jumpToPanel(3)">
+            <div class="pipe-dot" id="pdot-3">4</div>
+            <div class="pipe-label" id="plbl-3">Completion</div>
+          </div>
+          <div class="pipe-arrow" id="parr-3"></div>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-node" onclick="jumpToPanel(4)">
+            <div class="pipe-dot" id="pdot-4">5</div>
+            <div class="pipe-label" id="plbl-4">Handover</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage Panels -->
+      <div class="stage-panels" id="stage-panels">
+
+        <!-- ══ PANEL 1: SITE VISIT ══ -->
+        <div class="panel" id="panel-0">
+          <div class="panel-header" onclick="togglePanel(0)">
+            <div class="panel-title-group">
+              <span class="panel-step-num">STEP 1</span>
+              <span class="panel-title">Site Visit Assessment</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stage-pill" id="panel-0-badge"></span>
+              <span class="panel-toggle">▾</span>
+            </div>
+          </div>
+          <div class="panel-body" id="panel-0-body">
+
+            <div class="info-card" id="sv-info-card">
+              Complete the on-site assessment below. All fields help generate accurate COC and handover documents.
+            </div>
+
+            <div class="section-label">Visit Details</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Assessor Name</label>
+                <input type="text" class="form-input" id="sv-assessor" placeholder="Your name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Visit Date & Time</label>
+                <input type="datetime-local" class="form-input" id="sv-datetime">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Municipality</label>
+                <input type="text" class="form-input" id="sv-municipality" placeholder="e.g. City of Johannesburg">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grid Ref / Account No.</label>
+                <input type="text" class="form-input" id="sv-gridref" placeholder="Meter account number">
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Roof Assessment</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Roof Type</label>
+                <select class="form-select" id="sv-rooftype">
+                  <option value="">Select...</option>
+                  <option>IBR / Corrugated Steel</option>
+                  <option>Concrete Tiles</option>
+                  <option>Flat Concrete</option>
+                  <option>Slate / Shingles</option>
+                  <option>Thatch</option>
+                  <option>Metal Deck</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Roof Condition</label>
+                <select class="form-select" id="sv-roofcondition">
+                  <option value="">Select...</option>
+                  <option value="excellent">Excellent</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair — Minor repairs needed</option>
+                  <option value="poor">Poor — Repairs required first</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cable Run (metres)</label>
+                <input type="number" class="form-input" id="sv-cablerun" placeholder="e.g. 15">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Meter Type</label>
+                <select class="form-select" id="sv-metertype">
+                  <option value="">Select...</option>
+                  <option>Prepaid (Smart)</option>
+                  <option>Conventional (Credit)</option>
+                  <option>Net Metering</option>
+                  <option>Unknown</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Electrical</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Supply Phase</label>
+                <select class="form-select" id="sv-phase">
+                  <option value="">Select...</option>
+                  <option value="single">Single Phase</option>
+                  <option value="three">Three Phase</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">DB Board Adequate?</label>
+                <select class="form-select" id="sv-db">
+                  <option value="true">Yes — No upgrade needed</option>
+                  <option value="false">No — Upgrade required</option>
+                </select>
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">DB Board Notes</label>
+                <input type="text" class="form-input" id="sv-dbnotes" placeholder="Any issues or upgrade requirements...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Earthing OK?</label>
+                <select class="form-select" id="sv-earthing">
+                  <option value="true">Yes</option>
+                  <option value="false">No — Earthing required</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Earthing Notes</label>
+                <input type="text" class="form-input" id="sv-earthingnotes" placeholder="Details if earthing needed...">
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Shading</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Shading Issues?</label>
+                <select class="form-select" id="sv-shading">
+                  <option value="false">No — Clear roof</option>
+                  <option value="true">Yes — Shading present</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Shading Notes</label>
+                <input type="text" class="form-input" id="sv-shadingnotes" placeholder="Trees, chimneys, neighbouring buildings...">
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Recommended System</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Recommended System (kWp)</label>
+                <input type="number" step="0.1" class="form-input" id="sv-kw" placeholder="e.g. 10.5">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Recommended Battery (kWh)</label>
+                <input type="number" step="0.1" class="form-input" id="sv-battery" placeholder="e.g. 10.0">
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Additional Notes</label>
+                <textarea class="form-textarea" id="sv-notes" placeholder="Anything else the installation team should know..."></textarea>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" id="sv-complete-btn" onclick="completeSiteVisit()">✓ Complete Site Visit</button>
+              <button class="btn btn-ghost" onclick="saveSiteVisitDraft()">Save Draft</button>
+              <span id="sv-saving" style="font-family:var(--mono);font-size:11px;color:var(--text3);display:none">Saving...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 2: INSTALLATION PREP ══ -->
+        <div class="panel locked" id="panel-1">
+          <div class="panel-header" onclick="togglePanel(1)">
+            <div class="panel-title-group">
+              <span class="panel-step-num">STEP 2</span>
+              <span class="panel-title">Installation Preparation</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stage-pill" id="panel-1-badge"></span>
+              <span class="panel-toggle">▾</span>
+            </div>
+          </div>
+          <div class="panel-body" id="panel-1-body">
+
+            <div class="section-label">Team Assignment</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Team Lead</label>
+                <input type="text" class="form-input" id="inst-teamlead" placeholder="Lead installer name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Team Members</label>
+                <input type="text" class="form-input" id="inst-team" placeholder="e.g. John, Sipho, Marco">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Installation Date</label>
+                <input type="date" class="form-input" id="inst-date">
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Equipment Specification</div>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label class="form-label">Panel Brand</label>
+                <input type="text" class="form-input" id="inst-panelbrand" placeholder="e.g. JA Solar">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Panel Wattage</label>
+                <input type="number" class="form-input" id="inst-panelwatt" placeholder="e.g. 550">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Panel Quantity</label>
+                <input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Inverter Brand</label>
+                <input type="text" class="form-input" id="inst-inverterbrand" placeholder="e.g. Sungrow">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Inverter Size (kW)</label>
+                <input type="number" step="0.1" class="form-input" id="inst-inverterkw" placeholder="e.g. 10.0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Battery Brand</label>
+                <input type="text" class="form-input" id="inst-batterybrand" placeholder="e.g. BYD">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Battery kWh (each)</label>
+                <input type="number" step="0.1" class="form-input" id="inst-batterykwh" placeholder="e.g. 10.0">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Battery Quantity</label>
+                <input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="scheduleInstallation()">✓ Schedule Installation</button>
+              <button class="btn btn-ghost" onclick="saveInstallPrepDraft()">Save Draft</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 3: INSTALLATION ══ -->
+        <div class="panel locked" id="panel-2">
+          <div class="panel-header" onclick="togglePanel(2)">
+            <div class="panel-title-group">
+              <span class="panel-step-num">STEP 3</span>
+              <span class="panel-title">Installation Checklist</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stage-pill" id="panel-2-badge"></span>
+              <span class="panel-toggle">▾</span>
+            </div>
+          </div>
+          <div class="panel-body" id="panel-2-body">
+            <div class="info-card warning">Tick each item as the installation progresses. All items must be checked before completion.</div>
+
+            <div class="section-label">Pre-Installation</div>
+            <div class="checklist" id="checklist-pre"></div>
+
+            <hr class="section-sep">
+            <div class="section-label">Structural & Mounting</div>
+            <div class="checklist" id="checklist-structural"></div>
+
+            <hr class="section-sep">
+            <div class="section-label">Electrical</div>
+            <div class="checklist" id="checklist-electrical"></div>
+
+            <hr class="section-sep">
+            <div class="section-label">Commissioning</div>
+            <div class="checklist" id="checklist-commissioning"></div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" id="start-install-btn" onclick="startInstallation()">▶ Mark as In Progress</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 4: COMPLETION ══ -->
+        <div class="panel locked" id="panel-3">
+          <div class="panel-header" onclick="togglePanel(3)">
+            <div class="panel-title-group">
+              <span class="panel-step-num">STEP 4</span>
+              <span class="panel-title">Final Completion & Sign-off</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stage-pill" id="panel-3-badge"></span>
+              <span class="panel-toggle">▾</span>
+            </div>
+          </div>
+          <div class="panel-body" id="panel-3-body">
+
+            <div class="section-label">Final System Specs (as installed)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Final System kWp</label>
+                <input type="number" step="0.1" class="form-input" id="comp-kw" placeholder="Total installed kWp">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Final Battery kWh</label>
+                <input type="number" step="0.1" class="form-input" id="comp-battery" placeholder="Total installed kWh">
+              </div>
+              <div class="form-group form-full">
+                <label class="form-label">Punch List / Outstanding Items</label>
+                <textarea class="form-textarea" id="comp-punchlist" placeholder="Any items to address after sign-off..."></textarea>
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Inspector Sign-off</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Inspector Name</label>
+                <input type="text" class="form-input" id="comp-inspector" placeholder="Qualified person name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date Inspected</label>
+                <input type="date" class="form-input" id="comp-inspdate">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-green" onclick="completeInstallation()">✓ Mark Installation Complete</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PANEL 5: HANDOVER ══ -->
+        <div class="panel locked" id="panel-4">
+          <div class="panel-header" onclick="togglePanel(4)">
+            <div class="panel-title-group">
+              <span class="panel-step-num">STEP 5</span>
+              <span class="panel-title">Customer Handover</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="stage-pill" id="panel-4-badge"></span>
+              <span class="panel-toggle">▾</span>
+            </div>
+          </div>
+          <div class="panel-body" id="panel-4-body">
+
+            <div class="section-label">Certificate of Compliance (COC)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">COC Number</label>
+                <input type="text" class="form-input" id="ho-cocnum" placeholder="e.g. COC-2025-00123">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Issued By</label>
+                <input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number">
+              </div>
+              <div class="form-group">
+                <label class="form-label">COC Issue Date</label>
+                <input type="date" class="form-input" id="ho-cocdate">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grid Application Ref</label>
+                <input type="text" class="form-input" id="ho-gridref" placeholder="NRS097 / municipal ref">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grid Approved?</label>
+                <select class="form-select" id="ho-gridapproved">
+                  <option value="false">Pending</option>
+                  <option value="true">Approved</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Customer Training</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Training Completed?</label>
+                <select class="form-select" id="ho-trained">
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Training Notes</label>
+                <input type="text" class="form-input" id="ho-trainingnotes" placeholder="App walkthrough, load management, etc.">
+              </div>
+            </div>
+
+            <hr class="section-sep">
+            <div class="section-label">Handed Over By</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Your Name</label>
+                <input type="text" class="form-input" id="ho-by" placeholder="Staff member completing handover">
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-green" onclick="completeHandover()">✓ Complete Handover</button>
+              <button class="btn btn-ghost" onclick="printHandover()">⎙ Print Handover Document</button>
+            </div>
+
+            <hr class="section-sep">
+
+            <!-- Handover Document Preview -->
+            <div id="handover-doc-preview" style="display:none">
+              <div class="section-label">Handover Document Preview</div>
+              <div class="handover-doc" id="handover-doc">
+                <!-- filled dynamically -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /stage-panels -->
+
+      <!-- Activity Log -->
+      <div style="padding: 0 28px 28px">
+        <div class="activity-log">
+          <div class="activity-log-header">Activity Log</div>
+          <div id="activity-log-entries">
+            <div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity yet.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /job-workspace -->
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Config Modal -->
+<div class="modal-overlay" id="config-modal">
+  <div class="modal">
+    <div class="modal-title">⚙ Supabase Configuration</div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Supabase URL</label>
+      <input type="text" class="form-input" id="cfg-url" placeholder="https://xxxx.supabase.co">
     </div>
-    <div class="topbar-right">
-      <a href="prposal_portal.html" class="nav-btn dark">📋 Proposals</a>
-      <a href="solar-intelligence.html" class="nav-btn dark">⚡ New Design</a>
-      <button class="sign-out-btn" id="signOutBtn">Sign out</button>
+    <div class="form-group">
+      <label class="form-label">Anon Key</label>
+      <input type="text" class="form-input" id="cfg-key" placeholder="eyJh...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeConfig()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Save & Connect</button>
     </div>
   </div>
-
-  <div class="content" id="mainContent">
-    <div class="empty-state" id="emptyState">
-      <div class="es-icon">🏗</div>
-      <div class="es-title">Select a job from the pipeline</div>
-      <div class="es-sub">Jobs appear here when a proposal is accepted and a site visit is scheduled in the Proposal Portal.</div>
-    </div>
-    <div id="detailArea" style="display:none"></div>
-  </div>
-</main>
-
-<div id="toast"></div>
+</div>
 
 <script>
-var SUPA='https://zloxcqrhkcohheeixfns.supabase.co';
-var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-var PIPELINE_STATUSES=['site_visit_scheduled','site_visit_completed','installation_scheduled','installation_in_progress','completed'];
+// ──────────────────────────────────────────────
+// CONFIG & STATE
+// ──────────────────────────────────────────────
+let SB_URL = localStorage.getItem('si_sb_url') || '';
+let SB_KEY = localStorage.getItem('si_sb_key') || '';
+let jobs = [];
+let currentJob = null;
+let currentInstall = null;
+let currentHandover = null;
+let currentVisit = null;
+let activeFilter = 'all';
 
-var sb=supabase.createClient(SUPA,ANON);
-var installer=null, allJobs=[], activeStage='all', activeJobIdx=-1;
-var params=new URLSearchParams(window.location.search);
-var urlAiId=params.get('ai_id');
-
-// ── AUTH BOOT ────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', boot);
-async function boot(){
-  try{
-    var r=await sb.auth.getSession();
-    var session=r.data&&r.data.session;
-    if(session&&session.user&&session.user.email){
-      var rows=await api('/rest/v1/installers?contact_email=eq.'+enc(session.user.email)+'&select=installer_id,installer_name,contact_email&limit=1');
-      if(rows&&rows.length){installer=rows[0];showPortal();return;}
-    }
-  }catch(e){}
-  window.location.href='solar-intelligence.html';
+// ──────────────────────────────────────────────
+// SUPABASE HELPER
+// ──────────────────────────────────────────────
+async function sb(path, method = 'GET', body = null, extraHeaders = {}) {
+  if (!SB_URL || !SB_KEY) throw new Error('Supabase not configured');
+  const headers = {
+    'apikey': SB_KEY,
+    'Authorization': `Bearer ${SB_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': method === 'POST' ? 'return=representation' : 'return=representation',
+    ...extraHeaders
+  };
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  if (res.status === 204) return null;
+  return res.json();
 }
-function showPortal(){
-  document.getElementById('bootScreen').classList.add('hidden');
-  document.getElementById('instAv').textContent=(installer.installer_name||'N').charAt(0).toUpperCase();
-  document.getElementById('instName').textContent=installer.installer_name||'Installer';
+
+async function sbGet(table, query='') { return sb(`${table}?${query}`); }
+async function sbPost(table, data) { return sb(table, 'POST', data); }
+async function sbPatch(table, query, data) { return sb(`${table}?${query}`, 'PATCH', data); }
+
+// ──────────────────────────────────────────────
+// CONFIG MODAL
+// ──────────────────────────────────────────────
+function openConfig() {
+  document.getElementById('cfg-url').value = SB_URL;
+  document.getElementById('cfg-key').value = SB_KEY;
+  document.getElementById('config-modal').classList.add('open');
+}
+function closeConfig() { document.getElementById('config-modal').classList.remove('open'); }
+function saveConfig() {
+  SB_URL = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
+  SB_KEY = document.getElementById('cfg-key').value.trim();
+  localStorage.setItem('si_sb_url', SB_URL);
+  localStorage.setItem('si_sb_key', SB_KEY);
+  closeConfig();
   loadJobs();
 }
-document.getElementById('signOutBtn').addEventListener('click',async function(){
-  await sb.auth.signOut();
-  window.location.href='solar-intelligence.html';
-});
 
-// ── DATA LOAD ────────────────────────────────────────────────
-async function loadJobs(){
-  try{
-    var statusIn=PIPELINE_STATUSES.map(function(s){return'"'+s+'"';}).join(',');
-    var aiRows=await api('/rest/v1/ai_results?installer_id=eq.'+installer.installer_id+
-      '&status=in.('+statusIn+')'+
-      '&select=ai_id,client_name,client_email,client_phone,location,'+
-      'system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,'+
-      'required_load_kw,required_autonomy_hrs,total_cost,annual_savings,monthly_savings,payback_years,annual_solar_kwh,'+
-      'status,site_visit_date,site_visit_time,site_visit_notes,'+
-      'site_visit_completed_at,installation_scheduled_at,installation_started_at,installation_completed_at,'+
-      'won_at,created_at'+
-      '&order=created_at.desc');
-    if(!aiRows||!aiRows.length){renderJobList([]);return;}
-    var ids=aiRows.map(function(r){return r.ai_id;}).join(',');
-    var svrRows=[], ijRows=[];
-    try{svrRows=await api('/rest/v1/site_visit_results?ai_id=in.('+ids+')&select=*&order=created_at.desc');} catch(e){}
-    try{ijRows=await api('/rest/v1/installation_jobs?ai_id=in.('+ids+')&select=*&order=created_at.desc');} catch(e){}
-    var svrByAi={},ijByAi={};
-    (svrRows||[]).forEach(function(r){if(!svrByAi[r.ai_id])svrByAi[r.ai_id]=r;});
-    (ijRows||[]).forEach(function(r){if(!ijByAi[r.ai_id])ijByAi[r.ai_id]=r;});
-    allJobs=aiRows.map(function(r){return{ai:r,svr:svrByAi[r.ai_id]||null,job:ijByAi[r.ai_id]||null};});
-    renderStageCounts();
-    renderJobList(filteredJobs());
-    if(urlAiId){
-      var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(urlAiId);});
-      if(idx>=0){pick(idx,null);urlAiId=null;}
-    }
-  }catch(err){
-    document.getElementById('jobList').innerHTML='<div class="no-jobs" style="color:#f87171">Failed to load jobs</div>';
+// ──────────────────────────────────────────────
+// LOAD JOBS
+// ──────────────────────────────────────────────
+async function loadJobs() {
+  if (!SB_URL || !SB_KEY) {
+    document.getElementById('sync-status').textContent = '⬤ offline';
+    return;
+  }
+  try {
+    document.getElementById('sync-status').textContent = '⬤ syncing...';
+    document.getElementById('sync-status').style.color = 'var(--amber)';
+    const data = await sbGet('ai_results',
+      `select=ai_id,client_name,address,system_size_kw,battery_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
+      `&job_status=neq.lead&job_status=neq.quoted&order=created_at.desc`
+    );
+    jobs = data || [];
+    renderSidebar();
+    document.getElementById('sync-status').textContent = `⬤ ${jobs.length} jobs`;
+    document.getElementById('sync-status').style.color = 'var(--green)';
+  } catch(e) {
+    toast('Failed to load jobs: ' + e.message, 'error');
+    document.getElementById('sync-status').textContent = '⬤ error';
+    document.getElementById('sync-status').style.color = 'var(--red)';
   }
 }
 
-function filteredJobs(){
-  if(activeStage==='all')return allJobs;
-  return allJobs.filter(function(j){return j.ai.status===activeStage;});
+// ──────────────────────────────────────────────
+// SIDEBAR
+// ──────────────────────────────────────────────
+const STAGE_LABELS = {
+  accepted: 'Accepted',
+  site_visit_scheduled: 'Visit Sched.',
+  site_visit_complete: 'Visit Done',
+  installation_scheduled: 'Install Sched.',
+  installation_in_progress: 'Installing',
+  installation_complete: 'Install Done',
+  handed_over: 'Handed Over',
+};
+
+function setFilter(el, filter) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = filter;
+  renderSidebar();
 }
 
-function renderStageCounts(){
-  var counts={all:allJobs.length};
-  PIPELINE_STATUSES.forEach(function(s){counts[s]=allJobs.filter(function(j){return j.ai.status===s;}).length;});
-  Object.keys(counts).forEach(function(k){
-    var el=document.getElementById('cnt-'+k);
-    if(el){el.textContent=counts[k];el.className='stab-count'+(counts[k]>0?' has-jobs':'');}
+function filterJobs() { renderSidebar(); }
+
+function renderSidebar() {
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('job-list');
+  const empty = document.getElementById('empty-sidebar');
+
+  const installStatuses = ['installation_scheduled','installation_in_progress','installation_complete'];
+  const filtered = jobs.filter(j => {
+    const matchFilter =
+      activeFilter === 'all' ? true :
+      activeFilter === 'installation' ? installStatuses.includes(j.job_status) :
+      activeFilter === 'handed_over' ? j.job_status === 'handed_over' :
+      j.job_status === activeFilter;
+    const searchStr = `${j.client_name||''} ${j.address||''} ${j.ai_id||''}`.toLowerCase();
+    return matchFilter && (!search || searchStr.includes(search));
+  });
+
+  document.getElementById('job-count').textContent = filtered.length;
+
+  list.innerHTML = '';
+  if (!filtered.length) {
+    empty.style.display = 'block';
+    list.appendChild(empty);
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.forEach(j => {
+    const card = document.createElement('div');
+    card.className = `job-card ${currentJob?.ai_id === j.ai_id ? 'active' : ''}`;
+    card.onclick = () => openJob(j.ai_id);
+    const kw = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
+    const stage = j.job_status || 'unknown';
+    const label = STAGE_LABELS[stage] || stage;
+    card.innerHTML = `
+      <div class="job-card-name">${j.client_name || 'Unnamed'}</div>
+      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${j.address?.slice(0,28) || '—'}</div>
+      <div class="job-card-meta">
+        <span class="job-card-kw">${kw}</span>
+        <span class="stage-pill stage--${stage}">${label}</span>
+      </div>
+    `;
+    list.appendChild(card);
   });
 }
 
-function renderJobList(jobs){
-  var list=document.getElementById('jobList');
-  var hdr=document.getElementById('jobListHdr');
-  hdr.textContent=jobs.length+' Job'+(jobs.length!==1?'s':'');
-  if(!jobs.length){list.innerHTML='<div class="no-jobs">No jobs in this stage</div>';return;}
-  list.innerHTML=jobs.map(function(j,i){
-    var ai=j.ai;
-    var origIdx=allJobs.indexOf(j);
-    var name=ai.client_name||'Unknown';
-    var meta=(ai.location||'')+(ai.system_size_kw?' · '+parseFloat(ai.system_size_kw).toFixed(2)+' kW':'');
-    var stage=stageInfo(ai.status);
-    return '<div class="job-row" id="jr-'+origIdx+'" onclick="pick('+origIdx+',this)">'+
-      '<div class="jr-name">'+esc(name)+'</div>'+
-      '<div class="jr-meta">'+esc(meta)+'</div>'+
-      '<span class="jr-badge jb-'+stageCls(ai.status)+'">'+stage.short+'</span>'+
-    '</div>';
-  }).join('');
+// ──────────────────────────────────────────────
+// OPEN JOB
+// ──────────────────────────────────────────────
+async function openJob(id) {
+  try {
+    // Fetch full job details
+    const data = await sbGet('ai_results', `ai_id=eq.${id}&select=*`);
+    if (!data || !data[0]) { toast('Job not found', 'error'); return; }
+    currentJob = data[0];
+
+    // Fetch linked records
+    const [visits, installs, handovers, logs] = await Promise.all([
+      sbGet('site_visits', `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('installations', `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('handovers', `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('job_activity_log', `job_id=eq.${id}&order=created_at.desc&limit=20`),
+    ]);
+
+    currentVisit   = visits?.[0]   || null;
+    currentInstall = installs?.[0]  || null;
+    currentHandover= handovers?.[0] || null;
+
+    renderJobHeader();
+    renderPipeline();
+    renderPanels();
+    renderActivityLog(logs || []);
+    prefillForms();
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('job-workspace').style.display = 'flex';
+
+    // Highlight active card
+    renderSidebar();
+  } catch(e) {
+    toast('Error loading job: ' + e.message, 'error');
+  }
 }
 
-function setStage(s){
-  activeStage=s;
-  document.querySelectorAll('.stab').forEach(function(el){el.classList.remove('active');});
-  var el=document.getElementById('stab-'+s);
-  if(el)el.classList.add('active');
-  renderJobList(filteredJobs());
+async function refreshCurrentJob() {
+  if (currentJob) openJob(currentJob.ai_id);
 }
 
-function pick(idx,rowEl){
-  document.querySelectorAll('.job-row').forEach(function(r){r.classList.remove('active');});
-  var actual=rowEl||document.getElementById('jr-'+idx);
-  if(actual)actual.classList.add('active');
-  activeJobIdx=idx;
-  var j=allJobs[idx];
-  document.getElementById('emptyState').style.display='none';
-  document.getElementById('detailArea').style.display='block';
-  renderDetail(j);
+// ──────────────────────────────────────────────
+// HEADER
+// ──────────────────────────────────────────────
+function renderJobHeader() {
+  const j = currentJob;
+  document.getElementById('jh-name').textContent = j.client_name || '—';
+  document.getElementById('jh-ref').textContent = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.address || '—'}`;
+  document.getElementById('jh-kw').textContent = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
+  document.getElementById('jh-battery').textContent = j.battery_kwh ? `${j.battery_kwh} kWh` : '—';
+  document.getElementById('jh-address').textContent = j.address || '—';
+  const sl = STAGE_LABELS[j.job_status] || j.job_status || '—';
+  document.getElementById('jh-stage').textContent = sl;
 }
 
-// ── DETAIL RENDERER ──────────────────────────────────────────
-function renderDetail(j){
-  var ai=j.ai, svr=j.svr, job=j.job;
-  var html='';
-  html+=renderJobHeader(ai);
-  html+=renderPipeTracker(ai);
-  html+=renderSysCards(ai);
-  html+=renderStagePanel(j);
-  document.getElementById('detailArea').innerHTML=html;
-  bindStageEvents(j);
-}
+// ──────────────────────────────────────────────
+// PIPELINE
+// ──────────────────────────────────────────────
+const STAGE_ORDER = [
+  'site_visit_scheduled',
+  'site_visit_complete',
+  'installation_scheduled',
+  'installation_in_progress',
+  'installation_complete',
+  'handed_over'
+];
+// Panel index → which stages unlock it
+const PANEL_UNLOCK = [
+  // Panel 0: always unlocked for scheduled visits
+  ['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over','accepted'],
+  // Panel 1: unlocked after site visit complete
+  ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+  // Panel 2: unlocked after install scheduled
+  ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+  // Panel 3: unlocked after install started
+  ['installation_in_progress','installation_complete','handed_over'],
+  // Panel 4: unlocked after install complete
+  ['installation_complete','handed_over'],
+];
 
-function renderJobHeader(ai){
-  var name=ai.client_name||'Unknown';
-  var stage=stageInfo(ai.status);
-  return '<div class="job-header">'+
-    '<div class="jh-l">'+
-      '<div class="jh-av">'+init(name)+'</div>'+
-      '<div>'+
-        '<div class="jh-name">'+esc(name)+'</div>'+
-        '<div class="jh-sub">'+esc(ai.client_email||'')+'</div>'+
-        '<div class="jh-meta">'+
-          '<div class="jh-mi">📍 <strong>'+esc(ai.location||'—')+'</strong></div>'+
-          '<div class="jh-mi">⚡ <strong>'+pf(ai.system_size_kw,2)+' kW</strong></div>'+
-          '<div class="jh-mi">📅 <strong>'+fmtDate(ai.won_at||ai.created_at)+'</strong></div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-    '<span class="jh-pill '+stageCls(ai.status)+'">'+stage.label+'</span>'+
-  '</div>';
-}
+function stageIndex(status) { return STAGE_ORDER.indexOf(status); }
 
-function renderPipeTracker(ai){
-  var steps=[
-    {key:'site_visit_scheduled', lbl:'Site Visit',  icon:'🗓️', ts:ai.site_visit_date?ai.site_visit_date:null},
-    {key:'site_visit_completed', lbl:'Site Done',   icon:'🔍', ts:ai.site_visit_completed_at},
-    {key:'installation_scheduled',lbl:'Scheduled',  icon:'⚙️', ts:ai.installation_scheduled_at},
-    {key:'installation_in_progress',lbl:'In Progress',icon:'🔧',ts:ai.installation_started_at},
-    {key:'completed',            lbl:'Installed',   icon:'✅', ts:ai.installation_completed_at}
+function renderPipeline() {
+  const si = stageIndex(currentJob.job_status);
+  const pipeSteps = [
+    { label: 'Site\nVisit', stage: 'site_visit_complete' },
+    { label: 'Install\nPrep', stage: 'installation_scheduled' },
+    { label: 'Installation', stage: 'installation_in_progress' },
+    { label: 'Completion', stage: 'installation_complete' },
+    { label: 'Handover', stage: 'handed_over' },
   ];
-  var order=['site_visit_scheduled','site_visit_completed','installation_scheduled','installation_in_progress','completed'];
-  var curIdx=order.indexOf(ai.status);
-  var html='<div class="pipe-track">';
-  steps.forEach(function(s,i){
-    var isDone=(i<curIdx);
-    var isActive=(i===curIdx);
-    html+='<div class="pt-step">'+
-      '<div class="pt-dot'+(isDone?' done':isActive?' active':'')+'">'+s.icon+'</div>'+
-      '<div class="pt-lbl'+(isDone?' done':isActive?' active':'')+'">'+s.lbl+'</div>'+
-      '<div class="pt-time">'+(s.ts?fmtShort(s.ts):'')+'</div>'+
-    '</div>';
+  pipeSteps.forEach((ps, i) => {
+    const dot = document.getElementById(`pdot-${i}`);
+    const lbl = document.getElementById(`plbl-${i}`);
+    const arr = document.getElementById(`parr-${i}`);
+    const psi = stageIndex(ps.stage);
+    if (si >= psi) {
+      dot.className = 'pipe-dot done';
+      lbl.className = 'pipe-label done';
+      if (arr) arr.className = 'pipe-arrow done';
+    } else if (si === psi - 1) {
+      dot.className = 'pipe-dot active';
+      lbl.className = 'pipe-label active';
+    } else {
+      dot.className = 'pipe-dot';
+      lbl.className = 'pipe-label';
+      if (arr) arr.className = 'pipe-arrow';
+    }
   });
-  html+='</div>';
-  return html;
 }
 
-function renderSysCards(ai){
-  return '<div class="sys-summary">'+
-    '<div class="sc gold"><div class="sc-lbl">System Size</div><div class="sc-val">'+pf(ai.system_size_kw,2)+' <span style="font-size:11px;font-weight:400">kW DC</span></div><div class="sc-sub">'+esc(ai.panel_number||'—')+'x '+esc(ai.panel_model||'—')+'</div></div>'+
-    '<div class="sc blue"><div class="sc-lbl">Inverter</div><div class="sc-val" style="font-size:12px">'+esc(ai.inverter_model||'—')+'</div></div>'+
-    '<div class="sc teal"><div class="sc-lbl">Battery</div><div class="sc-val" style="font-size:12px">'+esc(ai.battery_model||'—')+'</div><div class="sc-sub">'+pf(ai.battery_capacity_kwh,1)+' kWh</div></div>'+
-    '<div class="sc green"><div class="sc-lbl">System Cost</div><div class="sc-val" style="font-size:13px">R '+fmtR(ai.total_cost)+'</div><div class="sc-sub">R '+fmtR(ai.annual_savings)+'/yr savings</div></div>'+
-  '</div>';
-}
-
-function renderStagePanel(j){
-  var ai=j.ai, svr=j.svr, job=j.job;
-  switch(ai.status){
-    case 'site_visit_scheduled':  return renderPanel_SiteVisitScheduled(ai);
-    case 'site_visit_completed':  return renderPanel_SiteVisitCompleted(ai,svr);
-    case 'installation_scheduled':return renderPanel_InstallScheduled(ai,job);
-    case 'installation_in_progress': return renderPanel_InProgress(ai,job);
-    case 'completed':             return renderPanel_Completed(ai,svr,job);
-    default: return '<div class="gate-block"><div class="gb-icon">🔒</div><div class="gb-title">Unknown Stage</div><div class="gb-sub">Status: '+esc(ai.status)+'</div></div>';
+function jumpToPanel(i) {
+  const panel = document.getElementById(`panel-${i}`);
+  if (!panel.classList.contains('locked')) {
+    panel.classList.add('open');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
-// PANEL 1: Site Visit Scheduled
-function renderPanel_SiteVisitScheduled(ai){
-  var svDate=ai.site_visit_date||'', svTime=ai.site_visit_time||'';
-  return '<div class="action-panel" id="panelSiteVisit">'+
-    '<div class="ap-header"><div class="ap-icon amber">🔍</div><div>'+
-    '<div class="ap-title">Complete Site Visit</div>'+
-    '<div class="ap-sub">Capture field results to confirm system design</div></div></div>'+
-    (svDate?'<div class="data-box">📅 Scheduled for <strong>'+svDate+(svTime?' at '+svTime:'')+'</strong>'+(ai.site_visit_notes?'<br>Notes: '+esc(ai.site_visit_notes):'')+'</div>':'')+
-    '<div class="ap-grid">'+
-      '<div class="ap-group"><div class="ap-label">Final Confirmed System Size (kW)</div>'+
-      '<input class="ap-input" id="sv-kw" type="number" step="0.01" min="0.5" max="1000" placeholder="'+pf(ai.system_size_kw,2)+'" value="'+pf(ai.system_size_kw,2)+'" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Installation Complexity</div>'+
-      '<select class="ap-select" id="sv-complexity">'+
-      '<option value="low">Low — standard roof, easy access</option>'+
-      '<option value="medium" selected>Medium — some challenges</option>'+
-      '<option value="high">High — complex roof/access</option>'+
-      '</select></div>'+
-      '<div class="ap-group full"><div class="ap-label">Roof Condition</div>'+
-      '<select class="ap-select" id="sv-roof">'+
-      '<option value="excellent">Excellent — new / perfect condition</option>'+
-      '<option value="good" selected>Good — minor wear</option>'+
-      '<option value="fair">Fair — some repairs may be needed</option>'+
-      '<option value="poor">Poor — repairs required before install</option>'+
-      '<option value="complex">Complex — multi-pitch / flat / unusual</option>'+
-      '</select></div>'+
-      '<div class="ap-group full"><div class="ap-label">Changes Required from Original Proposal?</div>'+
-      '<div class="ap-toggle">'+
-      '<button class="ap-tog-btn" id="sv-chg-no" onclick="setSvChange(false)">No Changes</button>'+
-      '<button class="ap-tog-btn" id="sv-chg-yes" onclick="setSvChange(true)">Yes — Changes Required</button>'+
-      '</div></div>'+
-      '<div class="ap-group full" id="sv-change-fields" style="display:none">'+
-      '<div class="ap-label">Change Notes</div>'+
-      '<textarea class="ap-textarea" id="sv-change-notes" placeholder="Describe changes from original proposal…"></textarea>'+
-      '<div class="ap-label" style="margin-top:8px">Updated Hardware (if changed)</div>'+
-      '<textarea class="ap-textarea" id="sv-hw-notes" placeholder="e.g. Panel qty changed from 14 to 16, different battery model…"></textarea>'+
-      '</div>'+
-      '<div class="ap-group full"><div class="ap-label">Field Notes</div>'+
-      '<textarea class="ap-textarea" id="sv-notes" placeholder="Access, shading, cable runs, any issues observed…"></textarea></div>'+
-      '<div class="ap-group full">'+
-      '<div class="ap-label">Photos</div>'+
-      '<div class="data-box amber">📷 Photo upload coming soon — note reference numbers or filenames here</div>'+
-      '<input class="ap-input" id="sv-photo-notes" placeholder="e.g. IMG_0423 north-facing elevation, IMG_0424 DB board" /></div>'+
-    '</div>'+
-    '<div class="ap-actions">'+
-    '<button class="ap-btn success" id="btnCompleteSV" onclick="completeSiteVisit('+ai.ai_id+')">✓ Mark Site Visit Complete</button>'+
-    '</div>'+
-  '</div>';
-}
+// ──────────────────────────────────────────────
+// PANELS LOCK/UNLOCK
+// ──────────────────────────────────────────────
+const PANEL_BADGE_LABELS = [
+  { done: 'Visit Complete', current: 'Pending', locked: 'Locked' },
+  { done: 'Scheduled', current: 'Pending', locked: 'Locked' },
+  { done: 'Complete', current: 'In Progress', locked: 'Locked' },
+  { done: 'Signed Off', current: 'Pending', locked: 'Locked' },
+  { done: '✓ Handed Over', current: 'Pending', locked: 'Locked' },
+];
 
-var svChangesRequired=false;
-function setSvChange(val){
-  svChangesRequired=val;
-  document.getElementById('sv-chg-no').className='ap-tog-btn'+(val?'':' on');
-  document.getElementById('sv-chg-yes').className='ap-tog-btn'+(val?' on':'');
-  document.getElementById('sv-change-fields').style.display=val?'block':'none';
-}
+function renderPanels() {
+  const status = currentJob.job_status;
+  PANEL_UNLOCK.forEach((unlock, i) => {
+    const panel = document.getElementById(`panel-${i}`);
+    const badge = document.getElementById(`panel-${i}-badge`);
+    const unlocked = unlock.includes(status);
+    panel.classList.toggle('locked', !unlocked);
 
-// PANEL 2: Site Visit Completed
-function renderPanel_SiteVisitCompleted(ai,svr){
-  var hasRevision=svr&&svr.proposal_revision_required;
-  return '<div class="action-panel" id="panelSchedule">'+
-    '<div class="ap-header"><div class="ap-icon green">⚙️</div><div>'+
-    '<div class="ap-title">Schedule Installation</div>'+
-    '<div class="ap-sub">Site visit complete — assign crew and confirm installation date</div></div></div>'+
-    (svr?'<div class="data-box green">✓ Site visit completed '+fmtDate(svr.completed_at)+
-      ' · System: <strong>'+pf(svr.final_system_kw,2)+' kW</strong>'+
-      ' · Roof: <strong>'+capitalize(svr.roof_condition||'—')+'</strong>'+
-      ' · Complexity: <strong>'+capitalize(svr.installation_complexity||'—')+'</strong>'+
-      (svr.changes_required?' · <strong style="color:#d97706">⚠ Changes noted</strong>':'')+
-    '</div>':'')+
-    (hasRevision?'<div class="data-box amber">⚠️ <strong>Proposal revision may be required.</strong> Review change notes before scheduling. If financials changed, client must re-accept.<br><br>'+
-    '<div style="margin-top:6px"><div class="ap-label" style="margin-bottom:4px">Revision Notes (optional)</div>'+
-    '<textarea class="ap-textarea" id="rev-notes" placeholder="Summarise what changed and why…"></textarea>'+
-    '<div style="display:flex;align-items:center;gap:6px;margin-top:6px">'+
-    '<input type="checkbox" id="rev-fin-changed" style="width:14px;height:14px" />'+
-    '<label for="rev-fin-changed" style="font-size:11.5px;color:#374151">Financials changed — client must re-accept</label>'+
-    '</div></div></div>':'')+
-    '<div class="ap-grid">'+
-      '<div class="ap-group"><div class="ap-label">Installation Date</div>'+
-      '<input class="ap-input" id="inst-date" type="date" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Expected Duration (days)</div>'+
-      '<select class="ap-select" id="inst-days">'+
-      '<option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="5">5 days</option>'+
-      '</select></div>'+
-      '<div class="ap-group"><div class="ap-label">Lead Technician</div>'+
-      '<input class="ap-input" id="inst-lead" placeholder="Name of lead installer" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Crew Members</div>'+
-      '<input class="ap-input" id="inst-crew" placeholder="e.g. John, Sarah, Mike" /></div>'+
-      '<div class="ap-group full"><div class="ap-label">Crew Notes / Instructions</div>'+
-      '<textarea class="ap-textarea" id="inst-crew-notes" placeholder="Access codes, special equipment needed, safety notes…"></textarea></div>'+
-    '</div>'+
-    '<div class="ap-actions">'+
-    '<button class="ap-btn success" id="btnScheduleInst" onclick="scheduleInstallation('+ai.ai_id+')">📅 Confirm Installation Schedule</button>'+
-    '</div>'+
-  '</div>';
-}
-
-// PANEL 3: Installation Scheduled
-function renderPanel_InstallScheduled(ai,job){
-  return '<div class="action-panel" id="panelInstScheduled">'+
-    '<div class="ap-header"><div class="ap-icon gold">🔧</div><div>'+
-    '<div class="ap-title">Installation Scheduled</div>'+
-    '<div class="ap-sub">Ready to begin — start the installation when crew is on site</div></div></div>'+
-    (job?'<div class="data-box">'+
-    '📅 <strong>Installation Date:</strong> '+fmtDate(job.scheduled_date)+'<br>'+
-    '👷 <strong>Lead:</strong> '+(job.lead_technician||'—')+'  ·  <strong>Crew:</strong> '+(job.crew_members||'—')+'<br>'+
-    '⏱ <strong>Expected Duration:</strong> '+(job.expected_duration_days||1)+' day(s)'+
-    (job.crew_notes?'<br>📝 '+esc(job.crew_notes):'')+'</div>':'')+
-    '<div class="ap-actions">'+
-    '<button class="ap-btn amber" id="btnStartInst" onclick="startInstallation('+JSON.stringify(job&&job.id||'')+','+ai.ai_id+')">🔧 Start Installation</button>'+
-    '</div>'+
-  '</div>';
-}
-
-// PANEL 4: In Progress
-function renderPanel_InProgress(ai,job){
-  var log=[];
-  try{log=JSON.parse(job&&job.progress_log||'[]');}catch(e){}
-  return '<div class="log-section" id="panelInProgress">'+
-    '<div class="ap-header" style="margin-bottom:10px"><div class="ap-icon purple" style="background:rgba(139,92,246,.1)">🔧</div><div>'+
-    '<div class="ap-title">Installation In Progress</div>'+
-    '<div class="ap-sub">Started '+fmtDate(job&&job.actual_start_date||ai.installation_started_at)+' · Log notes and mark complete below</div></div></div>'+
-    '<div class="log-title">Progress Log</div>'+
-    '<div class="log-entries" id="logEntries">'+
-    (log.length?log.map(function(e){return '<div class="log-entry"><div class="log-dot"></div><div class="log-body"><div class="log-text">'+esc(e.note)+'</div><div class="log-time">'+fmtDate(e.ts)+'</div></div></div>';}).join(''):'<div class="log-empty">No notes yet — log progress below.</div>')+
-    '</div>'+
-    '<div class="log-add"><textarea id="logNote" placeholder="Log a progress update, issue, or note…"></textarea>'+
-    '<button onclick="logProgress('+JSON.stringify(job&&job.id||'')+','+ai.ai_id+')">+ Log</button></div>'+
-  '</div>'+
-  '<div class="action-panel" id="panelComplete">'+
-    '<div class="ap-header"><div class="ap-icon green">✅</div><div>'+
-    '<div class="ap-title">Mark Installation Complete</div>'+
-    '<div class="ap-sub">Capture final configuration and confirm completion</div></div></div>'+
-    '<div class="ap-grid">'+
-      '<div class="ap-group"><div class="ap-label">Actual Completion Date</div>'+
-      '<input class="ap-input" id="comp-date" type="date" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Final System Size (kW)</div>'+
-      '<input class="ap-input" id="comp-kw" type="number" step="0.01" value="'+pf(ai.system_size_kw,2)+'" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Final Panel Count</div>'+
-      '<input class="ap-input" id="comp-panels" type="number" value="'+(ai.panel_number||'')+'" /></div>'+
-      '<div class="ap-group"><div class="ap-label">Final Inverter</div>'+
-      '<input class="ap-input" id="comp-inv" value="'+esc(ai.inverter_model||'')+'" /></div>'+
-      '<div class="ap-group full"><div class="ap-label">Deviations from Plan (if any)</div>'+
-      '<textarea class="ap-textarea" id="comp-deviations" placeholder="List any changes made during installation vs. original plan…"></textarea></div>'+
-      '<div class="ap-group full"><div class="ap-label">Completion Notes</div>'+
-      '<textarea class="ap-textarea" id="comp-notes" placeholder="Commissioning results, client walkthrough, next steps…"></textarea></div>'+
-    '</div>'+
-    '<div class="ap-actions">'+
-    '<button class="ap-btn success" id="btnMarkComplete" onclick="completeInstallation('+JSON.stringify(job&&job.id||'')+','+ai.ai_id+')">✅ Mark Installation Complete</button>'+
-    '</div>'+
-  '</div>';
-}
-
-// PANEL 5: Completed
-function renderPanel_Completed(ai,svr,job){
-  var finalKw=job&&job.final_system_kw||ai.system_size_kw;
-  var annSav=parseFloat(ai.annual_savings)||0;
-  var monthSav=parseFloat(ai.monthly_savings)||0;
-  return '<div class="handover-card">'+
-    '<div class="hc-eyebrow">Installation Complete — Handover Package</div>'+
-    '<div class="hc-title">'+(ai.client_name||'Client')+' · Job Closed</div>'+
-    '<div class="hc-sub">'+esc(ai.location||'')+(job&&job.actual_end_date?' · Completed '+fmtDate(job.actual_end_date):'')+'</div>'+
-    '<div class="hc-specs">'+
-    '<div class="hc-spec"><div class="hc-spec-lbl">Final System</div><div class="hc-spec-val">'+pf(finalKw,2)+' kW</div></div>'+
-    '<div class="hc-spec"><div class="hc-spec-lbl">Panel Count</div><div class="hc-spec-val">'+(job&&job.final_panel_count||ai.panel_number||'—')+'</div></div>'+
-    '<div class="hc-spec"><div class="hc-spec-lbl">Battery</div><div class="hc-spec-val" style="font-size:11px">'+esc(ai.battery_model||'—')+'</div></div>'+
-    '</div>'+
-    '<div class="hc-savings">'+
-    '<div class="hc-savings-lbl">Estimated Annual Savings</div>'+
-    '<div class="hc-savings-val">R '+fmtR(annSav)+'/year</div>'+
-    '<div class="hc-savings-sub">R '+fmtR(monthSav)+'/month · Payback '+(ai.payback_years||'—')+' years</div>'+
-    '</div>'+
-    (job&&job.deviations_from_plan?'<div style="background:rgba(255,255,255,.06);border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:rgba(255,255,255,.55)">📝 Deviations: '+esc(job.deviations_from_plan)+'</div>':'')+
-    (job&&job.completion_notes?'<div style="background:rgba(255,255,255,.06);border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:rgba(255,255,255,.55)">✅ Notes: '+esc(job.completion_notes)+'</div>':'')+
-    '<div class="hc-actions">'+
-    '<button class="hc-btn gold" onclick="printHandover('+ai.ai_id+')">⬇ Download Handover</button>'+
-    '<a href="prposal_portal.html?ai_id='+ai.ai_id+'" class="hc-btn ghost">📋 View Proposal</a>'+
-    '</div>'+
-  '</div>';
-}
-
-// ── BIND EVENTS (called after innerHTML set) ─────────────────
-function bindStageEvents(j){
-  setSvChange(false); // reset toggle
-}
-
-// ── STAGE ACTIONS ────────────────────────────────────────────
-async function completeSiteVisit(aiId){
-  var btn=document.getElementById('btnCompleteSV');
-  if(!btn)return;
-  var kw=parseFloat(document.getElementById('sv-kw').value||0);
-  var roof=document.getElementById('sv-roof').value;
-  var complexity=document.getElementById('sv-complexity').value;
-  var changeNotes=svChangesRequired?(document.getElementById('sv-change-notes').value.trim()):'',
-      hwNotes=svChangesRequired?(document.getElementById('sv-hw-notes').value.trim():'');
-  var notes=document.getElementById('sv-notes').value.trim();
-  var photoNotes=document.getElementById('sv-photo-notes').value.trim();
-  btn.disabled=true;btn.innerHTML='<span class="ap-spinner"></span> Saving…';
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    var nowIso=new Date().toISOString();
-    // Insert site_visit_results
-    var svrBody={ai_id:aiId,installer_id:installer.installer_id,completed_at:nowIso,
-      final_system_kw:kw||null,roof_condition:roof,installation_complexity:complexity,
-      changes_required:svChangesRequired,change_notes:changeNotes||null,
-      updated_hardware_notes:hwNotes||null,
-      photos_placeholder:photoNotes?[{note:photoNotes}]:[],
-      proposal_revision_required:svChangesRequired};
-    await apiPost('/rest/v1/site_visit_results',svrBody,token);
-    // Update ai_results
-    await apiPatch('/rest/v1/ai_results?ai_id=eq.'+aiId,{status:'site_visit_completed',site_visit_completed_at:nowIso},token);
-    toast('✓ Site visit completed');
-    await loadJobs();
-    var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(aiId);});
-    if(idx>=0)pick(idx,null);
-  }catch(err){toast('Error: '+err.message,true);btn.disabled=false;btn.innerHTML='✓ Mark Site Visit Complete';}
-}
-
-async function scheduleInstallation(aiId){
-  var btn=document.getElementById('btnScheduleInst');
-  if(!btn)return;
-  var date=document.getElementById('inst-date').value;
-  var days=parseInt(document.getElementById('inst-days').value||1);
-  var lead=document.getElementById('inst-lead').value.trim();
-  var crew=document.getElementById('inst-crew').value.trim();
-  var crewNotes=document.getElementById('inst-crew-notes').value.trim();
-  if(!date){toast('Please select an installation date',true);return;}
-  btn.disabled=true;btn.innerHTML='<span class="ap-spinner"></span> Saving…';
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    var nowIso=new Date().toISOString();
-    // Save revision if needed
-    var revNotes=document.getElementById('rev-notes');
-    var revFinChanged=document.getElementById('rev-fin-changed');
-    if(revNotes&&revNotes.value.trim()){
-      await apiPost('/rest/v1/proposal_versions',{ai_id:aiId,version_number:2,version_label:'Post Site Visit',
-        changes_summary:revNotes.value.trim(),financials_changed:revFinChanged&&revFinChanged.checked,
-        client_acceptance_required:revFinChanged&&revFinChanged.checked},token);
+    // Determine if this panel is done, current, or future
+    let bState = 'locked';
+    if (unlocked) {
+      const completedStages = {
+        0: ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+        1: ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+        2: ['installation_complete','handed_over'],
+        3: ['installation_complete','handed_over'],
+        4: ['handed_over'],
+      };
+      bState = (completedStages[i] || []).includes(status) ? 'done' : 'current';
     }
-    // Insert installation_jobs
-    var jobBody={ai_id:aiId,installer_id:installer.installer_id,scheduled_date:date,
-      expected_duration_days:days,lead_technician:lead||null,crew_members:crew||null,
-      crew_notes:crewNotes||null,status:'scheduled'};
-    await apiPost('/rest/v1/installation_jobs',jobBody,token);
-    // Update ai_results
-    await apiPatch('/rest/v1/ai_results?ai_id=eq.'+aiId,{status:'installation_scheduled',installation_scheduled_at:nowIso},token);
-    toast('✓ Installation scheduled for '+date);
-    await loadJobs();
-    var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(aiId);});
-    if(idx>=0)pick(idx,null);
-  }catch(err){toast('Error: '+err.message,true);btn.disabled=false;btn.innerHTML='📅 Confirm Installation Schedule';}
+
+    badge.textContent = PANEL_BADGE_LABELS[i][bState];
+    badge.className = `stage-pill ${bState === 'done' ? 'stage--installation_complete' : bState === 'current' ? 'stage--installation_in_progress' : 'stage--lead'}`;
+
+    // Auto-open current panel
+    if (bState === 'current') panel.classList.add('open');
+  });
+
+  // Build install checklist if empty
+  if (document.getElementById('checklist-pre').childElementCount === 0) {
+    buildChecklist();
+  }
 }
 
-async function startInstallation(jobId,aiId){
-  var btn=document.getElementById('btnStartInst');
-  if(!btn)return;
-  if(!confirm('Start the installation? This will mark the job as In Progress.'))return;
-  btn.disabled=true;btn.innerHTML='<span class="ap-spinner"></span> Starting…';
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    var nowIso=new Date().toISOString();
-    if(jobId)await apiPatch('/rest/v1/installation_jobs?id=eq.'+jobId,{status:'in_progress',actual_start_date:nowIso,updated_at:nowIso},token);
-    await apiPatch('/rest/v1/ai_results?ai_id=eq.'+aiId,{status:'installation_in_progress',installation_started_at:nowIso},token);
-    toast('🔧 Installation started');
-    await loadJobs();
-    var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(aiId);});
-    if(idx>=0)pick(idx,null);
-  }catch(err){toast('Error: '+err.message,true);btn.disabled=false;btn.innerHTML='🔧 Start Installation';}
-}
+// ──────────────────────────────────────────────
+// PREFILL FORMS FROM LOADED DATA
+// ──────────────────────────────────────────────
+function prefillForms() {
+  // Site visit form
+  const v = currentVisit;
+  if (v) {
+    setVal('sv-assessor', v.assessor_name);
+    setVal('sv-datetime', v.visited_at ? v.visited_at.slice(0,16) : '');
+    setVal('sv-municipality', v.municipality);
+    setVal('sv-gridref', v.grid_ref_number);
+    setVal('sv-rooftype', v.roof_type);
+    setVal('sv-roofcondition', v.roof_condition);
+    setVal('sv-cablerun', v.cable_run_meters);
+    setVal('sv-metertype', v.meter_type);
+    setVal('sv-phase', v.phase);
+    setVal('sv-db', String(v.db_board_adequate));
+    setVal('sv-dbnotes', v.db_notes);
+    setVal('sv-earthing', String(v.earthing_ok));
+    setVal('sv-earthingnotes', v.earthing_notes);
+    setVal('sv-shading', String(v.shading_issues));
+    setVal('sv-shadingnotes', v.shading_notes);
+    setVal('sv-kw', v.recommended_system_kw);
+    setVal('sv-battery', v.recommended_battery_kwh);
+    setVal('sv-notes', v.additional_notes);
+  }
 
-async function logProgress(jobId,aiId){
-  var ta=document.getElementById('logNote');
-  if(!ta||!ta.value.trim()){toast('Enter a note first',true);return;}
-  var note=ta.value.trim();
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    // Fetch current log
-    var j=allJobs.find(function(j){return j.job&&j.job.id===jobId;});
-    var currentLog=[];
-    try{currentLog=JSON.parse((j&&j.job&&j.job.progress_log)||'[]');}catch(e){}
-    currentLog.push({note:note,ts:new Date().toISOString()});
-    if(jobId)await apiPatch('/rest/v1/installation_jobs?id=eq.'+jobId,{progress_log:JSON.stringify(currentLog),updated_at:new Date().toISOString()},token);
-    ta.value='';
-    toast('✓ Note logged');
-    await loadJobs();
-    var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(aiId);});
-    if(idx>=0)pick(idx,null);
-  }catch(err){toast('Error: '+err.message,true);}
-}
+  // Install prep form
+  const inst = currentInstall;
+  if (inst) {
+    setVal('inst-teamlead', inst.team_lead);
+    setVal('inst-team', inst.team_members);
+    setVal('inst-date', inst.scheduled_date);
+    setVal('inst-panelbrand', inst.panels_brand);
+    setVal('inst-panelwatt', inst.panels_watt);
+    setVal('inst-panelqty', inst.panels_qty);
+    setVal('inst-inverterbrand', inst.inverter_brand);
+    setVal('inst-inverterkw', inst.inverter_kw);
+    setVal('inst-batterybrand', inst.battery_brand);
+    setVal('inst-batterykwh', inst.battery_kwh);
+    setVal('inst-batteryqty', inst.battery_qty);
+    setVal('comp-kw', inst.final_system_kw);
+    setVal('comp-battery', inst.final_battery_kwh);
+    setVal('comp-punchlist', inst.punch_list);
+    setVal('comp-inspector', inst.inspector_name);
+    setVal('comp-inspdate', inst.inspector_signed_at ? inst.inspector_signed_at.slice(0,10) : '');
 
-async function completeInstallation(jobId,aiId){
-  var btn=document.getElementById('btnMarkComplete');
-  if(!btn)return;
-  var date=document.getElementById('comp-date').value;
-  var kw=parseFloat(document.getElementById('comp-kw').value||0);
-  var panels=parseInt(document.getElementById('comp-panels').value||0);
-  var inv=document.getElementById('comp-inv').value.trim();
-  var deviations=document.getElementById('comp-deviations').value.trim();
-  var notes=document.getElementById('comp-notes').value.trim();
-  if(!date){toast('Please enter actual completion date',true);return;}
-  btn.disabled=true;btn.innerHTML='<span class="ap-spinner"></span> Completing…';
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    var nowIso=new Date(date).toISOString();
-    if(jobId){
-      await apiPatch('/rest/v1/installation_jobs?id=eq.'+jobId,{
-        status:'completed',actual_end_date:nowIso,
-        final_system_kw:kw||null,final_panel_count:panels||null,
-        final_inverter:inv||null,deviations_from_plan:deviations||null,
-        completion_notes:notes||null,updated_at:new Date().toISOString()
-      },token);
+    // Reload checklist state
+    if (inst.install_checklist && inst.install_checklist.length) {
+      reloadChecklist(inst.install_checklist);
     }
-    await apiPatch('/rest/v1/ai_results?ai_id=eq.'+aiId,{status:'completed',installation_completed_at:nowIso},token);
-    toast('✅ Installation complete! Handover ready.');
-    await loadJobs();
-    var idx=allJobs.findIndex(function(j){return String(j.ai.ai_id)===String(aiId);});
-    if(idx>=0){setStage('completed');pick(idx,null);}
-  }catch(err){toast('Error: '+err.message,true);btn.disabled=false;btn.innerHTML='✅ Mark Installation Complete';}
+  }
+
+  // Handover form
+  const ho = currentHandover;
+  if (ho) {
+    setVal('ho-cocnum', ho.coc_number);
+    setVal('ho-cocby', ho.coc_issued_by);
+    setVal('ho-cocdate', ho.coc_issued_at);
+    setVal('ho-gridref', ho.grid_application_number);
+    setVal('ho-gridapproved', String(ho.grid_approved));
+    setVal('ho-trained', String(ho.customer_trained));
+    setVal('ho-trainingnotes', ho.training_notes);
+    setVal('ho-by', ho.handed_over_by);
+    if (ho.handed_over_at) renderHandoverDoc();
+  }
 }
 
-async function printHandover(aiId){
-  var j=allJobs.find(function(j){return String(j.ai.ai_id)===String(aiId);});
-  if(!j)return;
-  var ai=j.ai,job=j.job;
-  var w=window.open('','_blank','width=800,height=700');
-  var html='<!DOCTYPE html><html><head><title>Handover — '+esc(ai.client_name||'Client')+'</title>'+
-  '<style>body{font-family:Arial,sans-serif;padding:30px;max-width:700px;margin:0 auto;color:#1a1a1a}'+
-  'h1{color:#0B1F3A;border-bottom:3px solid #FFD700;padding-bottom:8px}'+
-  'h2{color:#0B1F3A;font-size:14px;margin-top:20px;border-bottom:1px solid #e5e9ef;padding-bottom:4px}'+
-  '.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}'+
-  '.field{background:#f9fafb;border:1px solid #e5e9ef;border-radius:6px;padding:8px 10px}'+
-  '.field label{font-size:9px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:2px}'+
-  '.field value{font-size:14px;font-weight:600;color:#0B1F3A}'+
-  '.savings{background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:12px 16px;margin:14px 0}'+
-  '.savings h3{color:#15803d;margin:0 0 6px}'+
-  '.savings big{font-size:22px;font-weight:700;color:#15803d}'+
-  '.footer{margin-top:24px;font-size:10px;color:#9ca3af;text-align:center;border-top:1px solid #e5e9ef;padding-top:10px}'+
-  '@media print{body{padding:16px}}</style></head><body>'+
-  '<h1>🌞 Solar Installation Handover</h1>'+
-  '<p style="font-size:12px;color:#6b7280">Generated: '+new Date().toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'})+'</p>'+
-  '<h2>Client Details</h2><div class="grid">'+
-  '<div class="field"><label>Client Name</label><value>'+esc(ai.client_name||'—')+'</value></div>'+
-  '<div class="field"><label>Location</label><value>'+esc(ai.location||'—')+'</value></div>'+
-  '<div class="field"><label>Email</label><value>'+esc(ai.client_email||'—')+'</value></div>'+
-  '<div class="field"><label>Phone</label><value>'+esc(ai.client_phone||'—')+'</value></div>'+
-  '</div>'+
-  '<h2>Final System Configuration</h2><div class="grid">'+
-  '<div class="field"><label>System Size</label><value>'+pf(job&&job.final_system_kw||ai.system_size_kw,2)+' kW DC</value></div>'+
-  '<div class="field"><label>Panel Count</label><value>'+(job&&job.final_panel_count||ai.panel_number||'—')+'</value></div>'+
-  '<div class="field"><label>Panel Model</label><value>'+esc(ai.panel_model||'—')+'</value></div>'+
-  '<div class="field"><label>Inverter</label><value>'+esc(job&&job.final_inverter||ai.inverter_model||'—')+'</value></div>'+
-  '<div class="field"><label>Battery Model</label><value>'+esc(ai.battery_model||'—')+'</value></div>'+
-  '<div class="field"><label>Battery Capacity</label><value>'+pf(ai.battery_capacity_kwh,1)+' kWh</value></div>'+
-  '</div>'+
-  '<div class="savings"><h3>💰 Client Savings Confirmation</h3>'+
-  '<big>R '+fmtR(ai.annual_savings)+'/year</big>'+
-  '<p style="margin:4px 0 0;font-size:12px;color:#15803d">R '+fmtR(ai.monthly_savings)+'/month · Payback in '+(ai.payback_years||'—')+' years</p>'+
-  '<p style="margin:4px 0 0;font-size:11px;color:#6b7280">Annual solar yield: '+fmtR(ai.annual_solar_kwh)+' kWh/year</p>'+
-  '</div>'+
-  '<h2>Installation Details</h2><div class="grid">'+
-  '<div class="field"><label>Installer</label><value>'+esc(installer.installer_name)+'</value></div>'+
-  '<div class="field"><label>Completed</label><value>'+fmtDate(job&&job.actual_end_date||ai.installation_completed_at)+'</value></div>'+
-  '</div>'+
-  (job&&job.deviations_from_plan?'<h2>Deviations from Original Plan</h2><p style="font-size:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px">'+esc(job.deviations_from_plan)+'</p>':'')+
-  (job&&job.completion_notes?'<h2>Completion Notes</h2><p style="font-size:12px;background:#f9fafb;border:1px solid #e5e9ef;border-radius:6px;padding:10px">'+esc(job.completion_notes)+'</p>':'')+
-  '<div class="footer">This document was generated by Nova Metrics Solar Intelligence. Nova Metrics Group (Pty) Ltd.</div>'+
-  '</body></html>';
-  w.document.write(html);
-  w.document.close();
-  setTimeout(function(){w.print();},400);
-  // Mark handover generated
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    if(job&&job.id)await apiPatch('/rest/v1/installation_jobs?id=eq.'+job.id,{handover_generated_at:new Date().toISOString()},token);
-  }catch(e){}
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el && val !== null && val !== undefined) el.value = val;
 }
 
-// ── API HELPERS ──────────────────────────────────────────────
-async function api(path){
-  var r=await fetch(SUPA+path,{headers:{apikey:ANON,Authorization:'Bearer '+ANON,Accept:'application/json'}});
-  if(!r.ok)throw new Error(path+' → '+r.status);
-  return r.json();
-}
-async function apiPost(path,body,token){
-  var r=await fetch(SUPA+path,{method:'POST',headers:{apikey:ANON,'Authorization':'Bearer '+(token||ANON),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
-  if(!r.ok&&r.status!==201){var t=await r.text();throw new Error('POST '+path+' → '+r.status+' '+t);}
-  return r;
-}
-async function apiPatch(path,body,token){
-  var r=await fetch(SUPA+path,{method:'PATCH',headers:{apikey:ANON,'Authorization':'Bearer '+(token||ANON),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(body)});
-  if(!r.ok&&r.status!==204){var t=await r.text();throw new Error('PATCH '+path+' → '+r.status+' '+t);}
-  return r;
+// ──────────────────────────────────────────────
+// CHECKLIST BUILDER
+// ──────────────────────────────────────────────
+const CHECKLIST_ITEMS = {
+  pre: [
+    'Reviewed site visit report',
+    'Equipment delivered and checked against spec sheet',
+    'Safety briefing completed with team',
+    'Customer informed of start time',
+    'Work area secured / access arranged',
+  ],
+  structural: [
+    'Roof load assessment done',
+    'Mounting brackets positioned and marked',
+    'Rails installed and levelled',
+    'Mid and end clamps available',
+    'Anti-theft bolts fitted',
+    'Roof penetrations sealed / waterproofed',
+    'Panels mounted and secure',
+  ],
+  electrical: [
+    'DC cabling routed and secured',
+    'MC4 connectors crimped and tested',
+    'Isolators installed (DC and AC)',
+    'Inverter mounted and secured',
+    'Battery mounted and secured',
+    'AC wiring complete to DB board',
+    'Earth bonding complete',
+    'Cable management / conduit installed',
+    'All terminals torqued to spec',
+  ],
+  commissioning: [
+    'Inverter powered on and configured',
+    'Battery charged and communicating',
+    'System monitoring app connected',
+    'Export / import confirmed on meter',
+    'All alerts / faults cleared',
+    'Grid voltage and frequency within range',
+    'Customer walkthrough completed',
+    'Site cleaned up',
+  ],
+};
+
+function buildChecklist() {
+  Object.entries(CHECKLIST_ITEMS).forEach(([section, items]) => {
+    const container = document.getElementById(`checklist-${section}`);
+    if (!container) return;
+    container.innerHTML = '';
+    items.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'check-item';
+      row.dataset.key = `${section}-${idx}`;
+      row.innerHTML = `
+        <input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})">
+        <label for="chk-${section}-${idx}" class="check-item-label">${item}</label>
+        <input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">
+      `;
+      container.appendChild(row);
+    });
+  });
 }
 
-// ── UTILS ────────────────────────────────────────────────────
-function stageInfo(s){
-  var m={site_visit_scheduled:{label:'Site Visit Due',short:'SV Due'},
-    site_visit_completed:{label:'Site Visit Done',short:'SV Done'},
-    installation_scheduled:{label:'Scheduled',short:'Scheduled'},
-    installation_in_progress:{label:'In Progress',short:'Active'},
-    completed:{label:'Completed',short:'Done'}};
-  return m[s]||{label:s,short:s};
+function updateCheck(cb, section, idx) {
+  const row = cb.closest('.check-item');
+  row.classList.toggle('checked', cb.checked);
+  saveChecklistToDb();
 }
-function stageCls(s){
-  var m={site_visit_scheduled:'sv_scheduled',site_visit_completed:'sv_completed',
-    installation_scheduled:'inst_scheduled',installation_in_progress:'in_progress',completed:'completed'};
-  return m[s]||'sv_scheduled';
+
+function reloadChecklist(saved) {
+  saved.forEach(entry => {
+    const key = entry.key;
+    const [section, idx] = key.split('-');
+    const cb = document.getElementById(`chk-${section}-${idx}`);
+    if (cb) {
+      cb.checked = entry.done;
+      cb.closest('.check-item').classList.toggle('checked', entry.done);
+      const noteInput = cb.closest('.check-item').querySelector('.check-item-notes');
+      if (noteInput && entry.notes) noteInput.value = entry.notes;
+    }
+  });
 }
-function toast(msg,isErr){
-  var t=document.getElementById('toast');t.textContent=msg;
-  t.className=isErr?'show err':'show';
-  clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='';},3500);
+
+function collectChecklist() {
+  const result = [];
+  Object.entries(CHECKLIST_ITEMS).forEach(([section, items]) => {
+    items.forEach((item, idx) => {
+      const cb = document.getElementById(`chk-${section}-${idx}`);
+      if (!cb) return;
+      const noteInput = cb.closest('.check-item').querySelector('.check-item-notes');
+      result.push({ key: `${section}-${idx}`, item, done: cb.checked, notes: noteInput?.value || '' });
+    });
+  });
+  return result;
 }
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function enc(s){return encodeURIComponent(s||'');}
-function pf(v,d){var n=parseFloat(v);return isNaN(n)?'—':n.toFixed(d||1);}
-function fmtR(v){var n=parseFloat(v);return isNaN(n)?(v||'—'):Math.round(n).toLocaleString('en-ZA');}
-function fmtDate(iso){
-  if(!iso)return'—';
-  var d=new Date(iso);
-  return isNaN(d)?iso:d.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});
+
+async function saveChecklistToDb() {
+  if (!currentInstall) return;
+  try {
+    await sbPatch('installations', `id=eq.${currentInstall.id}`, {
+      install_checklist: collectChecklist()
+    });
+  } catch(e) { /* silent */ }
 }
-function fmtShort(iso){
-  if(!iso)return'';
-  var d=new Date(iso);
-  return isNaN(d)?'':d.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
+
+// ──────────────────────────────────────────────
+// STEP 1: COMPLETE SITE VISIT
+// ──────────────────────────────────────────────
+async function saveSiteVisitDraft() {
+  await _saveSiteVisit(false);
 }
-function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
-function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+
+async function completeSiteVisit() {
+  await _saveSiteVisit(true);
+}
+
+async function _saveSiteVisit(complete) {
+  if (!currentJob) return;
+  const saving = document.getElementById('sv-saving');
+  saving.style.display = 'inline';
+
+  const visitData = {
+    job_id: currentJob.ai_id,
+    assessor_name: getVal('sv-assessor'),
+    visited_at: getVal('sv-datetime') || new Date().toISOString(),
+    municipality: getVal('sv-municipality'),
+    grid_ref_number: getVal('sv-gridref'),
+    roof_type: getVal('sv-rooftype'),
+    roof_condition: getVal('sv-roofcondition') || null,
+    cable_run_meters: parseInt(getVal('sv-cablerun')) || null,
+    meter_type: getVal('sv-metertype'),
+    phase: getVal('sv-phase') || null,
+    db_board_adequate: getVal('sv-db') === 'true',
+    db_notes: getVal('sv-dbnotes'),
+    earthing_ok: getVal('sv-earthing') === 'true',
+    earthing_notes: getVal('sv-earthingnotes'),
+    shading_issues: getVal('sv-shading') === 'true',
+    shading_notes: getVal('sv-shadingnotes'),
+    recommended_system_kw: parseFloat(getVal('sv-kw')) || null,
+    recommended_battery_kwh: parseFloat(getVal('sv-battery')) || null,
+    additional_notes: getVal('sv-notes'),
+    completed_at: complete ? new Date().toISOString() : null,
+  };
+
+  try {
+    if (currentVisit) {
+      await sbPatch('site_visits', `id=eq.${currentVisit.id}`, visitData);
+    } else {
+      const res = await sbPost('site_visits', visitData);
+      currentVisit = res?.[0] || null;
+    }
+
+    if (complete) {
+      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, {
+        job_status: 'site_visit_complete'
+      });
+      await logActivity('SITE VISIT', 'Site visit assessment completed', visitData.assessor_name);
+      toast('Site visit completed!', 'success');
+      await openJob(currentJob.ai_id);
+    } else {
+      toast('Draft saved', 'info');
+    }
+  } catch(e) {
+    toast('Error saving: ' + e.message, 'error');
+  }
+  saving.style.display = 'none';
+}
+
+// ──────────────────────────────────────────────
+// STEP 2: SCHEDULE INSTALLATION
+// ──────────────────────────────────────────────
+async function saveInstallPrepDraft() {
+  await _saveInstallPrep(false);
+}
+
+async function scheduleInstallation() {
+  await _saveInstallPrep(true);
+}
+
+async function _saveInstallPrep(schedule) {
+  if (!currentJob) return;
+
+  const instData = {
+    job_id: currentJob.ai_id,
+    team_lead: getVal('inst-teamlead'),
+    team_members: getVal('inst-team'),
+    scheduled_date: getVal('inst-date') || null,
+    panels_brand: getVal('inst-panelbrand'),
+    panels_watt: parseInt(getVal('inst-panelwatt')) || null,
+    panels_qty: parseInt(getVal('inst-panelqty')) || null,
+    inverter_brand: getVal('inst-inverterbrand'),
+    inverter_kw: parseFloat(getVal('inst-inverterkw')) || null,
+    battery_brand: getVal('inst-batterybrand'),
+    battery_kwh: parseFloat(getVal('inst-batterykwh')) || null,
+    battery_qty: parseInt(getVal('inst-batteryqty')) || null,
+    install_checklist: collectChecklist(),
+  };
+
+  try {
+    if (currentInstall) {
+      await sbPatch('installations', `id=eq.${currentInstall.id}`, instData);
+    } else {
+      const res = await sbPost('installations', instData);
+      currentInstall = res?.[0] || null;
+    }
+
+    if (schedule) {
+      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, {
+        job_status: 'installation_scheduled',
+        installation_date: getVal('inst-date') || null,
+        assigned_team: getVal('inst-teamlead'),
+      });
+      await logActivity('INSTALL PREP', `Installation scheduled for ${getVal('inst-date')}`, getVal('inst-teamlead'));
+      toast('Installation scheduled!', 'success');
+      await openJob(currentJob.ai_id);
+    } else {
+      toast('Draft saved', 'info');
+    }
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ──────────────────────────────────────────────
+// STEP 3: START INSTALLATION
+// ──────────────────────────────────────────────
+async function startInstallation() {
+  if (!currentJob) return;
+  try {
+    if (currentInstall) {
+      await sbPatch('installations', `id=eq.${currentInstall.id}`, { started_at: new Date().toISOString() });
+    }
+    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_in_progress' });
+    await logActivity('INSTALLATION', 'Installation marked as in progress');
+    toast('Installation started!', 'success');
+    await openJob(currentJob.ai_id);
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ──────────────────────────────────────────────
+// STEP 4: COMPLETE INSTALLATION
+// ──────────────────────────────────────────────
+async function completeInstallation() {
+  if (!currentJob) return;
+
+  const compData = {
+    final_system_kw: parseFloat(getVal('comp-kw')) || null,
+    final_battery_kwh: parseFloat(getVal('comp-battery')) || null,
+    punch_list: getVal('comp-punchlist'),
+    inspector_name: getVal('comp-inspector'),
+    inspector_signed_at: getVal('comp-inspdate') ? new Date(getVal('comp-inspdate')).toISOString() : new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+    install_checklist: collectChecklist(),
+  };
+
+  try {
+    if (currentInstall) {
+      await sbPatch('installations', `id=eq.${currentInstall.id}`, compData);
+    }
+    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_complete' });
+    await logActivity('COMPLETION', `Final sign-off by ${getVal('comp-inspector')}`, getVal('comp-inspector'));
+    toast('Installation complete! Proceed to handover.', 'success');
+    await openJob(currentJob.ai_id);
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ──────────────────────────────────────────────
+// STEP 5: HANDOVER
+// ──────────────────────────────────────────────
+async function completeHandover() {
+  if (!currentJob) return;
+
+  const hoData = {
+    job_id: currentJob.ai_id,
+    installation_id: currentInstall?.id || null,
+    coc_number: getVal('ho-cocnum'),
+    coc_issued_by: getVal('ho-cocby'),
+    coc_issued_at: getVal('ho-cocdate') || null,
+    grid_application_number: getVal('ho-gridref'),
+    grid_approved: getVal('ho-gridapproved') === 'true',
+    customer_trained: getVal('ho-trained') === 'true',
+    training_notes: getVal('ho-trainingnotes'),
+    handed_over_by: getVal('ho-by'),
+    handed_over_at: new Date().toISOString(),
+    customer_signed: true,
+    customer_signed_at: new Date().toISOString(),
+  };
+
+  try {
+    if (currentHandover) {
+      await sbPatch('handovers', `id=eq.${currentHandover.id}`, hoData);
+    } else {
+      const res = await sbPost('handovers', hoData);
+      currentHandover = res?.[0] || null;
+    }
+
+    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'handed_over' });
+    await logActivity('HANDOVER', `Handed over by ${getVal('ho-by')}`, getVal('ho-by'));
+    toast('🎉 Job handed over! Project complete.', 'success');
+    renderHandoverDoc();
+    document.getElementById('handover-doc-preview').style.display = 'block';
+    await openJob(currentJob.ai_id);
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+// ──────────────────────────────────────────────
+// HANDOVER DOCUMENT
+// ──────────────────────────────────────────────
+function renderHandoverDoc() {
+  const j = currentJob;
+  const inst = currentInstall;
+  const ho = currentHandover;
+  const v = currentVisit;
+
+  const totalKwp = inst?.final_system_kw || v?.recommended_system_kw || j?.system_size_kw || '—';
+  const totalBattery = inst?.final_battery_kwh || v?.recommended_battery_kwh || j?.battery_kwh || '—';
+  const now = new Date().toLocaleDateString('en-ZA', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  document.getElementById('handover-doc').innerHTML = `
+    <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
+    <div class="hd-title">Solar System Handover Certificate</div>
+
+    <div class="hd-grid">
+      <div>
+        <div class="hd-section-title">Customer Details</div>
+        <div class="hd-row"><span class="hd-row-key">Name</span><span class="hd-row-val">${j?.client_name || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Address</span><span class="hd-row-val">${j?.address || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Municipality</span><span class="hd-row-val">${v?.municipality || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Meter Type</span><span class="hd-row-val">${v?.meter_type || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Grid Ref</span><span class="hd-row-val">${v?.grid_ref_number || '—'}</span></div>
+      </div>
+      <div>
+        <div class="hd-section-title">System Installed</div>
+        <div class="hd-row"><span class="hd-row-key">Total Capacity</span><span class="hd-row-val">${totalKwp} kWp</span></div>
+        <div class="hd-row"><span class="hd-row-key">Battery Storage</span><span class="hd-row-val">${totalBattery} kWh</span></div>
+        <div class="hd-row"><span class="hd-row-key">Panels</span><span class="hd-row-val">${inst?.panels_qty || '—'} × ${inst?.panels_brand || '—'} ${inst?.panels_watt || '—'}W</span></div>
+        <div class="hd-row"><span class="hd-row-key">Inverter</span><span class="hd-row-val">${inst?.inverter_brand || '—'} ${inst?.inverter_kw || '—'} kW</span></div>
+        <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty || '—'} × ${inst?.battery_brand || '—'} ${inst?.battery_kwh || '—'} kWh</span></div>
+        <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase || '—'} phase</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div class="hd-section-title">Compliance & Approvals</div>
+      <div class="hd-grid">
+        <div>
+          <div class="hd-row"><span class="hd-row-key">COC Number</span><span class="hd-row-val">${ho?.coc_number || getVal('ho-cocnum') || '—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">COC Issued By</span><span class="hd-row-val">${ho?.coc_issued_by || getVal('ho-cocby') || '—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">COC Date</span><span class="hd-row-val">${ho?.coc_issued_at || getVal('ho-cocdate') || '—'}</span></div>
+        </div>
+        <div>
+          <div class="hd-row"><span class="hd-row-key">Grid Application</span><span class="hd-row-val">${ho?.grid_application_number || getVal('ho-gridref') || 'Pending'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">Grid Approved</span><span class="hd-row-val">${(ho?.grid_approved || getVal('ho-gridapproved') === 'true') ? '✓ Yes' : 'Pending'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">Inspector</span><span class="hd-row-val">${inst?.inspector_name || '—'}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hd-warranty" style="margin-top:20px">
+      <div class="hd-section-title">Warranty & Support</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+        <div class="warranty-item">Solar panels — 25 year performance warranty</div>
+        <div class="warranty-item">Inverter — 10 year manufacturer warranty</div>
+        <div class="warranty-item">Battery — 10 year manufacturer warranty</div>
+        <div class="warranty-item">Workmanship — 2 year installation warranty</div>
+      </div>
+    </div>
+
+    <div class="hd-sign-block">
+      <div>
+        <div class="sign-line">Customer Signature</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
+          ${j?.client_name || '.....................'}<br>Date: ${now}
+        </div>
+      </div>
+      <div>
+        <div class="sign-line">Authorised by Solar Intelligence</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
+          ${ho?.handed_over_by || getVal('ho-by') || '...................'}<br>Date: ${now}
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('handover-doc-preview').style.display = 'block';
+}
+
+function printHandover() {
+  if (!currentJob) { toast('No job selected', 'error'); return; }
+  renderHandoverDoc();
+  document.getElementById('panel-4').classList.add('open', 'print-target');
+  window.print();
+}
+
+// ──────────────────────────────────────────────
+// ACTIVITY LOG
+// ──────────────────────────────────────────────
+async function logActivity(stage, action, performedBy = '') {
+  if (!currentJob) return;
+  try {
+    await sbPost('job_activity_log', {
+      job_id: currentJob.ai_id,
+      stage,
+      action,
+      performed_by: performedBy,
+    });
+  } catch(e) { /* silent */ }
+}
+
+function renderActivityLog(logs) {
+  const container = document.getElementById('activity-log-entries');
+  if (!logs.length) {
+    container.innerHTML = '<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>';
+    return;
+  }
+  container.innerHTML = logs.map(l => `
+    <div class="log-entry">
+      <span class="log-stage">${l.stage || '—'}</span>
+      <span class="log-time">${formatTime(l.created_at)}</span>
+      <span class="log-msg">${l.action || ''} ${l.performed_by ? `<span style="color:var(--text3)">· ${l.performed_by}</span>` : ''}</span>
+    </div>
+  `).join('');
+}
+
+function formatTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-ZA', { day:'2-digit', month:'short' }) + ' ' +
+         d.toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
+}
+
+// ──────────────────────────────────────────────
+// PANEL TOGGLE
+// ──────────────────────────────────────────────
+function togglePanel(i) {
+  const panel = document.getElementById(`panel-${i}`);
+  if (panel.classList.contains('locked')) return;
+  panel.classList.toggle('open');
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 300);
+  }, 3500);
+}
+
+// ──────────────────────────────────────────────
+// UTILS
+// ──────────────────────────────────────────────
+function getVal(id) {
+  return document.getElementById(id)?.value?.trim() || '';
+}
+
+// ──────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-fill config if stored
+  if (!SB_URL || !SB_KEY) {
+    openConfig();
+  } else {
+    loadJobs();
+  }
+
+  // Auto-refresh every 60s
+  setInterval(loadJobs, 60000);
+});
 </script>
 </body>
 </html>
