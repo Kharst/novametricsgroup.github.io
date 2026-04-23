@@ -465,7 +465,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="chart-row"><div class="chart-label">Panels</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-panels" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="cb-panels-v">&#8212;</div></div>
       <div class="chart-row"><div class="chart-label">BOS</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-bos" style="width:0%;background:var(--blue)"></div></div><div class="chart-val" id="cb-bos-v">&#8212;</div></div>
       <div class="chart-row"><div class="chart-label">Battery</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-batt" style="width:0%;background:var(--green)"></div></div><div class="chart-val" id="cb-batt-v">&#8212;</div></div>
-      <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa)"></div></div><div class="chart-val" id="cb-inv-v">&#8212;</div></div>
+      <div class="chart-row"><div class="chart-label">Inverter</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="cb-inv" style="width:0%;background:#a78bfa"></div></div><div class="chart-val" id="cb-inv-v">&#8212;</div></div>
     </div>
     <div class="section-title">25-Year Financial Model (SA Compliance Rates)</div>
     <div class="status-row"><span class="lbl">Monthly Savings (Year 1)</span><span class="val" id="f-monthly">&#8212;</span></div>
@@ -642,23 +642,85 @@ function selectBestBattery(reqKWh, peakLoad, autonomy){
   return cands[0];
 }
 
-function selectBestInverter(reqAC, sysDC){
-  let bInv=null,bScore=Infinity,bUnits=1;
-  DB.inverters.forEach(inv=>{
-    for(let u=1;u<=4;u++){
-      const tAC=inv.ac*u,tDC=inv.dc*u;
-      if(tAC<reqAC||tDC<sysDC) continue;
-      const da=sysDC/tAC;
-      if(da>DC_AC_MAX) continue;
-      // ── FIX: hard-reject inverters that produce DC/AC < 1.0 (NRS 097 minimum) ──
-      if(da<DC_AC_MIN_COMPLIANT) continue;
-      let s=da<0.70?150+(0.70-da)*200:da<DC_AC_MIN_COMPLIANT?80+(DC_AC_MIN_COMPLIANT-da)*80:Math.abs(da-DC_AC_TARGET)*40;
-      s+=Math.abs(tAC-reqAC)*3+(inv.price*u)*0.0005+(u-1)*25;
-      if(s<bScore){bScore=s;bInv=inv;bUnits=u;}
+// ── INVERTER-FIRST SYSTEM SELECTOR ──────────────────────────────────────────
+// Iterates every valid inverter, sizes solar to achieve compliant DC/AC ratio,
+// selects batteries, then returns ONE best compliant combination.
+// Rejects anything outside NRS 097-2-1 DC/AC range [1.0 – 1.5].
+function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh) {
+  const reqInvAC   = peakLoad * 1.3;                          // 30% safety margin (SA rule)
+  const battKWh    = dailyUsage * (autonomy / 24);            // evening backup energy
+  const battRechKWh= battKWh / BATT_ROUND_TRIP_EFF;          // recharge loss
+  const reqSolarE  = (dailyUsage - battKWh) + battRechKWh;   // solar must cover this
+  const effFactor  = psh * SYSTEM_PR * SYSTEM_AVAILABILITY;
+  const minSolarKW = reqSolarE / effFactor;                   // min kWp from energy
+
+  const candidates = [];
+
+  DB.inverters.forEach(inv => {
+    for (let u = 1; u <= 4; u++) {
+      const invAC = inv.ac * u;
+      if (invAC < reqInvAC) continue;           // must handle peak load × 1.3
+
+      // ── Solar sizing: use whichever is LARGER ──
+      // (a) DC = invAC × 1.3  →  hits NRS 097 target ratio
+      // (b) minSolarKW         →  covers daily energy need
+      const targetDC = Math.max(invAC * DC_AC_TARGET, minSolarKW);
+
+      // Quick pre-check: if even the minimum solar would exceed 1.5:1, skip
+      if (minSolarKW / invAC > DC_AC_MAX) continue;
+
+      // Find the tightest panel configuration that meets targetDC
+      let bestPanel = null, bestOs = Infinity;
+      DB.panels.forEach(p => {
+        const n  = Math.ceil(targetDC * 1000 / p.watts);
+        const dc = n * p.watts / 1000;
+        const os = dc - targetDC;
+        if (os >= 0 && os < bestOs) {
+          bestOs = os;
+          bestPanel = { ...p, panelsNeeded: n, dcKW: dc };
+        }
+      });
+      if (!bestPanel) continue;
+
+      const sysDC = bestPanel.dcKW;
+      const dcAc  = sysDC / invAC;
+
+      // ── Hard NRS 097-2-1 compliance gates (NO fallback, reject outright) ──
+      if (dcAc < DC_AC_MIN_COMPLIANT) continue;   // < 1.0  FAIL
+      if (dcAc > DC_AC_MAX)           continue;   // > 1.5  FAIL
+
+      // ── Battery selection ──
+      const batt = selectBestBattery(battKWh, peakLoad, autonomy);
+      if (!batt)                   continue;       // no battery fits
+      if (batt.totalKW < peakLoad) continue;       // battery can't supply peak
+
+      // ── Solar energy coverage check ──
+      const expDaily = sysDC * psh * SYSTEM_PR * SYSTEM_AVAILABILITY;
+      if (expDaily < reqSolarE)    continue;       // solar too weak
+
+      // ── Scoring (lower = better) ──
+      const dcAcScore  = Math.abs(dcAc - DC_AC_TARGET) * 40;   // reward proximity to 1.3
+      const sizeScore  = (sysDC - minSolarKW) * 5;             // penalise excess solar
+      const costScore  = (bestPanel.panelsNeeded * bestPanel.price
+                         + sysDC * 3000
+                         + batt.totalCost
+                         + inv.price * u) * 0.0004;
+
+      candidates.push({
+        inv, invUnits: u, invAC,
+        invDC: inv.dc * u,
+        invMPPT: inv.mppt * u,
+        invPrice: inv.price * u,
+        bestPanel, sysDC, dcAc, batt,
+        expDaily, reqSolarE, battKWh,
+        score: dcAcScore + sizeScore + costScore
+      });
     }
   });
-  if(!bInv){bInv=DB.inverters.reduce((a,b)=>a.ac>b.ac?a:b);bUnits=1;}
-  return{inv:bInv,units:bUnits};
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => a.score - b.score);
+  return candidates[0];                            // ONE best compliant system
 }
 
 function showNoSystemFound(reasons){
@@ -687,7 +749,6 @@ function calculate(){
   if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
   clearNoSystemAlert();
 
-  // ★ Read from Load Builder instead of old dropdown
   const {peakLoad,dailyUsage}=getLoadBuilderValues();
   if(!peakLoad||!dailyUsage){
     toast('&#9888; Add appliances in the Load Builder first',true);
@@ -695,49 +756,72 @@ function calculate(){
     return;
   }
 
-  // Reset compliance while calculating
   set('i-nrs097-status','<span style="color:var(--muted);font-size:11px">Checking&#8230;</span>');
   set('i-model-comp-badge','<span class="comp-kpi-checking">&#8203;Checking NRS 097&#8230;</span>');
   const det=document.getElementById('i-nrs097-detail');if(det){det.textContent='';det.style.display='none';}
   const alt=document.getElementById('i-nrs097-alt');if(alt){alt.className='comp-alt';}
 
-  const psh=selectedLoc.gti,locName=selectedLoc.label;
+  const psh=selectedLoc.gti, locName=selectedLoc.label;
   const autonomy=parseFloat(document.getElementById('sel-autonomy').value);
   const tariff=parseFloat(document.getElementById('sel-tariff').value);
   const markup=parseFloat(document.getElementById('sel-markup').value)/100;
 
-  const battBackupKWh=dailyUsage*(autonomy/24);
-  const battRecharge=battBackupKWh/BATT_ROUND_TRIP_EFF;
-  const reqSolarEnergy=(dailyUsage-battBackupKWh)+battRecharge;
-  const effFactor=psh*SYSTEM_PR*SYSTEM_AVAILABILITY;
-  const reqSolarKW=reqSolarEnergy/effFactor;
+  // ── INVERTER-FIRST: find ONE best compliant combination ──────────────────
+  const sys = findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh);
 
-  let bestPanel=null,bestOs=Infinity;
-  DB.panels.forEach(p=>{const n=Math.ceil(reqSolarKW*1000/p.watts),dc=n*p.watts/1000,os=dc-reqSolarKW;if(os>=0&&os<bestOs){bestOs=os;bestPanel={...p,panelsNeeded:n,dcKW:dc};}});
-  if(!bestPanel){const p=DB.panels[DB.panels.length-1];bestPanel={...p,panelsNeeded:Math.ceil(reqSolarKW*1000/p.watts)};bestPanel.dcKW=bestPanel.panelsNeeded*p.watts/1000;}
+  if (!sys) {
+    const whyFails = [];
+    const reqInvAC_chk = peakLoad * 1.3;
+    const hasInv = DB.inverters.some(inv => {
+      for (let u = 1; u <= 4; u++) if (inv.ac * u >= reqInvAC_chk) return true;
+      return false;
+    });
+    if (!hasInv) {
+      whyFails.push('No inverter (single or parallel) handles '
+        + fN(reqInvAC_chk, 1) + ' kW (peak × 1.3 safety margin)'
+        + ' — upload a larger inverter via <strong>My Hardware</strong>');
+    }
+    const battTest = selectBestBattery(dailyUsage * (autonomy / 24), peakLoad, autonomy);
+    if (!battTest) {
+      whyFails.push('No battery configuration achieves DoD ≤ 85% for '
+        + autonomy + ' h at ' + fN(peakLoad, 1) + ' kW'
+        + ' — reduce backup hours, reduce load, or upload larger batteries');
+    } else if (battTest.totalKW < peakLoad) {
+      whyFails.push('Battery continuous power (' + fN(battTest.totalKW, 1)
+        + ' kW) is below peak load (' + fN(peakLoad, 1)
+        + ' kW) — upload a higher-power battery unit');
+    }
+    if (!whyFails.length) {
+      whyFails.push(
+        'No inverter + solar combination can satisfy the NRS 097-2-1 DC/AC range (1.0 – 1.5)'
+        + ' for a ' + fN(peakLoad, 1) + ' kW peak load'
+        + ' — reduce appliances in the Load Builder, increase backup hours,'
+        + ' or upload a wider hardware range via <strong>My Hardware</strong>'
+      );
+    }
+    showNoSystemFound(whyFails);
+    return;
+  }
 
-  const sysDC=bestPanel.dcKW,expDaily=sysDC*psh*SYSTEM_PR*SYSTEM_AVAILABILITY;
-  const osP=(sysDC-reqSolarKW)/reqSolarKW,annSolar=expDaily*365;
-  const specYield=annSolar/sysDC,annCons=dailyUsage*365;
-  const pc=bestPanel.panelsNeeded,fp=pc*2.2;
-  const rfd=pc<=14?['Easy Fit','Single roof plane.']:pc<=20?['Standard Fit','May use multiple sections.']:pc<=30?['Complex Layout','East/West layout recommended.']:pc<=50?['Large System','Carport or ground mount may be needed.']:['Industrial Array','Multiple sections or ground mount required.'];
-  const solarOK=expDaily>=reqSolarEnergy&&osP>=0;
+  // ── Unpack the winning system ─────────────────────────────────────────────
+  const { inv: bInv, invUnits: iU, invAC, invDC, invMPPT, invPrice,
+          bestPanel, sysDC, dcAc, batt, expDaily } = sys;
 
-  const batt=selectBestBattery(battBackupKWh,peakLoad,autonomy);
-  const reqInvAC=peakLoad*1.3;
-  const{inv:bInv,units:iU}=selectBestInverter(reqInvAC,sysDC);
-  const invAC=bInv.ac*iU,invDC=bInv.dc*iU,invPrice=bInv.price*iU,invMPPT=bInv.mppt*iU;
-  const invOK=invAC>=reqInvAC,dcAc=sysDC/invAC;
-
-  const fails=[];
-  if(!solarOK) fails.push('Solar ('+fN(expDaily,2)+' kWh/day net) cannot cover daytime load + recharge ('+fN(reqSolarEnergy,2)+' kWh needed)');
-  if(!batt) fails.push('Battery: no LiFePO4 config achieves DoD &#8804; 85% for '+autonomy+'h at '+fN(peakLoad,1)+' kW — increase backup hours or upload larger batteries');
-  if(batt&&batt.totalKW<peakLoad) fails.push('Battery power ('+fN(batt.totalKW,1)+' kW) below peak load ('+fN(peakLoad,1)+' kW)');
-  if(!invOK) fails.push('Inverter AC ('+fN(invAC,1)+' kW) below required '+fN(reqInvAC,1)+' kW (peak × 1.3)');
-  if(dcAc>DC_AC_MAX) fails.push('DC/AC '+fN(dcAc,2)+' exceeds NRS 097-2-1 maximum of '+DC_AC_MAX);
-  // ── FIX: also block DC/AC below the NRS 097 minimum of 1.0 ──
-  if(dcAc<DC_AC_MIN_COMPLIANT) fails.push('DC/AC '+fN(dcAc,2)+' is below the NRS 097-2-1 minimum of 1.0 — the inverter AC output is too large for this solar array. Reduce peak load in the Load Builder or upload a larger solar panel range via My Hardware.');
-  if(fails.length>0){showNoSystemFound(fails);return;}
+  // Derived values — declared ONCE here, no conflicts
+  const battBackupKWh  = sys.battKWh;
+  const reqSolarEnergy = sys.reqSolarE;
+  const reqSolarKW     = reqSolarEnergy / (psh * SYSTEM_PR * SYSTEM_AVAILABILITY);
+  const osP            = (sysDC - reqSolarKW) / Math.max(reqSolarKW, 0.001);
+  const annSolar       = expDaily * 365;
+  const specYield      = annSolar / sysDC;
+  const annCons        = dailyUsage * 365;
+  const pc             = bestPanel.panelsNeeded;
+  const fp             = pc * 2.2;
+  const rfd = pc <= 14 ? ['Easy Fit','Single roof plane.']
+            : pc <= 20 ? ['Standard Fit','May use multiple sections.']
+            : pc <= 30 ? ['Complex Layout','East/West layout recommended.']
+            : pc <= 50 ? ['Large System','Carport or ground mount may be needed.']
+            :            ['Industrial Array','Multiple sections or ground mount required.'];
 
   const [dcAcTxt,dcAcColor]=dcAcLabel(dcAc);
   const iHeadroom=invAC-peakLoad,iModel=iU>1?iU+'x '+bInv.model+' (parallel)':bInv.model;
