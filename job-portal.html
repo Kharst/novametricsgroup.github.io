@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Solar Intelligence — Job Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -594,7 +595,6 @@
   </div>
   <div class="topbar-right">
     <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ offline</span>
-    <button class="config-btn" onclick="openConfig()">⚙ CONFIGURE</button>
   </div>
 </div>
 
@@ -1119,26 +1119,6 @@
 
 <!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
-
-<!-- Config Modal -->
-<div class="modal-overlay" id="config-modal">
-  <div class="modal">
-    <div class="modal-title">⚙ Supabase Configuration</div>
-    <div class="form-group" style="margin-bottom:14px">
-      <label class="form-label">Supabase URL</label>
-      <input type="text" class="form-input" id="cfg-url" placeholder="https://xxxx.supabase.co">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Anon Key</label>
-      <input type="text" class="form-input" id="cfg-key" placeholder="eyJh...">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeConfig()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveConfig()">Save & Connect</button>
-    </div>
-  </div>
-</div>
-
 <script>
 // ──────────────────────────────────────────────
 // CONFIG & STATE
@@ -1183,49 +1163,7 @@ async function sbPost(table, data) { return sb(table, 'POST', data); }
 async function sbPatch(table, query, data) { return sb(`${table}?${query}`, 'PATCH', data); }
 
 // ──────────────────────────────────────────────
-// CONFIG MODAL
-// ──────────────────────────────────────────────
-function openConfig() {
-  document.getElementById('cfg-url').value = SB_URL;
-  document.getElementById('cfg-key').value = SB_KEY;
-  document.getElementById('config-modal').classList.add('open');
-}
-function closeConfig() { document.getElementById('config-modal').classList.remove('open'); }
-function saveConfig() {
-  SB_URL = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
-  SB_KEY = document.getElementById('cfg-key').value.trim();
-  localStorage.setItem('si_sb_url', SB_URL);
-  localStorage.setItem('si_sb_key', SB_KEY);
-  closeConfig();
-  loadJobs();
-}
-
-// ──────────────────────────────────────────────
 // LOAD JOBS
-// ──────────────────────────────────────────────
-async function loadJobs() {
-  if (!SB_URL || !SB_KEY) {
-    document.getElementById('sync-status').textContent = '⬤ offline';
-    return;
-  }
-  try {
-    document.getElementById('sync-status').textContent = '⬤ syncing...';
-    document.getElementById('sync-status').style.color = 'var(--amber)';
-    const data = await sbGet('ai_results',
-      `select=ai_id,client_name,client_address,system_size_kw,battery_capacity_kwh,job_status,site_visit_date,site_visit_time,installation_date,assigned_team,created_at` +
-      `&job_status=neq.lead&job_status=neq.quoted&order=created_at.desc`
-    );
-    jobs = data || [];
-    renderSidebar();
-    document.getElementById('sync-status').textContent = `⬤ ${jobs.length} jobs`;
-    document.getElementById('sync-status').style.color = 'var(--green)';
-  } catch(e) {
-    toast('Failed to load jobs: ' + e.message, 'error');
-    document.getElementById('sync-status').textContent = '⬤ error';
-    document.getElementById('sync-status').style.color = 'var(--red)';
-  }
-}
-
 // ──────────────────────────────────────────────
 // SIDEBAR
 // ──────────────────────────────────────────────
