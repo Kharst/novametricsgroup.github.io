@@ -53,7 +53,6 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
   </div>
   <div class="header-right" id="header-actions" style="display:none">
     <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
-    <button class="btn btn-accept" id="btn-accept-hdr" onclick="acceptProposal()">✅ Accept This Proposal</button>
   </div>
   <div class="header-right" id="header-accepted" style="display:none">
     <div class="accepted-badge">🏆 Proposal Accepted</div>
@@ -91,7 +90,9 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
     <div class="proposal-info">Solar Proposal — <strong id="info-name">—</strong> — <strong id="info-loc">—</strong></div>
     <div class="toolbar-btns">
       <button class="btn btn-ghost" onclick="triggerDownload()">⬇ Download PDF</button>
-      <button class="btn btn-accept" id="btn-accept-toolbar" onclick="acceptProposal()">✅ Accept This Proposal</button>
+      <button class="btn btn-accept" id="btn-accept-toolbar" onclick="acceptProposal()">
+  ✅ Accept &amp; Proceed to Installation
+</button>
     </div>
   </div>
   <iframe id="pdf-frame" title="Solar Proposal"></iframe>
@@ -100,7 +101,9 @@ iframe#pdf-frame{flex:1;border:none;background:#fff;width:100%;min-height:0}
 <div id="mobile-fallback">
   <div class="state-icon">📄</div>
   <div class="state-title">Your Solar Proposal is Ready</div>
-  <div class="state-sub">Review the proposal, then tap Accept when you're ready to proceed.</div>
+  <div class="state-sub">
+  Your solar system has been designed and is ready to proceed. Tap <strong>Accept This Proposal</strong> to confirm — your installer will contact you shortly to arrange your site visit.
+</div>
   <a id="mobile-open-btn" class="btn btn-gold" href="#" style="width:100%;max-width:320px;justify-content:center">📄 Open Proposal PDF</a>
   <button class="btn btn-accept" id="btn-accept-mobile" onclick="acceptProposal()" style="width:100%;max-width:320px;justify-content:center">✅ Accept This Proposal</button>
 </div>
@@ -111,7 +114,7 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 
 const params = new URLSearchParams(window.location.search);
 const aiId   = params.get('id');
-const ACCEPT_BTN_IDS = ['btn-accept-hdr','btn-accept-toolbar','btn-accept-mobile'];
+const ACCEPT_BTN_IDS = ['btn-accept-toolbar','btn-accept-mobile'];
 
 function showState(id) {
   ['state-loading','state-error','state-accepted','pdf-container','mobile-fallback']
@@ -128,12 +131,27 @@ function isMobile() {
 
 function triggerDownload() {
   if (!aiId) return;
+  // Open the PDF — track as downloaded (NOT as accepted/won)
   const a = document.createElement('a');
-  a.href = `${SUPA_URL}/functions/v1/proposal-download/${aiId}`;
+  a.href = `${SUPA_URL}/functions/v1/proposal-download/${aiId}?source=client`;
   a.download = '';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  // Record pdf_downloaded_at — this is NOT a won signal
+  fetch(
+    `${SUPA_URL}/rest/v1/ai_results?ai_id=eq.${encodeURIComponent(aiId)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_ANON,
+        'Authorization': `Bearer ${SUPA_ANON}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ pdf_downloaded_at: new Date().toISOString() })
+    }
+  ).catch(() => {}); // silent — tracking only, never blocks the download
 }
 
 function showAccepted() {
@@ -191,7 +209,7 @@ async function boot() {
       { headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` } }
     );
     const rows = await chk.json();
-    if (rows && rows[0] && (rows[0].client_engaged || rows[0].proposal_status === 'accepted')) {
+    if (rows && rows[0] && rows[0].proposal_status === 'accepted') {
       showAccepted();
       return;
     }
