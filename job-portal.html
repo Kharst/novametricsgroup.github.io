@@ -593,9 +593,10 @@
   <div class="topbar-logo">
     ◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span>
   </div>
-  <div class="topbar-right">
+ <div class="topbar-right">
+    <a href="prposal_portal.html" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← Proposal Portal</a>
     <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ offline</span>
-  </div>
+</div>
 </div>
 
 <!-- LAYOUT -->
@@ -1939,6 +1940,30 @@ function getVal(id) {
 // ──────────────────────────────────────────────
 // INIT
 // ──────────────────────────────────────────────
+// ──────────────────────────────────────────────
+// LOAD JOBS (was missing — this is the fix)
+// ──────────────────────────────────────────────
+async function loadJobs() {
+  const syncEl = document.getElementById('sync-status');
+  try {
+    // Fetch all jobs that have moved past the "lead/quoted" stage
+    const data = await sbGet(
+      'ai_results',
+      'select=*&order=created_at.desc&job_status=neq.lead&job_status=neq.quoted'
+    );
+    jobs = data || [];
+    renderSidebar();
+    // ✅ Update the dot to green "online"
+    syncEl.textContent = '⬤ online';
+    syncEl.style.color = 'var(--green)';
+  } catch(e) {
+    // ❌ Keep dot red if something went wrong
+    syncEl.textContent = '⬤ error';
+    syncEl.style.color = 'var(--red)';
+    console.error('loadJobs failed:', e.message);
+  }
+}
+  
 document.addEventListener('DOMContentLoaded', () => {
   loadJobs();
   // Auto-refresh every 60s
