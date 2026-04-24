@@ -823,7 +823,7 @@ async function markAsWon(){
   var cname=(c&&c.ai&&c.ai.client_name)||(c&&c.lead&&c.lead.client_name)||'this client';
   if(!confirm('Manually mark proposal Won for '+cname+'?\n\nUse this only if the client accepted verbally.')) return;
   var nowIso=new Date().toISOString();
-  var patch={client_engaged:true,proposal_status:'accepted',won_at:nowIso};
+  var patch={client_engaged:true,proposal_status:'accepted',won_at:nowIso,job_status:'accepted'};
   if(c&&c.ai) Object.assign(c.ai,patch);
   renderClientList();
   try{
@@ -1120,7 +1120,7 @@ async function saveBooking(){
   try{
     var sess=await sb.auth.getSession();
     var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    var patch={site_visit_date:date,site_visit_time:time||null,site_visit_notes:notes||null,site_visit_confirmed:true};
+    var patch={site_visit_date:date,site_visit_time:time||null,site_visit_notes:notes||null,site_visit_confirmed:true,job_status:'site_visit_scheduled'};
     var res=await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
     if(res.ok||res.status===204){
       allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(activeAiId)){Object.assign(c.ai,patch);}});
