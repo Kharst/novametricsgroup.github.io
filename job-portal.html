@@ -1948,9 +1948,9 @@ async function loadJobs() {
   try {
     // Fetch all jobs that have moved past the "lead/quoted" stage
     const data = await sbGet(
-      'ai_results',
-      'select=*&order=created_at.desc&job_status=neq.lead&job_status=neq.quoted'
-    );
+  'ai_results',
+  'select=*&order=created_at.desc&or=(client_engaged.eq.true,job_status.not.is.null)'
+);
     jobs = data || [];
     renderSidebar();
     // ✅ Update the dot to green "online"
