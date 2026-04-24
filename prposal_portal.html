@@ -933,6 +933,10 @@ async function loadClients(){
       'won_at,rejected_at,created_at'+
       '&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
+    if(!Array.isArray(aiRows)){
+    console.warn('ai_results fetch failed:',aiRows);
+    aiRows=[];
+    }
     var aiByEmail={};
     (aiRows||[]).forEach(function(r){
       var k=(r.client_email||'').toLowerCase().trim();
