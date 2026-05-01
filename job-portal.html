@@ -26,410 +26,104 @@
     --mono:     'IBM Plex Mono', monospace;
     --sans:     'IBM Plex Sans', sans-serif;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  /* ── TOP BAR ── */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar-logo {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--amber);
-    letter-spacing: 0.08em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar-logo { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--amber); letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
   .topbar-logo span { color: var(--text2); font-weight: 400; }
   .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .config-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    background: transparent;
-    border: 1px solid var(--border2);
-    color: var(--text2);
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .config-btn:hover { border-color: var(--amber); color: var(--amber); }
-
-  /* ── LAYOUT ── */
   .layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 300px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-  }
-  .sidebar-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .sidebar-title {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text3);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .badge-count {
-    font-family: var(--mono);
-    font-size: 10px;
-    background: var(--amber);
-    color: #000;
-    padding: 2px 7px;
-    border-radius: 10px;
-    font-weight: 600;
-  }
-  .search-box {
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .search-box input {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 7px 10px;
-    border-radius: 4px;
-    outline: none;
-  }
+  .sidebar { width: 300px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+  .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase; }
+  .badge-count { font-family: var(--mono); font-size: 10px; background: var(--amber); color: #000; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+  .search-box { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .search-box input { width: 100%; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 7px 10px; border-radius: 4px; outline: none; }
   .search-box input:focus { border-color: var(--amber); }
   .search-box input::placeholder { color: var(--text3); }
-
-  .filter-tabs {
-    display: flex;
-    padding: 8px 16px;
-    gap: 4px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .filter-tab {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 3px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text3);
-    cursor: pointer;
-    transition: all 0.12s;
-    white-space: nowrap;
-  }
+  .filter-tabs { display: flex; padding: 8px 16px; gap: 4px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .filter-tab { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
   .filter-tab.active, .filter-tab:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.08); }
-
   .job-list { flex: 1; overflow-y: auto; }
   .job-list::-webkit-scrollbar { width: 4px; }
-  .job-list::-webkit-scrollbar-track { background: transparent; }
   .job-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  .job-card {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    transition: background 0.12s;
-    position: relative;
-  }
+  .job-card { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
   .job-card:hover { background: var(--panel); }
   .job-card.active { background: rgba(245,166,35,0.07); border-left: 2px solid var(--amber); }
-  .job-card-name {
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--white);
-    margin-bottom: 3px;
-  }
-  .job-card-ref {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    margin-bottom: 6px;
-  }
+  .job-card-name { font-weight: 600; font-size: 13px; color: var(--white); margin-bottom: 3px; }
+  .job-card-ref { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 6px; }
   .job-card-meta { display: flex; justify-content: space-between; align-items: center; }
   .job-card-kw { font-family: var(--mono); font-size: 11px; color: var(--text2); }
-  .stage-pill {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .stage--site_visit_scheduled  { background: rgba(74,158,255,0.15); color: var(--blue); }
-  .stage--site_visit_complete   { background: rgba(74,158,255,0.25); color: var(--blue); }
-  .stage--installation_scheduled{ background: rgba(245,166,35,0.15); color: var(--amber); }
-  .stage--installation_in_progress{ background: rgba(245,166,35,0.25); color: var(--amber2); }
-  .stage--installation_complete { background: rgba(46,204,138,0.15); color: var(--green); }
-  .stage--handed_over           { background: rgba(46,204,138,0.3);  color: var(--green); }
-  .stage--accepted              { background: rgba(138,154,184,0.15); color: var(--text2); }
-  .stage--lead, .stage--quoted  { background: rgba(90,106,133,0.15); color: var(--text3); }
-
-  .empty-state {
-    padding: 40px 16px;
-    text-align: center;
-    color: var(--text3);
-    font-size: 12px;
-  }
-
-  /* ── MAIN CONTENT ── */
+  .stage-pill { font-family: var(--mono); font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stage--site_visit_scheduled   { background: rgba(74,158,255,0.15); color: var(--blue); }
+  .stage--site_visit_complete    { background: rgba(74,158,255,0.25); color: var(--blue); }
+  .stage--installation_scheduled { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .stage--installation_in_progress { background: rgba(245,166,35,0.25); color: var(--amber2); }
+  .stage--installation_complete  { background: rgba(46,204,138,0.15); color: var(--green); }
+  .stage--handed_over            { background: rgba(46,204,138,0.3);  color: var(--green); }
+  .stage--accepted               { background: rgba(138,154,184,0.15); color: var(--text2); }
+  .stage--lead, .stage--quoted   { background: rgba(90,106,133,0.15); color: var(--text3); }
+  .empty-state { padding: 40px 16px; text-align: center; color: var(--text3); font-size: 12px; }
   .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
   .main::-webkit-scrollbar { width: 6px; }
-  .main::-webkit-scrollbar-track { background: transparent; }
   .main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-  .placeholder-screen {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 12px;
-    color: var(--text3);
-  }
+  .placeholder-screen { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: var(--text3); }
   .placeholder-screen svg { opacity: 0.2; }
   .placeholder-screen h3 { font-family: var(--mono); font-size: 14px; color: var(--text2); }
   .placeholder-screen p { font-size: 12px; }
-
-  /* ── JOB HEADER ── */
-  .job-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 28px;
-    display: none;
-  }
+  .job-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 28px; display: none; }
   .job-header.visible { display: block; }
   .jh-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
   .jh-name { font-size: 20px; font-weight: 600; color: var(--white); }
   .jh-ref { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
   .jh-actions { display: flex; gap: 8px; }
   .jh-stats { display: flex; gap: 24px; }
-  .stat-item { }
   .stat-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
   .stat-value { font-family: var(--mono); font-size: 13px; color: var(--amber); font-weight: 600; margin-top: 2px; }
-
-  /* ── PIPELINE ── */
-  .pipeline {
-    display: flex;
-    align-items: center;
-    padding: 16px 28px;
-    border-bottom: 1px solid var(--border);
-    gap: 0;
-    overflow-x: auto;
-    background: var(--bg);
-  }
-  .pipe-step {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    flex-shrink: 0;
-  }
-  .pipe-node {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    padding: 0 4px;
-  }
-  .pipe-dot {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid var(--border2);
-    background: var(--surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text3);
-    transition: all 0.2s;
-  }
-  .pipe-dot.done { border-color: var(--green); background: rgba(46,204,138,0.1); color: var(--green); }
+  .pipeline { display: flex; align-items: center; padding: 16px 28px; border-bottom: 1px solid var(--border); gap: 0; overflow-x: auto; background: var(--bg); }
+  .pipe-step { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+  .pipe-node { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0 4px; }
+  .pipe-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); transition: all 0.2s; }
+  .pipe-dot.done   { border-color: var(--green); background: rgba(46,204,138,0.1); color: var(--green); }
   .pipe-dot.active { border-color: var(--amber); background: rgba(245,166,35,0.1); color: var(--amber); box-shadow: 0 0 12px rgba(245,166,35,0.3); }
   .pipe-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-align: center; max-width: 60px; line-height: 1.2; }
-  .pipe-label.done { color: var(--green); }
+  .pipe-label.done   { color: var(--green); }
   .pipe-label.active { color: var(--amber); }
   .pipe-arrow { width: 32px; height: 2px; background: var(--border2); flex-shrink: 0; }
   .pipe-arrow.done { background: var(--green2); }
-
-  /* ── STAGE PANELS ── */
   .stage-panels { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
-
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .panel-header {
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 1px solid var(--border);
-    background: var(--panel);
-  }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border); background: var(--panel); }
   .panel-header:hover { background: rgba(255,255,255,0.03); }
   .panel-title-group { display: flex; align-items: center; gap: 10px; }
-  .panel-step-num {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text3);
-    background: var(--border);
-    padding: 2px 7px;
-    border-radius: 3px;
-  }
+  .panel-step-num { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); background: var(--border); padding: 2px 7px; border-radius: 3px; }
   .panel.current .panel-step-num { background: rgba(245,166,35,0.2); color: var(--amber); }
-  .panel.done .panel-step-num { background: rgba(46,204,138,0.1); color: var(--green); }
+  .panel.done .panel-step-num    { background: rgba(46,204,138,0.1); color: var(--green); }
   .panel-title { font-weight: 600; font-size: 14px; color: var(--white); }
-  .panel-status-badge { }
   .panel-toggle { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
   .panel.open .panel-toggle { transform: rotate(180deg); }
   .panel-body { display: none; padding: 20px; }
   .panel.open .panel-body { display: block; }
   .panel.locked { opacity: 0.5; pointer-events: none; }
   .panel.locked .panel-header { cursor: not-allowed; }
-
-  /* ── FORM ELEMENTS ── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .form-full { grid-column: 1 / -1; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .form-input, .form-select, .form-textarea {
-    background: var(--bg);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 12px;
-    padding: 8px 10px;
-    border-radius: 4px;
-    outline: none;
-    transition: border-color 0.15s;
-    width: 100%;
-  }
+  .form-full   { grid-column: 1 / -1; }
+  .form-group  { display: flex; flex-direction: column; gap: 5px; }
+  .form-label  { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 8px 10px; border-radius: 4px; outline: none; transition: border-color 0.15s; width: 100%; }
   .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--amber); }
-  .form-select { appearance: none; cursor: pointer; }
+  .form-select  { appearance: none; cursor: pointer; }
   .form-textarea { resize: vertical; min-height: 70px; }
-  .form-input:disabled, .form-select:disabled, .form-textarea:disabled {
-    opacity: 0.5; cursor: not-allowed;
-  }
-
-  /* toggle switch */
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
-  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
-  .toggle {
-    width: 36px; height: 20px;
-    background: var(--border2);
-    border-radius: 10px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.2s;
-    border: none;
-    flex-shrink: 0;
-  }
-  .toggle::after {
-    content: '';
-    position: absolute;
-    width: 14px; height: 14px;
-    background: #fff;
-    border-radius: 50%;
-    top: 3px; left: 3px;
-    transition: transform 0.2s;
-  }
-  .toggle.on { background: var(--green); }
-  .toggle.on::after { transform: translateX(16px); }
-  .toggle-label { font-size: 12px; color: var(--text2); }
-
-  /* Checklist */
+  .form-input:disabled, .form-select:disabled, .form-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
   .checklist { display: flex; flex-direction: column; gap: 6px; }
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    transition: border-color 0.15s;
-  }
+  .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; transition: border-color 0.15s; }
   .check-item.checked { border-color: var(--green2); background: rgba(46,204,138,0.04); }
   .check-item input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
   .check-item-label { flex: 1; font-size: 12px; color: var(--text2); }
   .check-item.checked .check-item-label { color: var(--text3); text-decoration: line-through; }
-  .check-item-notes {
-    font-family: var(--mono);
-    font-size: 11px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text2);
-    padding: 4px 8px;
-    border-radius: 3px;
-    width: 140px;
-  }
-
-  /* Buttons */
-  .btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 9px 18px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.04em;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-transform: uppercase;
-  }
+  .check-item-notes { font-family: var(--mono); font-size: 11px; background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 4px 8px; border-radius: 3px; width: 140px; }
+  .btn { font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 9px 18px; border-radius: 4px; border: none; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; }
   .btn-primary { background: var(--amber); color: #000; }
   .btn-primary:hover { background: var(--amber2); }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -437,145 +131,38 @@
   .btn-green:hover { filter: brightness(1.1); }
   .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
   .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
-  .btn-danger { background: transparent; border: 1px solid var(--red); color: var(--red); }
-  .btn-danger:hover { background: rgba(224,82,82,0.1); }
-
   .btn-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-
-  /* Section divider */
-  .section-sep {
-    margin: 20px 0;
-    border: none;
-    border-top: 1px solid var(--border);
-  }
-  .section-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 12px;
-  }
-
-  /* Info card */
-  .info-card {
-    background: rgba(74,158,255,0.07);
-    border: 1px solid rgba(74,158,255,0.2);
-    border-radius: 5px;
-    padding: 12px 14px;
-    font-size: 12px;
-    color: var(--blue);
-    margin-bottom: 16px;
-  }
+  .section-sep { margin: 20px 0; border: none; border-top: 1px solid var(--border); }
+  .section-label { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+  .info-card { background: rgba(74,158,255,0.07); border: 1px solid rgba(74,158,255,0.2); border-radius: 5px; padding: 12px 14px; font-size: 12px; color: var(--blue); margin-bottom: 16px; }
   .info-card.warning { background: rgba(245,166,35,0.07); border-color: rgba(245,166,35,0.2); color: var(--amber); }
   .info-card.success { background: rgba(46,204,138,0.07); border-color: rgba(46,204,138,0.2); color: var(--green); }
-
-  /* Completed panel summary */
-  .completed-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .cs-item { background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 10px 12px; }
-  .cs-key { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; margin-bottom: 3px; }
-  .cs-val { font-family: var(--mono); font-size: 12px; color: var(--text2); }
-
-  /* Activity log */
-  .activity-log {
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 16px;
-  }
-  .activity-log-header {
-    background: var(--panel);
-    padding: 8px 14px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-  .log-entry {
-    padding: 8px 14px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    font-size: 11px;
-  }
-  .log-time { font-family: var(--mono); color: var(--text3); flex-shrink: 0; }
-  .log-msg { color: var(--text2); }
+  .activity-log { border: 1px solid var(--border); border-radius: 5px; overflow: hidden; margin-top: 16px; }
+  .activity-log-header { background: var(--panel); padding: 8px 14px; font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
+  .log-entry { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; font-size: 11px; }
+  .log-time  { font-family: var(--mono); color: var(--text3); flex-shrink: 0; }
+  .log-msg   { color: var(--text2); }
   .log-stage { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 2px; background: var(--border); color: var(--text3); flex-shrink: 0; }
-
-  /* Handover document */
-  .handover-doc {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 24px;
-  }
-  .hd-logo { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
+  .handover-doc { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 24px; }
+  .hd-logo  { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
   .hd-title { font-size: 20px; font-weight: 300; color: var(--text); margin-bottom: 20px; letter-spacing: -0.01em; }
-  .hd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .hd-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .hd-section-title { font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-  .hd-row { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .hd-row   { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .hd-row-key { color: var(--text3); }
   .hd-row-val { font-family: var(--mono); color: var(--text2); }
-  .hd-warranty { margin-top: 16px; }
   .warranty-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--text2); }
   .warranty-item::before { content: '✓'; color: var(--green); font-size: 11px; }
   .hd-sign-block { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
   .sign-line { border-bottom: 1px solid var(--border2); padding-top: 40px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
-
-  /* Config modal */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: 8px;
-    padding: 28px;
-    width: 420px;
-    max-width: 95vw;
-  }
-  .modal-title { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--amber); margin-bottom: 20px; }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
-
-  /* toast */
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-  .toast {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 10px 16px;
-    border-radius: 5px;
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    min-width: 220px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: all 0.25s;
-    pointer-events: none;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .toast { font-family: var(--mono); font-size: 11px; padding: 10px 16px; border-radius: 5px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); min-width: 220px; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; }
+  .toast.show    { opacity: 1; transform: translateY(0); pointer-events: auto; }
   .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--red); color: var(--red); }
-  .toast.info { border-color: var(--blue); color: var(--blue); }
-
-  /* print */
+  .toast.error   { border-color: var(--red);   color: var(--red);   }
+  .toast.info    { border-color: var(--blue);   color: var(--blue);  }
   @media print {
-    .topbar, .sidebar, .pipeline, .btn-row, .config-btn, .stage-panels > *:not(.panel.print-target) { display: none !important; }
+    .topbar, .sidebar, .pipeline, .btn-row, .stage-panels > *:not(.panel.print-target) { display: none !important; }
     .layout { height: auto; }
     .main { overflow: visible; }
     .handover-doc { border: none; padding: 0; }
@@ -584,25 +171,20 @@
     .hd-row-key, .sign-line { color: #555 !important; }
   }
 </style>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-logo">
-    ◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span>
-  </div>
- <div class="topbar-right">
+  <div class="topbar-logo">◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span></div>
+  <div class="topbar-right">
     <a href="prposal_portal.html" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← Proposal Portal</a>
-    <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ offline</span>
-</div>
+    <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ connecting</span>
+    <button onclick="doSignOut()" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text3);padding:5px 10px;border-radius:4px;cursor:pointer;">Sign out</button>
+  </div>
 </div>
 
-<!-- LAYOUT -->
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="sidebar-header">
       <span class="sidebar-title">Active Jobs</span>
@@ -612,23 +194,20 @@
       <input type="text" id="search-input" placeholder="Search name, ref, address..." oninput="filterJobs()">
     </div>
     <div class="filter-tabs">
-      <button class="filter-tab active" data-filter="all" onclick="setFilter(this,'all')">All</button>
-      <button class="filter-tab" data-filter="site_visit_scheduled" onclick="setFilter(this,'site_visit_scheduled')">Visit</button>
-      <button class="filter-tab" data-filter="installation" onclick="setFilter(this,'installation')">Install</button>
-      <button class="filter-tab" data-filter="handed_over" onclick="setFilter(this,'handed_over')">Done</button>
+      <button class="filter-tab active" data-filter="all"                    onclick="setFilter(this,'all')">All</button>
+      <button class="filter-tab"        data-filter="site_visit_scheduled"   onclick="setFilter(this,'site_visit_scheduled')">Visit</button>
+      <button class="filter-tab"        data-filter="installation"           onclick="setFilter(this,'installation')">Install</button>
+      <button class="filter-tab"        data-filter="handed_over"            onclick="setFilter(this,'handed_over')">Done</button>
     </div>
     <div class="job-list" id="job-list">
       <div class="empty-state" id="empty-sidebar">
         <div style="font-size:24px;margin-bottom:8px">📋</div>
-        Configure Supabase to load jobs
+        No won jobs yet
       </div>
     </div>
   </div>
 
-  <!-- MAIN -->
   <div class="main" id="main-content">
-
-    <!-- Placeholder -->
     <div class="placeholder-screen" id="placeholder">
       <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
         <rect x="8" y="8" width="48" height="48" rx="4" stroke="#4a5568" stroke-width="2"/>
@@ -639,15 +218,13 @@
       <p>Choose a job from the sidebar to open its workspace</p>
     </div>
 
-    <!-- Job Workspace (hidden until job selected) -->
     <div id="job-workspace" style="display:none; flex-direction:column; flex:1">
 
-      <!-- Job Header -->
       <div class="job-header visible" id="job-header">
         <div class="jh-top">
           <div>
             <div class="jh-name" id="jh-name">—</div>
-            <div class="jh-ref" id="jh-ref">—</div>
+            <div class="jh-ref"  id="jh-ref">—</div>
           </div>
           <div class="jh-actions">
             <button class="btn btn-ghost" onclick="refreshCurrentJob()">↻ Refresh</button>
@@ -662,550 +239,347 @@
         </div>
       </div>
 
-      <!-- Pipeline -->
       <div class="pipeline" id="pipeline">
-        <div class="pipe-step">
-          <div class="pipe-node" onclick="jumpToPanel(0)">
-            <div class="pipe-dot" id="pdot-0">1</div>
-            <div class="pipe-label" id="plbl-0">Site Visit</div>
-          </div>
-          <div class="pipe-arrow" id="parr-0"></div>
-        </div>
-        <div class="pipe-step">
-          <div class="pipe-node" onclick="jumpToPanel(1)">
-            <div class="pipe-dot" id="pdot-1">2</div>
-            <div class="pipe-label" id="plbl-1">Installation Prep</div>
-          </div>
-          <div class="pipe-arrow" id="parr-1"></div>
-        </div>
-        <div class="pipe-step">
-          <div class="pipe-node" onclick="jumpToPanel(2)">
-            <div class="pipe-dot" id="pdot-2">3</div>
-            <div class="pipe-label" id="plbl-2">Installation</div>
-          </div>
-          <div class="pipe-arrow" id="parr-2"></div>
-        </div>
-        <div class="pipe-step">
-          <div class="pipe-node" onclick="jumpToPanel(3)">
-            <div class="pipe-dot" id="pdot-3">4</div>
-            <div class="pipe-label" id="plbl-3">Completion</div>
-          </div>
-          <div class="pipe-arrow" id="parr-3"></div>
-        </div>
-        <div class="pipe-step">
-          <div class="pipe-node" onclick="jumpToPanel(4)">
-            <div class="pipe-dot" id="pdot-4">5</div>
-            <div class="pipe-label" id="plbl-4">Handover</div>
-          </div>
-        </div>
+        <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(0)"><div class="pipe-dot" id="pdot-0">1</div><div class="pipe-label" id="plbl-0">Site Visit</div></div><div class="pipe-arrow" id="parr-0"></div></div>
+        <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(1)"><div class="pipe-dot" id="pdot-1">2</div><div class="pipe-label" id="plbl-1">Install Prep</div></div><div class="pipe-arrow" id="parr-1"></div></div>
+        <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(2)"><div class="pipe-dot" id="pdot-2">3</div><div class="pipe-label" id="plbl-2">Installation</div></div><div class="pipe-arrow" id="parr-2"></div></div>
+        <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(3)"><div class="pipe-dot" id="pdot-3">4</div><div class="pipe-label" id="plbl-3">Completion</div></div><div class="pipe-arrow" id="parr-3"></div></div>
+        <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(4)"><div class="pipe-dot" id="pdot-4">5</div><div class="pipe-label" id="plbl-4">Handover</div></div></div>
       </div>
 
-      <!-- Stage Panels -->
       <div class="stage-panels" id="stage-panels">
 
-        <!-- ══ PANEL 1: SITE VISIT ══ -->
+        <!-- PANEL 1: SITE VISIT -->
         <div class="panel" id="panel-0">
           <div class="panel-header" onclick="togglePanel(0)">
-            <div class="panel-title-group">
-              <span class="panel-step-num">STEP 1</span>
-              <span class="panel-title">Site Visit Assessment</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="stage-pill" id="panel-0-badge"></span>
-              <span class="panel-toggle">▾</span>
-            </div>
+            <div class="panel-title-group"><span class="panel-step-num">STEP 1</span><span class="panel-title">Site Visit Assessment</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-0-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-0-body">
-
-            <div class="info-card" id="sv-info-card">
-              Complete the on-site assessment below. All fields help generate accurate COC and handover documents.
-            </div>
-
+            <div class="info-card">Complete the on-site assessment below. All fields help generate accurate COC and handover documents.</div>
             <div class="section-label">Visit Details</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Assessor Name</label>
-                <input type="text" class="form-input" id="sv-assessor" placeholder="Your name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Visit Date & Time</label>
-                <input type="datetime-local" class="form-input" id="sv-datetime">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Municipality</label>
-                <input type="text" class="form-input" id="sv-municipality" placeholder="e.g. City of Johannesburg">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Grid Ref / Account No.</label>
-                <input type="text" class="form-input" id="sv-gridref" placeholder="Meter account number">
-              </div>
+              <div class="form-group"><label class="form-label">Assessor Name</label><input type="text" class="form-input" id="sv-assessor" placeholder="Your name"></div>
+              <div class="form-group"><label class="form-label">Visit Date &amp; Time</label><input type="datetime-local" class="form-input" id="sv-datetime"></div>
+              <div class="form-group"><label class="form-label">Municipality</label><input type="text" class="form-input" id="sv-municipality" placeholder="e.g. City of Johannesburg"></div>
+              <div class="form-group"><label class="form-label">Grid Ref / Account No.</label><input type="text" class="form-input" id="sv-gridref" placeholder="Meter account number"></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Roof Assessment</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Roof Type</label>
-                <select class="form-select" id="sv-rooftype">
-                  <option value="">Select...</option>
-                  <option>IBR / Corrugated Steel</option>
-                  <option>Concrete Tiles</option>
-                  <option>Flat Concrete</option>
-                  <option>Slate / Shingles</option>
-                  <option>Thatch</option>
-                  <option>Metal Deck</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Roof Condition</label>
-                <select class="form-select" id="sv-roofcondition">
-                  <option value="">Select...</option>
-                  <option value="excellent">Excellent</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair — Minor repairs needed</option>
-                  <option value="poor">Poor — Repairs required first</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Cable Run (metres)</label>
-                <input type="number" class="form-input" id="sv-cablerun" placeholder="e.g. 15">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Meter Type</label>
-                <select class="form-select" id="sv-metertype">
-                  <option value="">Select...</option>
-                  <option>Prepaid (Smart)</option>
-                  <option>Conventional (Credit)</option>
-                  <option>Net Metering</option>
-                  <option>Unknown</option>
-                </select>
-              </div>
+              <div class="form-group"><label class="form-label">Roof Type</label><select class="form-select" id="sv-rooftype"><option value="">Select...</option><option>IBR / Corrugated Steel</option><option>Concrete Tiles</option><option>Flat Concrete</option><option>Slate / Shingles</option><option>Thatch</option><option>Metal Deck</option></select></div>
+              <div class="form-group"><label class="form-label">Roof Condition</label><select class="form-select" id="sv-roofcondition"><option value="">Select...</option><option value="excellent">Excellent</option><option value="good">Good</option><option value="fair">Fair — Minor repairs needed</option><option value="poor">Poor — Repairs required first</option></select></div>
+              <div class="form-group"><label class="form-label">Cable Run (metres)</label><input type="number" class="form-input" id="sv-cablerun" placeholder="e.g. 15"></div>
+              <div class="form-group"><label class="form-label">Meter Type</label><select class="form-select" id="sv-metertype"><option value="">Select...</option><option>Prepaid (Smart)</option><option>Conventional (Credit)</option><option>Net Metering</option><option>Unknown</option></select></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Electrical</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Supply Phase</label>
-                <select class="form-select" id="sv-phase">
-                  <option value="">Select...</option>
-                  <option value="single">Single Phase</option>
-                  <option value="three">Three Phase</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">DB Board Adequate?</label>
-                <select class="form-select" id="sv-db">
-                  <option value="true">Yes — No upgrade needed</option>
-                  <option value="false">No — Upgrade required</option>
-                </select>
-              </div>
-              <div class="form-group form-full">
-                <label class="form-label">DB Board Notes</label>
-                <input type="text" class="form-input" id="sv-dbnotes" placeholder="Any issues or upgrade requirements...">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Earthing OK?</label>
-                <select class="form-select" id="sv-earthing">
-                  <option value="true">Yes</option>
-                  <option value="false">No — Earthing required</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Earthing Notes</label>
-                <input type="text" class="form-input" id="sv-earthingnotes" placeholder="Details if earthing needed...">
-              </div>
+              <div class="form-group"><label class="form-label">Supply Phase</label><select class="form-select" id="sv-phase"><option value="">Select...</option><option value="single">Single Phase</option><option value="three">Three Phase</option></select></div>
+              <div class="form-group"><label class="form-label">DB Board Adequate?</label><select class="form-select" id="sv-db"><option value="true">Yes — No upgrade needed</option><option value="false">No — Upgrade required</option></select></div>
+              <div class="form-group form-full"><label class="form-label">DB Board Notes</label><input type="text" class="form-input" id="sv-dbnotes" placeholder="Any issues or upgrade requirements..."></div>
+              <div class="form-group"><label class="form-label">Earthing OK?</label><select class="form-select" id="sv-earthing"><option value="true">Yes</option><option value="false">No — Earthing required</option></select></div>
+              <div class="form-group"><label class="form-label">Earthing Notes</label><input type="text" class="form-input" id="sv-earthingnotes" placeholder="Details if earthing needed..."></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Shading</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Shading Issues?</label>
-                <select class="form-select" id="sv-shading">
-                  <option value="false">No — Clear roof</option>
-                  <option value="true">Yes — Shading present</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Shading Notes</label>
-                <input type="text" class="form-input" id="sv-shadingnotes" placeholder="Trees, chimneys, neighbouring buildings...">
-              </div>
+              <div class="form-group"><label class="form-label">Shading Issues?</label><select class="form-select" id="sv-shading"><option value="false">No — Clear roof</option><option value="true">Yes — Shading present</option></select></div>
+              <div class="form-group"><label class="form-label">Shading Notes</label><input type="text" class="form-input" id="sv-shadingnotes" placeholder="Trees, chimneys, neighbouring buildings..."></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Recommended System</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Recommended System (kWp)</label>
-                <input type="number" step="0.1" class="form-input" id="sv-kw" placeholder="e.g. 10.5">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Recommended Battery (kWh)</label>
-                <input type="number" step="0.1" class="form-input" id="sv-battery" placeholder="e.g. 10.0">
-              </div>
-              <div class="form-group form-full">
-                <label class="form-label">Additional Notes</label>
-                <textarea class="form-textarea" id="sv-notes" placeholder="Anything else the installation team should know..."></textarea>
-              </div>
+              <div class="form-group"><label class="form-label">Recommended System (kWp)</label><input type="number" step="0.1" class="form-input" id="sv-kw" placeholder="e.g. 10.5"></div>
+              <div class="form-group"><label class="form-label">Recommended Battery (kWh)</label><input type="number" step="0.1" class="form-input" id="sv-battery" placeholder="e.g. 10.0"></div>
+              <div class="form-group form-full"><label class="form-label">Additional Notes</label><textarea class="form-textarea" id="sv-notes" placeholder="Anything else the installation team should know..."></textarea></div>
             </div>
-
             <div class="btn-row">
-              <button class="btn btn-primary" id="sv-complete-btn" onclick="completeSiteVisit()">✓ Complete Site Visit</button>
-              <button class="btn btn-ghost" onclick="saveSiteVisitDraft()">Save Draft</button>
+              <button class="btn btn-primary" onclick="completeSiteVisit()">✓ Complete Site Visit</button>
+              <button class="btn btn-ghost"   onclick="saveSiteVisitDraft()">Save Draft</button>
               <span id="sv-saving" style="font-family:var(--mono);font-size:11px;color:var(--text3);display:none">Saving...</span>
             </div>
           </div>
         </div>
 
-        <!-- ══ PANEL 2: INSTALLATION PREP ══ -->
+        <!-- PANEL 2: INSTALLATION PREP -->
         <div class="panel locked" id="panel-1">
           <div class="panel-header" onclick="togglePanel(1)">
-            <div class="panel-title-group">
-              <span class="panel-step-num">STEP 2</span>
-              <span class="panel-title">Installation Preparation</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="stage-pill" id="panel-1-badge"></span>
-              <span class="panel-toggle">▾</span>
-            </div>
+            <div class="panel-title-group"><span class="panel-step-num">STEP 2</span><span class="panel-title">Installation Preparation</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-1-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-1-body">
-
             <div class="section-label">Team Assignment</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Team Lead</label>
-                <input type="text" class="form-input" id="inst-teamlead" placeholder="Lead installer name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Team Members</label>
-                <input type="text" class="form-input" id="inst-team" placeholder="e.g. John, Sipho, Marco">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Installation Date</label>
-                <input type="date" class="form-input" id="inst-date">
-              </div>
+              <div class="form-group"><label class="form-label">Team Lead</label><input type="text" class="form-input" id="inst-teamlead" placeholder="Lead installer name"></div>
+              <div class="form-group"><label class="form-label">Team Members</label><input type="text" class="form-input" id="inst-team" placeholder="e.g. John, Sipho, Marco"></div>
+              <div class="form-group"><label class="form-label">Installation Date</label><input type="date" class="form-input" id="inst-date"></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Equipment Specification</div>
             <div class="form-grid-3">
-              <div class="form-group">
-                <label class="form-label">Panel Brand</label>
-                <input type="text" class="form-input" id="inst-panelbrand" placeholder="e.g. JA Solar">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Panel Wattage</label>
-                <input type="number" class="form-input" id="inst-panelwatt" placeholder="e.g. 550">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Panel Quantity</label>
-                <input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Inverter Brand</label>
-                <input type="text" class="form-input" id="inst-inverterbrand" placeholder="e.g. Sungrow">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Inverter Size (kW)</label>
-                <input type="number" step="0.1" class="form-input" id="inst-inverterkw" placeholder="e.g. 10.0">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Battery Brand</label>
-                <input type="text" class="form-input" id="inst-batterybrand" placeholder="e.g. BYD">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Battery kWh (each)</label>
-                <input type="number" step="0.1" class="form-input" id="inst-batterykwh" placeholder="e.g. 10.0">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Battery Quantity</label>
-                <input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1">
-              </div>
+              <div class="form-group"><label class="form-label">Panel Brand</label><input type="text" class="form-input" id="inst-panelbrand" placeholder="e.g. JA Solar"></div>
+              <div class="form-group"><label class="form-label">Panel Wattage</label><input type="number" class="form-input" id="inst-panelwatt" placeholder="e.g. 550"></div>
+              <div class="form-group"><label class="form-label">Panel Quantity</label><input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20"></div>
+              <div class="form-group"><label class="form-label">Inverter Brand</label><input type="text" class="form-input" id="inst-inverterbrand" placeholder="e.g. Sungrow"></div>
+              <div class="form-group"><label class="form-label">Inverter Size (kW)</label><input type="number" step="0.1" class="form-input" id="inst-inverterkw" placeholder="e.g. 10.0"></div>
+              <div class="form-group"><label class="form-label">Battery Brand</label><input type="text" class="form-input" id="inst-batterybrand" placeholder="e.g. BYD"></div>
+              <div class="form-group"><label class="form-label">Battery kWh (each)</label><input type="number" step="0.1" class="form-input" id="inst-batterykwh" placeholder="e.g. 10.0"></div>
+              <div class="form-group"><label class="form-label">Battery Quantity</label><input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1"></div>
             </div>
-
             <div class="btn-row">
               <button class="btn btn-primary" onclick="scheduleInstallation()">✓ Schedule Installation</button>
-              <button class="btn btn-ghost" onclick="saveInstallPrepDraft()">Save Draft</button>
+              <button class="btn btn-ghost"   onclick="saveInstallPrepDraft()">Save Draft</button>
             </div>
           </div>
         </div>
 
-        <!-- ══ PANEL 3: INSTALLATION ══ -->
+        <!-- PANEL 3: INSTALLATION CHECKLIST -->
         <div class="panel locked" id="panel-2">
           <div class="panel-header" onclick="togglePanel(2)">
-            <div class="panel-title-group">
-              <span class="panel-step-num">STEP 3</span>
-              <span class="panel-title">Installation Checklist</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="stage-pill" id="panel-2-badge"></span>
-              <span class="panel-toggle">▾</span>
-            </div>
+            <div class="panel-title-group"><span class="panel-step-num">STEP 3</span><span class="panel-title">Installation Checklist</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-2-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-2-body">
             <div class="info-card warning">Tick each item as the installation progresses. All items must be checked before completion.</div>
-
-            <div class="section-label">Pre-Installation</div>
-            <div class="checklist" id="checklist-pre"></div>
-
+            <div class="section-label">Pre-Installation</div><div class="checklist" id="checklist-pre"></div>
             <hr class="section-sep">
-            <div class="section-label">Structural & Mounting</div>
-            <div class="checklist" id="checklist-structural"></div>
-
+            <div class="section-label">Structural &amp; Mounting</div><div class="checklist" id="checklist-structural"></div>
             <hr class="section-sep">
-            <div class="section-label">Electrical</div>
-            <div class="checklist" id="checklist-electrical"></div>
-
+            <div class="section-label">Electrical</div><div class="checklist" id="checklist-electrical"></div>
             <hr class="section-sep">
-            <div class="section-label">Commissioning</div>
-            <div class="checklist" id="checklist-commissioning"></div>
-
+            <div class="section-label">Commissioning</div><div class="checklist" id="checklist-commissioning"></div>
             <div class="btn-row">
-              <button class="btn btn-primary" id="start-install-btn" onclick="startInstallation()">▶ Mark as In Progress</button>
+              <button class="btn btn-primary" onclick="startInstallation()">▶ Mark as In Progress</button>
             </div>
           </div>
         </div>
 
-        <!-- ══ PANEL 4: COMPLETION ══ -->
+        <!-- PANEL 4: COMPLETION -->
         <div class="panel locked" id="panel-3">
           <div class="panel-header" onclick="togglePanel(3)">
-            <div class="panel-title-group">
-              <span class="panel-step-num">STEP 4</span>
-              <span class="panel-title">Final Completion & Sign-off</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="stage-pill" id="panel-3-badge"></span>
-              <span class="panel-toggle">▾</span>
-            </div>
+            <div class="panel-title-group"><span class="panel-step-num">STEP 4</span><span class="panel-title">Final Completion &amp; Sign-off</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-3-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-3-body">
-
             <div class="section-label">Final System Specs (as installed)</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Final System kWp</label>
-                <input type="number" step="0.1" class="form-input" id="comp-kw" placeholder="Total installed kWp">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Final Battery kWh</label>
-                <input type="number" step="0.1" class="form-input" id="comp-battery" placeholder="Total installed kWh">
-              </div>
-              <div class="form-group form-full">
-                <label class="form-label">Punch List / Outstanding Items</label>
-                <textarea class="form-textarea" id="comp-punchlist" placeholder="Any items to address after sign-off..."></textarea>
-              </div>
+              <div class="form-group"><label class="form-label">Final System kWp</label><input type="number" step="0.1" class="form-input" id="comp-kw" placeholder="Total installed kWp"></div>
+              <div class="form-group"><label class="form-label">Final Battery kWh</label><input type="number" step="0.1" class="form-input" id="comp-battery" placeholder="Total installed kWh"></div>
+              <div class="form-group form-full"><label class="form-label">Punch List / Outstanding Items</label><textarea class="form-textarea" id="comp-punchlist" placeholder="Any items to address after sign-off..."></textarea></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Inspector Sign-off</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Inspector Name</label>
-                <input type="text" class="form-input" id="comp-inspector" placeholder="Qualified person name">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Date Inspected</label>
-                <input type="date" class="form-input" id="comp-inspdate">
-              </div>
+              <div class="form-group"><label class="form-label">Inspector Name</label><input type="text" class="form-input" id="comp-inspector" placeholder="Qualified person name"></div>
+              <div class="form-group"><label class="form-label">Date Inspected</label><input type="date" class="form-input" id="comp-inspdate"></div>
             </div>
-
             <div class="btn-row">
               <button class="btn btn-green" onclick="completeInstallation()">✓ Mark Installation Complete</button>
             </div>
           </div>
         </div>
 
-        <!-- ══ PANEL 5: HANDOVER ══ -->
+        <!-- PANEL 5: HANDOVER -->
         <div class="panel locked" id="panel-4">
           <div class="panel-header" onclick="togglePanel(4)">
-            <div class="panel-title-group">
-              <span class="panel-step-num">STEP 5</span>
-              <span class="panel-title">Customer Handover</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:10px">
-              <span class="stage-pill" id="panel-4-badge"></span>
-              <span class="panel-toggle">▾</span>
-            </div>
+            <div class="panel-title-group"><span class="panel-step-num">STEP 5</span><span class="panel-title">Customer Handover</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-4-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-4-body">
-
             <div class="section-label">Certificate of Compliance (COC)</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">COC Number</label>
-                <input type="text" class="form-input" id="ho-cocnum" placeholder="e.g. COC-2025-00123">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Issued By</label>
-                <input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number">
-              </div>
-              <div class="form-group">
-                <label class="form-label">COC Issue Date</label>
-                <input type="date" class="form-input" id="ho-cocdate">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Grid Application Ref</label>
-                <input type="text" class="form-input" id="ho-gridref" placeholder="NRS097 / municipal ref">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Grid Approved?</label>
-                <select class="form-select" id="ho-gridapproved">
-                  <option value="false">Pending</option>
-                  <option value="true">Approved</option>
-                </select>
-              </div>
+              <div class="form-group"><label class="form-label">COC Number</label><input type="text" class="form-input" id="ho-cocnum" placeholder="e.g. COC-2025-00123"></div>
+              <div class="form-group"><label class="form-label">Issued By</label><input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number"></div>
+              <div class="form-group"><label class="form-label">COC Issue Date</label><input type="date" class="form-input" id="ho-cocdate"></div>
+              <div class="form-group"><label class="form-label">Grid Application Ref</label><input type="text" class="form-input" id="ho-gridref" placeholder="NRS097 / municipal ref"></div>
+              <div class="form-group"><label class="form-label">Grid Approved?</label><select class="form-select" id="ho-gridapproved"><option value="false">Pending</option><option value="true">Approved</option></select></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Customer Training</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Training Completed?</label>
-                <select class="form-select" id="ho-trained">
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Training Notes</label>
-                <input type="text" class="form-input" id="ho-trainingnotes" placeholder="App walkthrough, load management, etc.">
-              </div>
+              <div class="form-group"><label class="form-label">Training Completed?</label><select class="form-select" id="ho-trained"><option value="false">No</option><option value="true">Yes</option></select></div>
+              <div class="form-group"><label class="form-label">Training Notes</label><input type="text" class="form-input" id="ho-trainingnotes" placeholder="App walkthrough, load management, etc."></div>
             </div>
-
             <hr class="section-sep">
             <div class="section-label">Handed Over By</div>
             <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Your Name</label>
-                <input type="text" class="form-input" id="ho-by" placeholder="Staff member completing handover">
-              </div>
+              <div class="form-group"><label class="form-label">Your Name</label><input type="text" class="form-input" id="ho-by" placeholder="Staff member completing handover"></div>
             </div>
-
             <div class="btn-row">
               <button class="btn btn-green" onclick="completeHandover()">✓ Complete Handover</button>
               <button class="btn btn-ghost" onclick="printHandover()">⎙ Print Handover Document</button>
             </div>
-
             <hr class="section-sep">
-
-            <!-- Handover Document Preview -->
             <div id="handover-doc-preview" style="display:none">
               <div class="section-label">Handover Document Preview</div>
-              <div class="handover-doc" id="handover-doc">
-                <!-- filled dynamically -->
-              </div>
+              <div class="handover-doc" id="handover-doc"></div>
             </div>
-
           </div>
         </div>
 
       </div><!-- /stage-panels -->
 
-      <!-- Activity Log -->
       <div style="padding: 0 28px 28px">
         <div class="activity-log">
           <div class="activity-log-header">Activity Log</div>
           <div id="activity-log-entries">
-            <div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity yet.</div>
+            <div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>
           </div>
         </div>
       </div>
 
     </div><!-- /job-workspace -->
-
   </div><!-- /main -->
 </div><!-- /layout -->
 
-<!-- Toast container -->
 <div class="toast-container" id="toast-container"></div>
-<script>
-// ──────────────────────────────────────────────
-// CONFIG & STATE
-// ──────────────────────────────────────────────
-const SUPA_URL = 'https://zloxcqrhkcohheeixfns.supabase.co';
-const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-  
-let SB_URL = SUPA_URL;
-let SB_KEY = SUPA_ANON;
-let jobs = [];
-let currentJob = null;
-let currentInstall = null;
-let currentHandover = null;
-let currentVisit = null;
-let activeFilter = 'all';
 
-// ──────────────────────────────────────────────
-// SUPABASE HELPER
-// ──────────────────────────────────────────────
-async function sb(path, method = 'GET', body = null, extraHeaders = {}) {
-  if (!SB_URL || !SB_KEY) throw new Error('Supabase not configured');
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+
+// Supabase SDK client — used for auth session management
+const sbClient = supabase.createClient(SUPA_URL, SUPA_ANON);
+
+let jobs           = [];
+let currentJob     = null;
+let currentInstall = null;
+let currentHandover= null;
+let currentVisit   = null;
+let activeFilter   = 'all';
+
+// ── AUTH ─────────────────────────────────────────────────────────────────
+// Job portal requires an authenticated session.
+// If not logged in, redirect to the login page immediately.
+(async function boot() {
+  const { data: { session } } = await sbClient.auth.getSession();
+  if (!session) {
+    window.location.href = 'nova-metrics_1.html';
+    return;
+  }
+  setSyncStatus('online');
+  await loadJobs();
+  setInterval(loadJobs, 60000);
+})();
+
+async function doSignOut() {
+  await sbClient.auth.signOut();
+  window.location.href = 'nova-metrics_1.html';
+}
+
+// ── SUPABASE HELPER ───────────────────────────────────────────────────────
+// Always uses the current authenticated session token — this is what allows
+// PATCH/POST on ai_results (RLS policy: installers_own_jobs for authenticated).
+async function sb(path, method = 'GET', body = null) {
+  const { data: { session } } = await sbClient.auth.getSession();
+  const token = session ? session.access_token : SUPA_ANON;
   const headers = {
-    'apikey': SB_KEY,
-    'Authorization': `Bearer ${SB_KEY}`,
-    'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : 'return=representation',
-    ...extraHeaders
+    'apikey':        SUPA_ANON,
+    'Authorization': `Bearer ${token}`,
+    'Content-Type':  'application/json',
   };
+  if (method !== 'GET') headers['Prefer'] = 'return=representation';
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(`${SB_URL}/rest/v1/${path}`, opts);
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
-  }
+  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, opts);
+  if (!res.ok) { const err = await res.text(); throw new Error(err); }
   if (res.status === 204) return null;
   return res.json();
 }
 
-async function sbGet(table, query='') { return sb(`${table}?${query}`); }
-async function sbPost(table, data) { return sb(table, 'POST', data); }
-async function sbPatch(table, query, data) { return sb(`${table}?${query}`, 'PATCH', data); }
+async function sbGet(table, query='')        { return sb(`${table}?${query}`); }
+async function sbPost(table, data)           { return sb(table, 'POST', data); }
+async function sbPatch(table, query, data)   { return sb(`${table}?${query}`, 'PATCH', data); }
 
-// ──────────────────────────────────────────────
-// LOAD JOBS
-// ──────────────────────────────────────────────
-// SIDEBAR
-// ──────────────────────────────────────────────
+// ── SYNC STATUS ──────────────────────────────────────────────────────────
+function setSyncStatus(state) {
+  const el = document.getElementById('sync-status');
+  if (state === 'online')  { el.textContent = '⬤ online';  el.style.color = 'var(--green)'; }
+  if (state === 'error')   { el.textContent = '⬤ error';   el.style.color = 'var(--red)'; }
+  if (state === 'loading') { el.textContent = '⬤ loading'; el.style.color = 'var(--text3)'; }
+}
+
+// ── STAGE CONFIG ─────────────────────────────────────────────────────────
 const STAGE_LABELS = {
-  accepted: 'Accepted',
-  site_visit_scheduled: 'Visit Sched.',
-  site_visit_complete: 'Visit Done',
-  installation_scheduled: 'Install Sched.',
+  lead:                     'Won — Awaiting Visit',
+  accepted:                 'Won — Awaiting Visit',
+  site_visit_scheduled:     'Visit Scheduled',
+  site_visit_complete:      'Visit Complete',
+  installation_scheduled:   'Install Scheduled',
   installation_in_progress: 'Installing',
-  installation_complete: 'Install Done',
-  handed_over: 'Handed Over',
+  installation_complete:    'Install Complete',
+  handed_over:              'Handed Over',
 };
 
+// Panel 0 unlocks for ANY won job — including job_status='lead' (the default
+// when a proposal is marked accepted before a site visit is booked).
+const PANEL_UNLOCK = [
+  ['lead','accepted','site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+  ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+  ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+  ['installation_in_progress','installation_complete','handed_over'],
+  ['installation_complete','handed_over'],
+];
+
+const PANEL_BADGE_LABELS = [
+  { done:'Visit Complete',  current:'Pending',     locked:'Locked' },
+  { done:'Scheduled',       current:'Pending',     locked:'Locked' },
+  { done:'Complete',        current:'In Progress', locked:'Locked' },
+  { done:'Signed Off',      current:'Pending',     locked:'Locked' },
+  { done:'✓ Handed Over',   current:'Pending',     locked:'Locked' },
+];
+
+const STAGE_ORDER = [
+  'site_visit_scheduled','site_visit_complete','installation_scheduled',
+  'installation_in_progress','installation_complete','handed_over',
+];
+
+function stageIndex(s) { return STAGE_ORDER.indexOf(s); }
+
+// ── LOAD JOBS ────────────────────────────────────────────────────────────
+async function loadJobs() {
+  setSyncStatus('loading');
+  try {
+    // All proposals marked accepted = won jobs ready for installation pipeline
+    const data = await sbGet('ai_results', 'select=*&proposal_status=eq.accepted&order=created_at.desc');
+    jobs = data || [];
+    renderSidebar();
+    setSyncStatus('online');
+  } catch(e) {
+    setSyncStatus('error');
+    console.error('loadJobs failed:', e.message);
+  }
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────────────────
 function setFilter(el, filter) {
   document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   activeFilter = filter;
   renderSidebar();
 }
-
 function filterJobs() { renderSidebar(); }
 
 function renderSidebar() {
   const search = document.getElementById('search-input').value.toLowerCase();
-  const list = document.getElementById('job-list');
-  const empty = document.getElementById('empty-sidebar');
-
+  const list   = document.getElementById('job-list');
+  const empty  = document.getElementById('empty-sidebar');
   const installStatuses = ['installation_scheduled','installation_in_progress','installation_complete'];
   const filtered = jobs.filter(j => {
     const matchFilter =
-      activeFilter === 'all' ? true :
+      activeFilter === 'all'          ? true :
       activeFilter === 'installation' ? installStatuses.includes(j.job_status) :
-      activeFilter === 'handed_over' ? j.job_status === 'handed_over' :
+      activeFilter === 'handed_over'  ? j.job_status === 'handed_over' :
       j.job_status === activeFilter;
     const searchStr = `${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
     return matchFilter && (!search || searchStr.includes(search));
   });
 
   document.getElementById('job-count').textContent = filtered.length;
-
   list.innerHTML = '';
+
   if (!filtered.length) {
     empty.style.display = 'block';
     list.appendChild(empty);
@@ -1217,42 +591,36 @@ function renderSidebar() {
     const card = document.createElement('div');
     card.className = `job-card ${currentJob?.ai_id === j.ai_id ? 'active' : ''}`;
     card.onclick = () => openJob(j.ai_id);
-    const kw = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
-    const stage = j.job_status || 'unknown';
+    const kw    = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
+    const stage = j.job_status || 'lead';
     const label = STAGE_LABELS[stage] || stage;
     card.innerHTML = `
       <div class="job-card-name">${j.client_name || 'Unnamed'}</div>
-      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${j.client_address?.slice(0,28) || '—'}</div>
+      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div>
       <div class="job-card-meta">
         <span class="job-card-kw">${kw}</span>
         <span class="stage-pill stage--${stage}">${label}</span>
-      </div>
-    `;
+      </div>`;
     list.appendChild(card);
   });
 }
 
-// ──────────────────────────────────────────────
-// OPEN JOB
-// ──────────────────────────────────────────────
+// ── OPEN JOB ─────────────────────────────────────────────────────────────
 async function openJob(id) {
   try {
-    // Fetch full job details
     const data = await sbGet('ai_results', `ai_id=eq.${id}&select=*`);
     if (!data || !data[0]) { toast('Job not found', 'error'); return; }
     currentJob = data[0];
 
-    // Fetch linked records
     const [visits, installs, handovers, logs] = await Promise.all([
-      sbGet('site_visits', `job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('installations', `job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('handovers', `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('site_visits',      `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('installations',    `job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('handovers',        `job_id=eq.${id}&order=created_at.desc&limit=1`),
       sbGet('job_activity_log', `job_id=eq.${id}&order=created_at.desc&limit=20`),
     ]);
-
-    currentVisit   = visits?.[0]   || null;
-    currentInstall = installs?.[0]  || null;
-    currentHandover= handovers?.[0] || null;
+    currentVisit    = visits?.[0]    || null;
+    currentInstall  = installs?.[0]  || null;
+    currentHandover = handovers?.[0] || null;
 
     renderJobHeader();
     renderPipeline();
@@ -1260,207 +628,134 @@ async function openJob(id) {
     renderActivityLog(logs || []);
     prefillForms();
 
-    document.getElementById('placeholder').style.display = 'none';
-    document.getElementById('job-workspace').style.display = 'flex';
-
-    // Highlight active card
+    document.getElementById('placeholder').style.display    = 'none';
+    document.getElementById('job-workspace').style.display  = 'flex';
     renderSidebar();
   } catch(e) {
     toast('Error loading job: ' + e.message, 'error');
   }
 }
+async function refreshCurrentJob() { if (currentJob) openJob(currentJob.ai_id); }
 
-async function refreshCurrentJob() {
-  if (currentJob) openJob(currentJob.ai_id);
-}
-
-// ──────────────────────────────────────────────
-// HEADER
-// ──────────────────────────────────────────────
+// ── JOB HEADER ───────────────────────────────────────────────────────────
 function renderJobHeader() {
   const j = currentJob;
-  document.getElementById('jh-name').textContent = j.client_name || '—';
-  document.getElementById('jh-ref').textContent = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address || '—'}`;
-  document.getElementById('jh-kw').textContent = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
+  document.getElementById('jh-name').textContent    = j.client_name || '—';
+  document.getElementById('jh-ref').textContent     = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address || '—'}`;
+  document.getElementById('jh-kw').textContent      = j.system_size_kw    ? `${j.system_size_kw} kWp`    : '—';
   document.getElementById('jh-battery').textContent = j.battery_capacity_kwh ? `${j.battery_capacity_kwh} kWh` : '—';
   document.getElementById('jh-address').textContent = j.client_address || '—';
-  const sl = STAGE_LABELS[j.job_status] || j.job_status || '—';
-  document.getElementById('jh-stage').textContent = sl;
+  document.getElementById('jh-stage').textContent   = STAGE_LABELS[j.job_status] || j.job_status || '—';
 }
 
-// ──────────────────────────────────────────────
-// PIPELINE
-// ──────────────────────────────────────────────
-const STAGE_ORDER = [
-  'site_visit_scheduled',
-  'site_visit_complete',
-  'installation_scheduled',
-  'installation_in_progress',
-  'installation_complete',
-  'handed_over'
-];
-// Panel index → which stages unlock it
-const PANEL_UNLOCK = [
-  // Panel 0: always unlocked for scheduled visits
-  ['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over','accepted'],
-  // Panel 1: unlocked after site visit complete
-  ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-  // Panel 2: unlocked after install scheduled
-  ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-  // Panel 3: unlocked after install started
-  ['installation_in_progress','installation_complete','handed_over'],
-  // Panel 4: unlocked after install complete
-  ['installation_complete','handed_over'],
-];
-
-function stageIndex(status) { return STAGE_ORDER.indexOf(status); }
-
+// ── PIPELINE ─────────────────────────────────────────────────────────────
 function renderPipeline() {
   const si = stageIndex(currentJob.job_status);
-  const pipeSteps = [
-    { label: 'Site\nVisit', stage: 'site_visit_complete' },
-    { label: 'Install\nPrep', stage: 'installation_scheduled' },
-    { label: 'Installation', stage: 'installation_in_progress' },
-    { label: 'Completion', stage: 'installation_complete' },
-    { label: 'Handover', stage: 'handed_over' },
+  const steps = [
+    { stage:'site_visit_complete' },
+    { stage:'installation_scheduled' },
+    { stage:'installation_in_progress' },
+    { stage:'installation_complete' },
+    { stage:'handed_over' },
   ];
-  pipeSteps.forEach((ps, i) => {
+  steps.forEach((ps, i) => {
     const dot = document.getElementById(`pdot-${i}`);
     const lbl = document.getElementById(`plbl-${i}`);
     const arr = document.getElementById(`parr-${i}`);
     const psi = stageIndex(ps.stage);
-    if (si >= psi) {
-      dot.className = 'pipe-dot done';
-      lbl.className = 'pipe-label done';
-      if (arr) arr.className = 'pipe-arrow done';
-    } else if (si === psi - 1) {
-      dot.className = 'pipe-dot active';
-      lbl.className = 'pipe-label active';
-    } else {
-      dot.className = 'pipe-dot';
-      lbl.className = 'pipe-label';
-      if (arr) arr.className = 'pipe-arrow';
-    }
+    if (si >= psi)       { dot.className='pipe-dot done';   lbl.className='pipe-label done';   if(arr) arr.className='pipe-arrow done'; }
+    else if (si===psi-1) { dot.className='pipe-dot active'; lbl.className='pipe-label active'; }
+    else                 { dot.className='pipe-dot';        lbl.className='pipe-label';         if(arr) arr.className='pipe-arrow'; }
   });
 }
 
 function jumpToPanel(i) {
-  const panel = document.getElementById(`panel-${i}`);
-  if (!panel.classList.contains('locked')) {
-    panel.classList.add('open');
-    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  const p = document.getElementById(`panel-${i}`);
+  if (!p.classList.contains('locked')) { p.classList.add('open'); p.scrollIntoView({behavior:'smooth',block:'start'}); }
 }
 
-// ──────────────────────────────────────────────
-// PANELS LOCK/UNLOCK
-// ──────────────────────────────────────────────
-const PANEL_BADGE_LABELS = [
-  { done: 'Visit Complete', current: 'Pending', locked: 'Locked' },
-  { done: 'Scheduled', current: 'Pending', locked: 'Locked' },
-  { done: 'Complete', current: 'In Progress', locked: 'Locked' },
-  { done: 'Signed Off', current: 'Pending', locked: 'Locked' },
-  { done: '✓ Handed Over', current: 'Pending', locked: 'Locked' },
-];
-
+// ── PANELS LOCK / UNLOCK ─────────────────────────────────────────────────
 function renderPanels() {
-  const status = currentJob.job_status;
+  const status = currentJob.job_status || 'lead';
   PANEL_UNLOCK.forEach((unlock, i) => {
-    const panel = document.getElementById(`panel-${i}`);
-    const badge = document.getElementById(`panel-${i}-badge`);
+    const panel    = document.getElementById(`panel-${i}`);
+    const badge    = document.getElementById(`panel-${i}-badge`);
     const unlocked = unlock.includes(status);
     panel.classList.toggle('locked', !unlocked);
 
-    // Determine if this panel is done, current, or future
+    const completedStages = {
+      0: ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+      1: ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+      2: ['installation_complete','handed_over'],
+      3: ['installation_complete','handed_over'],
+      4: ['handed_over'],
+    };
     let bState = 'locked';
-    if (unlocked) {
-      const completedStages = {
-        0: ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-        1: ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-        2: ['installation_complete','handed_over'],
-        3: ['installation_complete','handed_over'],
-        4: ['handed_over'],
-      };
-      bState = (completedStages[i] || []).includes(status) ? 'done' : 'current';
-    }
+    if (unlocked) bState = (completedStages[i]||[]).includes(status) ? 'done' : 'current';
 
     badge.textContent = PANEL_BADGE_LABELS[i][bState];
-    badge.className = `stage-pill ${bState === 'done' ? 'stage--installation_complete' : bState === 'current' ? 'stage--installation_in_progress' : 'stage--lead'}`;
-
-    // Auto-open current panel
+    badge.className   = `stage-pill ${bState==='done'?'stage--installation_complete':bState==='current'?'stage--installation_in_progress':'stage--lead'}`;
     if (bState === 'current') panel.classList.add('open');
   });
-
-  // Build install checklist if empty
-  if (document.getElementById('checklist-pre').childElementCount === 0) {
-    buildChecklist();
-  }
+  if (document.getElementById('checklist-pre').childElementCount === 0) buildChecklist();
 }
 
-// ──────────────────────────────────────────────
-// PREFILL FORMS FROM LOADED DATA
-// ──────────────────────────────────────────────
+// ── PREFILL FORMS ────────────────────────────────────────────────────────
+// Uses actual DB column names from loaded objects (not the form field names).
 function prefillForms() {
-  // Site visit form
   const v = currentVisit;
   if (v) {
-    setVal('sv-assessor', v.assessor_name);
-    setVal('sv-datetime', v.visited_at ? v.visited_at.slice(0,16) : '');
+    setVal('sv-assessor',     v.assessor_name);
+    setVal('sv-datetime',     v.visited_at ? v.visited_at.slice(0,16) : '');
     setVal('sv-municipality', v.municipality);
-    setVal('sv-gridref', v.grid_ref_number);
-    setVal('sv-rooftype', v.roof_type);
-    setVal('sv-roofcondition', v.roof_condition);
-    setVal('sv-cablerun', v.cable_run_meters);
-    setVal('sv-metertype', v.meter_type);
-    setVal('sv-phase', v.phase);
-    setVal('sv-db', String(v.db_board_adequate));
-    setVal('sv-dbnotes', v.db_notes);
-    setVal('sv-earthing', String(v.earthing_ok));
-    setVal('sv-earthingnotes', v.earthing_notes);
-    setVal('sv-shading', String(v.shading_issues));
+    setVal('sv-gridref',      v.grid_ref_number);
+    setVal('sv-rooftype',     v.roof_type);
+    setVal('sv-roofcondition',v.roof_condition);
+    setVal('sv-cablerun',     v.cable_run_meters);
+    setVal('sv-metertype',    v.meter_type);
+    setVal('sv-phase',        v.phase);
+    setVal('sv-db',           String(v.db_board_adequate));
+    setVal('sv-dbnotes',      v.db_notes);
+    setVal('sv-earthing',     String(v.earthing_ok));
+    setVal('sv-earthingnotes',v.earthing_notes);
+    setVal('sv-shading',      String(v.shading_issues));
     setVal('sv-shadingnotes', v.shading_notes);
-    setVal('sv-kw', v.recommended_system_kw);
-    setVal('sv-battery', v.recommended_battery_capacity_kwh);
-    setVal('sv-notes', v.additional_notes);
+    setVal('sv-kw',           v.recommended_system_kw);
+    setVal('sv-battery',      v.recommended_battery_kwh);    // DB col: recommended_battery_kwh
+    setVal('sv-notes',        v.additional_notes);
   }
 
-  // Install prep form
   const inst = currentInstall;
   if (inst) {
-    setVal('inst-teamlead', inst.team_lead);
-    setVal('inst-team', inst.team_members);
-    setVal('inst-date', inst.scheduled_date);
-    setVal('inst-panelbrand', inst.panels_brand);
-    setVal('inst-panelwatt', inst.panels_watt);
-    setVal('inst-panelqty', inst.panels_qty);
-    setVal('inst-inverterbrand', inst.inverter_brand);
-    setVal('inst-inverterkw', inst.inverter_kw);
-    setVal('inst-batterybrand', inst.battery_brand);
-    setVal('inst-batterykwh', inst.battery_capacity_kwh);
-    setVal('inst-batteryqty', inst.battery_qty);
-    setVal('comp-kw', inst.final_system_kw);
-    setVal('comp-battery', inst.final_battery_capacity_kwh);
-    setVal('comp-punchlist', inst.punch_list);
-    setVal('comp-inspector', inst.inspector_name);
-    setVal('comp-inspdate', inst.inspector_signed_at ? inst.inspector_signed_at.slice(0,10) : '');
-
-    // Reload checklist state
-    if (inst.install_checklist && inst.install_checklist.length) {
-      reloadChecklist(inst.install_checklist);
-    }
+    setVal('inst-teamlead',    inst.team_lead);
+    setVal('inst-team',        inst.team_members);
+    setVal('inst-date',        inst.scheduled_date);
+    setVal('inst-panelbrand',  inst.panels_brand);
+    setVal('inst-panelwatt',   inst.panels_watt);
+    setVal('inst-panelqty',    inst.panels_qty);
+    setVal('inst-inverterbrand',inst.inverter_brand);
+    setVal('inst-inverterkw',  inst.inverter_kw);
+    setVal('inst-batterybrand',inst.battery_brand);
+    setVal('inst-batterykwh',  inst.battery_kwh);             // DB col: battery_kwh
+    setVal('inst-batteryqty',  inst.battery_qty);
+    setVal('comp-kw',          inst.final_system_kw);
+    setVal('comp-battery',     inst.final_battery_kwh);       // DB col: final_battery_kwh
+    setVal('comp-punchlist',   inst.punch_list);
+    setVal('comp-inspector',   inst.inspector_name);
+    setVal('comp-inspdate',    inst.inspector_signed_at ? inst.inspector_signed_at.slice(0,10) : '');
+    if (inst.install_checklist?.length) reloadChecklist(inst.install_checklist);
   }
 
-  // Handover form
   const ho = currentHandover;
   if (ho) {
-    setVal('ho-cocnum', ho.coc_number);
-    setVal('ho-cocby', ho.coc_issued_by);
-    setVal('ho-cocdate', ho.coc_issued_at);
-    setVal('ho-gridref', ho.grid_application_number);
-    setVal('ho-gridapproved', String(ho.grid_approved));
-    setVal('ho-trained', String(ho.customer_trained));
+    setVal('ho-cocnum',        ho.coc_number);
+    setVal('ho-cocby',         ho.coc_issued_by);
+    setVal('ho-cocdate',       ho.coc_issued_at);
+    setVal('ho-gridref',       ho.grid_application_number);
+    setVal('ho-gridapproved',  String(ho.grid_approved));
+    setVal('ho-trained',       String(ho.customer_trained));
     setVal('ho-trainingnotes', ho.training_notes);
-    setVal('ho-by', ho.handed_over_by);
+    setVal('ho-by',            ho.handed_over_by);
     if (ho.handed_over_at) renderHandoverDoc();
   }
 }
@@ -1470,85 +765,44 @@ function setVal(id, val) {
   if (el && val !== null && val !== undefined) el.value = val;
 }
 
-// ──────────────────────────────────────────────
-// CHECKLIST BUILDER
-// ──────────────────────────────────────────────
+// ── CHECKLIST ────────────────────────────────────────────────────────────
 const CHECKLIST_ITEMS = {
-  pre: [
-    'Reviewed site visit report',
-    'Equipment delivered and checked against spec sheet',
-    'Safety briefing completed with team',
-    'Customer informed of start time',
-    'Work area secured / access arranged',
-  ],
-  structural: [
-    'Roof load assessment done',
-    'Mounting brackets positioned and marked',
-    'Rails installed and levelled',
-    'Mid and end clamps available',
-    'Anti-theft bolts fitted',
-    'Roof penetrations sealed / waterproofed',
-    'Panels mounted and secure',
-  ],
-  electrical: [
-    'DC cabling routed and secured',
-    'MC4 connectors crimped and tested',
-    'Isolators installed (DC and AC)',
-    'Inverter mounted and secured',
-    'Battery mounted and secured',
-    'AC wiring complete to DB board',
-    'Earth bonding complete',
-    'Cable management / conduit installed',
-    'All terminals torqued to spec',
-  ],
-  commissioning: [
-    'Inverter powered on and configured',
-    'Battery charged and communicating',
-    'System monitoring app connected',
-    'Export / import confirmed on meter',
-    'All alerts / faults cleared',
-    'Grid voltage and frequency within range',
-    'Customer walkthrough completed',
-    'Site cleaned up',
-  ],
+  pre:          ['Reviewed site visit report','Equipment delivered and checked against spec sheet','Safety briefing completed with team','Customer informed of start time','Work area secured / access arranged'],
+  structural:   ['Roof load assessment done','Mounting brackets positioned and marked','Rails installed and levelled','Mid and end clamps available','Anti-theft bolts fitted','Roof penetrations sealed / waterproofed','Panels mounted and secure'],
+  electrical:   ['DC cabling routed and secured','MC4 connectors crimped and tested','Isolators installed (DC and AC)','Inverter mounted and secured','Battery mounted and secured','AC wiring complete to DB board','Earth bonding complete','Cable management / conduit installed','All terminals torqued to spec'],
+  commissioning:['Inverter powered on and configured','Battery charged and communicating','System monitoring app connected','Export / import confirmed on meter','All alerts / faults cleared','Grid voltage and frequency within range','Customer walkthrough completed','Site cleaned up'],
 };
 
 function buildChecklist() {
   Object.entries(CHECKLIST_ITEMS).forEach(([section, items]) => {
-    const container = document.getElementById(`checklist-${section}`);
-    if (!container) return;
-    container.innerHTML = '';
+    const c = document.getElementById(`checklist-${section}`);
+    if (!c) return;
+    c.innerHTML = '';
     items.forEach((item, idx) => {
       const row = document.createElement('div');
       row.className = 'check-item';
-      row.dataset.key = `${section}-${idx}`;
-      row.innerHTML = `
-        <input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})">
+      row.innerHTML = `<input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})">
         <label for="chk-${section}-${idx}" class="check-item-label">${item}</label>
-        <input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">
-      `;
-      container.appendChild(row);
+        <input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">`;
+      c.appendChild(row);
     });
   });
 }
 
 function updateCheck(cb, section, idx) {
-  const row = cb.closest('.check-item');
-  row.classList.toggle('checked', cb.checked);
+  cb.closest('.check-item').classList.toggle('checked', cb.checked);
   saveChecklistToDb();
 }
 
 function reloadChecklist(saved) {
   saved.forEach(entry => {
-    const key = entry.key;
-    const [section, idx] = key.split('-');
+    const [section, idx] = entry.key.split('-');
     const cb = document.getElementById(`chk-${section}-${idx}`);
-    if (cb) {
-      cb.checked = entry.done;
-      cb.closest('.check-item').classList.toggle('checked', entry.done);
-      const noteInput = cb.closest('.check-item').querySelector('.check-item-notes');
-      if (noteInput && entry.notes) noteInput.value = entry.notes;
-    }
+    if (!cb) return;
+    cb.checked = entry.done;
+    cb.closest('.check-item').classList.toggle('checked', entry.done);
+    const note = cb.closest('.check-item').querySelector('.check-item-notes');
+    if (note && entry.notes) note.value = entry.notes;
   });
 }
 
@@ -1558,8 +812,7 @@ function collectChecklist() {
     items.forEach((item, idx) => {
       const cb = document.getElementById(`chk-${section}-${idx}`);
       if (!cb) return;
-      const noteInput = cb.closest('.check-item').querySelector('.check-item-notes');
-      result.push({ key: `${section}-${idx}`, item, done: cb.checked, notes: noteInput?.value || '' });
+      result.push({ key:`${section}-${idx}`, item, done:cb.checked, notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||'' });
     });
   });
   return result;
@@ -1567,50 +820,41 @@ function collectChecklist() {
 
 async function saveChecklistToDb() {
   if (!currentInstall) return;
-  try {
-    await sbPatch('installations', `id=eq.${currentInstall.id}`, {
-      install_checklist: collectChecklist()
-    });
-  } catch(e) { /* silent */ }
+  try { await sbPatch('installations', `id=eq.${currentInstall.id}`, { install_checklist: collectChecklist() }); }
+  catch(e) { /* silent — checklist saves are background */ }
 }
 
-// ──────────────────────────────────────────────
-// STEP 1: COMPLETE SITE VISIT
-// ──────────────────────────────────────────────
-async function saveSiteVisitDraft() {
-  await _saveSiteVisit(false);
-}
-
-async function completeSiteVisit() {
-  await _saveSiteVisit(true);
-}
+// ── STEP 1: SITE VISIT ───────────────────────────────────────────────────
+async function saveSiteVisitDraft() { await _saveSiteVisit(false); }
+async function completeSiteVisit()  { await _saveSiteVisit(true);  }
 
 async function _saveSiteVisit(complete) {
   if (!currentJob) return;
   const saving = document.getElementById('sv-saving');
   saving.style.display = 'inline';
 
+  // Column names match site_visits DB schema exactly
   const visitData = {
-    job_id: currentJob.ai_id,
-    assessor_name: getVal('sv-assessor'),
-    visited_at: getVal('sv-datetime') || new Date().toISOString(),
-    municipality: getVal('sv-municipality'),
-    grid_ref_number: getVal('sv-gridref'),
-    roof_type: getVal('sv-rooftype'),
-    roof_condition: getVal('sv-roofcondition') || null,
-    cable_run_meters: parseInt(getVal('sv-cablerun')) || null,
-    meter_type: getVal('sv-metertype'),
-    phase: getVal('sv-phase') || null,
-    db_board_adequate: getVal('sv-db') === 'true',
-    db_notes: getVal('sv-dbnotes'),
-    earthing_ok: getVal('sv-earthing') === 'true',
-    earthing_notes: getVal('sv-earthingnotes'),
-    shading_issues: getVal('sv-shading') === 'true',
-    shading_notes: getVal('sv-shadingnotes'),
-    recommended_system_kw: parseFloat(getVal('sv-kw')) || null,
-    recommended_battery_capacity_kwh: parseFloat(getVal('sv-battery')) || null,
-    additional_notes: getVal('sv-notes'),
-    completed_at: complete ? new Date().toISOString() : null,
+    job_id:                   String(currentJob.ai_id),
+    assessor_name:            getVal('sv-assessor'),
+    visited_at:               getVal('sv-datetime') || new Date().toISOString(),
+    municipality:             getVal('sv-municipality'),
+    grid_ref_number:          getVal('sv-gridref'),
+    roof_type:                getVal('sv-rooftype'),
+    roof_condition:           getVal('sv-roofcondition') || null,
+    cable_run_meters:         parseInt(getVal('sv-cablerun')) || null,
+    meter_type:               getVal('sv-metertype'),
+    phase:                    getVal('sv-phase') || null,
+    db_board_adequate:        getVal('sv-db') === 'true',
+    db_notes:                 getVal('sv-dbnotes'),
+    earthing_ok:              getVal('sv-earthing') === 'true',
+    earthing_notes:           getVal('sv-earthingnotes'),
+    shading_issues:           getVal('sv-shading') === 'true',
+    shading_notes:            getVal('sv-shadingnotes'),
+    recommended_system_kw:       parseFloat(getVal('sv-kw')) || null,
+    recommended_battery_kwh:     parseFloat(getVal('sv-battery')) || null,  // ← correct DB col name
+    additional_notes:         getVal('sv-notes'),
+    completed_at:             complete ? new Date().toISOString() : null,
   };
 
   try {
@@ -1620,11 +864,8 @@ async function _saveSiteVisit(complete) {
       const res = await sbPost('site_visits', visitData);
       currentVisit = res?.[0] || null;
     }
-
     if (complete) {
-      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, {
-        job_status: 'site_visit_complete'
-      });
+      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'site_visit_complete' });
       await logActivity('SITE VISIT', 'Site visit assessment completed', visitData.assessor_name);
       toast('Site visit completed!', 'success');
       await openJob(currentJob.ai_id);
@@ -1637,36 +878,28 @@ async function _saveSiteVisit(complete) {
   saving.style.display = 'none';
 }
 
-// ──────────────────────────────────────────────
-// STEP 2: SCHEDULE INSTALLATION
-// ──────────────────────────────────────────────
-async function saveInstallPrepDraft() {
-  await _saveInstallPrep(false);
-}
-
-async function scheduleInstallation() {
-  await _saveInstallPrep(true);
-}
+// ── STEP 2: INSTALLATION PREP ─────────────────────────────────────────────
+async function saveInstallPrepDraft() { await _saveInstallPrep(false); }
+async function scheduleInstallation() { await _saveInstallPrep(true);  }
 
 async function _saveInstallPrep(schedule) {
   if (!currentJob) return;
-
+  // Column names match installations DB schema exactly
   const instData = {
-    job_id: currentJob.ai_id,
-    team_lead: getVal('inst-teamlead'),
-    team_members: getVal('inst-team'),
-    scheduled_date: getVal('inst-date') || null,
-    panels_brand: getVal('inst-panelbrand'),
-    panels_watt: parseInt(getVal('inst-panelwatt')) || null,
-    panels_qty: parseInt(getVal('inst-panelqty')) || null,
-    inverter_brand: getVal('inst-inverterbrand'),
-    inverter_kw: parseFloat(getVal('inst-inverterkw')) || null,
-    battery_brand: getVal('inst-batterybrand'),
-    battery_capacity_kwh: parseFloat(getVal('inst-batterykwh')) || null,
-    battery_qty: parseInt(getVal('inst-batteryqty')) || null,
+    job_id:          String(currentJob.ai_id),
+    team_lead:       getVal('inst-teamlead'),
+    team_members:    getVal('inst-team'),
+    scheduled_date:  getVal('inst-date') || null,
+    panels_brand:    getVal('inst-panelbrand'),
+    panels_watt:     parseInt(getVal('inst-panelwatt')) || null,
+    panels_qty:      parseInt(getVal('inst-panelqty')) || null,
+    inverter_brand:  getVal('inst-inverterbrand'),
+    inverter_kw:     parseFloat(getVal('inst-inverterkw')) || null,
+    battery_brand:   getVal('inst-batterybrand'),
+    battery_kwh:     parseFloat(getVal('inst-batterykwh')) || null,  // ← correct DB col name
+    battery_qty:     parseInt(getVal('inst-batteryqty')) || null,
     install_checklist: collectChecklist(),
   };
-
   try {
     if (currentInstall) {
       await sbPatch('installations', `id=eq.${currentInstall.id}`, instData);
@@ -1674,12 +907,11 @@ async function _saveInstallPrep(schedule) {
       const res = await sbPost('installations', instData);
       currentInstall = res?.[0] || null;
     }
-
     if (schedule) {
       await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, {
-        job_status: 'installation_scheduled',
+        job_status:        'installation_scheduled',
         installation_date: getVal('inst-date') || null,
-        assigned_team: getVal('inst-teamlead'),
+        assigned_team:     getVal('inst-teamlead'),
       });
       await logActivity('INSTALL PREP', `Installation scheduled for ${getVal('inst-date')}`, getVal('inst-teamlead'));
       toast('Installation scheduled!', 'success');
@@ -1692,75 +924,58 @@ async function _saveInstallPrep(schedule) {
   }
 }
 
-// ──────────────────────────────────────────────
-// STEP 3: START INSTALLATION
-// ──────────────────────────────────────────────
+// ── STEP 3: START INSTALLATION ─────────────────────────────────────────────
 async function startInstallation() {
   if (!currentJob) return;
   try {
-    if (currentInstall) {
-      await sbPatch('installations', `id=eq.${currentInstall.id}`, { started_at: new Date().toISOString() });
-    }
+    if (currentInstall) await sbPatch('installations', `id=eq.${currentInstall.id}`, { started_at: new Date().toISOString() });
     await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_in_progress' });
     await logActivity('INSTALLATION', 'Installation marked as in progress');
     toast('Installation started!', 'success');
     await openJob(currentJob.ai_id);
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-// ──────────────────────────────────────────────
-// STEP 4: COMPLETE INSTALLATION
-// ──────────────────────────────────────────────
+// ── STEP 4: COMPLETE INSTALLATION ──────────────────────────────────────────
 async function completeInstallation() {
   if (!currentJob) return;
-
+  // Column names match installations DB schema exactly
   const compData = {
-    final_system_kw: parseFloat(getVal('comp-kw')) || null,
-    final_battery_capacity_kwh: parseFloat(getVal('comp-battery')) || null,
-    punch_list: getVal('comp-punchlist'),
-    inspector_name: getVal('comp-inspector'),
+    final_system_kw:     parseFloat(getVal('comp-kw'))      || null,
+    final_battery_kwh:   parseFloat(getVal('comp-battery')) || null,  // ← correct DB col name
+    punch_list:          getVal('comp-punchlist'),
+    inspector_name:      getVal('comp-inspector'),
     inspector_signed_at: getVal('comp-inspdate') ? new Date(getVal('comp-inspdate')).toISOString() : new Date().toISOString(),
-    completed_at: new Date().toISOString(),
-    install_checklist: collectChecklist(),
+    completed_at:        new Date().toISOString(),
+    install_checklist:   collectChecklist(),
   };
-
   try {
-    if (currentInstall) {
-      await sbPatch('installations', `id=eq.${currentInstall.id}`, compData);
-    }
+    if (currentInstall) await sbPatch('installations', `id=eq.${currentInstall.id}`, compData);
     await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_complete' });
     await logActivity('COMPLETION', `Final sign-off by ${getVal('comp-inspector')}`, getVal('comp-inspector'));
     toast('Installation complete! Proceed to handover.', 'success');
     await openJob(currentJob.ai_id);
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-// ──────────────────────────────────────────────
-// STEP 5: HANDOVER
-// ──────────────────────────────────────────────
+// ── STEP 5: HANDOVER ──────────────────────────────────────────────────────
 async function completeHandover() {
   if (!currentJob) return;
-
   const hoData = {
-    job_id: currentJob.ai_id,
-    installation_id: currentInstall?.id || null,
-    coc_number: getVal('ho-cocnum'),
-    coc_issued_by: getVal('ho-cocby'),
-    coc_issued_at: getVal('ho-cocdate') || null,
+    job_id:                  String(currentJob.ai_id),
+    installation_id:         currentInstall?.id || null,
+    coc_number:              getVal('ho-cocnum'),
+    coc_issued_by:           getVal('ho-cocby'),
+    coc_issued_at:           getVal('ho-cocdate') || null,
     grid_application_number: getVal('ho-gridref'),
-    grid_approved: getVal('ho-gridapproved') === 'true',
-    customer_trained: getVal('ho-trained') === 'true',
-    training_notes: getVal('ho-trainingnotes'),
-    handed_over_by: getVal('ho-by'),
-    handed_over_at: new Date().toISOString(),
-    customer_signed: true,
-    customer_signed_at: new Date().toISOString(),
+    grid_approved:           getVal('ho-gridapproved') === 'true',
+    customer_trained:        getVal('ho-trained') === 'true',
+    training_notes:          getVal('ho-trainingnotes'),
+    handed_over_by:          getVal('ho-by'),
+    handed_over_at:          new Date().toISOString(),
+    customer_signed:         true,
+    customer_signed_at:      new Date().toISOString(),
   };
-
   try {
     if (currentHandover) {
       await sbPatch('handovers', `id=eq.${currentHandover.id}`, hoData);
@@ -1768,73 +983,66 @@ async function completeHandover() {
       const res = await sbPost('handovers', hoData);
       currentHandover = res?.[0] || null;
     }
-
     await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'handed_over' });
     await logActivity('HANDOVER', `Handed over by ${getVal('ho-by')}`, getVal('ho-by'));
     toast('🎉 Job handed over! Project complete.', 'success');
     renderHandoverDoc();
     document.getElementById('handover-doc-preview').style.display = 'block';
     await openJob(currentJob.ai_id);
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-// ──────────────────────────────────────────────
-// HANDOVER DOCUMENT
-// ──────────────────────────────────────────────
+// ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
 function renderHandoverDoc() {
-  const j = currentJob;
+  const j    = currentJob;
   const inst = currentInstall;
-  const ho = currentHandover;
-  const v = currentVisit;
-
-  const totalKwp = inst?.final_system_kw || v?.recommended_system_kw || j?.system_size_kw || '—';
-  const totalBattery = inst?.final_battery_capacity_kwh || v?.recommended_battery_capacity_kwh || j?.battery_capacity_kwh || '—';
-  const now = new Date().toLocaleDateString('en-ZA', { day: '2-digit', month: 'long', year: 'numeric' });
+  const ho   = currentHandover;
+  const v    = currentVisit;
+  // Use correct DB column names from the loaded objects
+  const totalKwp    = inst?.final_system_kw      || v?.recommended_system_kw  || j?.system_size_kw      || '—';
+  const totalBattery= inst?.final_battery_kwh    || v?.recommended_battery_kwh|| j?.battery_capacity_kwh|| '—';
+  const battPerUnit = inst?.battery_kwh          || '—';
+  const now = new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'long', year:'numeric' });
 
   document.getElementById('handover-doc').innerHTML = `
     <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
     <div class="hd-title">Solar System Handover Certificate</div>
-
     <div class="hd-grid">
       <div>
         <div class="hd-section-title">Customer Details</div>
-        <div class="hd-row"><span class="hd-row-key">Name</span><span class="hd-row-val">${j?.client_name || '—'}</span></div>
-        <div class="hd-row"><span class="hd-row-key">Address</span><span class="hd-row-val">${j?.client_address || '—'}</span></div>
-        <div class="hd-row"><span class="hd-row-key">Municipality</span><span class="hd-row-val">${v?.municipality || '—'}</span></div>
-        <div class="hd-row"><span class="hd-row-key">Meter Type</span><span class="hd-row-val">${v?.meter_type || '—'}</span></div>
-        <div class="hd-row"><span class="hd-row-key">Grid Ref</span><span class="hd-row-val">${v?.grid_ref_number || '—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Name</span><span class="hd-row-val">${j?.client_name||'—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Address</span><span class="hd-row-val">${j?.client_address||'—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Municipality</span><span class="hd-row-val">${v?.municipality||'—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Meter Type</span><span class="hd-row-val">${v?.meter_type||'—'}</span></div>
+        <div class="hd-row"><span class="hd-row-key">Grid Ref</span><span class="hd-row-val">${v?.grid_ref_number||'—'}</span></div>
       </div>
       <div>
         <div class="hd-section-title">System Installed</div>
         <div class="hd-row"><span class="hd-row-key">Total Capacity</span><span class="hd-row-val">${totalKwp} kWp</span></div>
         <div class="hd-row"><span class="hd-row-key">Battery Storage</span><span class="hd-row-val">${totalBattery} kWh</span></div>
-        <div class="hd-row"><span class="hd-row-key">Panels</span><span class="hd-row-val">${inst?.panels_qty || '—'} × ${inst?.panels_brand || '—'} ${inst?.panels_watt || '—'}W</span></div>
-        <div class="hd-row"><span class="hd-row-key">Inverter</span><span class="hd-row-val">${inst?.inverter_brand || '—'} ${inst?.inverter_kw || '—'} kW</span></div>
-        <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty || '—'} × ${inst?.battery_brand || '—'} ${inst?.battery_capacity_kwh || '—'} kWh</span></div>
-        <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase || '—'} phase</span></div>
+        <div class="hd-row"><span class="hd-row-key">Panels</span><span class="hd-row-val">${inst?.panels_qty||'—'} × ${inst?.panels_brand||'—'} ${inst?.panels_watt||'—'}W</span></div>
+        <div class="hd-row"><span class="hd-row-key">Inverter</span><span class="hd-row-val">${inst?.inverter_brand||'—'} ${inst?.inverter_kw||'—'} kW</span></div>
+        <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty||'—'} × ${inst?.battery_brand||'—'} ${battPerUnit} kWh</span></div>
+        <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase||'—'} phase</span></div>
       </div>
     </div>
-
     <div style="margin-top:20px">
-      <div class="hd-section-title">Compliance & Approvals</div>
+      <div class="hd-section-title">Compliance &amp; Approvals</div>
       <div class="hd-grid">
         <div>
-          <div class="hd-row"><span class="hd-row-key">COC Number</span><span class="hd-row-val">${ho?.coc_number || getVal('ho-cocnum') || '—'}</span></div>
-          <div class="hd-row"><span class="hd-row-key">COC Issued By</span><span class="hd-row-val">${ho?.coc_issued_by || getVal('ho-cocby') || '—'}</span></div>
-          <div class="hd-row"><span class="hd-row-key">COC Date</span><span class="hd-row-val">${ho?.coc_issued_at || getVal('ho-cocdate') || '—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">COC Number</span><span class="hd-row-val">${ho?.coc_number||getVal('ho-cocnum')||'—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">COC Issued By</span><span class="hd-row-val">${ho?.coc_issued_by||getVal('ho-cocby')||'—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">COC Date</span><span class="hd-row-val">${ho?.coc_issued_at||getVal('ho-cocdate')||'—'}</span></div>
         </div>
         <div>
-          <div class="hd-row"><span class="hd-row-key">Grid Application</span><span class="hd-row-val">${ho?.grid_application_number || getVal('ho-gridref') || 'Pending'}</span></div>
-          <div class="hd-row"><span class="hd-row-key">Grid Approved</span><span class="hd-row-val">${(ho?.grid_approved || getVal('ho-gridapproved') === 'true') ? '✓ Yes' : 'Pending'}</span></div>
-          <div class="hd-row"><span class="hd-row-key">Inspector</span><span class="hd-row-val">${inst?.inspector_name || '—'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">Grid Application</span><span class="hd-row-val">${ho?.grid_application_number||getVal('ho-gridref')||'Pending'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">Grid Approved</span><span class="hd-row-val">${(ho?.grid_approved||getVal('ho-gridapproved')==='true')?'✓ Yes':'Pending'}</span></div>
+          <div class="hd-row"><span class="hd-row-key">Inspector</span><span class="hd-row-val">${inst?.inspector_name||'—'}</span></div>
         </div>
       </div>
     </div>
-
-    <div class="hd-warranty" style="margin-top:20px">
-      <div class="hd-section-title">Warranty & Support</div>
+    <div style="margin-top:20px">
+      <div class="hd-section-title">Warranty &amp; Support</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
         <div class="warranty-item">Solar panels — 25 year performance warranty</div>
         <div class="warranty-item">Inverter — 10 year manufacturer warranty</div>
@@ -1842,130 +1050,64 @@ function renderHandoverDoc() {
         <div class="warranty-item">Workmanship — 2 year installation warranty</div>
       </div>
     </div>
-
     <div class="hd-sign-block">
-      <div>
-        <div class="sign-line">Customer Signature</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
-          ${j?.client_name || '.....................'}<br>Date: ${now}
-        </div>
-      </div>
-      <div>
-        <div class="sign-line">Authorised by Solar Intelligence</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
-          ${ho?.handed_over_by || getVal('ho-by') || '...................'}<br>Date: ${now}
-        </div>
-      </div>
-    </div>
-  `;
+      <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
+      <div><div class="sign-line">Authorised by Solar Intelligence</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
+    </div>`;
   document.getElementById('handover-doc-preview').style.display = 'block';
 }
 
 function printHandover() {
   if (!currentJob) { toast('No job selected', 'error'); return; }
   renderHandoverDoc();
-  document.getElementById('panel-4').classList.add('open', 'print-target');
+  document.getElementById('panel-4').classList.add('open','print-target');
   window.print();
 }
 
-// ──────────────────────────────────────────────
-// ACTIVITY LOG
-// ──────────────────────────────────────────────
-async function logActivity(stage, action, performedBy = '') {
+// ── ACTIVITY LOG ──────────────────────────────────────────────────────────
+async function logActivity(stage, action, performedBy='') {
   if (!currentJob) return;
   try {
     await sbPost('job_activity_log', {
-      job_id: currentJob.ai_id,
-      stage,
-      action,
-      performed_by: performedBy,
+      job_id: String(currentJob.ai_id), stage, action, performed_by: performedBy,
     });
-  } catch(e) { /* silent */ }
+  } catch(e) { /* log failures are silent */ }
 }
 
 function renderActivityLog(logs) {
-  const container = document.getElementById('activity-log-entries');
-  if (!logs.length) {
-    container.innerHTML = '<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>';
-    return;
-  }
-  container.innerHTML = logs.map(l => `
+  const c = document.getElementById('activity-log-entries');
+  if (!logs.length) { c.innerHTML = '<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>'; return; }
+  c.innerHTML = logs.map(l => `
     <div class="log-entry">
-      <span class="log-stage">${l.stage || '—'}</span>
+      <span class="log-stage">${l.stage||'—'}</span>
       <span class="log-time">${formatTime(l.created_at)}</span>
-      <span class="log-msg">${l.action || ''} ${l.performed_by ? `<span style="color:var(--text3)">· ${l.performed_by}</span>` : ''}</span>
-    </div>
-  `).join('');
+      <span class="log-msg">${l.action||''} ${l.performed_by?`<span style="color:var(--text3)">· ${l.performed_by}</span>`:''}</span>
+    </div>`).join('');
 }
 
 function formatTime(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
-  return d.toLocaleDateString('en-ZA', { day:'2-digit', month:'short' }) + ' ' +
-         d.toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' });
+  return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ──────────────────────────────────────────────
-// PANEL TOGGLE
-// ──────────────────────────────────────────────
+// ── UTILS ─────────────────────────────────────────────────────────────────
 function togglePanel(i) {
-  const panel = document.getElementById(`panel-${i}`);
-  if (panel.classList.contains('locked')) return;
-  panel.classList.toggle('open');
+  const p = document.getElementById(`panel-${i}`);
+  if (!p.classList.contains('locked')) p.classList.toggle('open');
 }
 
-// ──────────────────────────────────────────────
-// TOAST
-// ──────────────────────────────────────────────
-function toast(msg, type = 'info') {
-  const container = document.getElementById('toast-container');
+function getVal(id) { return document.getElementById(id)?.value?.trim()||''; }
+
+function toast(msg, type='info') {
+  const c  = document.getElementById('toast-container');
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
-  container.appendChild(el);
+  c.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => el.remove(), 300);
-  }, 3500);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3500);
 }
-
-// ──────────────────────────────────────────────
-// UTILS
-// ──────────────────────────────────────────────
-function getVal(id) {
-  return document.getElementById(id)?.value?.trim() || '';
-}
-
-// ──────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────
-// ──────────────────────────────────────────────
-// LOAD JOBS (was missing — this is the fix)
-// ──────────────────────────────────────────────
-async function loadJobs() {
-  const syncEl = document.getElementById('sync-status');
-  try {
-    // Fetch all jobs that have moved past the "lead/quoted" stage
-    const data = await sbGet('ai_results', 'select=*&proposal_status=eq.accepted&order=created_at.desc');
-    jobs = data || [];
-    renderSidebar();
-    // ✅ Update the dot to green "online"
-    syncEl.textContent = '⬤ online';
-    syncEl.style.color = 'var(--green)';
-  } catch(e) {
-    // ❌ Keep dot red if something went wrong
-    syncEl.textContent = '⬤ error';
-    syncEl.style.color = 'var(--red)';
-    console.error('loadJobs failed:', e.message);
-  }
-}
-  
-document.addEventListener('DOMContentLoaded', () => {
-  loadJobs();
-  // Auto-refresh every 60s
-  setInterval(loadJobs, 60000);
-});
 </script>
 </body>
 </html>
