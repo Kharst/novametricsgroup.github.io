@@ -63,7 +63,6 @@
   .stage--handed_over            { background: rgba(46,204,138,0.3);  color: var(--green); }
   .stage--accepted               { background: rgba(138,154,184,0.15); color: var(--text2); }
   .stage--lead, .stage--quoted   { background: rgba(90,106,133,0.15); color: var(--text3); }
-  .empty-state { padding: 40px 16px; text-align: center; color: var(--text3); font-size: 12px; }
   .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
   .main::-webkit-scrollbar { width: 6px; }
   .main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
@@ -179,7 +178,7 @@
   <div class="topbar-logo">◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span></div>
   <div class="topbar-right">
     <a href="prposal_portal.html" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← Proposal Portal</a>
-    <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">⬤ connecting</span>
+    <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">● connecting</span>
     <button onclick="doSignOut()" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text3);padding:5px 10px;border-radius:4px;cursor:pointer;">Sign out</button>
   </div>
 </div>
@@ -194,17 +193,13 @@
       <input type="text" id="search-input" placeholder="Search name, ref, address..." oninput="filterJobs()">
     </div>
     <div class="filter-tabs">
-      <button class="filter-tab active" data-filter="all"                    onclick="setFilter(this,'all')">All</button>
-      <button class="filter-tab"        data-filter="site_visit_scheduled"   onclick="setFilter(this,'site_visit_scheduled')">Visit</button>
-      <button class="filter-tab"        data-filter="installation"           onclick="setFilter(this,'installation')">Install</button>
-      <button class="filter-tab"        data-filter="handed_over"            onclick="setFilter(this,'handed_over')">Done</button>
+      <button class="filter-tab active" onclick="setFilter(this,'all')">All</button>
+      <button class="filter-tab" onclick="setFilter(this,'site_visit_scheduled')">Visit</button>
+      <button class="filter-tab" onclick="setFilter(this,'installation')">Install</button>
+      <button class="filter-tab" onclick="setFilter(this,'handed_over')">Done</button>
     </div>
-    <div class="job-list" id="job-list">
-      <div class="empty-state" id="empty-sidebar">
-        <div style="font-size:24px;margin-bottom:8px">📋</div>
-        No won jobs yet
-      </div>
-    </div>
+    <!-- job-list is always empty in HTML; renderSidebar writes into it dynamically -->
+    <div class="job-list" id="job-list"></div>
   </div>
 
   <div class="main" id="main-content">
@@ -249,7 +244,6 @@
 
       <div class="stage-panels" id="stage-panels">
 
-        <!-- PANEL 1: SITE VISIT -->
         <div class="panel" id="panel-0">
           <div class="panel-header" onclick="togglePanel(0)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 1</span><span class="panel-title">Site Visit Assessment</span></div>
@@ -302,7 +296,6 @@
           </div>
         </div>
 
-        <!-- PANEL 2: INSTALLATION PREP -->
         <div class="panel locked" id="panel-1">
           <div class="panel-header" onclick="togglePanel(1)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 2</span><span class="panel-title">Installation Preparation</span></div>
@@ -334,7 +327,6 @@
           </div>
         </div>
 
-        <!-- PANEL 3: INSTALLATION CHECKLIST -->
         <div class="panel locked" id="panel-2">
           <div class="panel-header" onclick="togglePanel(2)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 3</span><span class="panel-title">Installation Checklist</span></div>
@@ -355,7 +347,6 @@
           </div>
         </div>
 
-        <!-- PANEL 4: COMPLETION -->
         <div class="panel locked" id="panel-3">
           <div class="panel-header" onclick="togglePanel(3)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 4</span><span class="panel-title">Final Completion &amp; Sign-off</span></div>
@@ -380,7 +371,6 @@
           </div>
         </div>
 
-        <!-- PANEL 5: HANDOVER -->
         <div class="panel locked" id="panel-4">
           <div class="panel-header" onclick="togglePanel(4)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 5</span><span class="panel-title">Customer Handover</span></div>
@@ -418,7 +408,7 @@
           </div>
         </div>
 
-      </div><!-- /stage-panels -->
+      </div>
 
       <div style="padding: 0 28px 28px">
         <div class="activity-log">
@@ -429,18 +419,15 @@
         </div>
       </div>
 
-    </div><!-- /job-workspace -->
-  </div><!-- /main -->
-</div><!-- /layout -->
+    </div>
+  </div>
+</div>
 
 <div class="toast-container" id="toast-container"></div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-
-// Supabase SDK client — used for auth session management
 const sbClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let jobs           = [];
@@ -450,15 +437,17 @@ let currentHandover= null;
 let currentVisit   = null;
 let activeFilter   = 'all';
 
-// ── AUTH ─────────────────────────────────────────────────────────────────
-// Job portal requires an authenticated session.
-// If not logged in, redirect to the login page immediately.
+// ── RACE CONDITION GUARD ──────────────────────────────────────────────────
+// Prevents two concurrent openJob calls interleaving their renders.
+// If a job is clicked while another is loading, we queue the latest request
+// and open it immediately after the in-progress load finishes.
+let _jobLoading  = false;
+let _pendingJobId = null;
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
 (async function boot() {
   const { data: { session } } = await sbClient.auth.getSession();
-  if (!session) {
-    window.location.href = 'nova-metrics_1.html';
-    return;
-  }
+  if (!session) { window.location.href = 'nova-metrics_1.html'; return; }
   setSyncStatus('online');
   await loadJobs();
   setInterval(loadJobs, 60000);
@@ -470,16 +459,10 @@ async function doSignOut() {
 }
 
 // ── SUPABASE HELPER ───────────────────────────────────────────────────────
-// Always uses the current authenticated session token — this is what allows
-// PATCH/POST on ai_results (RLS policy: installers_own_jobs for authenticated).
-async function sb(path, method = 'GET', body = null) {
+async function sb(path, method='GET', body=null) {
   const { data: { session } } = await sbClient.auth.getSession();
   const token = session ? session.access_token : SUPA_ANON;
-  const headers = {
-    'apikey':        SUPA_ANON,
-    'Authorization': `Bearer ${token}`,
-    'Content-Type':  'application/json',
-  };
+  const headers = { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
   if (method !== 'GET') headers['Prefer'] = 'return=representation';
   const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
@@ -488,33 +471,26 @@ async function sb(path, method = 'GET', body = null) {
   if (res.status === 204) return null;
   return res.json();
 }
+async function sbGet(table, query='')      { return sb(`${table}?${query}`); }
+async function sbPost(table, data)         { return sb(table, 'POST', data); }
+async function sbPatch(table, query, data) { return sb(`${table}?${query}`, 'PATCH', data); }
 
-async function sbGet(table, query='')        { return sb(`${table}?${query}`); }
-async function sbPost(table, data)           { return sb(table, 'POST', data); }
-async function sbPatch(table, query, data)   { return sb(`${table}?${query}`, 'PATCH', data); }
-
-// ── SYNC STATUS ──────────────────────────────────────────────────────────
+// ── SYNC STATUS ───────────────────────────────────────────────────────────
 function setSyncStatus(state) {
   const el = document.getElementById('sync-status');
-  if (state === 'online')  { el.textContent = '⬤ online';  el.style.color = 'var(--green)'; }
-  if (state === 'error')   { el.textContent = '⬤ error';   el.style.color = 'var(--red)'; }
-  if (state === 'loading') { el.textContent = '⬤ loading'; el.style.color = 'var(--text3)'; }
+  if (!el) return;
+  if (state==='online')  { el.textContent='● online';  el.style.color='var(--green)'; }
+  if (state==='error')   { el.textContent='● error';   el.style.color='var(--red)'; }
+  if (state==='loading') { el.textContent='● loading'; el.style.color='var(--text3)'; }
 }
 
-// ── STAGE CONFIG ─────────────────────────────────────────────────────────
+// ── STAGE CONFIG ──────────────────────────────────────────────────────────
 const STAGE_LABELS = {
-  lead:                     'Won — Awaiting Visit',
-  accepted:                 'Won — Awaiting Visit',
-  site_visit_scheduled:     'Visit Scheduled',
-  site_visit_complete:      'Visit Complete',
-  installation_scheduled:   'Install Scheduled',
-  installation_in_progress: 'Installing',
-  installation_complete:    'Install Complete',
-  handed_over:              'Handed Over',
+  lead:'Won — Awaiting Visit', accepted:'Won — Awaiting Visit',
+  site_visit_scheduled:'Visit Scheduled', site_visit_complete:'Visit Complete',
+  installation_scheduled:'Install Scheduled', installation_in_progress:'Installing',
+  installation_complete:'Install Complete', handed_over:'Handed Over',
 };
-
-// Panel 0 unlocks for ANY won job — including job_status='lead' (the default
-// when a proposal is marked accepted before a site visit is booked).
 const PANEL_UNLOCK = [
   ['lead','accepted','site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
   ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
@@ -522,28 +498,21 @@ const PANEL_UNLOCK = [
   ['installation_in_progress','installation_complete','handed_over'],
   ['installation_complete','handed_over'],
 ];
-
 const PANEL_BADGE_LABELS = [
-  { done:'Visit Complete',  current:'Pending',     locked:'Locked' },
-  { done:'Scheduled',       current:'Pending',     locked:'Locked' },
-  { done:'Complete',        current:'In Progress', locked:'Locked' },
-  { done:'Signed Off',      current:'Pending',     locked:'Locked' },
-  { done:'✓ Handed Over',   current:'Pending',     locked:'Locked' },
+  {done:'Visit Complete', current:'Pending',     locked:'Locked'},
+  {done:'Scheduled',      current:'Pending',     locked:'Locked'},
+  {done:'Complete',       current:'In Progress', locked:'Locked'},
+  {done:'Signed Off',     current:'Pending',     locked:'Locked'},
+  {done:'✓ Handed Over', current:'Pending',     locked:'Locked'},
 ];
-
-const STAGE_ORDER = [
-  'site_visit_scheduled','site_visit_complete','installation_scheduled',
-  'installation_in_progress','installation_complete','handed_over',
-];
-
+const STAGE_ORDER = ['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'];
 function stageIndex(s) { return STAGE_ORDER.indexOf(s); }
 
-// ── LOAD JOBS ────────────────────────────────────────────────────────────
+// ── LOAD JOBS ─────────────────────────────────────────────────────────────
 async function loadJobs() {
   setSyncStatus('loading');
   try {
-    // All proposals marked accepted = won jobs ready for installation pipeline
-    const data = await sbGet('ai_results', 'select=*&proposal_status=eq.accepted&order=created_at.desc');
+    const data = await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');
     jobs = data || [];
     renderSidebar();
     setSyncStatus('online');
@@ -553,7 +522,10 @@ async function loadJobs() {
   }
 }
 
-// ── SIDEBAR ──────────────────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────────────────────
+// IMPORTANT: this function only writes INTO job-list via innerHTML / appendChild.
+// It never reads back 'empty-sidebar' from the DOM (which caused the null.style crash
+// when list.innerHTML='' detached that element and a subsequent getElementById returned null).
 function setFilter(el, filter) {
   document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -565,37 +537,38 @@ function filterJobs() { renderSidebar(); }
 function renderSidebar() {
   const search = document.getElementById('search-input').value.toLowerCase();
   const list   = document.getElementById('job-list');
-  const empty  = document.getElementById('empty-sidebar');
   const installStatuses = ['installation_scheduled','installation_in_progress','installation_complete'];
   const filtered = jobs.filter(j => {
     const matchFilter =
-      activeFilter === 'all'          ? true :
-      activeFilter === 'installation' ? installStatuses.includes(j.job_status) :
-      activeFilter === 'handed_over'  ? j.job_status === 'handed_over' :
-      j.job_status === activeFilter;
+      activeFilter==='all'          ? true :
+      activeFilter==='installation' ? installStatuses.includes(j.job_status) :
+      activeFilter==='handed_over'  ? j.job_status==='handed_over' :
+      j.job_status===activeFilter;
     const searchStr = `${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
     return matchFilter && (!search || searchStr.includes(search));
   });
 
   document.getElementById('job-count').textContent = filtered.length;
+
+  // Always clear with innerHTML. Never re-attach a previously detached static element
+  // (that caused the null.style crash on repeat calls when empty-sidebar was detached).
   list.innerHTML = '';
 
   if (!filtered.length) {
-    empty.style.display = 'block';
-    list.appendChild(empty);
+    // Render empty state inline -- no static element to detach/re-attach
+    list.innerHTML = '<div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:12px"><div style="font-size:24px;margin-bottom:8px">📋</div>No won jobs yet</div>';
     return;
   }
-  empty.style.display = 'none';
 
   filtered.forEach(j => {
-    const card = document.createElement('div');
+    const card  = document.createElement('div');
     card.className = `job-card ${currentJob?.ai_id === j.ai_id ? 'active' : ''}`;
-    card.onclick = () => openJob(j.ai_id);
+    card.onclick   = () => openJob(j.ai_id);
     const kw    = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
     const stage = j.job_status || 'lead';
     const label = STAGE_LABELS[stage] || stage;
     card.innerHTML = `
-      <div class="job-card-name">${j.client_name || 'Unnamed'}</div>
+      <div class="job-card-name">${j.client_name||'Unnamed'}</div>
       <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div>
       <div class="job-card-meta">
         <span class="job-card-kw">${kw}</span>
@@ -605,8 +578,17 @@ function renderSidebar() {
   });
 }
 
-// ── OPEN JOB ─────────────────────────────────────────────────────────────
+// ── OPEN JOB ──────────────────────────────────────────────────────────────
+// Race condition guard: if a load is already in progress, queue the latest
+// request and execute it as soon as the current load finishes.
 async function openJob(id) {
+  if (_jobLoading) {
+    _pendingJobId = id; // queue it; the finally block will pick it up
+    return;
+  }
+  _jobLoading   = true;
+  _pendingJobId = null;
+
   try {
     const data = await sbGet('ai_results', `ai_id=eq.${id}&select=*`);
     if (!data || !data[0]) { toast('Job not found', 'error'); return; }
@@ -628,40 +610,52 @@ async function openJob(id) {
     renderActivityLog(logs || []);
     prefillForms();
 
-    document.getElementById('placeholder').style.display    = 'none';
-    document.getElementById('job-workspace').style.display  = 'flex';
-    renderSidebar();
+    // Safe DOM show/hide with null guards (elements always exist but guard defensively)
+    const ph = document.getElementById('placeholder');
+    const ws = document.getElementById('job-workspace');
+    if (ph) ph.style.display = 'none';
+    if (ws) ws.style.display = 'flex';
+
+    renderSidebar(); // re-highlight active card
   } catch(e) {
     toast('Error loading job: ' + e.message, 'error');
+    currentJob = null; // reset so sidebar doesn't show a ghost active state
+    renderSidebar();
+  } finally {
+    _jobLoading = false;
+    // If user clicked another job while this one was loading, open it now
+    if (_pendingJobId) {
+      const next   = _pendingJobId;
+      _pendingJobId = null;
+      openJob(next);
+    }
   }
 }
 async function refreshCurrentJob() { if (currentJob) openJob(currentJob.ai_id); }
 
-// ── JOB HEADER ───────────────────────────────────────────────────────────
+// ── JOB HEADER ────────────────────────────────────────────────────────────
 function renderJobHeader() {
   const j = currentJob;
-  document.getElementById('jh-name').textContent    = j.client_name || '—';
-  document.getElementById('jh-ref').textContent     = `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address || '—'}`;
-  document.getElementById('jh-kw').textContent      = j.system_size_kw    ? `${j.system_size_kw} kWp`    : '—';
-  document.getElementById('jh-battery').textContent = j.battery_capacity_kwh ? `${j.battery_capacity_kwh} kWh` : '—';
-  document.getElementById('jh-address').textContent = j.client_address || '—';
-  document.getElementById('jh-stage').textContent   = STAGE_LABELS[j.job_status] || j.job_status || '—';
+  setText('jh-name',    j.client_name || '—');
+  setText('jh-ref',     `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address||'—'}`);
+  setText('jh-kw',      j.system_size_kw     ? `${j.system_size_kw} kWp`         : '—');
+  setText('jh-battery', j.battery_capacity_kwh ? `${j.battery_capacity_kwh} kWh` : '—');
+  setText('jh-address', j.client_address || '—');
+  setText('jh-stage',   STAGE_LABELS[j.job_status] || j.job_status || '—');
 }
 
-// ── PIPELINE ─────────────────────────────────────────────────────────────
+// ── PIPELINE ──────────────────────────────────────────────────────────────
 function renderPipeline() {
   const si = stageIndex(currentJob.job_status);
   const steps = [
-    { stage:'site_visit_complete' },
-    { stage:'installation_scheduled' },
-    { stage:'installation_in_progress' },
-    { stage:'installation_complete' },
-    { stage:'handed_over' },
+    {stage:'site_visit_complete'},{stage:'installation_scheduled'},
+    {stage:'installation_in_progress'},{stage:'installation_complete'},{stage:'handed_over'},
   ];
   steps.forEach((ps, i) => {
     const dot = document.getElementById(`pdot-${i}`);
     const lbl = document.getElementById(`plbl-${i}`);
     const arr = document.getElementById(`parr-${i}`);
+    if (!dot || !lbl) return;
     const psi = stageIndex(ps.stage);
     if (si >= psi)       { dot.className='pipe-dot done';   lbl.className='pipe-label done';   if(arr) arr.className='pipe-arrow done'; }
     else if (si===psi-1) { dot.className='pipe-dot active'; lbl.className='pipe-label active'; }
@@ -671,105 +665,80 @@ function renderPipeline() {
 
 function jumpToPanel(i) {
   const p = document.getElementById(`panel-${i}`);
-  if (!p.classList.contains('locked')) { p.classList.add('open'); p.scrollIntoView({behavior:'smooth',block:'start'}); }
+  if (p && !p.classList.contains('locked')) { p.classList.add('open'); p.scrollIntoView({behavior:'smooth',block:'start'}); }
 }
 
-// ── PANELS LOCK / UNLOCK ─────────────────────────────────────────────────
+// ── PANELS ────────────────────────────────────────────────────────────────
 function renderPanels() {
   const status = currentJob.job_status || 'lead';
   PANEL_UNLOCK.forEach((unlock, i) => {
-    const panel    = document.getElementById(`panel-${i}`);
-    const badge    = document.getElementById(`panel-${i}-badge`);
+    const panel = document.getElementById(`panel-${i}`);
+    const badge = document.getElementById(`panel-${i}-badge`);
+    if (!panel || !badge) return;
     const unlocked = unlock.includes(status);
     panel.classList.toggle('locked', !unlocked);
-
     const completedStages = {
-      0: ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-      1: ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-      2: ['installation_complete','handed_over'],
-      3: ['installation_complete','handed_over'],
-      4: ['handed_over'],
+      0:['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+      1:['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
+      2:['installation_complete','handed_over'],
+      3:['installation_complete','handed_over'],
+      4:['handed_over'],
     };
     let bState = 'locked';
     if (unlocked) bState = (completedStages[i]||[]).includes(status) ? 'done' : 'current';
-
     badge.textContent = PANEL_BADGE_LABELS[i][bState];
     badge.className   = `stage-pill ${bState==='done'?'stage--installation_complete':bState==='current'?'stage--installation_in_progress':'stage--lead'}`;
-    if (bState === 'current') panel.classList.add('open');
+    if (bState==='current') panel.classList.add('open');
   });
-  if (document.getElementById('checklist-pre').childElementCount === 0) buildChecklist();
+  const pre = document.getElementById('checklist-pre');
+  if (pre && pre.childElementCount===0) buildChecklist();
 }
 
-// ── PREFILL FORMS ────────────────────────────────────────────────────────
-// Uses actual DB column names from loaded objects (not the form field names).
+// ── PREFILL ───────────────────────────────────────────────────────────────
 function prefillForms() {
   const v = currentVisit;
   if (v) {
-    setVal('sv-assessor',     v.assessor_name);
-    setVal('sv-datetime',     v.visited_at ? v.visited_at.slice(0,16) : '');
-    setVal('sv-municipality', v.municipality);
-    setVal('sv-gridref',      v.grid_ref_number);
-    setVal('sv-rooftype',     v.roof_type);
-    setVal('sv-roofcondition',v.roof_condition);
-    setVal('sv-cablerun',     v.cable_run_meters);
-    setVal('sv-metertype',    v.meter_type);
-    setVal('sv-phase',        v.phase);
-    setVal('sv-db',           String(v.db_board_adequate));
-    setVal('sv-dbnotes',      v.db_notes);
-    setVal('sv-earthing',     String(v.earthing_ok));
-    setVal('sv-earthingnotes',v.earthing_notes);
-    setVal('sv-shading',      String(v.shading_issues));
-    setVal('sv-shadingnotes', v.shading_notes);
-    setVal('sv-kw',           v.recommended_system_kw);
-    setVal('sv-battery',      v.recommended_battery_kwh);    // DB col: recommended_battery_kwh
-    setVal('sv-notes',        v.additional_notes);
+    setVal('sv-assessor',v.assessor_name); setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');
+    setVal('sv-municipality',v.municipality); setVal('sv-gridref',v.grid_ref_number);
+    setVal('sv-rooftype',v.roof_type); setVal('sv-roofcondition',v.roof_condition);
+    setVal('sv-cablerun',v.cable_run_meters); setVal('sv-metertype',v.meter_type);
+    setVal('sv-phase',v.phase); setVal('sv-db',String(v.db_board_adequate));
+    setVal('sv-dbnotes',v.db_notes); setVal('sv-earthing',String(v.earthing_ok));
+    setVal('sv-earthingnotes',v.earthing_notes); setVal('sv-shading',String(v.shading_issues));
+    setVal('sv-shadingnotes',v.shading_notes); setVal('sv-kw',v.recommended_system_kw);
+    setVal('sv-battery',v.recommended_battery_kwh); setVal('sv-notes',v.additional_notes);
   }
-
   const inst = currentInstall;
   if (inst) {
-    setVal('inst-teamlead',    inst.team_lead);
-    setVal('inst-team',        inst.team_members);
-    setVal('inst-date',        inst.scheduled_date);
-    setVal('inst-panelbrand',  inst.panels_brand);
-    setVal('inst-panelwatt',   inst.panels_watt);
-    setVal('inst-panelqty',    inst.panels_qty);
-    setVal('inst-inverterbrand',inst.inverter_brand);
-    setVal('inst-inverterkw',  inst.inverter_kw);
-    setVal('inst-batterybrand',inst.battery_brand);
-    setVal('inst-batterykwh',  inst.battery_kwh);             // DB col: battery_kwh
-    setVal('inst-batteryqty',  inst.battery_qty);
-    setVal('comp-kw',          inst.final_system_kw);
-    setVal('comp-battery',     inst.final_battery_kwh);       // DB col: final_battery_kwh
-    setVal('comp-punchlist',   inst.punch_list);
-    setVal('comp-inspector',   inst.inspector_name);
-    setVal('comp-inspdate',    inst.inspector_signed_at ? inst.inspector_signed_at.slice(0,10) : '');
+    setVal('inst-teamlead',inst.team_lead); setVal('inst-team',inst.team_members);
+    setVal('inst-date',inst.scheduled_date); setVal('inst-panelbrand',inst.panels_brand);
+    setVal('inst-panelwatt',inst.panels_watt); setVal('inst-panelqty',inst.panels_qty);
+    setVal('inst-inverterbrand',inst.inverter_brand); setVal('inst-inverterkw',inst.inverter_kw);
+    setVal('inst-batterybrand',inst.battery_brand); setVal('inst-batterykwh',inst.battery_kwh);
+    setVal('inst-batteryqty',inst.battery_qty); setVal('comp-kw',inst.final_system_kw);
+    setVal('comp-battery',inst.final_battery_kwh); setVal('comp-punchlist',inst.punch_list);
+    setVal('comp-inspector',inst.inspector_name);
+    setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');
     if (inst.install_checklist?.length) reloadChecklist(inst.install_checklist);
   }
-
   const ho = currentHandover;
   if (ho) {
-    setVal('ho-cocnum',        ho.coc_number);
-    setVal('ho-cocby',         ho.coc_issued_by);
-    setVal('ho-cocdate',       ho.coc_issued_at);
-    setVal('ho-gridref',       ho.grid_application_number);
-    setVal('ho-gridapproved',  String(ho.grid_approved));
-    setVal('ho-trained',       String(ho.customer_trained));
-    setVal('ho-trainingnotes', ho.training_notes);
-    setVal('ho-by',            ho.handed_over_by);
+    setVal('ho-cocnum',ho.coc_number); setVal('ho-cocby',ho.coc_issued_by);
+    setVal('ho-cocdate',ho.coc_issued_at); setVal('ho-gridref',ho.grid_application_number);
+    setVal('ho-gridapproved',String(ho.grid_approved)); setVal('ho-trained',String(ho.customer_trained));
+    setVal('ho-trainingnotes',ho.training_notes); setVal('ho-by',ho.handed_over_by);
     if (ho.handed_over_at) renderHandoverDoc();
   }
 }
 
-function setVal(id, val) {
-  const el = document.getElementById(id);
-  if (el && val !== null && val !== undefined) el.value = val;
-}
+function setVal(id, val) { const el=document.getElementById(id); if(el&&val!=null) el.value=val; }
+function setText(id, txt) { const el=document.getElementById(id); if(el) el.textContent=txt; }
 
-// ── CHECKLIST ────────────────────────────────────────────────────────────
+// ── CHECKLIST ─────────────────────────────────────────────────────────────
 const CHECKLIST_ITEMS = {
-  pre:          ['Reviewed site visit report','Equipment delivered and checked against spec sheet','Safety briefing completed with team','Customer informed of start time','Work area secured / access arranged'],
-  structural:   ['Roof load assessment done','Mounting brackets positioned and marked','Rails installed and levelled','Mid and end clamps available','Anti-theft bolts fitted','Roof penetrations sealed / waterproofed','Panels mounted and secure'],
-  electrical:   ['DC cabling routed and secured','MC4 connectors crimped and tested','Isolators installed (DC and AC)','Inverter mounted and secured','Battery mounted and secured','AC wiring complete to DB board','Earth bonding complete','Cable management / conduit installed','All terminals torqued to spec'],
+  pre:['Reviewed site visit report','Equipment delivered and checked against spec sheet','Safety briefing completed with team','Customer informed of start time','Work area secured / access arranged'],
+  structural:['Roof load assessment done','Mounting brackets positioned and marked','Rails installed and levelled','Mid and end clamps available','Anti-theft bolts fitted','Roof penetrations sealed / waterproofed','Panels mounted and secure'],
+  electrical:['DC cabling routed and secured','MC4 connectors crimped and tested','Isolators installed (DC and AC)','Inverter mounted and secured','Battery mounted and secured','AC wiring complete to DB board','Earth bonding complete','Cable management / conduit installed','All terminals torqued to spec'],
   commissioning:['Inverter powered on and configured','Battery charged and communicating','System monitoring app connected','Export / import confirmed on meter','All alerts / faults cleared','Grid voltage and frequency within range','Customer walkthrough completed','Site cleaned up'],
 };
 
@@ -789,18 +758,15 @@ function buildChecklist() {
   });
 }
 
-function updateCheck(cb, section, idx) {
-  cb.closest('.check-item').classList.toggle('checked', cb.checked);
-  saveChecklistToDb();
-}
+function updateCheck(cb, section, idx) { cb.closest('.check-item').classList.toggle('checked',cb.checked); saveChecklistToDb(); }
 
 function reloadChecklist(saved) {
   saved.forEach(entry => {
-    const [section, idx] = entry.key.split('-');
+    const [section,idx] = entry.key.split('-');
     const cb = document.getElementById(`chk-${section}-${idx}`);
     if (!cb) return;
     cb.checked = entry.done;
-    cb.closest('.check-item').classList.toggle('checked', entry.done);
+    cb.closest('.check-item').classList.toggle('checked',entry.done);
     const note = cb.closest('.check-item').querySelector('.check-item-notes');
     if (note && entry.notes) note.value = entry.notes;
   });
@@ -812,7 +778,7 @@ function collectChecklist() {
     items.forEach((item, idx) => {
       const cb = document.getElementById(`chk-${section}-${idx}`);
       if (!cb) return;
-      result.push({ key:`${section}-${idx}`, item, done:cb.checked, notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||'' });
+      result.push({key:`${section}-${idx}`,item,done:cb.checked,notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||''});
     });
   });
   return result;
@@ -820,191 +786,138 @@ function collectChecklist() {
 
 async function saveChecklistToDb() {
   if (!currentInstall) return;
-  try { await sbPatch('installations', `id=eq.${currentInstall.id}`, { install_checklist: collectChecklist() }); }
-  catch(e) { /* silent — checklist saves are background */ }
+  try { await sbPatch('installations',`id=eq.${currentInstall.id}`,{install_checklist:collectChecklist()}); }
+  catch(e) { /* silent */ }
 }
 
-// ── STEP 1: SITE VISIT ───────────────────────────────────────────────────
+// ── STEP 1: SITE VISIT ─────────────────────────────────────────────────────
 async function saveSiteVisitDraft() { await _saveSiteVisit(false); }
-async function completeSiteVisit()  { await _saveSiteVisit(true);  }
+async function completeSiteVisit()  { await _saveSiteVisit(true); }
 
 async function _saveSiteVisit(complete) {
   if (!currentJob) return;
-  const saving = document.getElementById('sv-saving');
-  saving.style.display = 'inline';
-
-  // Column names match site_visits DB schema exactly
+  const savingEl = document.getElementById('sv-saving');
+  if (savingEl) savingEl.style.display = 'inline';
   const visitData = {
-    job_id:                   String(currentJob.ai_id),
-    assessor_name:            getVal('sv-assessor'),
-    visited_at:               getVal('sv-datetime') || new Date().toISOString(),
-    municipality:             getVal('sv-municipality'),
-    grid_ref_number:          getVal('sv-gridref'),
-    roof_type:                getVal('sv-rooftype'),
-    roof_condition:           getVal('sv-roofcondition') || null,
-    cable_run_meters:         parseInt(getVal('sv-cablerun')) || null,
-    meter_type:               getVal('sv-metertype'),
-    phase:                    getVal('sv-phase') || null,
-    db_board_adequate:        getVal('sv-db') === 'true',
-    db_notes:                 getVal('sv-dbnotes'),
-    earthing_ok:              getVal('sv-earthing') === 'true',
-    earthing_notes:           getVal('sv-earthingnotes'),
-    shading_issues:           getVal('sv-shading') === 'true',
-    shading_notes:            getVal('sv-shadingnotes'),
-    recommended_system_kw:       parseFloat(getVal('sv-kw')) || null,
-    recommended_battery_kwh:     parseFloat(getVal('sv-battery')) || null,  // ← correct DB col name
-    additional_notes:         getVal('sv-notes'),
-    completed_at:             complete ? new Date().toISOString() : null,
+    job_id: String(currentJob.ai_id),
+    assessor_name:getVal('sv-assessor'), visited_at:getVal('sv-datetime')||new Date().toISOString(),
+    municipality:getVal('sv-municipality'), grid_ref_number:getVal('sv-gridref'),
+    roof_type:getVal('sv-rooftype'), roof_condition:getVal('sv-roofcondition')||null,
+    cable_run_meters:parseInt(getVal('sv-cablerun'))||null, meter_type:getVal('sv-metertype'),
+    phase:getVal('sv-phase')||null, db_board_adequate:getVal('sv-db')==='true',
+    db_notes:getVal('sv-dbnotes'), earthing_ok:getVal('sv-earthing')==='true',
+    earthing_notes:getVal('sv-earthingnotes'), shading_issues:getVal('sv-shading')==='true',
+    shading_notes:getVal('sv-shadingnotes'),
+    recommended_system_kw:parseFloat(getVal('sv-kw'))||null,
+    recommended_battery_kwh:parseFloat(getVal('sv-battery'))||null,
+    additional_notes:getVal('sv-notes'),
+    completed_at:complete?new Date().toISOString():null,
   };
-
   try {
-    if (currentVisit) {
-      await sbPatch('site_visits', `id=eq.${currentVisit.id}`, visitData);
-    } else {
-      const res = await sbPost('site_visits', visitData);
-      currentVisit = res?.[0] || null;
-    }
+    if (currentVisit) { await sbPatch('site_visits',`id=eq.${currentVisit.id}`,visitData); }
+    else { const res=await sbPost('site_visits',visitData); currentVisit=res?.[0]||null; }
     if (complete) {
-      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'site_visit_complete' });
-      await logActivity('SITE VISIT', 'Site visit assessment completed', visitData.assessor_name);
-      toast('Site visit completed!', 'success');
+      await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'site_visit_complete'});
+      await logActivity('SITE VISIT','Site visit assessment completed',visitData.assessor_name);
+      toast('Site visit completed!','success');
       await openJob(currentJob.ai_id);
-    } else {
-      toast('Draft saved', 'info');
-    }
-  } catch(e) {
-    toast('Error saving: ' + e.message, 'error');
-  }
-  saving.style.display = 'none';
+    } else { toast('Draft saved','info'); }
+  } catch(e) { toast('Error saving: '+e.message,'error'); }
+  if (savingEl) savingEl.style.display = 'none';
 }
 
-// ── STEP 2: INSTALLATION PREP ─────────────────────────────────────────────
+// ── STEP 2: INSTALLATION PREP ──────────────────────────────────────────────
 async function saveInstallPrepDraft() { await _saveInstallPrep(false); }
-async function scheduleInstallation() { await _saveInstallPrep(true);  }
+async function scheduleInstallation() { await _saveInstallPrep(true); }
 
 async function _saveInstallPrep(schedule) {
   if (!currentJob) return;
-  // Column names match installations DB schema exactly
   const instData = {
-    job_id:          String(currentJob.ai_id),
-    team_lead:       getVal('inst-teamlead'),
-    team_members:    getVal('inst-team'),
-    scheduled_date:  getVal('inst-date') || null,
-    panels_brand:    getVal('inst-panelbrand'),
-    panels_watt:     parseInt(getVal('inst-panelwatt')) || null,
-    panels_qty:      parseInt(getVal('inst-panelqty')) || null,
-    inverter_brand:  getVal('inst-inverterbrand'),
-    inverter_kw:     parseFloat(getVal('inst-inverterkw')) || null,
-    battery_brand:   getVal('inst-batterybrand'),
-    battery_kwh:     parseFloat(getVal('inst-batterykwh')) || null,  // ← correct DB col name
-    battery_qty:     parseInt(getVal('inst-batteryqty')) || null,
-    install_checklist: collectChecklist(),
+    job_id:String(currentJob.ai_id), team_lead:getVal('inst-teamlead'), team_members:getVal('inst-team'),
+    scheduled_date:getVal('inst-date')||null, panels_brand:getVal('inst-panelbrand'),
+    panels_watt:parseInt(getVal('inst-panelwatt'))||null, panels_qty:parseInt(getVal('inst-panelqty'))||null,
+    inverter_brand:getVal('inst-inverterbrand'), inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,
+    battery_brand:getVal('inst-batterybrand'), battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,
+    battery_qty:parseInt(getVal('inst-batteryqty'))||null, install_checklist:collectChecklist(),
   };
   try {
-    if (currentInstall) {
-      await sbPatch('installations', `id=eq.${currentInstall.id}`, instData);
-    } else {
-      const res = await sbPost('installations', instData);
-      currentInstall = res?.[0] || null;
-    }
+    if (currentInstall) { await sbPatch('installations',`id=eq.${currentInstall.id}`,instData); }
+    else { const res=await sbPost('installations',instData); currentInstall=res?.[0]||null; }
     if (schedule) {
-      await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, {
-        job_status:        'installation_scheduled',
-        installation_date: getVal('inst-date') || null,
-        assigned_team:     getVal('inst-teamlead'),
+      await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{
+        job_status:'installation_scheduled', installation_date:getVal('inst-date')||null, assigned_team:getVal('inst-teamlead'),
       });
-      await logActivity('INSTALL PREP', `Installation scheduled for ${getVal('inst-date')}`, getVal('inst-teamlead'));
-      toast('Installation scheduled!', 'success');
+      await logActivity('INSTALL PREP',`Installation scheduled for ${getVal('inst-date')}`,getVal('inst-teamlead'));
+      toast('Installation scheduled!','success');
       await openJob(currentJob.ai_id);
-    } else {
-      toast('Draft saved', 'info');
-    }
-  } catch(e) {
-    toast('Error: ' + e.message, 'error');
-  }
+    } else { toast('Draft saved','info'); }
+  } catch(e) { toast('Error: '+e.message,'error'); }
 }
 
 // ── STEP 3: START INSTALLATION ─────────────────────────────────────────────
 async function startInstallation() {
   if (!currentJob) return;
   try {
-    if (currentInstall) await sbPatch('installations', `id=eq.${currentInstall.id}`, { started_at: new Date().toISOString() });
-    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_in_progress' });
-    await logActivity('INSTALLATION', 'Installation marked as in progress');
-    toast('Installation started!', 'success');
+    if (currentInstall) await sbPatch('installations',`id=eq.${currentInstall.id}`,{started_at:new Date().toISOString()});
+    await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_in_progress'});
+    await logActivity('INSTALLATION','Installation marked as in progress');
+    toast('Installation started!','success');
     await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
+  } catch(e) { toast('Error: '+e.message,'error'); }
 }
 
 // ── STEP 4: COMPLETE INSTALLATION ──────────────────────────────────────────
 async function completeInstallation() {
   if (!currentJob) return;
-  // Column names match installations DB schema exactly
   const compData = {
-    final_system_kw:     parseFloat(getVal('comp-kw'))      || null,
-    final_battery_kwh:   parseFloat(getVal('comp-battery')) || null,  // ← correct DB col name
-    punch_list:          getVal('comp-punchlist'),
-    inspector_name:      getVal('comp-inspector'),
-    inspector_signed_at: getVal('comp-inspdate') ? new Date(getVal('comp-inspdate')).toISOString() : new Date().toISOString(),
-    completed_at:        new Date().toISOString(),
-    install_checklist:   collectChecklist(),
+    final_system_kw:parseFloat(getVal('comp-kw'))||null, final_battery_kwh:parseFloat(getVal('comp-battery'))||null,
+    punch_list:getVal('comp-punchlist'), inspector_name:getVal('comp-inspector'),
+    inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),
+    completed_at:new Date().toISOString(), install_checklist:collectChecklist(),
   };
   try {
-    if (currentInstall) await sbPatch('installations', `id=eq.${currentInstall.id}`, compData);
-    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'installation_complete' });
-    await logActivity('COMPLETION', `Final sign-off by ${getVal('comp-inspector')}`, getVal('comp-inspector'));
-    toast('Installation complete! Proceed to handover.', 'success');
+    if (currentInstall) await sbPatch('installations',`id=eq.${currentInstall.id}`,compData);
+    await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_complete'});
+    await logActivity('COMPLETION',`Final sign-off by ${getVal('comp-inspector')}`,getVal('comp-inspector'));
+    toast('Installation complete! Proceed to handover.','success');
     await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
+  } catch(e) { toast('Error: '+e.message,'error'); }
 }
 
 // ── STEP 5: HANDOVER ──────────────────────────────────────────────────────
 async function completeHandover() {
   if (!currentJob) return;
   const hoData = {
-    job_id:                  String(currentJob.ai_id),
-    installation_id:         currentInstall?.id || null,
-    coc_number:              getVal('ho-cocnum'),
-    coc_issued_by:           getVal('ho-cocby'),
-    coc_issued_at:           getVal('ho-cocdate') || null,
-    grid_application_number: getVal('ho-gridref'),
-    grid_approved:           getVal('ho-gridapproved') === 'true',
-    customer_trained:        getVal('ho-trained') === 'true',
-    training_notes:          getVal('ho-trainingnotes'),
-    handed_over_by:          getVal('ho-by'),
-    handed_over_at:          new Date().toISOString(),
-    customer_signed:         true,
-    customer_signed_at:      new Date().toISOString(),
+    job_id:String(currentJob.ai_id), installation_id:currentInstall?.id||null,
+    coc_number:getVal('ho-cocnum'), coc_issued_by:getVal('ho-cocby'),
+    coc_issued_at:getVal('ho-cocdate')||null, grid_application_number:getVal('ho-gridref'),
+    grid_approved:getVal('ho-gridapproved')==='true', customer_trained:getVal('ho-trained')==='true',
+    training_notes:getVal('ho-trainingnotes'), handed_over_by:getVal('ho-by'),
+    handed_over_at:new Date().toISOString(), customer_signed:true, customer_signed_at:new Date().toISOString(),
   };
   try {
-    if (currentHandover) {
-      await sbPatch('handovers', `id=eq.${currentHandover.id}`, hoData);
-    } else {
-      const res = await sbPost('handovers', hoData);
-      currentHandover = res?.[0] || null;
-    }
-    await sbPatch('ai_results', `ai_id=eq.${currentJob.ai_id}`, { job_status: 'handed_over' });
-    await logActivity('HANDOVER', `Handed over by ${getVal('ho-by')}`, getVal('ho-by'));
-    toast('🎉 Job handed over! Project complete.', 'success');
+    if (currentHandover) { await sbPatch('handovers',`id=eq.${currentHandover.id}`,hoData); }
+    else { const res=await sbPost('handovers',hoData); currentHandover=res?.[0]||null; }
+    await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'handed_over'});
+    await logActivity('HANDOVER',`Handed over by ${getVal('ho-by')}`,getVal('ho-by'));
+    toast('🎉 Job handed over! Project complete.','success');
     renderHandoverDoc();
-    document.getElementById('handover-doc-preview').style.display = 'block';
+    const prev = document.getElementById('handover-doc-preview');
+    if (prev) prev.style.display = 'block';
     await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: ' + e.message, 'error'); }
+  } catch(e) { toast('Error: '+e.message,'error'); }
 }
 
 // ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
 function renderHandoverDoc() {
-  const j    = currentJob;
-  const inst = currentInstall;
-  const ho   = currentHandover;
-  const v    = currentVisit;
-  // Use correct DB column names from the loaded objects
-  const totalKwp    = inst?.final_system_kw      || v?.recommended_system_kw  || j?.system_size_kw      || '—';
-  const totalBattery= inst?.final_battery_kwh    || v?.recommended_battery_kwh|| j?.battery_capacity_kwh|| '—';
-  const battPerUnit = inst?.battery_kwh          || '—';
-  const now = new Date().toLocaleDateString('en-ZA', { day:'2-digit', month:'long', year:'numeric' });
-
-  document.getElementById('handover-doc').innerHTML = `
+  const j=currentJob, inst=currentInstall, ho=currentHandover, v=currentVisit;
+  const totalKwp     = inst?.final_system_kw   || v?.recommended_system_kw   || j?.system_size_kw      || '—';
+  const totalBattery = inst?.final_battery_kwh || v?.recommended_battery_kwh || j?.battery_capacity_kwh || '—';
+  const battPerUnit  = inst?.battery_kwh || '—';
+  const now = new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
+  const doc = document.getElementById('handover-doc');
+  if (!doc) return;
+  doc.innerHTML = `
     <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
     <div class="hd-title">Solar System Handover Certificate</div>
     <div class="hd-grid">
@@ -1054,30 +967,30 @@ function renderHandoverDoc() {
       <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
       <div><div class="sign-line">Authorised by Solar Intelligence</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
     </div>`;
-  document.getElementById('handover-doc-preview').style.display = 'block';
+  const prev = document.getElementById('handover-doc-preview');
+  if (prev) prev.style.display = 'block';
 }
 
 function printHandover() {
-  if (!currentJob) { toast('No job selected', 'error'); return; }
+  if (!currentJob) { toast('No job selected','error'); return; }
   renderHandoverDoc();
-  document.getElementById('panel-4').classList.add('open','print-target');
+  const p4 = document.getElementById('panel-4');
+  if (p4) p4.classList.add('open','print-target');
   window.print();
 }
 
 // ── ACTIVITY LOG ──────────────────────────────────────────────────────────
 async function logActivity(stage, action, performedBy='') {
   if (!currentJob) return;
-  try {
-    await sbPost('job_activity_log', {
-      job_id: String(currentJob.ai_id), stage, action, performed_by: performedBy,
-    });
-  } catch(e) { /* log failures are silent */ }
+  try { await sbPost('job_activity_log',{job_id:String(currentJob.ai_id),stage,action,performed_by:performedBy}); }
+  catch(e) { /* silent */ }
 }
 
 function renderActivityLog(logs) {
   const c = document.getElementById('activity-log-entries');
-  if (!logs.length) { c.innerHTML = '<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>'; return; }
-  c.innerHTML = logs.map(l => `
+  if (!c) return;
+  if (!logs.length) { c.innerHTML='<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>'; return; }
+  c.innerHTML = logs.map(l=>`
     <div class="log-entry">
       <span class="log-stage">${l.stage||'—'}</span>
       <span class="log-time">${formatTime(l.created_at)}</span>
@@ -1092,21 +1005,15 @@ function formatTime(iso) {
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────
-function togglePanel(i) {
-  const p = document.getElementById(`panel-${i}`);
-  if (!p.classList.contains('locked')) p.classList.toggle('open');
-}
-
+function togglePanel(i) { const p=document.getElementById(`panel-${i}`); if(p&&!p.classList.contains('locked')) p.classList.toggle('open'); }
 function getVal(id) { return document.getElementById(id)?.value?.trim()||''; }
 
 function toast(msg, type='info') {
-  const c  = document.getElementById('toast-container');
-  const el = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.textContent = msg;
-  c.appendChild(el);
-  requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3500);
+  const c=document.getElementById('toast-container');
+  const el=document.createElement('div');
+  el.className=`toast ${type}`; el.textContent=msg; c.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3500);
 }
 </script>
 </body>
