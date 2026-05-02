@@ -7,167 +7,176 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:       #0d0f12;
-    --surface:  #141820;
-    --panel:    #1a1f2e;
-    --border:   #252d3d;
-    --border2:  #2e3a50;
-    --amber:    #f5a623;
-    --amber2:   #ffc85a;
-    --green:    #2ecc8a;
-    --green2:   #1a7a52;
-    --red:      #e05252;
-    --blue:     #4a9eff;
-    --muted:    #4a5568;
-    --text:     #c8d4e8;
-    --text2:    #8a9ab8;
-    --text3:    #5a6a85;
-    --white:    #eef2fa;
-    --mono:     'IBM Plex Mono', monospace;
-    --sans:     'IBM Plex Sans', sans-serif;
+    --bg:#0d0f12;--surface:#141820;--panel:#1a1f2e;--border:#252d3d;--border2:#2e3a50;
+    --amber:#f5a623;--amber2:#ffc85a;--green:#2ecc8a;--green2:#1a7a52;
+    --red:#e05252;--blue:#4a9eff;--muted:#4a5568;
+    --text:#c8d4e8;--text2:#8a9ab8;--text3:#5a6a85;--white:#eef2fa;
+    --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
-  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .topbar-logo { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--amber); letter-spacing: 0.08em; display: flex; align-items: center; gap: 8px; }
-  .topbar-logo span { color: var(--text2); font-weight: 400; }
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .layout { display: flex; height: calc(100vh - 56px); overflow: hidden; }
-  .sidebar { width: 300px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-  .sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .sidebar-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase; }
-  .badge-count { font-family: var(--mono); font-size: 10px; background: var(--amber); color: #000; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
-  .search-box { padding: 10px 16px; border-bottom: 1px solid var(--border); }
-  .search-box input { width: 100%; background: var(--panel); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 7px 10px; border-radius: 4px; outline: none; }
-  .search-box input:focus { border-color: var(--amber); }
-  .search-box input::placeholder { color: var(--text3); }
-  .filter-tabs { display: flex; padding: 8px 16px; gap: 4px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-  .filter-tab { font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; transition: all 0.12s; white-space: nowrap; }
-  .filter-tab.active, .filter-tab:hover { border-color: var(--amber); color: var(--amber); background: rgba(245,166,35,0.08); }
-  .job-list { flex: 1; overflow-y: auto; }
-  .job-list::-webkit-scrollbar { width: 4px; }
-  .job-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-  .job-card { padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
-  .job-card:hover { background: var(--panel); }
-  .job-card.active { background: rgba(245,166,35,0.07); border-left: 2px solid var(--amber); }
-  .job-card-name { font-weight: 600; font-size: 13px; color: var(--white); margin-bottom: 3px; }
-  .job-card-ref { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-bottom: 6px; }
-  .job-card-meta { display: flex; justify-content: space-between; align-items: center; }
-  .job-card-kw { font-family: var(--mono); font-size: 11px; color: var(--text2); }
-  .stage-pill { font-family: var(--mono); font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .stage--site_visit_scheduled   { background: rgba(74,158,255,0.15); color: var(--blue); }
-  .stage--site_visit_complete    { background: rgba(74,158,255,0.25); color: var(--blue); }
-  .stage--installation_scheduled { background: rgba(245,166,35,0.15); color: var(--amber); }
-  .stage--installation_in_progress { background: rgba(245,166,35,0.25); color: var(--amber2); }
-  .stage--installation_complete  { background: rgba(46,204,138,0.15); color: var(--green); }
-  .stage--handed_over            { background: rgba(46,204,138,0.3);  color: var(--green); }
-  .stage--accepted               { background: rgba(138,154,184,0.15); color: var(--text2); }
-  .stage--lead, .stage--quoted   { background: rgba(90,106,133,0.15); color: var(--text3); }
-  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-  .main::-webkit-scrollbar { width: 6px; }
-  .main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-  .placeholder-screen { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: var(--text3); }
-  .placeholder-screen svg { opacity: 0.2; }
-  .placeholder-screen h3 { font-family: var(--mono); font-size: 14px; color: var(--text2); }
-  .placeholder-screen p { font-size: 12px; }
-  .job-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 20px 28px; display: none; }
-  .job-header.visible { display: block; }
-  .jh-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
-  .jh-name { font-size: 20px; font-weight: 600; color: var(--white); }
-  .jh-ref { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .jh-actions { display: flex; gap: 8px; }
-  .jh-stats { display: flex; gap: 24px; }
-  .stat-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; }
-  .stat-value { font-family: var(--mono); font-size: 13px; color: var(--amber); font-weight: 600; margin-top: 2px; }
-  .pipeline { display: flex; align-items: center; padding: 16px 28px; border-bottom: 1px solid var(--border); gap: 0; overflow-x: auto; background: var(--bg); }
-  .pipe-step { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
-  .pipe-node { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 0 4px; }
-  .pipe-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); transition: all 0.2s; }
-  .pipe-dot.done   { border-color: var(--green); background: rgba(46,204,138,0.1); color: var(--green); }
-  .pipe-dot.active { border-color: var(--amber); background: rgba(245,166,35,0.1); color: var(--amber); box-shadow: 0 0 12px rgba(245,166,35,0.3); }
-  .pipe-label { font-family: var(--mono); font-size: 9px; color: var(--text3); text-align: center; max-width: 60px; line-height: 1.2; }
-  .pipe-label.done   { color: var(--green); }
-  .pipe-label.active { color: var(--amber); }
-  .pipe-arrow { width: 32px; height: 2px; background: var(--border2); flex-shrink: 0; }
-  .pipe-arrow.done { background: var(--green2); }
-  .stage-panels { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .panel-header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border); background: var(--panel); }
-  .panel-header:hover { background: rgba(255,255,255,0.03); }
-  .panel-title-group { display: flex; align-items: center; gap: 10px; }
-  .panel-step-num { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); background: var(--border); padding: 2px 7px; border-radius: 3px; }
-  .panel.current .panel-step-num { background: rgba(245,166,35,0.2); color: var(--amber); }
-  .panel.done .panel-step-num    { background: rgba(46,204,138,0.1); color: var(--green); }
-  .panel-title { font-weight: 600; font-size: 14px; color: var(--white); }
-  .panel-toggle { font-size: 16px; color: var(--text3); transition: transform 0.2s; }
-  .panel.open .panel-toggle { transform: rotate(180deg); }
-  .panel-body { display: none; padding: 20px; }
-  .panel.open .panel-body { display: block; }
-  .panel.locked { opacity: 0.5; pointer-events: none; }
-  .panel.locked .panel-header { cursor: not-allowed; }
-  .form-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .form-full   { grid-column: 1 / -1; }
-  .form-group  { display: flex; flex-direction: column; gap: 5px; }
-  .form-label  { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
-  .form-input, .form-select, .form-textarea { background: var(--bg); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 12px; padding: 8px 10px; border-radius: 4px; outline: none; transition: border-color 0.15s; width: 100%; }
-  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--amber); }
-  .form-select  { appearance: none; cursor: pointer; }
-  .form-textarea { resize: vertical; min-height: 70px; }
-  .form-input:disabled, .form-select:disabled, .form-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
-  .checklist { display: flex; flex-direction: column; gap: 6px; }
-  .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; transition: border-color 0.15s; }
-  .check-item.checked { border-color: var(--green2); background: rgba(46,204,138,0.04); }
-  .check-item input[type="checkbox"] { accent-color: var(--green); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
-  .check-item-label { flex: 1; font-size: 12px; color: var(--text2); }
-  .check-item.checked .check-item-label { color: var(--text3); text-decoration: line-through; }
-  .check-item-notes { font-family: var(--mono); font-size: 11px; background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 4px 8px; border-radius: 3px; width: 140px; }
-  .btn { font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 9px 18px; border-radius: 4px; border: none; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; }
-  .btn-primary { background: var(--amber); color: #000; }
-  .btn-primary:hover { background: var(--amber2); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-green { background: var(--green); color: #000; }
-  .btn-green:hover { filter: brightness(1.1); }
-  .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
-  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
-  .btn-row { display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-  .section-sep { margin: 20px 0; border: none; border-top: 1px solid var(--border); }
-  .section-label { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
-  .info-card { background: rgba(74,158,255,0.07); border: 1px solid rgba(74,158,255,0.2); border-radius: 5px; padding: 12px 14px; font-size: 12px; color: var(--blue); margin-bottom: 16px; }
-  .info-card.warning { background: rgba(245,166,35,0.07); border-color: rgba(245,166,35,0.2); color: var(--amber); }
-  .info-card.success { background: rgba(46,204,138,0.07); border-color: rgba(46,204,138,0.2); color: var(--green); }
-  .activity-log { border: 1px solid var(--border); border-radius: 5px; overflow: hidden; margin-top: 16px; }
-  .activity-log-header { background: var(--panel); padding: 8px 14px; font-family: var(--mono); font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
-  .log-entry { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; font-size: 11px; }
-  .log-time  { font-family: var(--mono); color: var(--text3); flex-shrink: 0; }
-  .log-msg   { color: var(--text2); }
-  .log-stage { font-family: var(--mono); font-size: 9px; padding: 1px 6px; border-radius: 2px; background: var(--border); color: var(--text3); flex-shrink: 0; }
-  .handover-doc { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 24px; }
-  .hd-logo  { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
-  .hd-title { font-size: 20px; font-weight: 300; color: var(--text); margin-bottom: 20px; letter-spacing: -0.01em; }
-  .hd-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .hd-section-title { font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-  .hd-row   { display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .hd-row-key { color: var(--text3); }
-  .hd-row-val { font-family: var(--mono); color: var(--text2); }
-  .warranty-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--text2); }
-  .warranty-item::before { content: '✓'; color: var(--green); font-size: 11px; }
-  .hd-sign-block { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-  .sign-line { border-bottom: 1px solid var(--border2); padding-top: 40px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
-  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-  .toast { font-family: var(--mono); font-size: 11px; padding: 10px 16px; border-radius: 5px; background: var(--surface); border: 1px solid var(--border2); color: var(--text); min-width: 220px; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; }
-  .toast.show    { opacity: 1; transform: translateY(0); pointer-events: auto; }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error   { border-color: var(--red);   color: var(--red);   }
-  .toast.info    { border-color: var(--blue);   color: var(--blue);  }
-  @media print {
-    .topbar, .sidebar, .pipeline, .btn-row, .stage-panels > *:not(.panel.print-target) { display: none !important; }
-    .layout { height: auto; }
-    .main { overflow: visible; }
-    .handover-doc { border: none; padding: 0; }
-    body { background: #fff; color: #000; }
-    .hd-row-val, .hd-section-title, .stat-value, .hd-logo { color: #000 !important; }
-    .hd-row-key, .sign-line { color: #555 !important; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .topbar-logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--amber);letter-spacing:.08em;display:flex;align-items:center;gap:8px}
+  .topbar-logo span{color:var(--text2);font-weight:400}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .layout{display:flex;height:calc(100vh - 56px);overflow:hidden}
+  .sidebar{width:300px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+  .sidebar-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .sidebar-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.12em;text-transform:uppercase}
+  .badge-count{font-family:var(--mono);font-size:10px;background:var(--amber);color:#000;padding:2px 7px;border-radius:10px;font-weight:600}
+  .search-box{padding:10px 16px;border-bottom:1px solid var(--border)}
+  .search-box input{width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;border-radius:4px;outline:none}
+  .search-box input:focus{border-color:var(--amber)}
+  .search-box input::placeholder{color:var(--text3)}
+  .filter-tabs{display:flex;padding:8px 16px;gap:4px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .filter-tab{font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all .12s;white-space:nowrap}
+  .filter-tab.active,.filter-tab:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,166,35,.08)}
+  .job-list{flex:1;overflow-y:auto}
+  .job-list::-webkit-scrollbar{width:4px}
+  .job-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .job-card{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+  .job-card:hover{background:var(--panel)}
+  .job-card.active{background:rgba(245,166,35,.07);border-left:2px solid var(--amber)}
+  .job-card-name{font-weight:600;font-size:13px;color:var(--white);margin-bottom:3px}
+  .job-card-ref{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:6px}
+  .job-card-meta{display:flex;justify-content:space-between;align-items:center}
+  .job-card-kw{font-family:var(--mono);font-size:11px;color:var(--text2)}
+  .stage-pill{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em}
+  .stage--site_visit_scheduled{background:rgba(74,158,255,.15);color:var(--blue)}
+  .stage--site_visit_complete{background:rgba(74,158,255,.25);color:var(--blue)}
+  .stage--installation_scheduled{background:rgba(245,166,35,.15);color:var(--amber)}
+  .stage--installation_in_progress{background:rgba(245,166,35,.25);color:var(--amber2)}
+  .stage--installation_complete{background:rgba(46,204,138,.15);color:var(--green)}
+  .stage--handed_over{background:rgba(46,204,138,.3);color:var(--green)}
+  .stage--accepted,.stage--lead,.stage--quoted{background:rgba(90,106,133,.15);color:var(--text3)}
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .main::-webkit-scrollbar{width:6px}
+  .main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  .placeholder-screen{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text3)}
+  .placeholder-screen h3{font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .placeholder-screen p{font-size:12px}
+  .job-header{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 28px;display:none}
+  .job-header.visible{display:block}
+  .jh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+  .jh-name{font-size:20px;font-weight:600;color:var(--white)}
+  .jh-ref{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:2px}
+  .jh-actions{display:flex;gap:8px}
+  .jh-stats{display:flex;gap:24px;flex-wrap:wrap}
+  .stat-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+  .stat-value{font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:600;margin-top:2px}
+  .pipeline{display:flex;align-items:center;padding:16px 28px;border-bottom:1px solid var(--border);gap:0;overflow-x:auto;background:var(--bg)}
+  .pipe-step{display:flex;align-items:center;gap:0;flex-shrink:0}
+  .pipe-node{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:0 4px}
+  .pipe-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);transition:all .2s}
+  .pipe-dot.done{border-color:var(--green);background:rgba(46,204,138,.1);color:var(--green)}
+  .pipe-dot.active{border-color:var(--amber);background:rgba(245,166,35,.1);color:var(--amber);box-shadow:0 0 12px rgba(245,166,35,.3)}
+  .pipe-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-align:center;max-width:60px;line-height:1.2}
+  .pipe-label.done{color:var(--green)}.pipe-label.active{color:var(--amber)}
+  .pipe-arrow{width:32px;height:2px;background:var(--border2);flex-shrink:0}
+  .pipe-arrow.done{background:var(--green2)}
+  .stage-panels{padding:24px 28px;display:flex;flex-direction:column;gap:20px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .panel-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-bottom:1px solid var(--border);background:var(--panel)}
+  .panel-header:hover{background:rgba(255,255,255,.03)}
+  .panel-title-group{display:flex;align-items:center;gap:10px}
+  .panel-step-num{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);background:var(--border);padding:2px 7px;border-radius:3px}
+  .panel.current .panel-step-num{background:rgba(245,166,35,.2);color:var(--amber)}
+  .panel.done .panel-step-num{background:rgba(46,204,138,.1);color:var(--green)}
+  .panel-title{font-weight:600;font-size:14px;color:var(--white)}
+  .panel-toggle{font-size:16px;color:var(--text3);transition:transform .2s}
+  .panel.open .panel-toggle{transform:rotate(180deg)}
+  .panel-body{display:none;padding:20px}
+  .panel.open .panel-body{display:block}
+  .panel.locked{opacity:.5;pointer-events:none}
+  .panel.locked .panel-header{cursor:not-allowed}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .form-full{grid-column:1/-1}
+  .form-group{display:flex;flex-direction:column;gap:5px}
+  .form-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+  .form-input,.form-select,.form-textarea{background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 10px;border-radius:4px;outline:none;transition:border-color .15s;width:100%}
+  .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--amber)}
+  .form-select{appearance:none;cursor:pointer}
+  .form-textarea{resize:vertical;min-height:70px}
+  .form-input:disabled,.form-select:disabled,.form-textarea:disabled{opacity:.5;cursor:not-allowed}
+  .checklist{display:flex;flex-direction:column;gap:6px}
+  .check-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px;transition:border-color .15s}
+  .check-item.checked{border-color:var(--green2);background:rgba(46,204,138,.04)}
+  .check-item input[type="checkbox"]{accent-color:var(--green);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+  .check-item-label{flex:1;font-size:12px;color:var(--text2)}
+  .check-item.checked .check-item-label{color:var(--text3);text-decoration:line-through}
+  .check-item-notes{font-family:var(--mono);font-size:11px;background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:4px 8px;border-radius:3px;width:140px}
+  .btn{font-family:var(--mono);font-size:11px;font-weight:600;padding:9px 18px;border-radius:4px;border:none;cursor:pointer;transition:all .15s;letter-spacing:.04em;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase}
+  .btn-primary{background:var(--amber);color:#000}.btn-primary:hover{background:var(--amber2)}.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+  .btn-green{background:var(--green);color:#000}.btn-green:hover{filter:brightness(1.1)}
+  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+  .btn-blue{background:rgba(74,158,255,.12);border:1px solid rgba(74,158,255,.3);color:var(--blue)}.btn-blue:hover{background:rgba(74,158,255,.2)}
+  .btn-blue:disabled{opacity:.4;cursor:not-allowed}
+  .btn-row{display:flex;align-items:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .section-sep{margin:20px 0;border:none;border-top:1px solid var(--border)}
+  .section-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+  .info-card{border-radius:5px;padding:12px 14px;font-size:12px;margin-bottom:16px}
+  .info-card.blue{background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);color:var(--blue)}
+  .info-card.warning{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);color:var(--amber)}
+  .info-card.success{background:rgba(46,204,138,.07);border:1px solid rgba(46,204,138,.2);color:var(--green)}
+  .info-card.error{background:rgba(224,82,82,.07);border:1px solid rgba(224,82,82,.2);color:var(--red)}
+
+  /* ── NOTIFICATION STATUS ROW ── */
+  .notify-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+  .notify-status{display:flex;align-items:center;gap:8px;font-size:12px}
+  .notify-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .notify-dot.sent{background:var(--green);box-shadow:0 0 6px rgba(46,204,138,.5)}
+  .notify-dot.unsent{background:var(--text3)}
+  .notify-label{font-family:var(--mono);font-size:11px}
+  .notify-label.sent{color:var(--green)}.notify-label.unsent{color:var(--text3)}
+  .notify-sub{font-size:11px;color:var(--text3)}
+
+  /* ── DESIGN CHANGE ALERT ── */
+  .design-change-alert{display:none;margin-bottom:20px;border:1.5px solid rgba(245,166,35,.4);border-radius:8px;background:rgba(245,166,35,.06);overflow:hidden}
+  .design-change-alert.visible{display:block}
+  .dca-header{padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(245,166,35,.15)}
+  .dca-icon{font-size:18px;flex-shrink:0}
+  .dca-title{font-size:14px;font-weight:600;color:var(--amber)}
+  .dca-sub{font-size:11px;color:var(--text2);margin-top:2px}
+  .dca-body{padding:16px 18px}
+  .dca-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .dca-col{background:rgba(0,0,0,.2);border-radius:6px;padding:12px 14px}
+  .dca-col-title{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+  .dca-col-title.original{color:var(--text3)}.dca-col-title.revised{color:var(--amber)}
+  .dca-col-val{font-family:var(--mono);font-size:14px;font-weight:600}
+  .dca-col-val.original{color:var(--text2)}.dca-col-val.revised{color:var(--amber)}
+  .dca-col-sub{font-size:11px;color:var(--text3);margin-top:3px}
+
+  .activity-log{border:1px solid var(--border);border-radius:5px;overflow:hidden;margin-top:16px}
+  .activity-log-header{background:var(--panel);padding:8px 14px;font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+  .log-entry{padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;font-size:11px}
+  .log-time{font-family:var(--mono);color:var(--text3);flex-shrink:0}
+  .log-msg{color:var(--text2)}
+  .log-stage{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:2px;background:var(--border);color:var(--text3);flex-shrink:0}
+  .handover-doc{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:24px}
+  .hd-logo{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--amber);margin-bottom:4px}
+  .hd-title{font-size:20px;font-weight:300;color:var(--text);margin-bottom:20px;letter-spacing:-.01em}
+  .hd-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .hd-section-title{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+  .hd-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .hd-row-key{color:var(--text3)}.hd-row-val{font-family:var(--mono);color:var(--text2)}
+  .warranty-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px;color:var(--text2)}
+  .warranty-item::before{content:'✓';color:var(--green);font-size:11px}
+  .hd-sign-block{margin-top:24px;border-top:1px solid var(--border);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+  .sign-line{border-bottom:1px solid var(--border2);padding-top:40px;font-size:11px;color:var(--text3);font-family:var(--mono)}
+  .toast-container{position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px}
+  .toast{font-family:var(--mono);font-size:11px;padding:10px 16px;border-radius:5px;background:var(--surface);border:1px solid var(--border2);color:var(--text);min-width:220px;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+  .toast.success{border-color:var(--green);color:var(--green)}
+  .toast.error{border-color:var(--red);color:var(--red)}
+  .toast.info{border-color:var(--blue);color:var(--blue)}
+  @media print{
+    .topbar,.sidebar,.pipeline,.btn-row,.stage-panels>*:not(.panel.print-target){display:none!important}
+    .layout{height:auto}.main{overflow:visible}
+    .handover-doc{border:none;padding:0}
+    body{background:#fff;color:#000}
+    .hd-row-val,.hd-section-title,.stat-value,.hd-logo{color:#000!important}
+    .hd-row-key,.sign-line{color:#555!important}
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -177,9 +186,9 @@
 <div class="topbar">
   <div class="topbar-logo">◈ SOLAR INTELLIGENCE <span>/ JOB PORTAL</span></div>
   <div class="topbar-right">
-    <a href="prposal_portal.html" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← Proposal Portal</a>
+    <a href="prposal_portal.html" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.borderColor='var(--amber)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">← Proposal Portal</a>
     <span id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3)">● connecting</span>
-    <button onclick="doSignOut()" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text3);padding:5px 10px;border-radius:4px;cursor:pointer;">Sign out</button>
+    <button onclick="doSignOut()" style="font-family:var(--mono);font-size:11px;background:transparent;border:1px solid var(--border2);color:var(--text3);padding:5px 10px;border-radius:4px;cursor:pointer">Sign out</button>
   </div>
 </div>
 
@@ -198,7 +207,6 @@
       <button class="filter-tab" onclick="setFilter(this,'installation')">Install</button>
       <button class="filter-tab" onclick="setFilter(this,'handed_over')">Done</button>
     </div>
-    <!-- job-list is always empty in HTML; renderSidebar writes into it dynamically -->
     <div class="job-list" id="job-list"></div>
   </div>
 
@@ -213,13 +221,13 @@
       <p>Choose a job from the sidebar to open its workspace</p>
     </div>
 
-    <div id="job-workspace" style="display:none; flex-direction:column; flex:1">
+    <div id="job-workspace" style="display:none;flex-direction:column;flex:1">
 
       <div class="job-header visible" id="job-header">
         <div class="jh-top">
           <div>
             <div class="jh-name" id="jh-name">—</div>
-            <div class="jh-ref"  id="jh-ref">—</div>
+            <div class="jh-ref" id="jh-ref">—</div>
           </div>
           <div class="jh-actions">
             <button class="btn btn-ghost" onclick="refreshCurrentJob()">↻ Refresh</button>
@@ -229,7 +237,7 @@
         <div class="jh-stats">
           <div class="stat-item"><div class="stat-label">System Size</div><div class="stat-value" id="jh-kw">—</div></div>
           <div class="stat-item"><div class="stat-label">Battery</div><div class="stat-value" id="jh-battery">—</div></div>
-          <div class="stat-item"><div class="stat-label">Address</div><div class="stat-value" id="jh-address" style="font-size:11px;color:var(--text2)">—</div></div>
+          <div class="stat-item"><div class="stat-label">Client Email</div><div class="stat-value" id="jh-email" style="font-size:11px;color:var(--text2)">—</div></div>
           <div class="stat-item"><div class="stat-label">Stage</div><div class="stat-value" id="jh-stage">—</div></div>
         </div>
       </div>
@@ -242,19 +250,73 @@
         <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(4)"><div class="pipe-dot" id="pdot-4">5</div><div class="pipe-label" id="plbl-4">Handover</div></div></div>
       </div>
 
+      <!-- DESIGN CHANGE ALERT — shown between steps 1 and 2 when specs differ -->
+      <div class="design-change-alert" id="design-change-alert" style="margin:0 28px">
+        <div class="dca-header">
+          <div class="dca-icon">⚠</div>
+          <div>
+            <div class="dca-title">Design Change Detected — Action Required</div>
+            <div class="dca-sub">The site assessment recommends a different system to the original accepted proposal. Review and document the reason before proceeding.</div>
+          </div>
+        </div>
+        <div class="dca-body">
+          <div class="dca-compare">
+            <div class="dca-col">
+              <div class="dca-col-title original">Originally Proposed</div>
+              <div class="dca-col-val original" id="dca-orig-kw">—</div>
+              <div class="dca-col-sub">Accepted by client</div>
+              <div class="dca-col-val original" style="font-size:12px;margin-top:8px" id="dca-orig-batt">—</div>
+            </div>
+            <div class="dca-col">
+              <div class="dca-col-title revised">Recommended After Site Visit</div>
+              <div class="dca-col-val revised" id="dca-new-kw">—</div>
+              <div class="dca-col-sub">Based on actual site conditions</div>
+              <div class="dca-col-val revised" style="font-size:12px;margin-top:8px" id="dca-new-batt">—</div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Reason for design change <span style="color:var(--red)">*</span></label>
+            <textarea class="form-textarea" id="design-change-reason" placeholder="e.g. Roof could only accommodate 18 panels on north face due to HVAC units. Extended cable run required larger battery. Client verbally confirmed revised specs on site." style="min-height:80px"></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="acknowledgeDesignChange()">✓ Confirm &amp; Document Design Change</button>
+            <button class="btn btn-ghost" onclick="dismissDesignChange()">Proceed with Original Design</button>
+          </div>
+          <div id="dca-ack-status" style="display:none;margin-top:12px" class="info-card success">
+            ✓ Design change documented and saved to activity log.
+          </div>
+        </div>
+      </div>
+
       <div class="stage-panels" id="stage-panels">
 
+        <!-- STEP 1: SITE VISIT -->
         <div class="panel" id="panel-0">
           <div class="panel-header" onclick="togglePanel(0)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 1</span><span class="panel-title">Site Visit Assessment</span></div>
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-0-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-0-body">
-            <div class="info-card">Complete the on-site assessment below. All fields help generate accurate COC and handover documents.</div>
+
+            <!-- CLIENT NOTIFICATION -->
+            <div class="section-label" style="margin-bottom:8px">Client Visit Confirmation</div>
+            <div class="notify-row" id="notify-row">
+              <div class="notify-status">
+                <div class="notify-dot unsent" id="notify-dot"></div>
+                <div>
+                  <div class="notify-label unsent" id="notify-label">Client not yet notified</div>
+                  <div class="notify-sub" id="notify-sub">Fill in the assessor name and visit date/time below, then send the confirmation email.</div>
+                </div>
+              </div>
+              <button class="btn btn-blue" id="btn-notify-client" onclick="sendVisitNotification()" disabled>
+                ✉ Send to Client
+              </button>
+            </div>
+
             <div class="section-label">Visit Details</div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Assessor Name</label><input type="text" class="form-input" id="sv-assessor" placeholder="Your name"></div>
-              <div class="form-group"><label class="form-label">Visit Date &amp; Time</label><input type="datetime-local" class="form-input" id="sv-datetime"></div>
+              <div class="form-group"><label class="form-label">Assessor Name</label><input type="text" class="form-input" id="sv-assessor" placeholder="Your name" oninput="checkNotifyReady()"></div>
+              <div class="form-group"><label class="form-label">Visit Date &amp; Time</label><input type="datetime-local" class="form-input" id="sv-datetime" oninput="checkNotifyReady()"></div>
               <div class="form-group"><label class="form-label">Municipality</label><input type="text" class="form-input" id="sv-municipality" placeholder="e.g. City of Johannesburg"></div>
               <div class="form-group"><label class="form-label">Grid Ref / Account No.</label><input type="text" class="form-input" id="sv-gridref" placeholder="Meter account number"></div>
             </div>
@@ -282,26 +344,37 @@
               <div class="form-group"><label class="form-label">Shading Notes</label><input type="text" class="form-input" id="sv-shadingnotes" placeholder="Trees, chimneys, neighbouring buildings..."></div>
             </div>
             <hr class="section-sep">
-            <div class="section-label">Recommended System</div>
+            <div class="section-label">Recommended System <span style="font-size:10px;color:var(--text3);font-weight:400;font-family:var(--sans)">(compared to accepted proposal — changes will be flagged)</span></div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Recommended System (kWp)</label><input type="number" step="0.1" class="form-input" id="sv-kw" placeholder="e.g. 10.5"></div>
-              <div class="form-group"><label class="form-label">Recommended Battery (kWh)</label><input type="number" step="0.1" class="form-input" id="sv-battery" placeholder="e.g. 10.0"></div>
+              <div class="form-group">
+                <label class="form-label">Recommended System (kWp)</label>
+                <input type="number" step="0.1" class="form-input" id="sv-kw" placeholder="e.g. 10.5" oninput="checkDesignChangeLive()">
+                <div id="sv-kw-hint" style="font-size:10px;color:var(--text3);margin-top:3px"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Recommended Battery (kWh)</label>
+                <input type="number" step="0.1" class="form-input" id="sv-battery" placeholder="e.g. 10.0" oninput="checkDesignChangeLive()">
+                <div id="sv-batt-hint" style="font-size:10px;color:var(--text3);margin-top:3px"></div>
+              </div>
               <div class="form-group form-full"><label class="form-label">Additional Notes</label><textarea class="form-textarea" id="sv-notes" placeholder="Anything else the installation team should know..."></textarea></div>
             </div>
             <div class="btn-row">
               <button class="btn btn-primary" onclick="completeSiteVisit()">✓ Complete Site Visit</button>
-              <button class="btn btn-ghost"   onclick="saveSiteVisitDraft()">Save Draft</button>
+              <button class="btn btn-ghost" onclick="saveSiteVisitDraft()">Save Draft</button>
               <span id="sv-saving" style="font-family:var(--mono);font-size:11px;color:var(--text3);display:none">Saving...</span>
             </div>
           </div>
         </div>
 
+        <!-- STEP 2: INSTALLATION PREP -->
         <div class="panel locked" id="panel-1">
           <div class="panel-header" onclick="togglePanel(1)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 2</span><span class="panel-title">Installation Preparation</span></div>
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-1-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body" id="panel-1-body">
+            <!-- Design change reminder shown here if applicable -->
+            <div id="panel1-design-note" style="display:none" class="info-card warning"></div>
             <div class="section-label">Team Assignment</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Team Lead</label><input type="text" class="form-input" id="inst-teamlead" placeholder="Lead installer name"></div>
@@ -322,11 +395,12 @@
             </div>
             <div class="btn-row">
               <button class="btn btn-primary" onclick="scheduleInstallation()">✓ Schedule Installation</button>
-              <button class="btn btn-ghost"   onclick="saveInstallPrepDraft()">Save Draft</button>
+              <button class="btn btn-ghost" onclick="saveInstallPrepDraft()">Save Draft</button>
             </div>
           </div>
         </div>
 
+        <!-- STEP 3: INSTALLATION CHECKLIST -->
         <div class="panel locked" id="panel-2">
           <div class="panel-header" onclick="togglePanel(2)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 3</span><span class="panel-title">Installation Checklist</span></div>
@@ -347,6 +421,7 @@
           </div>
         </div>
 
+        <!-- STEP 4: COMPLETION -->
         <div class="panel locked" id="panel-3">
           <div class="panel-header" onclick="togglePanel(3)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 4</span><span class="panel-title">Final Completion &amp; Sign-off</span></div>
@@ -371,6 +446,7 @@
           </div>
         </div>
 
+        <!-- STEP 5: HANDOVER -->
         <div class="panel locked" id="panel-4">
           <div class="panel-header" onclick="togglePanel(4)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 5</span><span class="panel-title">Customer Handover</span></div>
@@ -408,9 +484,9 @@
           </div>
         </div>
 
-      </div>
+      </div><!-- /stage-panels -->
 
-      <div style="padding: 0 28px 28px">
+      <div style="padding:0 28px 28px">
         <div class="activity-log">
           <div class="activity-log-header">Activity Log</div>
           <div id="activity-log-entries">
@@ -419,9 +495,9 @@
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /job-workspace -->
+  </div><!-- /main -->
+</div><!-- /layout -->
 
 <div class="toast-container" id="toast-container"></div>
 
@@ -430,494 +506,652 @@ const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const sbClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
-let jobs           = [];
-let currentJob     = null;
-let currentInstall = null;
-let currentHandover= null;
-let currentVisit   = null;
-let activeFilter   = 'all';
-
-// ── RACE CONDITION GUARD ──────────────────────────────────────────────────
-// Prevents two concurrent openJob calls interleaving their renders.
-// If a job is clicked while another is loading, we queue the latest request
-// and open it immediately after the in-progress load finishes.
-let _jobLoading  = false;
-let _pendingJobId = null;
+let jobs=[], currentJob=null, currentInstall=null, currentHandover=null, currentVisit=null;
+let activeFilter='all';
+let _jobLoading=false, _pendingJobId=null;
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
-(async function boot() {
-  const { data: { session } } = await sbClient.auth.getSession();
-  if (!session) { window.location.href = 'nova-metrics_1.html'; return; }
+(async function boot(){
+  const {data:{session}}=await sbClient.auth.getSession();
+  if(!session){window.location.href='nova-metrics_1.html';return;}
   setSyncStatus('online');
   await loadJobs();
-  setInterval(loadJobs, 60000);
+  setInterval(loadJobs,60000);
 })();
 
-async function doSignOut() {
-  await sbClient.auth.signOut();
-  window.location.href = 'nova-metrics_1.html';
-}
+async function doSignOut(){await sbClient.auth.signOut();window.location.href='nova-metrics_1.html';}
 
 // ── SUPABASE HELPER ───────────────────────────────────────────────────────
-async function sb(path, method='GET', body=null) {
-  const { data: { session } } = await sbClient.auth.getSession();
-  const token = session ? session.access_token : SUPA_ANON;
-  const headers = { 'apikey': SUPA_ANON, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-  if (method !== 'GET') headers['Prefer'] = 'return=representation';
-  const opts = { method, headers };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, opts);
-  if (!res.ok) { const err = await res.text(); throw new Error(err); }
-  if (res.status === 204) return null;
+async function sb(path,method='GET',body=null){
+  const {data:{session}}=await sbClient.auth.getSession();
+  const token=session?session.access_token:SUPA_ANON;
+  const headers={'apikey':SUPA_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
+  if(method!=='GET') headers['Prefer']='return=representation';
+  const opts={method,headers};
+  if(body) opts.body=JSON.stringify(body);
+  const res=await fetch(`${SUPA_URL}/rest/v1/${path}`,opts);
+  if(!res.ok){const err=await res.text();throw new Error(err);}
+  if(res.status===204)return null;
   return res.json();
 }
-async function sbGet(table, query='')      { return sb(`${table}?${query}`); }
-async function sbPost(table, data)         { return sb(table, 'POST', data); }
-async function sbPatch(table, query, data) { return sb(`${table}?${query}`, 'PATCH', data); }
+const sbGet=(t,q='')=>sb(`${t}?${q}`);
+const sbPost=(t,d)=>sb(t,'POST',d);
+const sbPatch=(t,q,d)=>sb(`${t}?${q}`,'PATCH',d);
 
-// ── SYNC STATUS ───────────────────────────────────────────────────────────
-function setSyncStatus(state) {
-  const el = document.getElementById('sync-status');
-  if (!el) return;
-  if (state==='online')  { el.textContent='● online';  el.style.color='var(--green)'; }
-  if (state==='error')   { el.textContent='● error';   el.style.color='var(--red)'; }
-  if (state==='loading') { el.textContent='● loading'; el.style.color='var(--text3)'; }
+function setSyncStatus(state){
+  const el=document.getElementById('sync-status');if(!el)return;
+  if(state==='online'){el.textContent='● online';el.style.color='var(--green)';}
+  if(state==='error'){el.textContent='● error';el.style.color='var(--red)';}
+  if(state==='loading'){el.textContent='● loading';el.style.color='var(--text3)';}
 }
 
 // ── STAGE CONFIG ──────────────────────────────────────────────────────────
-const STAGE_LABELS = {
-  lead:'Won — Awaiting Visit', accepted:'Won — Awaiting Visit',
-  site_visit_scheduled:'Visit Scheduled', site_visit_complete:'Visit Complete',
-  installation_scheduled:'Install Scheduled', installation_in_progress:'Installing',
-  installation_complete:'Install Complete', handed_over:'Handed Over',
+const STAGE_LABELS={
+  lead:'Won — Awaiting Visit',accepted:'Won — Awaiting Visit',
+  site_visit_scheduled:'Visit Scheduled',site_visit_complete:'Visit Complete',
+  installation_scheduled:'Install Scheduled',installation_in_progress:'Installing',
+  installation_complete:'Install Complete',handed_over:'Handed Over',
 };
-const PANEL_UNLOCK = [
+const PANEL_UNLOCK=[
   ['lead','accepted','site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
   ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
   ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
   ['installation_in_progress','installation_complete','handed_over'],
   ['installation_complete','handed_over'],
 ];
-const PANEL_BADGE_LABELS = [
-  {done:'Visit Complete', current:'Pending',     locked:'Locked'},
-  {done:'Scheduled',      current:'Pending',     locked:'Locked'},
-  {done:'Complete',       current:'In Progress', locked:'Locked'},
-  {done:'Signed Off',     current:'Pending',     locked:'Locked'},
-  {done:'✓ Handed Over', current:'Pending',     locked:'Locked'},
+const PANEL_BADGE_LABELS=[
+  {done:'Visit Complete',current:'Pending',locked:'Locked'},
+  {done:'Scheduled',current:'Pending',locked:'Locked'},
+  {done:'Complete',current:'In Progress',locked:'Locked'},
+  {done:'Signed Off',current:'Pending',locked:'Locked'},
+  {done:'✓ Handed Over',current:'Pending',locked:'Locked'},
 ];
-const STAGE_ORDER = ['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'];
-function stageIndex(s) { return STAGE_ORDER.indexOf(s); }
+const STAGE_ORDER=['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'];
+function stageIndex(s){return STAGE_ORDER.indexOf(s);}
 
 // ── LOAD JOBS ─────────────────────────────────────────────────────────────
-async function loadJobs() {
+async function loadJobs(){
   setSyncStatus('loading');
-  try {
-    const data = await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');
-    jobs = data || [];
-    renderSidebar();
-    setSyncStatus('online');
-  } catch(e) {
-    setSyncStatus('error');
-    console.error('loadJobs failed:', e.message);
-  }
+  try{
+    const data=await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');
+    jobs=data||[];renderSidebar();setSyncStatus('online');
+  }catch(e){setSyncStatus('error');console.error('loadJobs:',e.message);}
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────
-// IMPORTANT: this function only writes INTO job-list via innerHTML / appendChild.
-// It never reads back 'empty-sidebar' from the DOM (which caused the null.style crash
-// when list.innerHTML='' detached that element and a subsequent getElementById returned null).
-function setFilter(el, filter) {
-  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  activeFilter = filter;
-  renderSidebar();
+function setFilter(el,filter){
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');activeFilter=filter;renderSidebar();
 }
-function filterJobs() { renderSidebar(); }
+function filterJobs(){renderSidebar();}
 
-function renderSidebar() {
-  const search = document.getElementById('search-input').value.toLowerCase();
-  const list   = document.getElementById('job-list');
-  const installStatuses = ['installation_scheduled','installation_in_progress','installation_complete'];
-  const filtered = jobs.filter(j => {
-    const matchFilter =
-      activeFilter==='all'          ? true :
-      activeFilter==='installation' ? installStatuses.includes(j.job_status) :
-      activeFilter==='handed_over'  ? j.job_status==='handed_over' :
+function renderSidebar(){
+  const search=document.getElementById('search-input').value.toLowerCase();
+  const list=document.getElementById('job-list');
+  const installStatuses=['installation_scheduled','installation_in_progress','installation_complete'];
+  const filtered=jobs.filter(j=>{
+    const matchFilter=
+      activeFilter==='all'?true:
+      activeFilter==='installation'?installStatuses.includes(j.job_status):
+      activeFilter==='handed_over'?j.job_status==='handed_over':
       j.job_status===activeFilter;
-    const searchStr = `${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
-    return matchFilter && (!search || searchStr.includes(search));
+    const s=`${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
+    return matchFilter&&(!search||s.includes(search));
   });
-
-  document.getElementById('job-count').textContent = filtered.length;
-
-  // Always clear with innerHTML. Never re-attach a previously detached static element
-  // (that caused the null.style crash on repeat calls when empty-sidebar was detached).
-  list.innerHTML = '';
-
-  if (!filtered.length) {
-    // Render empty state inline -- no static element to detach/re-attach
-    list.innerHTML = '<div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:12px"><div style="font-size:24px;margin-bottom:8px">📋</div>No won jobs yet</div>';
-    return;
-  }
-
-  filtered.forEach(j => {
-    const card  = document.createElement('div');
-    card.className = `job-card ${currentJob?.ai_id === j.ai_id ? 'active' : ''}`;
-    card.onclick   = () => openJob(j.ai_id);
-    const kw    = j.system_size_kw ? `${j.system_size_kw} kWp` : '—';
-    const stage = j.job_status || 'lead';
-    const label = STAGE_LABELS[stage] || stage;
-    card.innerHTML = `
-      <div class="job-card-name">${j.client_name||'Unnamed'}</div>
+  document.getElementById('job-count').textContent=filtered.length;
+  list.innerHTML='';
+  if(!filtered.length){list.innerHTML='<div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:12px"><div style="font-size:24px;margin-bottom:8px">📋</div>No won jobs yet</div>';return;}
+  filtered.forEach(j=>{
+    const card=document.createElement('div');
+    card.className=`job-card ${currentJob?.ai_id===j.ai_id?'active':''}`;
+    card.onclick=()=>openJob(j.ai_id);
+    const kw=j.system_size_kw?`${j.system_size_kw} kWp`:'—';
+    const stage=j.job_status||'lead';
+    const label=STAGE_LABELS[stage]||stage;
+    card.innerHTML=`<div class="job-card-name">${j.client_name||'Unnamed'}</div>
       <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div>
-      <div class="job-card-meta">
-        <span class="job-card-kw">${kw}</span>
-        <span class="stage-pill stage--${stage}">${label}</span>
-      </div>`;
+      <div class="job-card-meta"><span class="job-card-kw">${kw}</span><span class="stage-pill stage--${stage}">${label}</span></div>`;
     list.appendChild(card);
   });
 }
 
 // ── OPEN JOB ──────────────────────────────────────────────────────────────
-// Race condition guard: if a load is already in progress, queue the latest
-// request and execute it as soon as the current load finishes.
-async function openJob(id) {
-  if (_jobLoading) {
-    _pendingJobId = id; // queue it; the finally block will pick it up
-    return;
-  }
-  _jobLoading   = true;
-  _pendingJobId = null;
-
-  try {
-    const data = await sbGet('ai_results', `ai_id=eq.${id}&select=*`);
-    if (!data || !data[0]) { toast('Job not found', 'error'); return; }
-    currentJob = data[0];
-
-    const [visits, installs, handovers, logs] = await Promise.all([
-      sbGet('site_visits',      `job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('installations',    `job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('handovers',        `job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('job_activity_log', `job_id=eq.${id}&order=created_at.desc&limit=20`),
+async function openJob(id){
+  if(_jobLoading){_pendingJobId=id;return;}
+  _jobLoading=true;_pendingJobId=null;
+  try{
+    const data=await sbGet('ai_results',`ai_id=eq.${id}&select=*`);
+    if(!data||!data[0]){toast('Job not found','error');return;}
+    currentJob=data[0];
+    const[visits,installs,handovers,logs]=await Promise.all([
+      sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('installations',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('handovers',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+      sbGet('job_activity_log',`job_id=eq.${id}&order=created_at.desc&limit=20`),
     ]);
-    currentVisit    = visits?.[0]    || null;
-    currentInstall  = installs?.[0]  || null;
-    currentHandover = handovers?.[0] || null;
-
-    renderJobHeader();
-    renderPipeline();
-    renderPanels();
-    renderActivityLog(logs || []);
-    prefillForms();
-
-    // Safe DOM show/hide with null guards (elements always exist but guard defensively)
-    const ph = document.getElementById('placeholder');
-    const ws = document.getElementById('job-workspace');
-    if (ph) ph.style.display = 'none';
-    if (ws) ws.style.display = 'flex';
-
-    renderSidebar(); // re-highlight active card
-  } catch(e) {
-    toast('Error loading job: ' + e.message, 'error');
-    currentJob = null; // reset so sidebar doesn't show a ghost active state
+    currentVisit=visits?.[0]||null;
+    currentInstall=installs?.[0]||null;
+    currentHandover=handovers?.[0]||null;
+    renderJobHeader();renderPipeline();renderPanels();
+    renderActivityLog(logs||[]);prefillForms();
+    renderNotificationStatus();
+    renderDesignChangeAlert();
+    renderPanel1DesignNote();
+    const ph=document.getElementById('placeholder');
+    const ws=document.getElementById('job-workspace');
+    if(ph)ph.style.display='none';
+    if(ws)ws.style.display='flex';
     renderSidebar();
-  } finally {
-    _jobLoading = false;
-    // If user clicked another job while this one was loading, open it now
-    if (_pendingJobId) {
-      const next   = _pendingJobId;
-      _pendingJobId = null;
-      openJob(next);
-    }
+  }catch(e){
+    toast('Error loading job: '+e.message,'error');
+    currentJob=null;renderSidebar();
+  }finally{
+    _jobLoading=false;
+    if(_pendingJobId){const next=_pendingJobId;_pendingJobId=null;openJob(next);}
   }
 }
-async function refreshCurrentJob() { if (currentJob) openJob(currentJob.ai_id); }
+async function refreshCurrentJob(){if(currentJob)openJob(currentJob.ai_id);}
 
 // ── JOB HEADER ────────────────────────────────────────────────────────────
-function renderJobHeader() {
-  const j = currentJob;
-  setText('jh-name',    j.client_name || '—');
-  setText('jh-ref',     `REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address||'—'}`);
-  setText('jh-kw',      j.system_size_kw     ? `${j.system_size_kw} kWp`         : '—');
-  setText('jh-battery', j.battery_capacity_kwh ? `${j.battery_capacity_kwh} kWh` : '—');
-  setText('jh-address', j.client_address || '—');
-  setText('jh-stage',   STAGE_LABELS[j.job_status] || j.job_status || '—');
+function renderJobHeader(){
+  const j=currentJob;
+  setText('jh-name',j.client_name||'—');
+  setText('jh-ref',`REF: ${String(j.ai_id).padStart(6,'0')} · ${j.client_address||'—'}`);
+  setText('jh-kw',j.system_size_kw?`${j.system_size_kw} kWp`:'—');
+  setText('jh-battery',j.battery_capacity_kwh?`${j.battery_capacity_kwh} kWh`:'—');
+  setText('jh-email',j.client_email||'—');
+  setText('jh-stage',STAGE_LABELS[j.job_status]||j.job_status||'—');
 }
 
 // ── PIPELINE ──────────────────────────────────────────────────────────────
-function renderPipeline() {
-  const si = stageIndex(currentJob.job_status);
-  const steps = [
+function renderPipeline(){
+  const si=stageIndex(currentJob.job_status);
+  const steps=[
     {stage:'site_visit_complete'},{stage:'installation_scheduled'},
     {stage:'installation_in_progress'},{stage:'installation_complete'},{stage:'handed_over'},
   ];
-  steps.forEach((ps, i) => {
-    const dot = document.getElementById(`pdot-${i}`);
-    const lbl = document.getElementById(`plbl-${i}`);
-    const arr = document.getElementById(`parr-${i}`);
-    if (!dot || !lbl) return;
-    const psi = stageIndex(ps.stage);
-    if (si >= psi)       { dot.className='pipe-dot done';   lbl.className='pipe-label done';   if(arr) arr.className='pipe-arrow done'; }
-    else if (si===psi-1) { dot.className='pipe-dot active'; lbl.className='pipe-label active'; }
-    else                 { dot.className='pipe-dot';        lbl.className='pipe-label';         if(arr) arr.className='pipe-arrow'; }
+  steps.forEach((ps,i)=>{
+    const dot=document.getElementById(`pdot-${i}`);
+    const lbl=document.getElementById(`plbl-${i}`);
+    const arr=document.getElementById(`parr-${i}`);
+    if(!dot||!lbl)return;
+    const psi=stageIndex(ps.stage);
+    if(si>=psi){dot.className='pipe-dot done';lbl.className='pipe-label done';if(arr)arr.className='pipe-arrow done';}
+    else if(si===psi-1){dot.className='pipe-dot active';lbl.className='pipe-label active';}
+    else{dot.className='pipe-dot';lbl.className='pipe-label';if(arr)arr.className='pipe-arrow';}
   });
 }
-
-function jumpToPanel(i) {
-  const p = document.getElementById(`panel-${i}`);
-  if (p && !p.classList.contains('locked')) { p.classList.add('open'); p.scrollIntoView({behavior:'smooth',block:'start'}); }
+function jumpToPanel(i){
+  const p=document.getElementById(`panel-${i}`);
+  if(p&&!p.classList.contains('locked')){p.classList.add('open');p.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 
 // ── PANELS ────────────────────────────────────────────────────────────────
-function renderPanels() {
-  const status = currentJob.job_status || 'lead';
-  PANEL_UNLOCK.forEach((unlock, i) => {
-    const panel = document.getElementById(`panel-${i}`);
-    const badge = document.getElementById(`panel-${i}-badge`);
-    if (!panel || !badge) return;
-    const unlocked = unlock.includes(status);
-    panel.classList.toggle('locked', !unlocked);
-    const completedStages = {
+function renderPanels(){
+  const status=currentJob.job_status||'lead';
+  PANEL_UNLOCK.forEach((unlock,i)=>{
+    const panel=document.getElementById(`panel-${i}`);
+    const badge=document.getElementById(`panel-${i}-badge`);
+    if(!panel||!badge)return;
+    const unlocked=unlock.includes(status);
+    panel.classList.toggle('locked',!unlocked);
+    const completedStages={
       0:['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
       1:['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-      2:['installation_complete','handed_over'],
-      3:['installation_complete','handed_over'],
-      4:['handed_over'],
+      2:['installation_complete','handed_over'],3:['installation_complete','handed_over'],4:['handed_over'],
     };
-    let bState = 'locked';
-    if (unlocked) bState = (completedStages[i]||[]).includes(status) ? 'done' : 'current';
-    badge.textContent = PANEL_BADGE_LABELS[i][bState];
-    badge.className   = `stage-pill ${bState==='done'?'stage--installation_complete':bState==='current'?'stage--installation_in_progress':'stage--lead'}`;
-    if (bState==='current') panel.classList.add('open');
+    let bState='locked';
+    if(unlocked) bState=(completedStages[i]||[]).includes(status)?'done':'current';
+    badge.textContent=PANEL_BADGE_LABELS[i][bState];
+    badge.className=`stage-pill ${bState==='done'?'stage--installation_complete':bState==='current'?'stage--installation_in_progress':'stage--lead'}`;
+    if(bState==='current')panel.classList.add('open');
   });
-  const pre = document.getElementById('checklist-pre');
-  if (pre && pre.childElementCount===0) buildChecklist();
+  const pre=document.getElementById('checklist-pre');
+  if(pre&&pre.childElementCount===0)buildChecklist();
 }
 
-// ── PREFILL ───────────────────────────────────────────────────────────────
-function prefillForms() {
-  const v = currentVisit;
-  if (v) {
-    setVal('sv-assessor',v.assessor_name); setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');
-    setVal('sv-municipality',v.municipality); setVal('sv-gridref',v.grid_ref_number);
-    setVal('sv-rooftype',v.roof_type); setVal('sv-roofcondition',v.roof_condition);
-    setVal('sv-cablerun',v.cable_run_meters); setVal('sv-metertype',v.meter_type);
-    setVal('sv-phase',v.phase); setVal('sv-db',String(v.db_board_adequate));
-    setVal('sv-dbnotes',v.db_notes); setVal('sv-earthing',String(v.earthing_ok));
-    setVal('sv-earthingnotes',v.earthing_notes); setVal('sv-shading',String(v.shading_issues));
-    setVal('sv-shadingnotes',v.shading_notes); setVal('sv-kw',v.recommended_system_kw);
-    setVal('sv-battery',v.recommended_battery_kwh); setVal('sv-notes',v.additional_notes);
+// ── CLIENT NOTIFICATION STATUS ─────────────────────────────────────────────
+function renderNotificationStatus(){
+  const v=currentVisit;
+  const dot=document.getElementById('notify-dot');
+  const label=document.getElementById('notify-label');
+  const sub=document.getElementById('notify-sub');
+  if(!dot||!label||!sub)return;
+  if(v&&v.client_notified_at){
+    dot.className='notify-dot sent';label.className='notify-label sent';
+    const d=new Date(v.client_notified_at);
+    label.textContent=`✓ Client notified on ${d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'})} at ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`;
+    sub.textContent=`Sent by ${v.client_notified_by||'installer'}`;
+    const btn=document.getElementById('btn-notify-client');
+    if(btn){btn.textContent='↻ Resend';btn.disabled=false;}
+  }else{
+    dot.className='notify-dot unsent';label.className='notify-label unsent';
+    label.textContent='Client not yet notified';
+    sub.textContent='Fill in the assessor name and visit date/time below, then send the confirmation email.';
+    checkNotifyReady();
   }
-  const inst = currentInstall;
-  if (inst) {
-    setVal('inst-teamlead',inst.team_lead); setVal('inst-team',inst.team_members);
-    setVal('inst-date',inst.scheduled_date); setVal('inst-panelbrand',inst.panels_brand);
-    setVal('inst-panelwatt',inst.panels_watt); setVal('inst-panelqty',inst.panels_qty);
-    setVal('inst-inverterbrand',inst.inverter_brand); setVal('inst-inverterkw',inst.inverter_kw);
-    setVal('inst-batterybrand',inst.battery_brand); setVal('inst-batterykwh',inst.battery_kwh);
-    setVal('inst-batteryqty',inst.battery_qty); setVal('comp-kw',inst.final_system_kw);
-    setVal('comp-battery',inst.final_battery_kwh); setVal('comp-punchlist',inst.punch_list);
+}
+
+function checkNotifyReady(){
+  const btn=document.getElementById('btn-notify-client');
+  if(!btn)return;
+  const assessor=getVal('sv-assessor');
+  const datetime=getVal('sv-datetime');
+  const hasEmail=currentJob?.client_email;
+  btn.disabled=!(assessor&&datetime&&hasEmail);
+}
+
+// ── SEND VISIT NOTIFICATION ────────────────────────────────────────────────
+async function sendVisitNotification(){
+  const btn=document.getElementById('btn-notify-client');
+  if(!currentJob||!currentJob.client_email){toast('No client email on record','error');return;}
+  const assessor=getVal('sv-assessor');
+  const datetime=getVal('sv-datetime');
+  if(!assessor||!datetime){toast('Fill in assessor name and visit date/time first','error');return;}
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    const res=await fetch(`${SUPA_URL}/functions/v1/send-visit-notification`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+      body:JSON.stringify({
+        client_name:       currentJob.client_name,
+        client_email:      currentJob.client_email,
+        client_phone:      currentJob.client_phone||'',
+        client_address:    currentJob.client_address||'',
+        assessor_name:     assessor,
+        visit_datetime:    datetime,
+        installer_name:    currentJob.installer_name||'Your Solar Installer',
+        installer_contact: currentJob.contact_number||'',
+        system_size_kw:    currentJob.system_size_kw||'',
+        ai_id:             currentJob.ai_id,
+      }),
+    });
+    const data=await res.json();
+    if(!data.success){throw new Error(data.error||'Failed to send');}
+
+    // Record notification in site_visits
+    const notifyData={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
+    if(currentVisit){
+      await sbPatch('site_visits',`id=eq.${currentVisit.id}`,notifyData);
+      currentVisit={...currentVisit,...notifyData};
+    }else{
+      // Save a draft visit record to hold the notification timestamp
+      const visitDraft={
+        job_id:String(currentJob.ai_id),assessor_name:assessor,
+        visited_at:new Date(datetime).toISOString(),
+        ...notifyData,
+      };
+      const res2=await sbPost('site_visits',visitDraft);
+      currentVisit=res2?.[0]||null;
+    }
+    await logActivity('NOTIFICATION',`Site visit confirmation sent to ${currentJob.client_email}`,assessor);
+    renderNotificationStatus();
+    toast(`✓ Visit confirmation sent to ${currentJob.client_email}`,'success');
+  }catch(e){
+    btn.disabled=false;btn.textContent='✉ Send to Client';
+    toast('Failed to send: '+e.message,'error');
+  }
+}
+
+// ── DESIGN CHANGE DETECTION ────────────────────────────────────────────────
+// Called live as the installer types in the recommended system fields
+function checkDesignChangeLive(){
+  if(!currentJob)return;
+  const origKw=parseFloat(currentJob.system_size_kw)||0;
+  const origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
+  const newKw=parseFloat(getVal('sv-kw'))||0;
+  const newBatt=parseFloat(getVal('sv-battery'))||0;
+
+  const kwHint=document.getElementById('sv-kw-hint');
+  const battHint=document.getElementById('sv-batt-hint');
+
+  if(origKw>0&&newKw>0){
+    const diff=Math.abs((newKw-origKw)/origKw);
+    if(diff>0.05){
+      const dir=newKw>origKw?'↑ larger':'↓ smaller';
+      if(kwHint)kwHint.textContent=`⚠ ${dir} than proposed ${origKw} kWp — ${(diff*100).toFixed(0)}% change`;
+      if(kwHint)kwHint.style.color='var(--amber)';
+    }else{
+      if(kwHint)kwHint.textContent=origKw?`✓ Matches proposed ${origKw} kWp`:'';
+      if(kwHint)kwHint.style.color='var(--green)';
+    }
+  }else{if(kwHint)kwHint.textContent='';}
+
+  if(origBatt>0&&newBatt>0){
+    const diff=Math.abs((newBatt-origBatt)/origBatt);
+    if(diff>0.05){
+      const dir=newBatt>origBatt?'↑ larger':'↓ smaller';
+      if(battHint)battHint.textContent=`⚠ ${dir} than proposed ${origBatt} kWh — ${(diff*100).toFixed(0)}% change`;
+      if(battHint)battHint.style.color='var(--amber)';
+    }else{
+      if(battHint)battHint.textContent=origBatt?`✓ Matches proposed ${origBatt} kWh`:'';
+      if(battHint)battHint.style.color='var(--green)';
+    }
+  }else{if(battHint)battHint.textContent='';}
+}
+
+// Render the design change alert block (shown after site visit completion if specs differ)
+function renderDesignChangeAlert(){
+  const alert=document.getElementById('design-change-alert');
+  if(!alert||!currentVisit)return;
+  const v=currentVisit;
+  const j=currentJob;
+  if(!v.design_changed){alert.classList.remove('visible');return;}
+
+  // Populate comparison values
+  const origKw=v.original_proposal_kw||j?.system_size_kw||'—';
+  const origBatt=v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—';
+  setText('dca-orig-kw',`${origKw} kWp`);
+  setText('dca-orig-batt',`${origBatt} kWh battery`);
+  setText('dca-new-kw',`${v.recommended_system_kw||'—'} kWp`);
+  setText('dca-new-batt',`${v.recommended_battery_kwh||'—'} kWh battery`);
+
+  if(v.design_change_acknowledged){
+    // Already acknowledged — show a quiet status instead of the full alert
+    alert.style.borderColor='rgba(46,204,138,.25)';
+    alert.style.background='rgba(46,204,138,.04)';
+    const ackStatus=document.getElementById('dca-ack-status');
+    if(ackStatus)ackStatus.style.display='block';
+    // Replace reason field with readonly display
+    setVal('design-change-reason',v.design_change_reason||'');
+    document.getElementById('design-change-reason').readOnly=true;
+  }
+  alert.classList.add('visible');
+}
+
+// Render reminder in Step 2 if there's a design change
+function renderPanel1DesignNote(){
+  const note=document.getElementById('panel1-design-note');
+  if(!note||!currentVisit)return;
+  const v=currentVisit;
+  if(!v.design_changed){note.style.display='none';return;}
+  const origKw=v.original_proposal_kw||currentJob?.system_size_kw||'—';
+  const newKw=v.recommended_system_kw||'—';
+  note.style.display='block';
+  note.textContent=`⚠ Design change on record: originally ${origKw} kWp proposed, site assessment recommended ${newKw} kWp. Reason: "${v.design_change_reason||'not documented'}". Plan installation to the revised specification.`;
+}
+
+async function acknowledgeDesignChange(){
+  if(!currentVisit){toast('No site visit record found','error');return;}
+  const reason=getVal('design-change-reason');
+  if(!reason){toast('Please document the reason for the design change first','error');return;}
+  try{
+    await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{
+      design_change_reason:reason,design_change_acknowledged:true,
+    });
+    currentVisit={...currentVisit,design_change_reason:reason,design_change_acknowledged:true};
+    await logActivity('DESIGN CHANGE',`Design change acknowledged. Reason: ${reason}`,getVal('sv-assessor'));
+    const ackStatus=document.getElementById('dca-ack-status');
+    if(ackStatus)ackStatus.style.display='block';
+    const alert=document.getElementById('design-change-alert');
+    if(alert){alert.style.borderColor='rgba(46,204,138,.25)';alert.style.background='rgba(46,204,138,.04)';}
+    document.getElementById('design-change-reason').readOnly=true;
+    renderPanel1DesignNote();
+    toast('Design change documented','success');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+async function dismissDesignChange(){
+  if(!currentVisit)return;
+  if(!confirm('Proceed with the original proposal design?\n\nThe system will note that you chose to proceed with the original despite the site assessment recommendation.'))return;
+  try{
+    await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{
+      design_change_acknowledged:true,
+      design_change_reason:'Installer chose to proceed with original proposal design despite site assessment differences.',
+    });
+    currentVisit={...currentVisit,design_change_acknowledged:true};
+    await logActivity('DESIGN CHANGE','Installer confirmed original design — site differences noted');
+    const alert=document.getElementById('design-change-alert');
+    if(alert)alert.classList.remove('visible');
+    toast('Proceeding with original design','info');
+  }catch(e){toast('Error: '+e.message,'error');}
+}
+
+// ── PREFILL ────────────────────────────────────────────────────────────────
+function prefillForms(){
+  const v=currentVisit;
+  if(v){
+    setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');
+    setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);
+    setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);
+    setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);
+    setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));
+    setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));
+    setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));
+    setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);
+    setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);
+    checkDesignChangeLive();
+  }
+  const inst=currentInstall;
+  if(inst){
+    setVal('inst-teamlead',inst.team_lead);setVal('inst-team',inst.team_members);
+    setVal('inst-date',inst.scheduled_date);setVal('inst-panelbrand',inst.panels_brand);
+    setVal('inst-panelwatt',inst.panels_watt);setVal('inst-panelqty',inst.panels_qty);
+    setVal('inst-inverterbrand',inst.inverter_brand);setVal('inst-inverterkw',inst.inverter_kw);
+    setVal('inst-batterybrand',inst.battery_brand);setVal('inst-batterykwh',inst.battery_kwh);
+    setVal('inst-batteryqty',inst.battery_qty);setVal('comp-kw',inst.final_system_kw);
+    setVal('comp-battery',inst.final_battery_kwh);setVal('comp-punchlist',inst.punch_list);
     setVal('comp-inspector',inst.inspector_name);
     setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');
-    if (inst.install_checklist?.length) reloadChecklist(inst.install_checklist);
+    if(inst.install_checklist?.length)reloadChecklist(inst.install_checklist);
   }
-  const ho = currentHandover;
-  if (ho) {
-    setVal('ho-cocnum',ho.coc_number); setVal('ho-cocby',ho.coc_issued_by);
-    setVal('ho-cocdate',ho.coc_issued_at); setVal('ho-gridref',ho.grid_application_number);
-    setVal('ho-gridapproved',String(ho.grid_approved)); setVal('ho-trained',String(ho.customer_trained));
-    setVal('ho-trainingnotes',ho.training_notes); setVal('ho-by',ho.handed_over_by);
-    if (ho.handed_over_at) renderHandoverDoc();
+  const ho=currentHandover;
+  if(ho){
+    setVal('ho-cocnum',ho.coc_number);setVal('ho-cocby',ho.coc_issued_by);
+    setVal('ho-cocdate',ho.coc_issued_at);setVal('ho-gridref',ho.grid_application_number);
+    setVal('ho-gridapproved',String(ho.grid_approved));setVal('ho-trained',String(ho.customer_trained));
+    setVal('ho-trainingnotes',ho.training_notes);setVal('ho-by',ho.handed_over_by);
+    if(ho.handed_over_at)renderHandoverDoc();
   }
+  checkNotifyReady();
 }
 
-function setVal(id, val) { const el=document.getElementById(id); if(el&&val!=null) el.value=val; }
-function setText(id, txt) { const el=document.getElementById(id); if(el) el.textContent=txt; }
+function setVal(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
+function setText(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt;}
 
-// ── CHECKLIST ─────────────────────────────────────────────────────────────
-const CHECKLIST_ITEMS = {
+// ── CHECKLIST ──────────────────────────────────────────────────────────────
+const CHECKLIST_ITEMS={
   pre:['Reviewed site visit report','Equipment delivered and checked against spec sheet','Safety briefing completed with team','Customer informed of start time','Work area secured / access arranged'],
   structural:['Roof load assessment done','Mounting brackets positioned and marked','Rails installed and levelled','Mid and end clamps available','Anti-theft bolts fitted','Roof penetrations sealed / waterproofed','Panels mounted and secure'],
   electrical:['DC cabling routed and secured','MC4 connectors crimped and tested','Isolators installed (DC and AC)','Inverter mounted and secured','Battery mounted and secured','AC wiring complete to DB board','Earth bonding complete','Cable management / conduit installed','All terminals torqued to spec'],
   commissioning:['Inverter powered on and configured','Battery charged and communicating','System monitoring app connected','Export / import confirmed on meter','All alerts / faults cleared','Grid voltage and frequency within range','Customer walkthrough completed','Site cleaned up'],
 };
 
-function buildChecklist() {
-  Object.entries(CHECKLIST_ITEMS).forEach(([section, items]) => {
-    const c = document.getElementById(`checklist-${section}`);
-    if (!c) return;
-    c.innerHTML = '';
-    items.forEach((item, idx) => {
-      const row = document.createElement('div');
-      row.className = 'check-item';
-      row.innerHTML = `<input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})">
+function buildChecklist(){
+  Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{
+    const c=document.getElementById(`checklist-${section}`);if(!c)return;
+    c.innerHTML='';
+    items.forEach((item,idx)=>{
+      const row=document.createElement('div');row.className='check-item';
+      row.innerHTML=`<input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})">
         <label for="chk-${section}-${idx}" class="check-item-label">${item}</label>
         <input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">`;
       c.appendChild(row);
     });
   });
 }
-
-function updateCheck(cb, section, idx) { cb.closest('.check-item').classList.toggle('checked',cb.checked); saveChecklistToDb(); }
-
-function reloadChecklist(saved) {
-  saved.forEach(entry => {
-    const [section,idx] = entry.key.split('-');
-    const cb = document.getElementById(`chk-${section}-${idx}`);
-    if (!cb) return;
-    cb.checked = entry.done;
-    cb.closest('.check-item').classList.toggle('checked',entry.done);
-    const note = cb.closest('.check-item').querySelector('.check-item-notes');
-    if (note && entry.notes) note.value = entry.notes;
+function updateCheck(cb,section,idx){cb.closest('.check-item').classList.toggle('checked',cb.checked);saveChecklistToDb();}
+function reloadChecklist(saved){
+  saved.forEach(entry=>{
+    const[section,idx]=entry.key.split('-');
+    const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;
+    cb.checked=entry.done;cb.closest('.check-item').classList.toggle('checked',entry.done);
+    const note=cb.closest('.check-item').querySelector('.check-item-notes');
+    if(note&&entry.notes)note.value=entry.notes;
   });
 }
-
-function collectChecklist() {
-  const result = [];
-  Object.entries(CHECKLIST_ITEMS).forEach(([section, items]) => {
-    items.forEach((item, idx) => {
-      const cb = document.getElementById(`chk-${section}-${idx}`);
-      if (!cb) return;
+function collectChecklist(){
+  const result=[];
+  Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{
+    items.forEach((item,idx)=>{
+      const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;
       result.push({key:`${section}-${idx}`,item,done:cb.checked,notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||''});
     });
   });
   return result;
 }
-
-async function saveChecklistToDb() {
-  if (!currentInstall) return;
-  try { await sbPatch('installations',`id=eq.${currentInstall.id}`,{install_checklist:collectChecklist()}); }
-  catch(e) { /* silent */ }
+async function saveChecklistToDb(){
+  if(!currentInstall)return;
+  try{await sbPatch('installations',`id=eq.${currentInstall.id}`,{install_checklist:collectChecklist()});}
+  catch(e){}
 }
 
 // ── STEP 1: SITE VISIT ─────────────────────────────────────────────────────
-async function saveSiteVisitDraft() { await _saveSiteVisit(false); }
-async function completeSiteVisit()  { await _saveSiteVisit(true); }
+async function saveSiteVisitDraft(){await _saveSiteVisit(false);}
+async function completeSiteVisit(){await _saveSiteVisit(true);}
 
-async function _saveSiteVisit(complete) {
-  if (!currentJob) return;
-  const savingEl = document.getElementById('sv-saving');
-  if (savingEl) savingEl.style.display = 'inline';
-  const visitData = {
-    job_id: String(currentJob.ai_id),
-    assessor_name:getVal('sv-assessor'), visited_at:getVal('sv-datetime')||new Date().toISOString(),
-    municipality:getVal('sv-municipality'), grid_ref_number:getVal('sv-gridref'),
-    roof_type:getVal('sv-rooftype'), roof_condition:getVal('sv-roofcondition')||null,
-    cable_run_meters:parseInt(getVal('sv-cablerun'))||null, meter_type:getVal('sv-metertype'),
-    phase:getVal('sv-phase')||null, db_board_adequate:getVal('sv-db')==='true',
-    db_notes:getVal('sv-dbnotes'), earthing_ok:getVal('sv-earthing')==='true',
-    earthing_notes:getVal('sv-earthingnotes'), shading_issues:getVal('sv-shading')==='true',
+async function _saveSiteVisit(complete){
+  if(!currentJob)return;
+  const savingEl=document.getElementById('sv-saving');
+  if(savingEl)savingEl.style.display='inline';
+
+  const newKw=parseFloat(getVal('sv-kw'))||null;
+  const newBatt=parseFloat(getVal('sv-battery'))||null;
+  const origKw=parseFloat(currentJob.system_size_kw)||0;
+  const origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
+
+  // Detect significant design change (>5% on either dimension)
+  const kwDiff=newKw&&origKw?Math.abs((newKw-origKw)/origKw):0;
+  const battDiff=newBatt&&origBatt?Math.abs((newBatt-origBatt)/origBatt):0;
+  const designChanged=kwDiff>0.05||battDiff>0.05;
+
+  const visitData={
+    job_id:String(currentJob.ai_id),
+    assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),
+    municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),
+    roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,
+    cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),
+    phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',
+    db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',
+    earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',
     shading_notes:getVal('sv-shadingnotes'),
-    recommended_system_kw:parseFloat(getVal('sv-kw'))||null,
-    recommended_battery_kwh:parseFloat(getVal('sv-battery'))||null,
+    recommended_system_kw:newKw,recommended_battery_kwh:newBatt,
     additional_notes:getVal('sv-notes'),
     completed_at:complete?new Date().toISOString():null,
+    // Record design change data
+    design_changed:designChanged,
+    original_proposal_kw:origKw||null,
+    original_proposal_batt_kwh:origBatt||null,
   };
-  try {
-    if (currentVisit) { await sbPatch('site_visits',`id=eq.${currentVisit.id}`,visitData); }
-    else { const res=await sbPost('site_visits',visitData); currentVisit=res?.[0]||null; }
-    if (complete) {
+
+  try{
+    if(currentVisit){
+      // Preserve notification data — don't overwrite it
+      delete visitData.client_notified_at;delete visitData.client_notified_by;
+      await sbPatch('site_visits',`id=eq.${currentVisit.id}`,visitData);
+      currentVisit={...currentVisit,...visitData};
+    }else{
+      const res=await sbPost('site_visits',visitData);currentVisit=res?.[0]||null;
+    }
+    if(complete){
       await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'site_visit_complete'});
-      await logActivity('SITE VISIT','Site visit assessment completed',visitData.assessor_name);
-      toast('Site visit completed!','success');
+      let logMsg='Site visit assessment completed';
+      if(designChanged)logMsg+=` — design change detected (${origKw}kWp → ${newKw}kWp)`;
+      await logActivity('SITE VISIT',logMsg,visitData.assessor_name);
+      toast(designChanged?'Site visit complete — design change detected, review required':'Site visit completed!','success');
       await openJob(currentJob.ai_id);
-    } else { toast('Draft saved','info'); }
-  } catch(e) { toast('Error saving: '+e.message,'error'); }
-  if (savingEl) savingEl.style.display = 'none';
+    }else{toast('Draft saved','info');}
+  }catch(e){toast('Error saving: '+e.message,'error');}
+  if(savingEl)savingEl.style.display='none';
 }
 
-// ── STEP 2: INSTALLATION PREP ──────────────────────────────────────────────
-async function saveInstallPrepDraft() { await _saveInstallPrep(false); }
-async function scheduleInstallation() { await _saveInstallPrep(true); }
+// ── STEP 2 ─────────────────────────────────────────────────────────────────
+async function saveInstallPrepDraft(){await _saveInstallPrep(false);}
+async function scheduleInstallation(){await _saveInstallPrep(true);}
 
-async function _saveInstallPrep(schedule) {
-  if (!currentJob) return;
-  const instData = {
-    job_id:String(currentJob.ai_id), team_lead:getVal('inst-teamlead'), team_members:getVal('inst-team'),
-    scheduled_date:getVal('inst-date')||null, panels_brand:getVal('inst-panelbrand'),
-    panels_watt:parseInt(getVal('inst-panelwatt'))||null, panels_qty:parseInt(getVal('inst-panelqty'))||null,
-    inverter_brand:getVal('inst-inverterbrand'), inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,
-    battery_brand:getVal('inst-batterybrand'), battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,
-    battery_qty:parseInt(getVal('inst-batteryqty'))||null, install_checklist:collectChecklist(),
+async function _saveInstallPrep(schedule){
+  if(!currentJob)return;
+  const instData={
+    job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),
+    scheduled_date:getVal('inst-date')||null,panels_brand:getVal('inst-panelbrand'),
+    panels_watt:parseInt(getVal('inst-panelwatt'))||null,panels_qty:parseInt(getVal('inst-panelqty'))||null,
+    inverter_brand:getVal('inst-inverterbrand'),inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,
+    battery_brand:getVal('inst-batterybrand'),battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,
+    battery_qty:parseInt(getVal('inst-batteryqty'))||null,install_checklist:collectChecklist(),
   };
-  try {
-    if (currentInstall) { await sbPatch('installations',`id=eq.${currentInstall.id}`,instData); }
-    else { const res=await sbPost('installations',instData); currentInstall=res?.[0]||null; }
-    if (schedule) {
+  try{
+    if(currentInstall){await sbPatch('installations',`id=eq.${currentInstall.id}`,instData);}
+    else{const res=await sbPost('installations',instData);currentInstall=res?.[0]||null;}
+    if(schedule){
       await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{
-        job_status:'installation_scheduled', installation_date:getVal('inst-date')||null, assigned_team:getVal('inst-teamlead'),
+        job_status:'installation_scheduled',installation_date:getVal('inst-date')||null,assigned_team:getVal('inst-teamlead'),
       });
       await logActivity('INSTALL PREP',`Installation scheduled for ${getVal('inst-date')}`,getVal('inst-teamlead'));
       toast('Installation scheduled!','success');
       await openJob(currentJob.ai_id);
-    } else { toast('Draft saved','info'); }
-  } catch(e) { toast('Error: '+e.message,'error'); }
+    }else{toast('Draft saved','info');}
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── STEP 3: START INSTALLATION ─────────────────────────────────────────────
-async function startInstallation() {
-  if (!currentJob) return;
-  try {
-    if (currentInstall) await sbPatch('installations',`id=eq.${currentInstall.id}`,{started_at:new Date().toISOString()});
+// ── STEP 3 ─────────────────────────────────────────────────────────────────
+async function startInstallation(){
+  if(!currentJob)return;
+  try{
+    if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,{started_at:new Date().toISOString()});
     await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_in_progress'});
     await logActivity('INSTALLATION','Installation marked as in progress');
-    toast('Installation started!','success');
-    await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: '+e.message,'error'); }
+    toast('Installation started!','success');await openJob(currentJob.ai_id);
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── STEP 4: COMPLETE INSTALLATION ──────────────────────────────────────────
-async function completeInstallation() {
-  if (!currentJob) return;
-  const compData = {
-    final_system_kw:parseFloat(getVal('comp-kw'))||null, final_battery_kwh:parseFloat(getVal('comp-battery'))||null,
-    punch_list:getVal('comp-punchlist'), inspector_name:getVal('comp-inspector'),
+// ── STEP 4 ─────────────────────────────────────────────────────────────────
+async function completeInstallation(){
+  if(!currentJob)return;
+  const compData={
+    final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,
+    punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),
     inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),
-    completed_at:new Date().toISOString(), install_checklist:collectChecklist(),
+    completed_at:new Date().toISOString(),install_checklist:collectChecklist(),
   };
-  try {
-    if (currentInstall) await sbPatch('installations',`id=eq.${currentInstall.id}`,compData);
+  try{
+    if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,compData);
     await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_complete'});
     await logActivity('COMPLETION',`Final sign-off by ${getVal('comp-inspector')}`,getVal('comp-inspector'));
-    toast('Installation complete! Proceed to handover.','success');
-    await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: '+e.message,'error'); }
+    toast('Installation complete! Proceed to handover.','success');await openJob(currentJob.ai_id);
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── STEP 5: HANDOVER ──────────────────────────────────────────────────────
-async function completeHandover() {
-  if (!currentJob) return;
-  const hoData = {
-    job_id:String(currentJob.ai_id), installation_id:currentInstall?.id||null,
-    coc_number:getVal('ho-cocnum'), coc_issued_by:getVal('ho-cocby'),
-    coc_issued_at:getVal('ho-cocdate')||null, grid_application_number:getVal('ho-gridref'),
-    grid_approved:getVal('ho-gridapproved')==='true', customer_trained:getVal('ho-trained')==='true',
-    training_notes:getVal('ho-trainingnotes'), handed_over_by:getVal('ho-by'),
-    handed_over_at:new Date().toISOString(), customer_signed:true, customer_signed_at:new Date().toISOString(),
+// ── STEP 5: HANDOVER ───────────────────────────────────────────────────────
+async function completeHandover(){
+  if(!currentJob)return;
+  const hoData={
+    job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,
+    coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),
+    coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),
+    grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',
+    training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),
+    handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString(),
   };
-  try {
-    if (currentHandover) { await sbPatch('handovers',`id=eq.${currentHandover.id}`,hoData); }
-    else { const res=await sbPost('handovers',hoData); currentHandover=res?.[0]||null; }
+  try{
+    if(currentHandover){await sbPatch('handovers',`id=eq.${currentHandover.id}`,hoData);}
+    else{const res=await sbPost('handovers',hoData);currentHandover=res?.[0]||null;}
     await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'handed_over'});
     await logActivity('HANDOVER',`Handed over by ${getVal('ho-by')}`,getVal('ho-by'));
     toast('🎉 Job handed over! Project complete.','success');
     renderHandoverDoc();
-    const prev = document.getElementById('handover-doc-preview');
-    if (prev) prev.style.display = 'block';
+    const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
     await openJob(currentJob.ai_id);
-  } catch(e) { toast('Error: '+e.message,'error'); }
+  }catch(e){toast('Error: '+e.message,'error');}
 }
 
-// ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
-function renderHandoverDoc() {
-  const j=currentJob, inst=currentInstall, ho=currentHandover, v=currentVisit;
-  const totalKwp     = inst?.final_system_kw   || v?.recommended_system_kw   || j?.system_size_kw      || '—';
-  const totalBattery = inst?.final_battery_kwh || v?.recommended_battery_kwh || j?.battery_capacity_kwh || '—';
-  const battPerUnit  = inst?.battery_kwh || '—';
-  const now = new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
-  const doc = document.getElementById('handover-doc');
-  if (!doc) return;
-  doc.innerHTML = `
+// ── HANDOVER DOCUMENT ──────────────────────────────────────────────────────
+function renderHandoverDoc(){
+  const j=currentJob,inst=currentInstall,ho=currentHandover,v=currentVisit;
+  const totalKwp=inst?.final_system_kw||v?.recommended_system_kw||j?.system_size_kw||'—';
+  const totalBattery=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
+  const battPerUnit=inst?.battery_kwh||'—';
+  const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
+
+  // Design change note for handover doc
+  const designNote=(v?.design_changed&&v?.design_change_reason)?
+    `<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div>
+      <div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh battery. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div>
+    </div>`:
+    '';
+
+  const doc=document.getElementById('handover-doc');if(!doc)return;
+  doc.innerHTML=`
     <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
     <div class="hd-title">Solar System Handover Certificate</div>
     <div class="hd-grid">
@@ -939,6 +1173,7 @@ function renderHandoverDoc() {
         <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase||'—'} phase</span></div>
       </div>
     </div>
+    ${designNote}
     <div style="margin-top:20px">
       <div class="hd-section-title">Compliance &amp; Approvals</div>
       <div class="hd-grid">
@@ -965,32 +1200,29 @@ function renderHandoverDoc() {
     </div>
     <div class="hd-sign-block">
       <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
-      <div><div class="sign-line">Authorised by Solar Intelligence</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
+      <div><div class="sign-line">Authorised by ${currentJob?.installer_name||'Installer'}</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
     </div>`;
-  const prev = document.getElementById('handover-doc-preview');
-  if (prev) prev.style.display = 'block';
+  const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
 }
 
-function printHandover() {
-  if (!currentJob) { toast('No job selected','error'); return; }
+function printHandover(){
+  if(!currentJob){toast('No job selected','error');return;}
   renderHandoverDoc();
-  const p4 = document.getElementById('panel-4');
-  if (p4) p4.classList.add('open','print-target');
+  const p4=document.getElementById('panel-4');if(p4)p4.classList.add('open','print-target');
   window.print();
 }
 
-// ── ACTIVITY LOG ──────────────────────────────────────────────────────────
-async function logActivity(stage, action, performedBy='') {
-  if (!currentJob) return;
-  try { await sbPost('job_activity_log',{job_id:String(currentJob.ai_id),stage,action,performed_by:performedBy}); }
-  catch(e) { /* silent */ }
+// ── ACTIVITY LOG ───────────────────────────────────────────────────────────
+async function logActivity(stage,action,performedBy=''){
+  if(!currentJob)return;
+  try{await sbPost('job_activity_log',{job_id:String(currentJob.ai_id),stage,action,performed_by:performedBy});}
+  catch(e){}
 }
 
-function renderActivityLog(logs) {
-  const c = document.getElementById('activity-log-entries');
-  if (!c) return;
-  if (!logs.length) { c.innerHTML='<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>'; return; }
-  c.innerHTML = logs.map(l=>`
+function renderActivityLog(logs){
+  const c=document.getElementById('activity-log-entries');if(!c)return;
+  if(!logs.length){c.innerHTML='<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>';return;}
+  c.innerHTML=logs.map(l=>`
     <div class="log-entry">
       <span class="log-stage">${l.stage||'—'}</span>
       <span class="log-time">${formatTime(l.created_at)}</span>
@@ -998,22 +1230,20 @@ function renderActivityLog(logs) {
     </div>`).join('');
 }
 
-function formatTime(iso) {
-  if (!iso) return '—';
-  const d = new Date(iso);
+function formatTime(iso){
+  if(!iso)return'—';
+  const d=new Date(iso);
   return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────
-function togglePanel(i) { const p=document.getElementById(`panel-${i}`); if(p&&!p.classList.contains('locked')) p.classList.toggle('open'); }
-function getVal(id) { return document.getElementById(id)?.value?.trim()||''; }
-
-function toast(msg, type='info') {
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function togglePanel(i){const p=document.getElementById(`panel-${i}`);if(p&&!p.classList.contains('locked'))p.classList.toggle('open');}
+function getVal(id){return document.getElementById(id)?.value?.trim()||'';}
+function toast(msg,type='info'){
   const c=document.getElementById('toast-container');
-  const el=document.createElement('div');
-  el.className=`toast ${type}`; el.textContent=msg; c.appendChild(el);
+  const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;c.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('show'));
-  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3500);
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},3800);
 }
 </script>
 </body>
