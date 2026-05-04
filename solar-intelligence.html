@@ -200,6 +200,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .lb-total-item b{color:var(--text);font-weight:600;}
 .lb-clear{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:5px;transition:.15s;}
 .lb-clear:hover{color:var(--red);}
+
+  /* ── Real-World Performance Panel ── */
+.rw-panel{border:1px solid rgba(251,191,36,.20);border-radius:10px;padding:16px 18px;background:rgba(251,191,36,.04);margin-top:18px;}
+.rw-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
+.rw-title::after{content:'';flex:1;height:1px;background:rgba(251,191,36,.15);}
+.rw-block{margin-bottom:11px;}
+.rw-block-hd{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;}
+.rw-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.rw-row:last-child{border-bottom:none;}
+.rw-lbl{color:var(--muted);}
+.rw-val{font-weight:500;color:var(--text);}
+.rw-val.warn{color:var(--amber);}
+.rw-val.ok{color:var(--green);}
+.rw-actions-hd{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px;}
+.rw-action{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-size:11.5px;color:var(--text);line-height:1.5;margin-bottom:5px;}
+.rw-action-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+  
 </style>
 </head>
 <body>
@@ -381,6 +398,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <div class="value" id="sys-rec-value" style="font-size:1rem">&#8212;</div>
         <div class="sub" id="sys-rec-sub"></div>
       </div>
+      <div id="rw-panel"></div>
     </div>
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Battery Design</div><div class="value" id="b-verdict" style="font-size:.9rem">&#8212;</div></div>
@@ -867,7 +885,9 @@ function calculate(){
     pCost,bosCost,hwCost,totCost,sellP,profit,cPkW,
     monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
     annCons,co2T,trees,coal,water,seg,indP,nersaCat};
-  renderAll(calcResult);
+  const tw=analyseLoadTiming(lbItems,sys.battKWh,autonomy,dailyUsage,batt.runtime);
+  calcResult.timingAnalysis=tw;
+renderAll(calcResult);
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
   toast('&#10003; Compliant system designed — all SA checks passed');
 }
@@ -950,6 +970,7 @@ function renderAll(r){
   set('e-consumption',Math.round(r.annCons).toLocaleString('en-ZA')+' kWh');set('e-segment',r.seg);
   document.getElementById('e-indep-bar').style.width=r.indP+'%';
   set('e-indep-tip','Solar supplies approx. '+fN(r.indP,0)+'% of annual energy needs.');
+  renderRealWorld(r, r.timingAnalysis);
 
   set('ps-system',r.pc+'x '+r.panelModel+' | '+r.invModel+' | '+r.battUnits+'x '+r.battModel);
   set('ps-cost',fR(r.totCost));set('ps-savings',fR(r.annSavY1)+'/year (Year 1)');
@@ -1127,6 +1148,25 @@ const APPLIANCE_CATALOG=[
   {id:'custom',    name:'Custom Load',      icon:'⚡', watts:500,  hours:2,   tip:'Add any unlisted appliance'},
 ];
 
+  // ── Time-of-day profiles: what fraction of each appliance's daily energy
+//    falls during solar hours (09:00-16:00), and does it run in the evening?
+const LOAD_TIMING={
+  lights:    {solarFrac:0.05,eveningLoad:true, morningLoad:true },
+  tv:        {solarFrac:0.05,eveningLoad:true, morningLoad:false},
+  fridge:    {solarFrac:0.29,eveningLoad:true, morningLoad:true }, // 24h: 7/24 in solar
+  geyser:    {solarFrac:0.00,eveningLoad:true, morningLoad:true }, // morning+evening only
+  ac:        {solarFrac:0.50,eveningLoad:true, morningLoad:false},
+  stove:     {solarFrac:0.05,eveningLoad:true, morningLoad:true },
+  pool:      {solarFrac:0.75,eveningLoad:false,morningLoad:false}, // should run during solar
+  washing:   {solarFrac:0.30,eveningLoad:false,morningLoad:true },
+  microwave: {solarFrac:0.10,eveningLoad:true, morningLoad:true },
+  dishwasher:{solarFrac:0.10,eveningLoad:true, morningLoad:false},
+  computer:  {solarFrac:0.40,eveningLoad:true, morningLoad:false},
+  security:  {solarFrac:0.29,eveningLoad:true, morningLoad:true }, // 24h
+  gate:      {solarFrac:0.15,eveningLoad:false,morningLoad:true },
+  custom:    {solarFrac:0.30,eveningLoad:true, morningLoad:false},
+};
+
 // Quick templates — pre-populate the builder with a common load set
 const LB_TEMPLATES=[
   {name:'Lights Only',     items:[{id:'lights',qty:10,watts:50,hours:6}]},
@@ -1269,7 +1309,100 @@ function getLoadBuilderValues(){
 // END LOAD BUILDER
 // ══════════════════════════════════════════════════════════════════
 
-// ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
+  // ── Real-world load timing analysis ──────────────────────────────────────────
+function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRuntime){
+  let eveningPeakKW=0, solarKWh=0;
+  let geyserPresent=false, geyserKWh=0, geyserPeakKW=0;
+  const eveningContribs=[];
+
+  items.forEach(it=>{
+    const t=LOAD_TIMING[it.id]||LOAD_TIMING.custom;
+    const kw=it.watts*it.qty/1000;
+    const kwh=kw*it.hours;
+    solarKWh+=kwh*t.solarFrac;
+    if(t.eveningLoad){
+      eveningPeakKW+=kw;
+      if(kw>=0.3) eveningContribs.push({name:it.name,kw});
+    }
+    if(it.id==='geyser'){geyserPresent=true;geyserKWh=kwh;geyserPeakKW=kw;}
+  });
+
+  eveningContribs.sort((a,b)=>b.kw-a.kw);
+  const solarUtilPct=dailyKWh>0?solarKWh/dailyKWh*100:0;
+  const eveningRuntime=eveningPeakKW>0?battBackupKWh/eveningPeakKW:99;
+  const geyserPct=dailyKWh>0&&geyserPresent?geyserKWh/dailyKWh*100:0;
+  // Geyser default timing = morning+evening, zero solar fraction → outside solar hours
+  const geyserOutsideSolar=geyserPresent&&LOAD_TIMING.geyser.solarFrac===0;
+
+  return{eveningPeakKW,eveningRuntime,avgRuntime:avgBattRuntime,
+    solarKWh,solarUtilPct,eveningContribs:eveningContribs.slice(0,4),
+    geyserPresent,geyserKWh,geyserPeakKW,geyserPct,geyserOutsideSolar};
+}
+
+function renderRealWorld(r, tw){
+  const el=document.getElementById('rw-panel');
+  if(!el||!tw)return;
+
+  // ── Battery runtimes
+  const avgOk=tw.avgRuntime>=r.autonomy;
+  const pkOk=tw.eveningRuntime>=r.autonomy*0.75;
+
+  // ── Solar utilisation
+  const solOk=tw.solarUtilPct>=40;
+
+  // ── Recommended actions
+  const actions=[];
+  if(tw.geyserPresent&&tw.geyserOutsideSolar)
+    actions.push({icon:'🕐','text':'Set a geyser timer — heat 10:00–14:00 using free solar energy instead of draining the battery.'});
+  if(tw.geyserPresent&&tw.geyserPct>30)
+    actions.push({icon:'🔌',text:'Geyser uses '+fN(tw.geyserPct,0)+'% of total energy. Exclude it from battery backup using a dedicated bypass — extends runtime significantly.'});
+  if(!pkOk)
+    actions.push({icon:'🔋',text:'Evening peak ('+fN(tw.eveningPeakKW,1)+' kW) drains battery in ~'+fN(tw.eveningRuntime,1)+' hrs. Increase battery capacity or shed the geyser from the backup circuit.'});
+  if(!solOk)
+    actions.push({icon:'☀️',text:'Only '+fN(tw.solarUtilPct,0)+'% of daily load falls during solar hours. Shift washing machine, dishwasher, and pool pump to 10:00–15:00 to reduce battery reliance.'});
+  if(tw.geyserPresent&&tw.geyserPct>25)
+    actions.push({icon:'♨️',text:'Consider a heat pump or solar geyser for the geyser — removes '+fN(tw.geyserPct,0)+'% of load from the solar/battery system entirely.'});
+
+  // Keep max 4 most relevant
+  const topActions=actions.slice(0,4);
+
+  // ── Render
+  el.innerHTML=`
+<div class="rw-panel">
+  <div class="rw-title">⚠️ Real-World Performance</div>
+
+  <div class="rw-block">
+    <div class="rw-block-hd">🔋 Battery Runtime</div>
+    <div class="rw-row"><span class="rw-lbl">Average load runtime</span><span class="rw-val ${avgOk?'ok':'warn'}">${fN(tw.avgRuntime,1)} hrs ${avgOk?'✓':''}</span></div>
+    <div class="rw-row"><span class="rw-lbl">Evening peak runtime</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
+  </div>
+
+  <div class="rw-block">
+    <div class="rw-block-hd">⚡ Evening Load</div>
+    <div class="rw-row"><span class="rw-lbl">Evening peak load</span><span class="rw-val warn">${fN(tw.eveningPeakKW,2)} kW</span></div>
+    <div class="rw-row"><span class="rw-lbl">Main contributors</span><span class="rw-val" style="text-align:right;max-width:60%">${tw.eveningContribs.length?tw.eveningContribs.map(c=>c.name+' ('+fN(c.kw,1)+' kW)').join(', '):'—'}</span></div>
+  </div>
+
+  ${tw.geyserPresent?`
+  <div class="rw-block">
+    <div class="rw-block-hd">🚿 Geyser</div>
+    <div class="rw-row"><span class="rw-lbl">% of total daily energy</span><span class="rw-val warn">${fN(tw.geyserPct,0)}%</span></div>
+    <div class="rw-row"><span class="rw-lbl">Timing alignment</span><span class="rw-val ${tw.geyserOutsideSolar?'warn':'ok'}">${tw.geyserOutsideSolar?'Outside solar hours ⚠':'Within solar hours ✓'}</span></div>
+  </div>`:''}
+
+  <div class="rw-block">
+    <div class="rw-block-hd">☀️ Solar Utilisation</div>
+    <div class="rw-row"><span class="rw-lbl">Load during solar hours</span><span class="rw-val ${solOk?'ok':'warn'}">${fN(tw.solarUtilPct,0)}% ${solOk?'✓':'⚠'}</span></div>
+    <div class="rw-row"><span class="rw-lbl">Energy in solar window</span><span class="rw-val">${fN(tw.solarKWh,1)} kWh / day</span></div>
+  </div>
+
+  ${topActions.length?`
+  <div class="rw-actions-hd">🔧 Installer Actions</div>
+  ${topActions.map(a=>`<div class="rw-action"><span class="rw-action-icon">${a.icon}</span><span>${a.text}</span></div>`).join('')}`:''}
+</div>`;
+}
+
+  // ── NRS 097 COMPLIANCE BADGE ──────────────────────────────────────────────
 async function sbRpc(fn,params){
   const{data:{session}}=await supabaseClient.auth.getSession();
   const token=session?session.access_token:SUPA_ANON;
