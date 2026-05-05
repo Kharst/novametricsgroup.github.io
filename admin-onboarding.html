@@ -132,7 +132,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="card">
         <div class="card-title">➕ Invite / Re-invite Installer</div>
 
-        <!-- Note about re-inviting -->
         <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--amber);line-height:1.6">
           💡 If the installer already has an account, submitting this form will <strong>resend their invite email</strong> with a fresh link — no error, no blocking.
         </div>
@@ -148,14 +147,33 @@ tr:hover td{background:rgba(255,255,255,.02)}
           </div>
         </div>
 
-        <div class="field">
-          <label>Contact Number</label>
-          <input type="tel" id="f-phone" placeholder="+27 82 000 0000" />
+        <div class="field-row">
+          <div class="field">
+            <label>Contact Number</label>
+            <input type="tel" id="f-phone" placeholder="+27 82 000 0000" />
+          </div>
+          <div class="field">
+            <label>Contact Person</label>
+            <input type="text" id="f-contact-person" placeholder="e.g. John Smith" />
+          </div>
         </div>
 
         <div class="field">
           <label>Logo URL <span style="color:var(--muted);font-weight:400;text-transform:none">(optional)</span></label>
           <input type="url" id="f-logo" placeholder="https://..." />
+        </div>
+
+        <div class="card-title" style="margin-top:6px">📋 Compliance &amp; Accreditation</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Registration Number</label>
+            <input type="text" id="f-reg" placeholder="e.g. 2012/123456/07" />
+          </div>
+          <div class="field">
+            <label>Accreditation</label>
+            <input type="text" id="f-accreditation" placeholder="e.g. SAPVIA, SESSA" />
+          </div>
         </div>
 
         <div class="card-title" style="margin-top:6px">🎨 Branding Colours</div>
@@ -219,7 +237,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
                 <th>Name</th>
                 <th>Email</th>
                 <th>Auth</th>
-                <th>Colours</th>
+                <th>Compliance</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -233,6 +251,43 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <!-- QUICK ACTIONS -->
       <div class="card" style="margin-top:20px">
         <div class="card-title">⚡ Quick Actions</div>
+
+        <!-- EDIT COMPLIANCE DETAILS -->
+        <div class="field">
+          <label>Update Compliance Details for Existing Installer</label>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5">
+            Use this to add or update contact person, registration number, and accreditation for any existing installer. These appear on the printed handover certificate.
+          </p>
+          <select id="compliance-installer-sel" style="margin-bottom:8px" onchange="loadComplianceFields()">
+            <option value="">— select installer —</option>
+          </select>
+          <div id="compliance-fields" style="display:none">
+            <div class="field-row" style="margin-bottom:10px">
+              <div class="field" style="margin-bottom:0">
+                <label>Contact Person</label>
+                <input type="text" id="c-contact-person" placeholder="e.g. John Smith" />
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Contact Number</label>
+                <input type="tel" id="c-phone" placeholder="+27 82 000 0000" />
+              </div>
+            </div>
+            <div class="field-row" style="margin-bottom:10px">
+              <div class="field" style="margin-bottom:0">
+                <label>Registration Number</label>
+                <input type="text" id="c-reg" placeholder="e.g. 2012/123456/07" />
+              </div>
+              <div class="field" style="margin-bottom:0">
+                <label>Accreditation</label>
+                <input type="text" id="c-accreditation" placeholder="e.g. SAPVIA, SESSA" />
+              </div>
+            </div>
+            <button class="btn btn-gold" onclick="saveComplianceDetails()" id="compliance-save-btn">💾 Save Compliance Details</button>
+          </div>
+          <div class="msg" id="compliance-msg"></div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:16px 0"></div>
 
         <div class="field">
           <label>Resend Access Email to Existing Installer</label>
@@ -271,6 +326,7 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 
 let adminSecret = '';
 let allLocations = [];
+let allInstallers = [];
 
 async function unlockAdmin() {
   const val = document.getElementById('admin-secret-input').value.trim();
@@ -366,14 +422,17 @@ function syncColor(hexId, colorId) {
 }
 
 async function inviteInstaller() {
-  const name  = document.getElementById('f-name').value.trim();
-  const email = document.getElementById('f-email').value.trim().toLowerCase();
-  const phone = document.getElementById('f-phone').value.trim();
-  const logo  = document.getElementById('f-logo').value.trim();
-  const primary   = document.getElementById('f-primary-hex').value.trim() || '#0A2540';
-  const secondary = document.getElementById('f-secondary-hex').value.trim() || '#FFFFFF';
-  const accent    = document.getElementById('f-accent-hex').value.trim() || '#B8962E';
-  const locIds    = getSelectedLocIds();
+  const name          = document.getElementById('f-name').value.trim();
+  const email         = document.getElementById('f-email').value.trim().toLowerCase();
+  const phone         = document.getElementById('f-phone').value.trim();
+  const contactPerson = document.getElementById('f-contact-person').value.trim();
+  const reg           = document.getElementById('f-reg').value.trim();
+  const accreditation = document.getElementById('f-accreditation').value.trim();
+  const logo          = document.getElementById('f-logo').value.trim();
+  const primary       = document.getElementById('f-primary-hex').value.trim() || '#0A2540';
+  const secondary     = document.getElementById('f-secondary-hex').value.trim() || '#FFFFFF';
+  const accent        = document.getElementById('f-accent-hex').value.trim() || '#B8962E';
+  const locIds        = getSelectedLocIds();
   const msgEl = document.getElementById('invite-msg');
   const btn   = document.getElementById('invite-btn');
 
@@ -405,11 +464,23 @@ async function inviteInstaller() {
     const installerId = data.installer_id;
     const wasExisting = data.was_existing;
 
+    // Save compliance fields directly to installers table
+    if (installerId && (contactPerson || reg || accreditation)) {
+      const patch = {};
+      if (contactPerson) patch.contact_person    = contactPerson;
+      if (reg)           patch.registration_number = reg;
+      if (accreditation) patch.accreditation      = accreditation;
+      await fetch(`${SUPA_URL}/rest/v1/installers?installer_id=eq.${installerId}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(patch)
+      });
+    }
+
     if (locIds.length > 0 && installerId) {
       await assignLocations(installerId, locIds);
     }
 
-    // Show appropriate message depending on whether this was a new or re-invite
     const msgType = wasExisting ? 'warn' : 'ok';
     const msgText = wasExisting
       ? `↻ Re-invite sent to ${email}.\n\nThey had an existing account — a fresh access email has been sent. Profile details have been updated.\n${locIds.length > 0 ? locIds.length + ' location(s) assigned.' : ''}`
@@ -418,7 +489,7 @@ async function inviteInstaller() {
     showMsg(msgEl, msgType, msgText);
     toast(wasExisting ? `↻ Re-invite sent to ${name}` : `✓ ${name} invited`);
 
-    ['f-name','f-email','f-phone','f-logo'].forEach(id => document.getElementById(id).value = '');
+    ['f-name','f-email','f-phone','f-contact-person','f-reg','f-accreditation','f-logo'].forEach(id => document.getElementById(id).value = '');
     clearAllLocs();
     loadInstallers();
 
@@ -465,7 +536,51 @@ async function assignLocationsOnly() {
   btn.disabled = false; btn.textContent = 'Assign Selected Locations';
 }
 
-// Resend invite / password reset to existing installer
+// ── COMPLIANCE DETAILS for existing installer ─────────────────────────────
+function loadComplianceFields() {
+  const sel = document.getElementById('compliance-installer-sel');
+  const installerId = parseInt(sel.value);
+  const panel = document.getElementById('compliance-fields');
+  if (!installerId) { panel.style.display = 'none'; return; }
+  const installer = allInstallers.find(i => i.installer_id === installerId);
+  if (!installer) { panel.style.display = 'none'; return; }
+  document.getElementById('c-contact-person').value  = installer.contact_person      || '';
+  document.getElementById('c-phone').value           = installer.contact_number      || '';
+  document.getElementById('c-reg').value             = installer.registration_number || '';
+  document.getElementById('c-accreditation').value   = installer.accreditation       || '';
+  panel.style.display = 'block';
+}
+
+async function saveComplianceDetails() {
+  const sel = document.getElementById('compliance-installer-sel');
+  const installerId = parseInt(sel.value);
+  const msgEl = document.getElementById('compliance-msg');
+  const btn   = document.getElementById('compliance-save-btn');
+  msgEl.className = 'msg'; msgEl.textContent = '';
+  if (!installerId) return showMsg(msgEl, 'err', 'Select an installer first.');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    const patch = {
+      contact_person:      document.getElementById('c-contact-person').value.trim() || null,
+      contact_number:      document.getElementById('c-phone').value.trim()           || null,
+      registration_number: document.getElementById('c-reg').value.trim()             || null,
+      accreditation:       document.getElementById('c-accreditation').value.trim()   || null,
+    };
+    const res = await fetch(`${SUPA_URL}/rest/v1/installers?installer_id=eq.${installerId}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(patch)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showMsg(msgEl, 'ok', '✓ Compliance details saved. These will now appear on printed handover certificates.');
+    toast('✓ Compliance details saved');
+    loadInstallers();
+  } catch(e) {
+    showMsg(msgEl, 'err', '✗ ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = '💾 Save Compliance Details';
+}
+
 async function sendReset() {
   const email = document.getElementById('reset-email').value.trim().toLowerCase();
   const msgEl = document.getElementById('reset-msg');
@@ -474,7 +589,6 @@ async function sendReset() {
   if (!email) return showMsg(msgEl, 'err', 'Enter an email address.');
   btn.disabled = true; btn.textContent = 'Sending…';
   try {
-    // Use invite-installer to resend — it handles existing accounts gracefully
     const res = await fetch(`${SUPA_URL}/functions/v1/invite-installer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
@@ -492,10 +606,11 @@ async function sendReset() {
 
 async function loadInstallers() {
   const res = await fetch(
-    `${SUPA_URL}/rest/v1/installers?select=installer_id,installer_name,contact_email,primary_color,accent_color,auth_user_id&order=installer_id.asc`,
+    `${SUPA_URL}/rest/v1/installers?select=installer_id,installer_name,contact_email,contact_number,contact_person,registration_number,accreditation,primary_color,accent_color,auth_user_id&order=installer_id.asc`,
     { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON } }
   );
-  const installers = await res.json();
+  allInstallers = await res.json();
+
   const lcRes = await fetch(
     `${SUPA_URL}/rest/v1/installer_locations?select=installer_id,location_id`,
     { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON } }
@@ -506,35 +621,48 @@ async function loadInstallers() {
 
   const tbody = document.getElementById('installer-tbody');
   const assignSel = document.getElementById('assign-installer-sel');
-  assignSel.innerHTML = '<option value="">— select installer —</option>' +
-    installers.map(i => `<option value="${i.installer_id}">${i.installer_name || i.contact_email}</option>`).join('');
+  const complianceSel = document.getElementById('compliance-installer-sel');
 
-  if (!installers.length) {
+  const optionsHtml = '<option value="">— select installer —</option>' +
+    allInstallers.map(i => `<option value="${i.installer_id}">${i.installer_name || i.contact_email}</option>`).join('');
+  assignSel.innerHTML = optionsHtml;
+  complianceSel.innerHTML = optionsHtml;
+
+  if (!allInstallers.length) {
     tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">No installers yet</td></tr>';
     return;
   }
 
-  tbody.innerHTML = installers.map(i => {
+  tbody.innerHTML = allInstallers.map(i => {
     const hasAuth = !!i.auth_user_id;
     const locCount = lcMap[i.installer_id] || 0;
     const authPill = hasAuth
       ? `<span class="pill pill-green">Auth ✓</span>`
       : `<span class="pill pill-red">No Auth</span>`;
+    const hasCompliance = !!(i.contact_person && i.registration_number && i.accreditation);
+    const compliancePill = hasCompliance
+      ? `<span class="pill pill-green">✓ Complete</span>`
+      : `<span class="pill pill-amber" title="Missing: ${[!i.contact_person&&'contact person',!i.registration_number&&'reg number',!i.accreditation&&'accreditation'].filter(Boolean).join(', ')}">⚠ Incomplete</span>`;
     return `<tr>
       <td><strong>${i.installer_name || '—'}</strong><br><span style="color:var(--muted);font-size:10px">#${i.installer_id} · ${locCount} locations</span></td>
       <td style="color:var(--muted)">${i.contact_email || '—'}</td>
       <td>${authPill}</td>
-      <td>
-        <span class="color-dot" style="background:${i.primary_color||'#0A2540'}" title="${i.primary_color}"></span>
-        <span class="color-dot" style="background:${i.accent_color||'#B8962E'}" title="${i.accent_color}"></span>
-      </td>
+      <td>${compliancePill}</td>
       <td>
         <div class="action-cell">
+          <button class="btn btn-ghost btn-sm" onclick="prefillCompliance(${i.installer_id})">Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="prefillReset('${i.contact_email||''}')">Resend</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+}
+
+function prefillCompliance(installerId) {
+  const sel = document.getElementById('compliance-installer-sel');
+  sel.value = installerId;
+  loadComplianceFields();
+  sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function prefillReset(email) {
