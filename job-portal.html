@@ -940,37 +940,18 @@ async function completeHandover(){
 }
 
 // ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
-const designNote = (v?.design_changed && v?.design_change_reason)
-  ? `
-  <div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px">
-
-    <!-- 🔹 NEW BLOCK (INSERTED HERE) -->
-    <div style="font-family:var(--mono);font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">
-      Proposal Reference Baseline
-    </div>
-
-    <div style="font-size:11px;color:var(--text2);margin-bottom:10px">
-      Proposal Ref: REF ${j?.ai_id || '—'}<br>
-      Proposal Acceptance: Client accepted initial design
-    </div>
-
-    <!-- 🔻 EXISTING SECTION -->
-    <div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">
-      Design Change on Record
-    </div>
-
-    <div style="font-size:11px;color:var(--text2)">
-      Originally proposed (as per accepted proposal REF ${j?.ai_id || '—'}):
-      ${v.original_proposal_kw || j?.system_size_kw || '—'} kWp /
-      ${v.original_proposal_batt_kwh || j?.battery_capacity_kwh || '—'} kWh.
-      As-installed:
-      ${totalKwp} kWp / ${totalBattery} kWh.
-      Reason: ${v.design_change_reason}
-    </div>
-
-  </div>
-  `
-  : '';
+function renderHandoverDoc(){
+  const j=currentJob,inst=currentInstall,ho=currentHandover,v=currentVisit;
+  // Installer profile comes from currentInstallerProfile (installers table), NOT from installations
+  const ip=currentInstallerProfile;
+  const totalKwp=inst?.final_system_kw||v?.recommended_system_kw||j?.system_size_kw||'—';
+  const totalBattery=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
+  const battPerUnit=inst?.battery_kwh||'—';
+  const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
+  const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div></div>`:'';
+  const doc=document.getElementById('handover-doc');if(!doc)return;
+  doc.innerHTML=`
+  
 <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
 <div class="hd-title">Solar Installation Handover Certificate</div>
 <div class="hd-grid">
