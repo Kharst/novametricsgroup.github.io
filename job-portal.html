@@ -161,7 +161,7 @@
   .toast.success{border-color:var(--green);color:var(--green)}
   .toast.error{border-color:var(--red);color:var(--red)}
   .toast.info{border-color:var(--blue);color:var(--blue)}
-  @media print{.topbar,.sidebar,.pipeline,.btn-row,.stage-panels>*:not(.panel.print-target){display:none!important}.layout{height:auto}.main{overflow:visible}.handover-doc{border:none;padding:0}body{background:#fff;color:#000}.hd-row-val,.hd-section-title,.stat-value,.hd-logo{color:#000!important}.hd-row-key,.sign-line{color:#555!important}}
+  @media print{.topbar,.sidebar,.pipeline,.btn-row,.stage-panels>*:not(.panel.print-target){display:none!important}.layout{height:auto}.main{overflow:visible}.handover-doc{border:none;padding:0}body{background:#fff;color:#000}.hd-row-val,.hd-section-title,.stat-value,.hd-logo{color:#000!important}.hd-row-key,.sign-line{color:#555!important}.verified-badge{background:#e6f9ef!important;border-color:#2ecc8a!important;color:#1a7a52!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -258,8 +258,6 @@
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-0-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body">
-
-            <!-- CLIENT NOTIFICATION BLOCK — email + WhatsApp -->
             <div class="section-label" style="margin-bottom:8px">Client Notification</div>
             <div class="notify-block">
               <div class="notify-status-row">
@@ -277,7 +275,6 @@
               </div>
               <div id="notify-hint" style="font-size:11px;color:var(--text3);margin-top:8px">Fill in assessor name and visit date/time to enable notifications.</div>
             </div>
-
             <div class="section-label">Visit Details</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">Assessor Name</label><input type="text" class="form-input" id="sv-assessor" placeholder="Your name" oninput="checkNotifyReady()"></div>
@@ -381,7 +378,6 @@
             <div class="section-label">Commissioning</div><div class="checklist" id="checklist-commissioning"></div>
             <div class="btn-row">
               <button class="btn btn-primary" id="btn-start-install" onclick="startInstallation()">▶ Mark as In Progress</button>
-              <!-- No separate Save needed — checklist saves on every tick automatically -->
             </div>
           </div>
         </div>
@@ -474,14 +470,13 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 const sbClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let jobs=[], currentJob=null, currentInstall=null, currentHandover=null, currentVisit=null;
-// ── NEW: loaded from installers table using installer_id from ai_results ──
 let currentInstallerProfile = null;
 let activeFilter='all', _jobLoading=false, _pendingJobId=null;
 
 // ── DOUBLE-CLICK GUARD ────────────────────────────────────────────────────
 let _actionInProgress = false;
 function beginAction(btnId){if(_actionInProgress)return false;_actionInProgress=true;const btn=document.getElementById(btnId);if(btn){btn.disabled=true;btn.style.opacity='0.6';}return true;}
-function endAction(btnId){_actionInProgress=false;const btn=document.getElementById(btnId);if(btn){btn.disabled=false;btn.style.opacity='';}}
+function endAction(btnId){_actionInProgress=false;const btn=document.getElementById(btnId);if(btn){btn.disabled=false;btn.style.opacity='';}};
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
 (async function boot(){
@@ -572,7 +567,6 @@ async function openJob(id){
     if(!data||!data[0]){toast('Job not found','error');return;}
     currentJob=data[0];
 
-    // ── Load installer profile from installers table (correct source for contact/reg/accreditation) ──
     currentInstallerProfile=null;
     if(currentJob.installer_id){
       try{
@@ -659,7 +653,6 @@ function checkNotifyReady(){
   const ready=!!(getVal('sv-assessor')&&getVal('sv-datetime')&&currentJob?.client_email);
   const btnE=document.getElementById('btn-notify-email');const btnW=document.getElementById('btn-notify-wa');
   if(btnE)btnE.disabled=!ready;
-  // WhatsApp works even without client email — just needs assessor + datetime
   const waReady=!!(getVal('sv-assessor')&&getVal('sv-datetime'));
   if(btnW)btnW.disabled=!waReady;
   const hint=document.getElementById('notify-hint');
@@ -670,7 +663,6 @@ function checkNotifyReady(){
   }
 }
 
-// ── EMAIL NOTIFICATION ────────────────────────────────────────────────────
 async function sendVisitNotification(){
   const btn=document.getElementById('btn-notify-email');
   if(!currentJob?.client_email){toast('No client email on record','error');return;}
@@ -696,9 +688,6 @@ async function sendVisitNotification(){
   }catch(e){btn.disabled=false;btn.textContent='✉ Email Confirmation';toast('Failed: '+e.message,'error');}
 }
 
-// ── WHATSAPP NOTIFICATION ─────────────────────────────────────────────────
-// Opens WhatsApp with a pre-filled message to the client's phone number.
-// No API needed — uses the universal wa.me link format.
 function openWhatsApp(){
   const assessor=getVal('sv-assessor'),datetime=getVal('sv-datetime');
   if(!assessor||!datetime){toast('Fill in assessor name and visit date/time first','error');return;}
@@ -707,13 +696,9 @@ function openWhatsApp(){
   const timeStr=d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
   const j=currentJob;
   const msg=`Hi ${j.client_name||''},\n\nYour solar site assessment is confirmed.\n\n📅 *${dateStr} at ${timeStr}*\n📍 ${j.client_address||'Your property'}\n👷 Assessor: ${assessor}\n⚡ System: ${j.system_size_kw||''}kWp (as per your proposal)\n🔖 REF: ${String(j.ai_id).padStart(6,'0')}\n\n*Please ensure access to:*\n• Your roof\n• Electrical DB board\n\nThe assessment takes 30–60 minutes.\n\nFrom ${j.installer_name||'your solar installer'}`;
-
-  // Use client's phone number if available, otherwise open blank
   const phone=(j.client_phone||'').replace(/\D/g,'').replace(/^0/,'27');
   const url=`https://wa.me/${phone||''}?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
-
-  // Mark as notified via WhatsApp
   (async()=>{
     try{
       const notifyData={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
@@ -725,7 +710,6 @@ function openWhatsApp(){
   })();
 }
 
-// ── DESIGN CHANGE ─────────────────────────────────────────────────────────
 function checkDesignChangeLive(){
   if(!currentJob)return;
   const origKw=parseFloat(currentJob.system_size_kw)||0,origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
@@ -804,7 +788,6 @@ function reloadChecklist(saved){saved.forEach(entry=>{const[section,idx]=entry.k
 function collectChecklist(){const result=[];Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{items.forEach((item,idx)=>{const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;result.push({key:`${section}-${idx}`,item,done:cb.checked,notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||''});});});return result;}
 async function saveChecklistToDb(){if(!currentInstall)return;try{await sbPatch('installations',`id=eq.${currentInstall.id}`,{install_checklist:collectChecklist()});}catch(e){}}
 
-// ── SAVE DRAFT HELPERS (safe to call anytime — no status change) ──────────
 async function saveSiteVisitDraft(){await _saveSiteVisit(false);}
 async function saveInstallPrepDraft(){await _saveInstallPrep(false);}
 async function saveCompletionDraft(){
@@ -822,7 +805,6 @@ async function saveHandoverDraft(){
   }catch(e){toast('Save failed: '+e.message,'error');}
 }
 
-// ── ACTION FUNCTIONS ──────────────────────────────────────────────────────
 async function completeSiteVisit(){
   if(!beginAction('btn-complete-sv'))return;
   try{await _saveSiteVisit(true);}finally{endAction('btn-complete-sv');}
@@ -896,7 +878,6 @@ async function completeHandover(){
     renderHandoverDoc();
     const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
 
-    // ── SEND HANDOVER EMAIL TO CLIENT ─────────────────────────────────────
     if(currentJob.client_email){
       const ip=currentInstallerProfile;
       try{
@@ -942,16 +923,23 @@ async function completeHandover(){
 // ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
 function renderHandoverDoc(){
   const j=currentJob,inst=currentInstall,ho=currentHandover,v=currentVisit;
-  // Installer profile comes from currentInstallerProfile (installers table), NOT from installations
   const ip=currentInstallerProfile;
   const totalKwp=inst?.final_system_kw||v?.recommended_system_kw||j?.system_size_kw||'—';
   const totalBattery=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
   const battPerUnit=inst?.battery_kwh||'—';
   const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
   const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div></div>`:'';
+
+  // ── VERIFIED BADGE: shown when installer has both reg number + accreditation ──
+  const isVerified = !!(ip?.registration_number && ip?.accreditation);
+  const verifiedBadge = isVerified
+    ? `<div class="verified-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.35);border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);letter-spacing:.05em">
+        <span style="font-size:13px">✓</span> VERIFIED INSTALLER
+      </div>`
+    : '';
+
   const doc=document.getElementById('handover-doc');if(!doc)return;
   doc.innerHTML=`
-  
 <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
 <div class="hd-title">Solar Installation Handover Certificate</div>
 <div class="hd-grid">
@@ -1012,6 +1000,7 @@ ${designNote}
       <div class="hd-row"><span class="hd-row-key">Accreditation</span><span class="hd-row-val">${ip?.accreditation||'—'}</span></div>
     </div>
   </div>
+  ${verifiedBadge}
 </div>
 <div class="hd-sign-block">
   <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
