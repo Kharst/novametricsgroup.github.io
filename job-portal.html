@@ -433,13 +433,13 @@
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-4-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body">
-            <div class="section-label">Compliance Details (COC)</div>
+            <div class="section-label">Installer-Reported Compliance Details (COC)</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">COC Number</label><input type="text" class="form-input" id="ho-cocnum" placeholder="e.g. COC-2025-00123"></div>
-              <div class="form-group"><label class="form-label">Issued By</label><input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number"></div>
+              <div class="form-group"><label class="form-label">Issued By (Certified Electrician)</label><input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number"></div>
               <div class="form-group"><label class="form-label">COC Issue Date</label><input type="date" class="form-input" id="ho-cocdate"></div>
               <div class="form-group"><label class="form-label">Grid Application Ref</label><input type="text" class="form-input" id="ho-gridref" placeholder="NRS097 / municipal ref"></div>
-              <div class="form-group"><label class="form-label">Grid Approved?</label><select class="form-select" id="ho-gridapproved"><option value="false">Pending</option><option value="true">Approved</option></select></div>
+              <div class="form-group"><label class="form-label">Grid Approval Status</label><select class="form-select" id="ho-gridapproved"><option value="false">Pending</option><option value="true">Approved</option></select></div>
             </div>
             <hr class="section-sep">
             <div class="section-label">Customer Training</div>
@@ -1047,7 +1047,7 @@ function renderHandoverDoc(){
   const doc=document.getElementById('handover-doc');if(!doc)return;
   doc.innerHTML=`
 <div class="hd-logo">${installerName}</div>
-<div class="hd-title">Solar Installation Handover Certificate</div>
+<div class="hd-title">Solar Installation Handover Summary & Record</div>
 <div class="hd-grid">
   <div>
     <div class="hd-section-title">Customer Details</div>
@@ -1110,10 +1110,11 @@ ${designNote}
 </div>
 <div class="hd-sign-block">
   <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
-  <div><div class="sign-line">Authorised by ${installerName}</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
+  <div><div class="sign-line">Installed & Commissioned by ${installerName}</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
 </div>
 <div style="margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--text3);line-height:1.6">
   <strong>Disclaimer:</strong> This document is a system-generated summary of project and compliance-related information recorded by the installer. COC certificates, regulatory approvals, and compliance determinations are issued by accredited third-party professionals and relevant authorities. Responsibility for compliance rests solely with the licensed installer and certifying professionals.
+  All data presented is based on information provided by the installer or third parties.
 </div>`;
   const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
 }
