@@ -138,6 +138,20 @@
   .dca-col-val{font-family:var(--mono);font-size:14px;font-weight:600}
   .dca-col-val.original{color:var(--text2)}.dca-col-val.revised{color:var(--amber)}
   .dca-col-sub{font-size:11px;color:var(--text3);margin-top:3px}
+  /* ── CLIENT APPROVAL STATUS ─────────────────────────────────────── */
+  .approval-bar{margin-top:14px;padding:10px 14px;border-radius:5px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:8px}
+  .approval-bar.pending{background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.2);color:var(--blue)}
+  .approval-bar.approved{background:rgba(46,204,138,.08);border:1px solid rgba(46,204,138,.25);color:var(--green)}
+  .approval-bar.declined{background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.25);color:var(--red)}
+  .approval-bar.notified{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.2);color:var(--amber)}
+  @keyframes pulse-slow{0%,100%{opacity:1}50%{opacity:.45}}
+  .pulse{animation:pulse-slow 2s ease-in-out infinite}
+  /* ── INSTALLER APPROVAL ALERT (top of workspace) ─────────────────── */
+  .approval-alert-banner{display:none;margin:0 28px 0;padding:12px 18px;border-radius:6px;font-family:var(--mono);font-size:12px;align-items:center;gap:10px;font-weight:600}
+  .approval-alert-banner.show{display:flex}
+  .approval-alert-banner.approved{background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.3);color:var(--green)}
+  .approval-alert-banner.declined{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);color:var(--red)}
+  /* ─────────────────────────────────────────────────────────────────── */
   .activity-log{border:1px solid var(--border);border-radius:5px;overflow:hidden;margin-top:16px}
   .activity-log-header{background:var(--panel);padding:8px 14px;font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
   .log-entry{padding:8px 14px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;font-size:11px}
@@ -230,7 +244,13 @@
         <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(4)"><div class="pipe-dot" id="pdot-4">5</div><div class="pipe-label" id="plbl-4">Handover</div></div></div>
       </div>
 
-      <div class="design-change-alert" id="design-change-alert" style="margin:0 28px">
+      <!-- ── CLIENT APPROVAL BANNER (shown when client responds to major change) ── -->
+      <div class="approval-alert-banner" id="approval-alert-banner" style="margin-top:16px">
+        <span id="approval-alert-icon"></span>
+        <span id="approval-alert-msg"></span>
+      </div>
+
+      <div class="design-change-alert" id="design-change-alert" style="margin:16px 28px 0">
         <div class="dca-header"><div class="dca-icon">⚠</div><div><div class="dca-title">Design Change Detected — Action Required</div><div class="dca-sub">The site assessment recommends a different system to the original accepted proposal.</div></div></div>
         <div class="dca-body">
           <div class="dca-compare">
@@ -246,6 +266,8 @@
             <button class="btn btn-ghost" onclick="dismissDesignChange()">Proceed with Original Design</button>
           </div>
           <div id="dca-ack-status" style="display:none;margin-top:12px" class="info-card success">✓ Design change documented.</div>
+          <!-- CLIENT NOTIFICATION STATUS -->
+          <div id="dca-client-status" class="approval-bar" style="display:none"></div>
         </div>
       </div>
 
@@ -473,16 +495,47 @@ let jobs=[], currentJob=null, currentInstall=null, currentHandover=null, current
 let currentInstallerProfile = null;
 let activeFilter='all', _jobLoading=false, _pendingJobId=null;
 
+// ── DESIGN CHANGE THRESHOLDS ──────────────────────────────────────────────
+// minor  = 5–19%  → client notified, no action needed
+// major  = ≥20%   → client must click Accept before installation proceeds
+const MINOR_CHANGE_THRESHOLD = 0.05;
+const MAJOR_CHANGE_THRESHOLD = 0.20;
+
+function getChangeCategory(kwDiff, battDiff) {
+  const max = Math.max(kwDiff || 0, battDiff || 0);
+  if (max >= MAJOR_CHANGE_THRESHOLD) return 'major';
+  if (max >= MINOR_CHANGE_THRESHOLD) return 'minor';
+  return 'none';
+}
+
 // ── DOUBLE-CLICK GUARD ────────────────────────────────────────────────────
 let _actionInProgress = false;
 function beginAction(btnId){if(_actionInProgress)return false;_actionInProgress=true;const btn=document.getElementById(btnId);if(btn){btn.disabled=true;btn.style.opacity='0.6';}return true;}
-function endAction(btnId){_actionInProgress=false;const btn=document.getElementById(btnId);if(btn){btn.disabled=false;btn.style.opacity='';}};
+function endAction(btnId){_actionInProgress=false;const btn=document.getElementById(btnId);if(btn){btn.disabled=false;btn.style.opacity='';}}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
 (async function boot(){
   const {data:{session}}=await sbClient.auth.getSession();
   if(!session){window.location.href='nova-metrics_1.html';return;}
   setSyncStatus('online');await loadJobs();setInterval(loadJobs,60000);
+
+  // ── REALTIME: notify installer immediately when client responds ───────
+  sbClient.channel('design-approvals')
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'site_visits'},payload=>{
+      if(!currentVisit||!payload.new||payload.new.id!==currentVisit.id)return;
+      const oldStatus=currentVisit.client_approval_status;
+      const newStatus=payload.new.client_approval_status;
+      if(newStatus===oldStatus)return;
+      currentVisit={...currentVisit,...payload.new};
+      renderDesignChangeAlert();
+      renderApprovalBanner();
+      if(newStatus==='approved'){
+        toast('🎉 Client accepted the revised design — you can now proceed!','success');
+      }else if(newStatus==='declined'){
+        toast('⚠ Client declined the revised design — contact them before proceeding.','error');
+      }
+    })
+    .subscribe();
 })();
 async function doSignOut(){await sbClient.auth.signOut();window.location.href='nova-metrics_1.html';}
 
@@ -584,7 +637,7 @@ async function openJob(id){
     currentVisit=visits?.[0]||null;currentInstall=installs?.[0]||null;currentHandover=handovers?.[0]||null;
     renderJobHeader();renderPipeline();renderPanels();
     renderActivityLog(logs||[]);prefillForms();
-    renderNotificationStatus();renderDesignChangeAlert();renderPanel1DesignNote();
+    renderNotificationStatus();renderDesignChangeAlert();renderPanel1DesignNote();renderApprovalBanner();
     const ph=document.getElementById('placeholder');const ws=document.getElementById('job-workspace');
     if(ph)ph.style.display='none';if(ws)ws.style.display='flex';
     renderSidebar();
@@ -626,6 +679,28 @@ function renderPanels(){
     if(bState==='current')panel.classList.add('open');
   });
   const pre=document.getElementById('checklist-pre');if(pre&&pre.childElementCount===0)buildChecklist();
+}
+
+// ── APPROVAL BANNER (top of workspace) ───────────────────────────────────
+function renderApprovalBanner(){
+  const banner=document.getElementById('approval-alert-banner');
+  const icon=document.getElementById('approval-alert-icon');
+  const msg=document.getElementById('approval-alert-msg');
+  if(!banner||!currentVisit)return;
+  const v=currentVisit;
+  if(v.design_change_category==='major'){
+    if(v.client_approval_status==='approved'){
+      banner.className='approval-alert-banner show approved';
+      icon.textContent='🎉';msg.textContent='Client accepted the revised design — cleared to proceed with installation.';
+    }else if(v.client_approval_status==='declined'){
+      banner.className='approval-alert-banner show declined';
+      icon.textContent='⚠';msg.textContent='Client declined the revised design — contact them before proceeding.';
+    }else if(v.client_notified_of_change_at){
+      banner.className='approval-alert-banner show';
+      banner.style.background='rgba(74,158,255,.07)';banner.style.border='1px solid rgba(74,158,255,.2)';banner.style.color='var(--blue)';
+      icon.textContent='⏳';msg.textContent='Awaiting client approval on revised design — approval link sent, do not proceed until accepted.';
+    }else{banner.className='approval-alert-banner';}
+  }else{banner.className='approval-alert-banner';}
 }
 
 // ── NOTIFICATION STATUS ───────────────────────────────────────────────────
@@ -675,11 +750,7 @@ async function sendVisitNotification(){
       body:JSON.stringify({client_name:currentJob.client_name,client_email:currentJob.client_email,client_phone:currentJob.client_phone||'',client_address:currentJob.client_address||'',assessor_name:assessor,visit_datetime:datetime,installer_name:currentJob.installer_name||'Your Solar Installer',installer_contact:currentInstallerProfile?.contact_number||currentJob.contact_number||'',system_size_kw:currentJob.system_size_kw||'',ai_id:currentJob.ai_id}),
     });
     const data=await res.json();
-    if(!data.success){
-      if(data.setup||data.setup_instructions){const msg='RESEND_API_KEY not configured in Supabase.\n\nGo to: Supabase Dashboard → Project Settings → Edge Functions → Secrets → Add RESEND_API_KEY';toast('Email not configured','error');alert(msg);}
-      else{throw new Error(data.error||'Failed to send');}
-      btn.disabled=false;btn.textContent='✉ Email Confirmation';return;
-    }
+    if(!data.success){throw new Error(data.error||'Failed to send');}
     const notifyData={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
     if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,notifyData);currentVisit={...currentVisit,...notifyData};}
     else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...notifyData});currentVisit=r?.[0]||null;}
@@ -715,8 +786,26 @@ function checkDesignChangeLive(){
   const origKw=parseFloat(currentJob.system_size_kw)||0,origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
   const newKw=parseFloat(getVal('sv-kw'))||0,newBatt=parseFloat(getVal('sv-battery'))||0;
   const kwHint=document.getElementById('sv-kw-hint'),battHint=document.getElementById('sv-batt-hint');
-  if(origKw>0&&newKw>0){const d=Math.abs((newKw-origKw)/origKw);if(kwHint){kwHint.textContent=d>0.05?`⚠ ${newKw>origKw?'↑ larger':'↓ smaller'} than proposed ${origKw} kWp — ${(d*100).toFixed(0)}% change`:`✓ Matches proposed ${origKw} kWp`;kwHint.style.color=d>0.05?'var(--amber)':'var(--green)';}}else if(kwHint)kwHint.textContent='';
-  if(origBatt>0&&newBatt>0){const d=Math.abs((newBatt-origBatt)/origBatt);if(battHint){battHint.textContent=d>0.05?`⚠ ${newBatt>origBatt?'↑ larger':'↓ smaller'} than proposed ${origBatt} kWh — ${(d*100).toFixed(0)}% change`:`✓ Matches proposed ${origBatt} kWh`;battHint.style.color=d>0.05?'var(--amber)':'var(--green)';}}else if(battHint)battHint.textContent='';
+  if(origKw>0&&newKw>0){
+    const d=Math.abs((newKw-origKw)/origKw);
+    const cat=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';
+    if(kwHint){
+      if(cat==='major')kwHint.textContent=`🔴 ${newKw>origKw?'↑ larger':'↓ smaller'} than proposed ${origKw} kWp — ${(d*100).toFixed(0)}% (client approval required)`;
+      else if(cat==='minor')kwHint.textContent=`⚠ ${newKw>origKw?'↑ larger':'↓ smaller'} than proposed ${origKw} kWp — ${(d*100).toFixed(0)}% change`;
+      else kwHint.textContent=`✓ Matches proposed ${origKw} kWp`;
+      kwHint.style.color=cat==='major'?'var(--red)':cat==='minor'?'var(--amber)':'var(--green)';
+    }
+  }else if(kwHint)kwHint.textContent='';
+  if(origBatt>0&&newBatt>0){
+    const d=Math.abs((newBatt-origBatt)/origBatt);
+    const cat=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';
+    if(battHint){
+      if(cat==='major')battHint.textContent=`🔴 ${newBatt>origBatt?'↑ larger':'↓ smaller'} than proposed ${origBatt} kWh — ${(d*100).toFixed(0)}% (client approval required)`;
+      else if(cat==='minor')battHint.textContent=`⚠ ${newBatt>origBatt?'↑ larger':'↓ smaller'} than proposed ${origBatt} kWh — ${(d*100).toFixed(0)}% change`;
+      else battHint.textContent=`✓ Matches proposed ${origBatt} kWh`;
+      battHint.style.color=cat==='major'?'var(--red)':cat==='minor'?'var(--amber)':'var(--green)';
+    }
+  }else if(battHint)battHint.textContent='';
 }
 
 function renderDesignChangeAlert(){
@@ -726,15 +815,49 @@ function renderDesignChangeAlert(){
   setText('dca-orig-batt',`${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh battery`);
   setText('dca-new-kw',`${v.recommended_system_kw||'—'} kWp`);
   setText('dca-new-batt',`${v.recommended_battery_kwh||'—'} kWh battery`);
-  if(v.design_change_acknowledged){alert.style.borderColor='rgba(46,204,138,.25)';alert.style.background='rgba(46,204,138,.04)';const a=document.getElementById('dca-ack-status');if(a)a.style.display='block';setVal('design-change-reason',v.design_change_reason||'');const r=document.getElementById('design-change-reason');if(r)r.readOnly=true;}
+  if(v.design_change_acknowledged){
+    alert.style.borderColor='rgba(46,204,138,.25)';alert.style.background='rgba(46,204,138,.04)';
+    const a=document.getElementById('dca-ack-status');if(a)a.style.display='block';
+    setVal('design-change-reason',v.design_change_reason||'');
+    const r=document.getElementById('design-change-reason');if(r)r.readOnly=true;
+  }
   alert.classList.add('visible');
+
+  // ── Show client notification / approval status ────────────────────────
+  const cs=document.getElementById('dca-client-status');
+  if(cs){
+    if(v.client_notified_of_change_at){
+      const d=new Date(v.client_notified_of_change_at);
+      const time=`${d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})} ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`;
+      if(v.client_approval_status==='approved'){
+        cs.className='approval-bar approved';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client accepted the revised design · '+time+'</span>';
+      }else if(v.client_approval_status==='declined'){
+        cs.className='approval-bar declined';cs.style.display='flex';
+        cs.innerHTML='<span>✗</span><span>Client declined the revised design · '+time+'</span>';
+      }else if(v.design_change_category==='major'){
+        cs.className='approval-bar pending';cs.style.display='flex';
+        cs.innerHTML='<span class="pulse">⏳</span><span>Awaiting client approval · link sent '+time+'</span>';
+      }else if(v.design_change_category==='minor'){
+        cs.className='approval-bar notified';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client notified of minor adjustment · '+time+'</span>';
+      }else{
+        cs.className='approval-bar notified';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client notified — proceeding with original design · '+time+'</span>';
+      }
+    }else{cs.style.display='none';}
+  }
 }
 
 function renderPanel1DesignNote(){
   const note=document.getElementById('panel1-design-note');if(!note||!currentVisit)return;
   const v=currentVisit;if(!v.design_changed){note.style.display='none';return;}
   note.style.display='block';
-  note.textContent=`⚠ Design change on record: originally ${v.original_proposal_kw||currentJob?.system_size_kw||'—'} kWp, site recommended ${v.recommended_system_kw||'—'} kWp. Reason: "${v.design_change_reason||'not yet documented'}". Plan installation to revised spec.`;
+  const approvalNeeded=v.design_change_category==='major'&&v.client_approval_status!=='approved';
+  note.className=approvalNeeded?'info-card error':'info-card warning';
+  note.textContent=approvalNeeded
+    ?`🔴 Major design change — client approval required before installation. Original: ${v.original_proposal_kw||currentJob?.system_size_kw||'—'} kWp → Revised: ${v.recommended_system_kw||'—'} kWp. Awaiting client response.`
+    :`⚠ Design change on record: ${v.original_proposal_kw||currentJob?.system_size_kw||'—'} → ${v.recommended_system_kw||'—'} kWp. Reason: "${v.design_change_reason||'not yet documented'}". Plan installation to revised spec.`;
 }
 
 async function acknowledgeDesignChange(){
@@ -761,6 +884,63 @@ async function dismissDesignChange(){
     const alert=document.getElementById('design-change-alert');if(alert)alert.classList.remove('visible');
     toast('Proceeding with original design','info');
   }catch(e){toast('Error: '+e.message,'error');}
+}
+
+// ── DESIGN CHANGE NOTIFICATION TO CLIENT ─────────────────────────────────
+async function sendDesignChangeNotification(job, visit, category) {
+  if (!job.client_email) return;
+  try {
+    const res = await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({
+        client_name:    job.client_name,
+        client_email:   job.client_email,
+        client_address: job.client_address || '',
+        original_kw:    visit.original_proposal_kw    || job.system_size_kw,
+        original_batt:  visit.original_proposal_batt_kwh || job.battery_capacity_kwh,
+        new_kw:         visit.recommended_system_kw,
+        new_batt:       visit.recommended_battery_kwh,
+        change_category: category,
+        change_reason:   visit.design_change_reason || '',
+        installer_name:  job.installer_name || 'Your Solar Installer',
+        ai_id:  job.ai_id,
+        visit_id: visit.id,
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const patch = {
+        client_notified_of_change_at: new Date().toISOString(),
+        design_change_category: category,
+      };
+      if (data.approval_token) patch.client_approval_token = data.approval_token;
+      await sbPatch('site_visits', `id=eq.${visit.id}`, patch);
+      currentVisit = { ...currentVisit, ...patch };
+      const actionMsg = category === 'none'
+        ? 'Client notified — proceeding with original design'
+        : category === 'minor'
+          ? 'Client notified of minor design adjustment'
+          : 'Client sent approval request for major design change';
+      await logActivity('DESIGN NOTIFICATION', actionMsg, visit.assessor_name);
+      toast(
+        category === 'major'
+          ? '⏳ Approval request sent — awaiting client response'
+          : category === 'minor'
+            ? '✓ Client notified of minor adjustment'
+            : '✓ Client notified — proceeding with original design',
+        category === 'major' ? 'info' : 'success'
+      );
+      renderDesignChangeAlert();
+      renderApprovalBanner();
+    } else {
+      console.warn('Design change notification failed:', data.error);
+      toast('Could not notify client: ' + (data.error || 'unknown error'), 'error');
+    }
+  } catch (e) {
+    console.error('sendDesignChangeNotification error:', e);
+    toast('Client notification error: ' + e.message, 'error');
+  }
 }
 
 function prefillForms(){
@@ -817,15 +997,26 @@ async function _saveSiteVisit(complete){
   const origKw=parseFloat(currentJob.system_size_kw)||0,origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
   const kwDiff=newKw&&origKw?Math.abs((newKw-origKw)/origKw):0;
   const battDiff=newBatt&&origBatt?Math.abs((newBatt-origBatt)/origBatt):0;
-  const designChanged=kwDiff>0.05||battDiff>0.05;
+  const designChanged=kwDiff>MINOR_CHANGE_THRESHOLD||battDiff>MINOR_CHANGE_THRESHOLD;
+  const changeCategory=getChangeCategory(kwDiff,battDiff);
   const visitData={job_id:String(currentJob.ai_id),assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',shading_notes:getVal('sv-shadingnotes'),recommended_system_kw:newKw,recommended_battery_kwh:newBatt,additional_notes:getVal('sv-notes'),completed_at:complete?new Date().toISOString():null,design_changed:designChanged,original_proposal_kw:origKw||null,original_proposal_batt_kwh:origBatt||null};
   try{
     if(currentVisit){delete visitData.client_notified_at;delete visitData.client_notified_by;await sbPatch('site_visits',`id=eq.${currentVisit.id}`,visitData);currentVisit={...currentVisit,...visitData};}
     else{const res=await sbPost('site_visits',visitData);currentVisit=res?.[0]||null;}
     if(complete){
       await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'site_visit_complete'});
-      await logActivity('SITE VISIT','Site visit completed'+(designChanged?` — design change detected (${origKw}→${newKw}kWp)`:''),visitData.assessor_name);
-      toast(designChanged?'Site visit complete — design change flagged':'Site visit completed!','success');
+      const logMsg=changeCategory==='major'
+        ?`Site visit complete — MAJOR design change (${origKw}→${newKw} kWp). Client approval required.`
+        :changeCategory==='minor'
+          ?`Site visit complete — minor design adjustment (${origKw}→${newKw} kWp).`
+          :'Site visit complete — no design changes.';
+      await logActivity('SITE VISIT',logMsg,visitData.assessor_name);
+      const toastMsg=changeCategory==='major'?'Site visit complete — client approval required for major change':changeCategory==='minor'?'Site visit complete — minor adjustment noted':'Site visit completed!';
+      toast(toastMsg,changeCategory==='major'?'info':'success');
+
+      // ── Auto-notify client of outcome (always, regardless of change size) ──
+      if(currentVisit)await sendDesignChangeNotification(currentJob,currentVisit,changeCategory);
+
       await openJob(currentJob.ai_id);
     }else{toast('Progress saved','info');}
   }catch(e){toast('Error: '+e.message,'error');}
@@ -908,14 +1099,13 @@ async function completeHandover(){
           if(statusEl){statusEl.style.display='block';statusEl.textContent=`✓ Handover certificate emailed to ${currentJob.client_email}`;}
           toast(`✓ Handover email sent to ${currentJob.client_email}`,'success');
         }else{
-          if(statusEl){statusEl.style.display='block';statusEl.className='info-card warning';statusEl.textContent=`⚠ Handover saved but email not sent — ${emailData.error||'check RESEND_API_KEY in Supabase secrets'}`;}
+          if(statusEl){statusEl.style.display='block';statusEl.className='info-card warning';statusEl.textContent=`⚠ Handover saved but email not sent — ${emailData.error||'unknown error'}`;}
         }
       }catch(emailErr){
         const statusEl=document.getElementById('handover-email-status');
         if(statusEl){statusEl.style.display='block';statusEl.className='info-card warning';statusEl.textContent='⚠ Handover saved but email could not be sent. Print and share the document manually.';}
       }
     }
-
     await openJob(currentJob.ai_id);
   }catch(e){toast('Error: '+e.message,'error');}finally{endAction('btn-complete-handover');}
 }
@@ -928,16 +1118,9 @@ function renderHandoverDoc(){
   const totalBattery=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
   const battPerUnit=inst?.battery_kwh||'—';
   const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
-  const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div></div>`:'';
-
-  // ── VERIFIED BADGE: shown when installer has both reg number + accreditation ──
-  const isVerified = !!(ip?.registration_number && ip?.accreditation);
-  const verifiedBadge = isVerified
-    ? `<div class="verified-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.35);border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);letter-spacing:.05em">
-        <span style="font-size:13px">✓</span> VERIFIED INSTALLER
-      </div>`
-    : '';
-
+  const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div>${v.client_approval_status==='approved'?'<div style="font-size:10px;color:var(--green);margin-top:6px">✓ Client approved the revised design via self-service link.</div>':''}</div>`:'';
+  const isVerified=!!(ip?.registration_number&&ip?.accreditation);
+  const verifiedBadge=isVerified?`<div class="verified-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.35);border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);letter-spacing:.05em"><span style="font-size:13px">✓</span> VERIFIED INSTALLER</div>`:'';
   const doc=document.getElementById('handover-doc');if(!doc)return;
   doc.innerHTML=`
 <div class="hd-logo">◈ SOLAR INTELLIGENCE</div>
