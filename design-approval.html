@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Revised Solar Design — Nova Metrics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f4f6f8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;color:#1a2332}
+.card{background:#fff;border-radius:14px;max-width:520px;width:100%;overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,.1)}
+.header{background:#0B1F3A;padding:28px 32px}
+.brand{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#c8911c;margin-bottom:8px}
+.title{font-size:22px;font-weight:300;color:#fff;line-height:1.3}
+.body{padding:28px 32px}
+.loading{text-align:center;padding:40px;color:#6b7280}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#0B1F3A;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col{border-radius:8px;padding:16px}
+.col-orig{background:#f9fafb;border:1px solid #e5e7eb}
+.col-new{background:#fff7ed;border:1px solid #fed7aa}
+.col-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.col-label-orig{color:#9ca3af}
+.col-label-new{color:#9a3412}
+.col-kw{font-size:20px;font-weight:600}
+.col-kw-orig{color:#6b7280}
+.col-kw-new{color:#c2410c}
+.col-sub{font-size:12px;margin-top:4px}
+.col-sub-orig{color:#9ca3af}
+.col-sub-new{color:#9a3412}
+.reason-box{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px 16px;font-size:13px;color:#374151;line-height:1.6;margin-bottom:20px}
+.reason-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:6px}
+.btn-row{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.btn{border:none;padding:13px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;flex:1;min-width:140px}
+.btn-accept{background:#0B1F3A;color:#fff}
+.btn-accept:hover{background:#0d2745}
+.btn-decline{background:#fff;border:1px solid #e5e7eb;color:#6b7280}
+.btn-decline:hover{background:#f9fafb;border-color:#d1d5db}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.result{text-align:center;padding:32px 24px}
+.result-icon{font-size:48px;margin-bottom:12px}
+.result-title{font-size:20px;font-weight:600;margin-bottom:8px}
+.result-sub{font-size:14px;color:#6b7280;line-height:1.6}
+.error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 16px;color:#dc2626;font-size:13px}
+.notice{font-size:12px;color:#9ca3af;line-height:1.6;margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="brand">Nova Metrics · Solar Intelligence</div>
+    <div class="title" id="page-title">Revised Solar Design<br>Requires Your Approval</div>
+  </div>
+  <div class="body" id="page-body">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Loading your design details…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+
+const params = new URLSearchParams(window.location.search);
+const token  = params.get('token');
+let visitData = null;
+
+async function init() {
+  const body = document.getElementById('page-body');
+  if (!token) { body.innerHTML = `<div class="error-box">Invalid link — no approval token found.</div>`; return; }
+
+  // Load visit by token
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/site_visits?client_approval_token=eq.${token}&select=*&limit=1`, {
+      headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON }
+    });
+    const rows = await res.json();
+    if (!rows || !rows.length) { body.innerHTML = `<div class="error-box">This approval link is invalid or has expired. Please contact your installer.</div>`; return; }
+    visitData = rows[0];
+
+    if (visitData.client_approval_status === 'approved') { showResult('approved', false); return; }
+    if (visitData.client_approval_status === 'declined') { showResult('declined', false); return; }
+
+    showApprovalForm();
+  } catch (e) {
+    body.innerHTML = `<div class="error-box">Could not load design details: ${e.message}</div>`;
+  }
+}
+
+function showApprovalForm() {
+  const v = visitData;
+  const origKw   = v.original_proposal_kw    || '—';
+  const origBatt = v.original_proposal_batt_kwh || '—';
+  const newKw    = v.recommended_system_kw    || '—';
+  const newBatt  = v.recommended_battery_kwh  || '—';
+  const reason   = v.design_change_reason || '';
+
+  document.getElementById('page-body').innerHTML = `
+    <p style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px">
+      After completing the site assessment at your property, our installation team recommends a revised system size based on the actual roof space and electrical conditions.
+    </p>
+    <div class="compare">
+      <div class="col col-orig">
+        <div class="col-label col-label-orig">Your Accepted Proposal</div>
+        <div class="col-kw col-kw-orig">${origKw} kWp</div>
+        <div class="col-sub col-sub-orig">${origBatt} kWh battery</div>
+      </div>
+      <div class="col col-new">
+        <div class="col-label col-label-new">Recommended After Visit</div>
+        <div class="col-kw col-kw-new">${newKw} kWp</div>
+        <div class="col-sub col-sub-new">${newBatt} kWh battery</div>
+      </div>
+    </div>
+    ${reason ? `<div class="reason-box"><div class="reason-label">Why the change?</div>${reason}</div>` : ''}
+    <p style="font-size:13px;color:#374151;line-height:1.7;margin-bottom:20px">
+      By clicking <strong>Accept Revised Design</strong>, you confirm that you agree to proceed with the updated system specification. Your installer will then schedule the installation.
+    </p>
+    <div id="action-result" style="display:none;margin-bottom:16px"></div>
+    <div class="btn-row">
+      <button class="btn btn-accept" id="btn-accept" onclick="submitAction('approve')">✓ Accept Revised Design</button>
+      <button class="btn btn-decline" id="btn-decline" onclick="submitAction('decline')">✗ Decline — Contact Installer</button>
+    </div>
+    <p class="notice">This link is unique to you and can only be used once. Your decision will be recorded and your installer will be notified immediately.</p>
+  `;
+}
+
+async function submitAction(action) {
+  const btnA = document.getElementById('btn-accept');
+  const btnD = document.getElementById('btn-decline');
+  const resultEl = document.getElementById('action-result');
+  if (btnA) btnA.disabled = true;
+  if (btnD) btnD.disabled = true;
+  if (resultEl) { resultEl.style.display = 'none'; }
+
+  try {
+    const res = await fetch(`${SUPA_URL}/functions/v1/handle-design-approval`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({ token, action })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Submission failed');
+    showResult(action === 'approve' ? 'approved' : 'declined', true);
+  } catch (e) {
+    if (resultEl) {
+      resultEl.innerHTML = `<div class="error-box">Something went wrong: ${e.message}. Please try again or contact your installer.</div>`;
+      resultEl.style.display = 'block';
+    }
+    if (btnA) btnA.disabled = false;
+    if (btnD) btnD.disabled = false;
+  }
+}
+
+function showResult(status, wasAction) {
+  const body = document.getElementById('page-body');
+  const title = document.getElementById('page-title');
+  if (status === 'approved') {
+    if (title) title.textContent = 'Design Accepted';
+    body.innerHTML = `
+      <div class="result">
+        <div class="result-icon">✅</div>
+        <div class="result-title" style="color:#166534">${wasAction ? 'Thank you — design accepted!' : 'You already accepted this design.'}</div>
+        <div class="result-sub">Your installer has been notified and will be in touch to confirm the installation date. No further action is needed from you.</div>
+      </div>`;
+  } else {
+    if (title) title.textContent = 'Design Declined';
+    body.innerHTML = `
+      <div class="result">
+        <div class="result-icon">📞</div>
+        <div class="result-title" style="color:#b45309">${wasAction ? 'Response recorded.' : 'You already declined this design.'}</div>
+        <div class="result-sub">Your installer has been notified of your decision. Please contact them directly to discuss alternatives before any changes are made.</div>
+      </div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
