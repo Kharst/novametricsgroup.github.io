@@ -1041,7 +1041,7 @@ function renderHandoverDoc(){
   const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
   const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div>${v.client_approval_status==='approved'?'<div style="font-size:10px;color:var(--green);margin-top:6px">✓ Client approved the revised design.</div>':''}</div>`:'';
   const isVerified=!!(ip?.registration_number&&ip?.accreditation);
-  const verifiedBadge=isVerified?`<div class="verified-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.35);border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);letter-spacing:.05em"><span style="font-size:13px">✓</span> VERIFIED INSTALLER</div>`:'';
+  
   // Use installer company name in the document header — not Nova Metrics branding
   const installerName=j?.installer_name||ip?.installer_name||'Solar Installer';
   const doc=document.getElementById('handover-doc');if(!doc)return;
@@ -1106,7 +1106,6 @@ ${designNote}
       <div class="hd-row"><span class="hd-row-key">Accreditation</span><span class="hd-row-val">${ip?.accreditation||'—'}</span></div>
     </div>
   </div>
-  ${verifiedBadge}
 </div>
 <div class="hd-sign-block">
   <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
