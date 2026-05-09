@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Export My Data — Nova Metrics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0B1F3A;--gold:#FFD700;--text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.08);--surface:#112840;--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:540px;width:100%;overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+.header{padding:28px 32px 20px}
+.brand{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:6px}
+.subtitle{font-size:13px;color:var(--muted);line-height:1.6}
+.body{padding:0 32px 28px}
+.what-list{margin-bottom:20px}
+.what-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.what-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.what-item:last-child{border-bottom:none}
+.what-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+.what-name{flex:1;font-weight:500}
+.what-count{font-size:11px;color:var(--muted);font-family:monospace}
+.notice{background:rgba(122,200,248,.07);border:1px solid rgba(122,200,248,.18);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--blue);line-height:1.6;margin-bottom:20px}
+.notice strong{color:#fff}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:7px;flex:1;justify-content:center;min-width:140px}
+.btn-json{background:var(--gold);color:var(--navy)}.btn-json:hover:not(:disabled){background:#fff}
+.btn-csv{background:rgba(52,211,153,.12);border:1.5px solid rgba(52,211,153,.3);color:var(--green)}.btn-csv:hover:not(:disabled){background:rgba(52,211,153,.22)}
+.btn-back{background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted)}.btn-back:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.progress{font-size:12px;color:var(--muted);text-align:center;padding:10px 0;display:none}
+.progress.show{display:block}
+.msg{font-size:12px;padding:10px 14px;border-radius:7px;margin-top:14px;display:none;line-height:1.6}
+.msg.show{display:block}
+.msg.ok{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.msg.err{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.loading{text-align:center;padding:32px;color:var(--muted);font-size:13px}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,215,0,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="brand">Nova Metrics · Solar Intelligence</div>
+    <div class="title">Your Data Export</div>
+    <div class="subtitle">Everything we hold for your account, in a format you can open, store, and use anywhere. No strings attached.</div>
+  </div>
+
+  <div class="body" id="main-body">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>Checking your account…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SUPA = 'https://zloxcqrhkcohheeixfns.supabase.co';
+var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+var sb = supabase.createClient(SUPA, ANON);
+var installer = null;
+
+async function init() {
+  var body = document.getElementById('main-body');
+  try {
+    var r = await sb.auth.getSession();
+    var session = r.data && r.data.session;
+    if (!session || !session.user) {
+      body.innerHTML = '<div class="loading" style="color:var(--red)">Not signed in. <a href="nova-metrics_1.html" style="color:var(--gold)">Sign in here →</a></div>';
+      return;
+    }
+    var email = session.user.email.toLowerCase().trim();
+    var res = await fetch(SUPA + '/rest/v1/installers?contact_email=eq.' + encodeURIComponent(email) + '&select=*&limit=1', {
+      headers: { apikey: ANON, Authorization: 'Bearer ' + session.access_token }
+    });
+    var rows = await res.json();
+    if (!rows || !rows.length) {
+      body.innerHTML = '<div class="loading" style="color:var(--red)">Installer account not found for ' + email + '.</div>';
+      return;
+    }
+    installer = rows[0];
+    await loadCounts();
+  } catch(e) {
+    body.innerHTML = '<div class="loading" style="color:var(--red)">Error: ' + e.message + '</div>';
+  }
+}
+
+async function loadCounts() {
+  var body = document.getElementById('main-body');
+  var h = { apikey: ANON, Authorization: 'Bearer ' + ANON };
+  var id = installer.installer_id;
+
+  try {
+    var propRes = await fetch(SUPA + '/rest/v1/ai_results?installer_id=eq.' + id + '&select=ai_id', { headers: h });
+    var props = await propRes.json();
+    var jobIds = Array.isArray(props) ? props.map(function(p){ return p.ai_id; }) : [];
+    var jf = jobIds.length ? 'job_id=in.(' + jobIds.join(',') + ')' : 'job_id=eq.-1';
+
+    var[vR, iR, hR, lR] = await Promise.all([
+      fetch(SUPA + '/rest/v1/site_visits?' + jf + '&select=id', { headers: h }),
+      fetch(SUPA + '/rest/v1/installations?' + jf + '&select=id', { headers: h }),
+      fetch(SUPA + '/rest/v1/handovers?' + jf + '&select=id', { headers: h }),
+      fetch(SUPA + '/rest/v1/job_activity_log?' + jf + '&select=id', { headers: h }),
+    ]);
+    var[visits, insts, hos, logs] = await Promise.all([vR.json(), iR.json(), hR.json(), lR.json()]);
+
+    var counts = {
+      proposals: Array.isArray(props) ? props.length : 0,
+      visits: Array.isArray(visits) ? visits.length : 0,
+      installs: Array.isArray(insts) ? insts.length : 0,
+      handovers: Array.isArray(hos) ? hos.length : 0,
+      logs: Array.isArray(logs) ? logs.length : 0,
+    };
+
+    body.innerHTML = renderUI(counts);
+  } catch(e) {
+    body.innerHTML = '<div class="loading" style="color:var(--red)">Could not load counts: ' + e.message + '</div>';
+  }
+}
+
+function renderUI(counts) {
+  return `
+    <div class="what-list">
+      <div class="what-title">Included in your export</div>
+      <div class="what-item"><span class="what-icon">📋</span><span class="what-name">Proposals &amp; client records</span><span class="what-count">${counts.proposals} records</span></div>
+      <div class="what-item"><span class="what-icon">🔍</span><span class="what-name">Site visit assessments</span><span class="what-count">${counts.visits} records</span></div>
+      <div class="what-item"><span class="what-icon">🔧</span><span class="what-name">Installation records &amp; checklists</span><span class="what-count">${counts.installs} records</span></div>
+      <div class="what-item"><span class="what-icon">🏆</span><span class="what-name">Handover certificates</span><span class="what-count">${counts.handovers} records</span></div>
+      <div class="what-item"><span class="what-icon">📝</span><span class="what-name">Activity &amp; approval logs</span><span class="what-count">${counts.logs} records</span></div>
+    </div>
+    <div class="notice"><strong>Your data, your rules.</strong> This export contains every record we hold for your installer account. JSON opens in any modern tool. CSV opens directly in Excel or Google Sheets. Nothing is held back or filtered.</div>
+    <div class="progress" id="prog">Fetching your data — please wait…</div>
+    <div class="btn-row">
+      <button class="btn btn-json" id="btn-json" onclick="doExport('json')">⬇ Download JSON</button>
+      <button class="btn btn-csv" id="btn-csv" onclick="doExport('csv')">⬇ Download CSV</button>
+    </div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn btn-back" onclick="window.location.href='prposal_portal.html'">← Back to Portal</button>
+    </div>
+    <div class="msg" id="export-msg"></div>`;
+}
+
+async function doExport(format) {
+  var prog = document.getElementById('prog');
+  var msgEl = document.getElementById('export-msg');
+  var btnJ = document.getElementById('btn-json');
+  var btnC = document.getElementById('btn-csv');
+  prog.classList.add('show');
+  prog.textContent = 'Fetching proposals…';
+  btnJ.disabled = true; btnC.disabled = true;
+  msgEl.className = 'msg';
+
+  try {
+    var h = { apikey: ANON, Authorization: 'Bearer ' + ANON };
+    var id = installer.installer_id;
+
+    var propRes = await fetch(SUPA + '/rest/v1/ai_results?installer_id=eq.' + id + '&select=*&order=created_at.desc', { headers: h });
+    var proposals = await propRes.json();
+    if (!Array.isArray(proposals)) proposals = [];
+
+    prog.textContent = 'Fetching job records…';
+    var jobIds = proposals.map(function(p){ return p.ai_id; });
+    var visits = [], installs = [], handovers = [], logs = [];
+
+    if (jobIds.length) {
+      var jf = 'job_id=in.(' + jobIds.join(',') + ')';
+      var[vR, iR, hR, lR] = await Promise.all([
+        fetch(SUPA + '/rest/v1/site_visits?' + jf + '&select=*&order=created_at.desc', { headers: h }),
+        fetch(SUPA + '/rest/v1/installations?' + jf + '&select=*&order=created_at.desc', { headers: h }),
+        fetch(SUPA + '/rest/v1/handovers?' + jf + '&select=*&order=created_at.desc', { headers: h }),
+        fetch(SUPA + '/rest/v1/job_activity_log?' + jf + '&select=*&order=created_at.desc', { headers: h }),
+      ]);
+      visits    = await vR.json(); if (!Array.isArray(visits)) visits = [];
+      installs  = await iR.json(); if (!Array.isArray(installs)) installs = [];
+      handovers = await hR.json(); if (!Array.isArray(handovers)) handovers = [];
+      logs      = await lR.json(); if (!Array.isArray(logs)) logs = [];
+    }
+
+    prog.textContent = 'Building export…';
+    var exportedAt = new Date().toISOString();
+
+    if (format === 'json') {
+      var payload = {
+        export_info: {
+          exported_at: exportedAt,
+          exported_by: installer.installer_name || 'Unknown',
+          installer_id: id,
+          platform: 'Nova Metrics Solar Intelligence',
+          note: 'This file contains all data held for your installer account. It is yours — store, use, or delete it as you see fit.',
+        },
+        proposals: proposals,
+        site_visits: visits,
+        installations: installs,
+        handovers: handovers,
+        activity_log: logs,
+      };
+      downloadFile('solar-intelligence-export-' + datestamp() + '.json', JSON.stringify(payload, null, 2), 'application/json');
+    } else {
+      var lines = [];
+      lines.push('Nova Metrics Solar Intelligence — Data Export');
+      lines.push('Exported: ' + exportedAt);
+      lines.push('Installer: ' + (installer.installer_name || ''));
+      lines.push('');
+      lines.push('== PROPOSALS ==');
+      lines = lines.concat(toCSV(proposals));
+      lines.push('');
+      lines.push('== SITE VISITS ==');
+      lines = lines.concat(toCSV(visits));
+      lines.push('');
+      lines.push('== INSTALLATIONS ==');
+      lines = lines.concat(toCSV(installs));
+      lines.push('');
+      lines.push('== HANDOVERS ==');
+      lines = lines.concat(toCSV(handovers));
+      lines.push('');
+      lines.push('== ACTIVITY LOG ==');
+      lines = lines.concat(toCSV(logs));
+      downloadFile('solar-intelligence-export-' + datestamp() + '.csv', lines.join('\n'), 'text/csv');
+    }
+
+    prog.textContent = '✓ Download started!';
+    setTimeout(function(){ prog.classList.remove('show'); }, 3000);
+    msgEl.className = 'msg ok show';
+    msgEl.textContent = '✓ Your data has been downloaded. The file contains all records held for your account.';
+
+  } catch(e) {
+    prog.classList.remove('show');
+    msgEl.className = 'msg err show';
+    msgEl.textContent = 'Export failed: ' + e.message;
+  }
+
+  btnJ.disabled = false; btnC.disabled = false;
+}
+
+function toCSV(rows) {
+  if (!rows || !rows.length) return ['(no records)'];
+  var keys = Object.keys(rows[0]);
+  var out = [keys.map(cell).join(',')];
+  rows.forEach(function(r){ out.push(keys.map(function(k){ return cell(r[k]); }).join(',')); });
+  return out;
+}
+function cell(v) {
+  if (v === null || v === undefined) return '';
+  var s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+  return (s.includes(',') || s.includes('"') || s.includes('\n')) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+function downloadFile(name, content, mime) {
+  var blob = new Blob([content], { type: mime });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+function datestamp() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+init();
+</script>
+</body>
+</html>
