@@ -85,9 +85,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .load-more-btn{width:100%;padding:5px;border-radius:6px;font-size:10px;font-weight:600;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:.15s;}
 .load-more-btn:hover{background:rgba(255,255,255,.1);color:var(--text);}
 
+/* ── Sidebar footer: data portability ── */
+.sidebar-footer{flex-shrink:0;padding:8px 9px;border-top:1px solid var(--border);}
+.sidebar-export-btn{display:flex;align-items:center;gap:7px;width:100%;padding:8px 10px;border-radius:7px;background:transparent;border:1px solid transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;letter-spacing:.02em;}
+.sidebar-export-btn:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--text);}
+.sidebar-export-btn:hover .export-arrow{opacity:.8;transform:translateY(2px);}
+.export-arrow{opacity:.35;transition:all .2s;}
+.sidebar-export-pulse{width:5px;height:5px;border-radius:50%;background:rgba(122,200,248,.6);flex-shrink:0;animation:pulse-exp 2.5s ease-in-out infinite;}
+@keyframes pulse-exp{0%,100%{opacity:.4}50%{opacity:1}}
+
 /* ── Main ── */
 .main{flex:1;background:#f4f6f9;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
-/* Topbar: trimmed so it doesn't eat vertical space */
 .topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:8px;flex-wrap:wrap;}
 .t-tabs{display:flex;gap:3px;}
 .t-btn{padding:5px 11px;border-radius:7px;font-size:11.5px;font-weight:500;border:none;cursor:pointer;background:transparent;color:#6b7280;transition:all .15s;font-family:'DM Sans',sans-serif;}
@@ -107,12 +115,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .e-cta{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:4px;border:none;cursor:pointer;}
 .e-cta:hover{background:#1e3a5f;transform:translateY(-1px);}
 
-/* ── Detail panel — compact vertical rhythm ── */
 .detail{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 12px;display:none;flex-direction:column;gap:7px;animation:up .22s ease;}
 .detail.on{display:flex;}
 @keyframes up{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* ── Arrival banner ── */
 .arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:6px 14px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0;}
 .arrival-banner.on{display:flex;}
 .ab-text{font-size:11px;color:#374151;display:flex;align-items:center;gap:7px;}
@@ -120,7 +126,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .ab-check{width:17px;height:17px;border-radius:50%;background:rgba(34,197,94,.15);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;}
 .ab-close{background:none;border:none;color:#9ca3af;cursor:pointer;font-size:13px;padding:0 4px;line-height:1;}
 
-/* ── Client header card — compact ── */
 .ch{background:var(--navy);border-radius:11px;padding:9px 13px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;overflow:hidden;gap:10px;flex-wrap:wrap;}
 .ch::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,.07) 0%,transparent 60%);pointer-events:none;}
 .ch-l{display:flex;align-items:center;gap:9px;min-width:0;flex:1;}
@@ -140,53 +145,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .attn-banner{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:7px;padding:6px 10px;font-size:10.5px;color:var(--amber);display:none;align-items:center;gap:8px;}
 .attn-banner.on{display:flex;}
 
-/* ── Tracking strip — no overlap, min-width prevents squash ── */
-.tracking-strip{
-  background:#fff;border-radius:10px;border:1px solid #e8ecf0;
-  padding:7px 6px 6px;
-  display:flex;gap:0;align-items:flex-start;
-  max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
-}
-.tev{
-  flex:1;min-width:50px;          /* min-width prevents ribbon items squashing */
-  text-align:center;position:relative;
-  display:flex;flex-direction:column;align-items:center;
-  padding:0 3px;overflow:hidden;
-}
-.tev:not(:first-child)::before{
-  content:'';position:absolute;top:9px;left:0;width:50%;
-  height:2px;background:#e8ecf0;z-index:0;
-}
-.tev:not(:last-child)::after{
-  content:'';position:absolute;top:9px;right:0;left:50%;
-  height:2px;background:#e8ecf0;z-index:0;
-}
-.tev-dot{
-  width:20px;height:20px;border-radius:50%;
-  margin-bottom:4px;
-  display:flex;align-items:center;justify-content:center;font-size:9px;
-  position:relative;z-index:1;
-  border:2px solid #e8ecf0;background:#f9fafb;flex-shrink:0;
-}
+.tracking-strip{background:#fff;border-radius:10px;border:1px solid #e8ecf0;padding:7px 6px 6px;display:flex;gap:0;align-items:flex-start;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tev{flex:1;min-width:50px;text-align:center;position:relative;display:flex;flex-direction:column;align-items:center;padding:0 3px;overflow:hidden;}
+.tev:not(:first-child)::before{content:'';position:absolute;top:9px;left:0;width:50%;height:2px;background:#e8ecf0;z-index:0;}
+.tev:not(:last-child)::after{content:'';position:absolute;top:9px;right:0;left:50%;height:2px;background:#e8ecf0;z-index:0;}
+.tev-dot{width:20px;height:20px;border-radius:50%;margin-bottom:4px;display:flex;align-items:center;justify-content:center;font-size:9px;position:relative;z-index:1;border:2px solid #e8ecf0;background:#f9fafb;flex-shrink:0;}
 .tev-dot.done{background:#ecfdf5;border-color:#22c55e;}
-.tev-lbl{
-  font-size:7.5px;font-weight:600;color:#9ca3af;
-  text-transform:uppercase;letter-spacing:.04em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  width:100%;display:block;
-}
+.tev-lbl{font-size:7.5px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;display:block;}
 .tev-lbl.done{color:#16a34a;}
-.tev-time{
-  font-size:7px;color:#9ca3af;margin-top:2px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  width:100%;display:block;
-}
+.tev-time{font-size:7px;color:#9ca3af;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;display:block;}
 
-/* ── Won banner ── */
 .won-badge-row{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:9px;padding:7px 11px;display:flex;align-items:center;gap:9px;font-size:11px;color:#166534;}
 .won-badge-icon{font-size:16px;flex-shrink:0;}
-
-/* ── Manual override row ── */
 .manual-override-row{background:#f9fafb;border:1px dashed #d1d5db;border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .mo-label{font-size:10.5px;color:#6b7280;flex:1;min-width:120px;}
 .mo-label strong{color:#374151;}
@@ -196,7 +166,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .mo-btn-reject{background:rgba(248,113,113,.07);color:#dc2626;border-color:rgba(248,113,113,.25);}
 .mo-btn-reject:hover{background:rgba(248,113,113,.15);}
 
-/* ── Stats — 4 cards in one compact row ── */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
 .stats>*{min-width:0;}
 .s-card{background:#fff;border-radius:10px;padding:8px 10px;border:1px solid #e8ecf0;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;}
@@ -208,7 +177,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .s-unit{font-size:10px;font-weight:400;color:#6b7280;}
 .s-sub2{font-size:9px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* ── Spec cards — tighter rows ── */
 .specs{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
 .specs>*{min-width:0;}
 .sp-card{background:#fff;border-radius:10px;padding:10px 12px;border:1px solid #e8ecf0;}
@@ -223,7 +191,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .np-cta{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:5px 12px;border-radius:7px;background:var(--navy);color:#fff;font-size:11px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;}
 .np-cta:hover{background:#1e3a5f;}
 
-/* ── Download / send card — compact, buttons never wrap ── */
 .dl{background:linear-gradient(135deg,#0d2240 0%,#14294a 100%);border-radius:11px;border:1px solid var(--gold-border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;flex-shrink:0;gap:10px;flex-wrap:wrap;}
 .dl::before{content:'';position:absolute;top:-50px;right:-50px;width:140px;height:140px;border-radius:50%;background:rgba(255,215,0,.06);pointer-events:none;}
 .dl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold) 0%,rgba(255,215,0,.2) 100%);}
@@ -232,7 +199,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-eyebrow::before{content:'';width:12px;height:1px;background:var(--gold);display:inline-block;}
 .dl-ti{font-size:13px;font-weight:600;color:#fff;font-family:'DM Serif Display',serif;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dl-su{font-size:10px;color:rgba(255,255,255,.42);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.dl-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;flex-wrap:nowrap;}/* nowrap keeps buttons in one row */
+.dl-actions{display:flex;gap:5px;align-items:center;flex-shrink:0;flex-wrap:nowrap;}
 .dl-btn{display:flex;align-items:center;gap:5px;background:var(--gold);color:var(--navy);border:none;border-radius:7px;padding:7px 11px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;z-index:1;}
 .dl-btn:hover{background:#fff;transform:translateY(-2px);box-shadow:0 5px 14px rgba(255,215,0,.3);}
 .dl-btn svg{width:11px;height:11px;flex-shrink:0;}
@@ -242,7 +209,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dl-btn-wa:hover{background:rgba(37,211,102,.28);transform:translateY(-2px);}
 .dl-btn-wa.sent{background:rgba(37,211,102,.3);border-color:#25D366;}
 
-/* ── Booking card ── */
 .booking-card{background:linear-gradient(135deg,#ecfdf5 0%,#f0fdf4 100%);border:1.5px solid #86efac;border-radius:11px;padding:13px 15px;position:relative;overflow:hidden;}
 .booking-card::before{content:'';position:absolute;top:-18px;right:-18px;width:70px;height:70px;border-radius:50%;background:rgba(34,197,94,.07);}
 .booking-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
@@ -266,7 +232,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .bk-existing{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:10.5px;color:#166534;margin-bottom:8px;display:none;}
 .bk-existing.on{display:block;}
 
-/* ── Analytics ── */
 #analyticsTab{overflow:hidden;flex-direction:column;}
 .dash-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .dash-topbar{background:#fff;border-bottom:1px solid #e5e9ef;padding:7px 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:7px;}
@@ -332,14 +297,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 .main ::-webkit-scrollbar-thumb{background:#d1d5db;}
 
-/* ── Responsive breakpoints ── */
 @media(max-width:1280px){
   :root{--sidebar-w:200px;}
   .detail{padding:7px 10px;gap:6px;}
   .stats{grid-template-columns:repeat(2,1fr);}
   .specs{grid-template-columns:1fr;}
   .ch-nm{max-width:260px;}
-  .dl-actions{flex-wrap:wrap;}/* allow wrap only at narrower widths */
+  .dl-actions{flex-wrap:wrap;}
 }
 @media(max-width:1024px){
   :root{--sidebar-w:185px;}
@@ -409,6 +373,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       <button class="load-more-btn" id="loadMoreBtn">Load more ↓</button>
     </div>
   </div>
+
+  <!-- ── Data portability — anchored to sidebar base ── -->
+  <div class="sidebar-footer">
+    <a href="data-export.html" class="sidebar-export-btn" title="Download all your data — proposals, site visits, installations, handovers — as JSON or CSV">
+      <svg class="export-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      <span style="flex:1">Export My Data</span>
+      <div class="sidebar-export-pulse"></div>
+    </a>
+  </div>
 </aside>
 
 <main class="main">
@@ -449,7 +426,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <span id="attnMsg">This proposal needs follow-up.</span>
       </div>
 
-      <!-- Client header -->
       <div class="ch">
         <div class="ch-l">
           <div class="ch-av" id="chAv">?</div>
@@ -467,36 +443,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="pill p" id="chPill">No Proposal</div>
       </div>
 
-      <!-- Tracking timeline -->
       <div class="tracking-strip" id="trackingStrip" style="display:none">
-        <div class="tev">
-          <div class="tev-dot" id="tev-dot-generated">📄</div>
-          <div class="tev-lbl" id="tev-lbl-generated">Generated</div>
-          <div class="tev-time" id="tev-time-generated"></div>
-        </div>
-        <div class="tev">
-          <div class="tev-dot" id="tev-dot-sent">📤</div>
-          <div class="tev-lbl" id="tev-lbl-sent">Sent</div>
-          <div class="tev-time" id="tev-time-sent"></div>
-        </div>
-        <div class="tev">
-          <div class="tev-dot" id="tev-dot-opened">📬</div>
-          <div class="tev-lbl" id="tev-lbl-opened">Opened</div>
-          <div class="tev-time" id="tev-time-opened"></div>
-        </div>
-        <div class="tev">
-          <div class="tev-dot" id="tev-dot-viewed">👁</div>
-          <div class="tev-lbl" id="tev-lbl-viewed">Viewed</div>
-          <div class="tev-time" id="tev-time-viewed"></div>
-        </div>
-        <div class="tev">
-          <div class="tev-dot" id="tev-dot-won">🏆</div>
-          <div class="tev-lbl" id="tev-lbl-won">Won</div>
-          <div class="tev-time" id="tev-time-won"></div>
-        </div>
+        <div class="tev"><div class="tev-dot" id="tev-dot-generated">📄</div><div class="tev-lbl" id="tev-lbl-generated">Generated</div><div class="tev-time" id="tev-time-generated"></div></div>
+        <div class="tev"><div class="tev-dot" id="tev-dot-sent">📤</div><div class="tev-lbl" id="tev-lbl-sent">Sent</div><div class="tev-time" id="tev-time-sent"></div></div>
+        <div class="tev"><div class="tev-dot" id="tev-dot-opened">📬</div><div class="tev-lbl" id="tev-lbl-opened">Opened</div><div class="tev-time" id="tev-time-opened"></div></div>
+        <div class="tev"><div class="tev-dot" id="tev-dot-viewed">👁</div><div class="tev-lbl" id="tev-lbl-viewed">Viewed</div><div class="tev-time" id="tev-time-viewed"></div></div>
+        <div class="tev"><div class="tev-dot" id="tev-dot-won">🏆</div><div class="tev-lbl" id="tev-lbl-won">Won</div><div class="tev-time" id="tev-time-won"></div></div>
       </div>
 
-      <!-- Won banner -->
       <div id="wonBadgeRow" style="display:none">
         <div class="won-badge-row">
           <span class="won-badge-icon">🏆</span>
@@ -507,7 +461,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- Manual override -->
       <div id="manualOverrideRow" style="display:none">
         <div class="manual-override-row">
           <span class="mo-label"><strong>Installer override:</strong> mark outcome if client accepted or rejected verbally.</span>
@@ -579,7 +532,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-      <!-- Booking card: ONLY shown when Won -->
       <div class="booking-card" id="bookingCard" style="display:none">
         <div class="booking-header">
           <div class="booking-icon">🗓️</div>
@@ -590,18 +542,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
         <div class="bk-existing" id="bkExisting"></div>
         <div class="booking-grid">
-          <div class="bk-group">
-            <label class="bk-label">Visit Date</label>
-            <input type="date" class="bk-input" id="bkDate"/>
-          </div>
-          <div class="bk-group">
-            <label class="bk-label">Arrival Time</label>
-            <input type="time" class="bk-input" id="bkTime"/>
-          </div>
-          <div class="bk-group bk-notes">
-            <label class="bk-label">Notes (optional)</label>
-            <textarea class="bk-textarea" id="bkNotes" placeholder="Access instructions, contact on site…"></textarea>
-          </div>
+          <div class="bk-group"><label class="bk-label">Visit Date</label><input type="date" class="bk-input" id="bkDate"/></div>
+          <div class="bk-group"><label class="bk-label">Arrival Time</label><input type="time" class="bk-input" id="bkTime"/></div>
+          <div class="bk-group bk-notes"><label class="bk-label">Notes (optional)</label><textarea class="bk-textarea" id="bkNotes" placeholder="Access instructions, contact on site…"></textarea></div>
         </div>
         <div class="bk-actions">
           <button class="bk-save" id="bkSaveBtn" onclick="saveBooking()">📅 Confirm Site Visit</button>
@@ -609,10 +552,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         </div>
       </div>
 
-    </div><!-- /detailPanel -->
-  </div><!-- /proposalsTab -->
+    </div>
+  </div>
 
-  <!-- Analytics tab -->
   <div class="tab-content" id="analyticsTab">
     <div class="dash-shell">
       <div class="dash-topbar">
@@ -643,7 +585,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 </main>
 
 <script>
-/* ── Constants ── */
 var SUPA='https://zloxcqrhkcohheeixfns.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 var DOWNLOAD_FN=SUPA+'/functions/v1/proposal-download/';
@@ -680,13 +621,10 @@ function switchDashTab(name){
   if(pane)pane.classList.add('on');
 }
 
-/* ── Status derivation — timestamps are ground truth ── */
 function getProposalStatus(ai){
   if(!ai||!ai.pdf_url) return null;
-  // WON = only explicit acceptance. client_engaged alone (set by download) does NOT count as won.
   if(ai.proposal_status==='accepted') return 'accepted';
   if(ai.proposal_status==='rejected') return 'rejected';
-  // PDF downloaded = client has seen it. Show as "viewed", never as won.
   if(ai.pdf_downloaded_at||ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
   if(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at) return 'sent';
   return 'generated';
@@ -703,15 +641,8 @@ function getStatusInfo(c){
     default:          return{label:'Ready',cls:'sb-generated'};
   }
 }
-function getPillClass(ps){
-  var map={generated:'generated',sent:'sent',viewed:'viewed',accepted:'accepted',rejected:'rejected'};
-  return map[ps]||'p';
-}
-function getPillLabel(ps,hasPdf){
-  if(!hasPdf) return 'No Proposal';
-  var map={generated:'Generated',sent:'Sent',viewed:'Viewed',accepted:'Won ✓',rejected:'Rejected'};
-  return map[ps]||'Ready';
-}
+function getPillClass(ps){var map={generated:'generated',sent:'sent',viewed:'viewed',accepted:'accepted',rejected:'rejected'};return map[ps]||'p';}
+function getPillLabel(ps,hasPdf){if(!hasPdf) return 'No Proposal';var map={generated:'Generated',sent:'Sent',viewed:'Viewed',accepted:'Won ✓',rejected:'Rejected'};return map[ps]||'Ready';}
 function needsAttention(c){
   var ai=c.ai;
   if(!ai||!ai.pdf_url) return false;
@@ -724,11 +655,10 @@ function needsAttention(c){
 }
 function attnMessage(c){
   var ai=c.ai,ps=getProposalStatus(ai),now=Date.now();
-  if(ps==='generated'){var hrs=Math.round((now-new Date(ai.created_at).getTime())/3600000);return '⚠️ Proposal generated '+hrs+'h ago but not yet sent.';}
-  if(ps==='sent'){var sentAt=ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at;var days=Math.round((now-new Date(sentAt).getTime())/86400000);return '⚠️ Sent '+days+' days ago — not viewed yet. Consider a follow-up call.';}
+  if(ps==='generated'){var hrs=Math.round((now-new Date(ai.created_at).getTime())/3600000);return'⚠️ Proposal generated '+hrs+'h ago but not yet sent.';}
+  if(ps==='sent'){var sentAt=ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at;var days=Math.round((now-new Date(sentAt).getTime())/86400000);return'⚠️ Sent '+days+' days ago — not viewed yet. Consider a follow-up call.';}
   return '';
 }
-
 function clientMatchesTab(c,tab){
   var ai=c.ai;
   switch(tab){
@@ -798,21 +728,10 @@ async function markAsSent(aiId,method){
   var patch={proposal_status:'sent',sent_at:nowIso};
   if(method==='email') patch.email_sent_at=nowIso;
   if(method==='whatsapp') patch.whatsapp_sent_at=nowIso;
-  allClients.forEach(function(c){
-    if(c.ai&&String(c.ai.ai_id)===String(aiId)){
-      Object.assign(c.ai,{proposal_status:'sent',sent_at:nowIso});
-      if(method==='email') c.ai.email_sent_at=nowIso;
-      if(method==='whatsapp') c.ai.whatsapp_sent_at=nowIso;
-    }
-  });
+  allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(aiId)){Object.assign(c.ai,{proposal_status:'sent',sent_at:nowIso});if(method==='email') c.ai.email_sent_at=nowIso;if(method==='whatsapp') c.ai.whatsapp_sent_at=nowIso;}});
   renderClientList();
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(aiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
-  }catch(e){console.warn('Status persist failed:',e);}
-  var pill=document.getElementById('chPill');
-  if(pill){pill.className='pill sent';pill.textContent='Sent';}
+  try{var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(aiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});}catch(e){console.warn('Status persist failed:',e);}
+  var pill=document.getElementById('chPill');if(pill){pill.className='pill sent';pill.textContent='Sent';}
   document.getElementById('attnBanner').classList.remove('on');
   tevSet('sent',new Date().toISOString(),'Sent');
 }
@@ -826,19 +745,13 @@ async function markAsWon(){
   var patch={client_engaged:true,proposal_status:'accepted',won_at:nowIso,job_status:'accepted'};
   if(c&&c.ai) Object.assign(c.ai,patch);
   renderClientList();
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
-  }catch(e){console.warn('Won persist failed:',e);}
-  var pill=document.getElementById('chPill');
-  if(pill){pill.className='pill accepted';pill.textContent='Won ✓';}
+  try{var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});}catch(e){console.warn('Won persist failed:',e);}
+  var pill=document.getElementById('chPill');if(pill){pill.className='pill accepted';pill.textContent='Won ✓';}
   tevSet('won',nowIso,'Won');
   document.getElementById('manualOverrideRow').style.display='none';
   document.getElementById('wonBadgeRow').style.display='block';
   document.getElementById('attnBanner').classList.remove('on');
-  var bk=document.getElementById('bookingCard');
-  if(bk){bk.style.display='block';setTimeout(function(){bk.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('bkDate').focus();},200);}
+  var bk=document.getElementById('bookingCard');if(bk){bk.style.display='block';setTimeout(function(){bk.scrollIntoView({behavior:'smooth',block:'nearest'});document.getElementById('bkDate').focus();},200);}
 }
 async function markAsRejected(){
   if(!activeAiId) return;
@@ -849,13 +762,8 @@ async function markAsRejected(){
   var patch={proposal_status:'rejected',client_engaged:false,rejected_at:nowIso};
   if(c&&c.ai) Object.assign(c.ai,patch);
   renderClientList();
-  try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
-    await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
-  }catch(e){console.warn('Rejected persist failed:',e);}
-  var pill=document.getElementById('chPill');
-  if(pill){pill.className='pill rejected';pill.textContent='Rejected';}
+  try{var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});}catch(e){console.warn('Rejected persist failed:',e);}
+  var pill=document.getElementById('chPill');if(pill){pill.className='pill rejected';pill.textContent='Rejected';}
   document.getElementById('manualOverrideRow').style.display='none';
   document.getElementById('wonBadgeRow').style.display='none';
   document.getElementById('bookingCard').style.display='none';
@@ -878,11 +786,7 @@ async function boot(){
   if(saved){try{installer=JSON.parse(saved);}catch(e){}}
   if(installer){showPortal();return;}
   if(urlEmail){
-    try{
-      var res2=await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-      var rows2=await res2.json();
-      if(rows2&&rows2.length){installer=rows2[0];showPortal();return;}
-    }catch(e){}
+    try{var res2=await fetch(SUPA+'/rest/v1/installers?contact_email=eq.'+encodeURIComponent(urlEmail)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color&limit=1',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});var rows2=await res2.json();if(rows2&&rows2.length){installer=rows2[0];showPortal();return;}}catch(e){}
   }
   window.location.href='solar-intelligence.html';
 }
@@ -899,16 +803,8 @@ function showPortal(){
 }
 function initSidebarControls(){
   document.getElementById('sidebarSearch').addEventListener('input',function(){searchQuery=this.value;displayCount=PAGE_SIZE;renderClientList();});
-  document.getElementById('sidebarFtabs').addEventListener('click',function(e){
-    var btn=e.target.closest('.ftab');if(!btn)return;
-    document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});
-    btn.classList.add('active');activeFilterTab=btn.dataset.tab;displayCount=PAGE_SIZE;renderClientList();
-  });
-  document.querySelector('.sidebar-sortbar').addEventListener('click',function(e){
-    var btn=e.target.closest('.sort-btn');if(!btn)return;
-    document.querySelectorAll('.sort-btn').forEach(function(t){t.classList.remove('active');});
-    btn.classList.add('active');sortMode=btn.dataset.sort;displayCount=PAGE_SIZE;renderClientList();
-  });
+  document.getElementById('sidebarFtabs').addEventListener('click',function(e){var btn=e.target.closest('.ftab');if(!btn)return;document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});btn.classList.add('active');activeFilterTab=btn.dataset.tab;displayCount=PAGE_SIZE;renderClientList();});
+  document.querySelector('.sidebar-sortbar').addEventListener('click',function(e){var btn=e.target.closest('.sort-btn');if(!btn)return;document.querySelectorAll('.sort-btn').forEach(function(t){t.classList.remove('active');});btn.classList.add('active');sortMode=btn.dataset.sort;displayCount=PAGE_SIZE;renderClientList();});
 }
 document.getElementById('signOutBtn').addEventListener('click',async function(){
   try{await sb.auth.signOut();}finally{localStorage.removeItem(SESSION_KEY);window.location.href='solar-intelligence.html';}
@@ -921,47 +817,18 @@ async function loadClients(){
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+
-      '&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,'+
-      'status,proposal_status,sent_at,'+
-      'system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,'+
-      'annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,'+
-      'annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,'+
-      'pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,'+
-      'whatsapp_sent_at,client_engaged,'+
-      'site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,'+
-      'won_at,rejected_at,created_at'+
-      '&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,proposal_status,sent_at,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,whatsapp_sent_at,client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,won_at,rejected_at,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
     var aiRows=await aiRes.json();
-    if(!Array.isArray(aiRows)){
-    console.warn('ai_results fetch failed:',aiRows);
-    aiRows=[];
-    }
+    if(!Array.isArray(aiRows)){console.warn('ai_results fetch failed:',aiRows);aiRows=[];}
     var aiByEmail={};
-    (aiRows||[]).forEach(function(r){
-      var k=(r.client_email||'').toLowerCase().trim();
-      if(!k) return;
-      if(!aiByEmail[k]){aiByEmail[k]=r;return;}
-      var cur=aiByEmail[k];
-      function score(x){return(x.pdf_url?100:0)+(x.email_sent_at||x.sent_at||x.whatsapp_sent_at?10:0)+(x.email_opened_at?5:0)+(x.proposal_viewed_at?5:0)+(x.client_engaged?20:0);}
-      if(score(r)>score(cur)) aiByEmail[k]=r;
-    });
+    (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(!k) return;if(!aiByEmail[k]){aiByEmail[k]=r;return;}var cur=aiByEmail[k];function score(x){return(x.pdf_url?100:0)+(x.email_sent_at||x.sent_at||x.whatsapp_sent_at?10:0)+(x.email_opened_at?5:0)+(x.proposal_viewed_at?5:0)+(x.client_engaged?20:0);}if(score(r)>score(cur)) aiByEmail[k]=r;});
     allClients=unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
-    Object.keys(aiByEmail).forEach(function(k){
-      var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});
-      if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});
-    });
+    Object.keys(aiByEmail).forEach(function(k){var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});});
     renderClientList();
     if(urlAiId){
       var idx=allClients.findIndex(function(c){return c.ai&&String(c.ai.ai_id)===String(urlAiId);});
       if(idx<0) idx=allClients.findIndex(function(c){return c.ai&&c.ai.pdf_url;});
-      if(idx>=0){
-        var matchRow=Array.from(document.querySelectorAll('.c-row')).find(function(r){return parseInt(r.dataset.idx)===idx;});
-        pick(idx,matchRow||null);
-        var cname=(allClients[idx].ai&&allClients[idx].ai.client_name)||(allClients[idx].lead&&allClients[idx].lead.client_name)||'your client';
-        document.getElementById('arrivalClientName').textContent=cname;
-        return;
-      }
+      if(idx>=0){var matchRow=Array.from(document.querySelectorAll('.c-row')).find(function(r){return parseInt(r.dataset.idx)===idx;});pick(idx,matchRow||null);var cname=(allClients[idx].ai&&allClients[idx].ai.client_name)||(allClients[idx].lead&&allClients[idx].lead.client_name)||'your client';document.getElementById('arrivalClientName').textContent=cname;return;}
     }
     document.getElementById('emptyState').style.display='flex';
   }catch(err){
@@ -976,7 +843,6 @@ function pick(idx,rowEl){
   document.querySelectorAll('.c-row').forEach(function(r){r.classList.remove('active');});
   if(rowEl) rowEl.classList.add('active');
   activeDetailIdx=idx;
-
   var c=allClients[idx];
   var name=(c.ai&&c.ai.client_name)||(c.lead&&c.lead.client_name)||'Unknown';
   var email=(c.ai&&c.ai.client_email)||(c.lead&&c.lead.client_email)||'—';
@@ -984,158 +850,59 @@ function pick(idx,rowEl){
   var has=!!(c.ai&&c.ai.pdf_url);
   var ai=c.ai;
   activeAiId=ai?ai.ai_id:null;
-
   document.getElementById('emptyState').style.display='none';
   var panel=document.getElementById('detailPanel');
   panel.classList.remove('on');void panel.offsetWidth;panel.classList.add('on');
-
   var isAttn=needsAttention(c);
   document.getElementById('attnBanner').classList.toggle('on',isAttn);
   if(isAttn) document.getElementById('attnMsg').textContent=attnMessage(c);
-
   s('chAv',init(name));s('chNm',name);s('chEm',email);
   s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
   s('chSeg',has?(ai.client_segment||'—'):'—');
   s('chDt',ai?fmtDate(ai.created_at):'—');
-  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}
-  else{document.getElementById('chPhoneRow').style.display='none';}
-
+  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}else{document.getElementById('chPhoneRow').style.display='none';}
   var ps=has?getProposalStatus(ai):null;
-  var pill=document.getElementById('chPill');
-  pill.textContent=getPillLabel(ps,has);
-  pill.className='pill '+getPillClass(ps);
-
-  var ts=document.getElementById('trackingStrip');
-  ts.style.display=has?'flex':'none';
-  if(has){
-    tevSet('generated',ai.created_at,'Generated');
-    tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');
-    tevSet('opened',ai.email_opened_at,'Opened');
-    tevSet('viewed',ai.proposal_viewed_at,'Viewed');
-    tevSet('won',ai.won_at||null,'Won');
-  }
-
-  vis('noPropRow',!has,'flex');
-  vis('statsRow',has,'grid');
-  vis('specsRow',has,'grid');
-  vis('dlRow',has,'flex');
-
-  var isAccepted=(ps==='accepted');
-  var isTerminal=(ps==='accepted'||ps==='rejected');
+  var pill=document.getElementById('chPill');pill.textContent=getPillLabel(ps,has);pill.className='pill '+getPillClass(ps);
+  var ts=document.getElementById('trackingStrip');ts.style.display=has?'flex':'none';
+  if(has){tevSet('generated',ai.created_at,'Generated');tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');tevSet('opened',ai.email_opened_at,'Opened');tevSet('viewed',ai.proposal_viewed_at,'Viewed');tevSet('won',ai.won_at||null,'Won');}
+  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
+  var isAccepted=(ps==='accepted');var isTerminal=(ps==='accepted'||ps==='rejected');
   document.getElementById('wonBadgeRow').style.display=(has&&isAccepted)?'block':'none';
   document.getElementById('manualOverrideRow').style.display=(has&&!isTerminal)?'block':'none';
   document.getElementById('bookingCard').style.display=(has&&isAccepted)?'block':'none';
-
   if(!has) return;
-
-  s('stKw',round(ai.system_size_kw,2));
-  s('stPanels',(ai.panel_number||'—')+'× '+(ai.panel_model||'—'));
-  s('stAnnual',fmt(ai.annual_savings));
-  s('stCost',fmt(ai.total_cost));
-  s('stMonthlySub','R '+fmt(ai.monthly_savings)+'/mo saving');
-  s('stPayback',ai.payback_years||'—');
-  s('spPanel',ai.panel_model||'—');s('spCount',(ai.panel_number||'—')+' units');
-  s('spKw',round(ai.system_size_kw,2)+' kW DC');s('spInv',ai.inverter_model||'—');
-  s('spBatt',ai.battery_model||'—');s('spBkwh',(ai.battery_capacity_kwh||'—')+' kWh');
-  s('spLoad',(ai.required_load_kw||'—')+' kW');s('spAuto',(ai.required_autonomy_hrs||'—')+' hrs');
-  s('spCost','R '+fmt(ai.total_cost));s('spMon','R '+fmt(ai.monthly_savings)+'/mo');
-  s('spAnn','R '+fmt(ai.annual_savings)+'/yr');s('spLife','R '+fmt(ai.lifetime_savings));
-  s('spSol',fmt(Math.round(ai.annual_solar_kwh||0))+' kWh/yr');
-  s('spCO2',round(ai.annual_co2_saved,1)+' t/yr');s('spCoal',round(ai.coal_avoided_tons,1)+' t/yr');
-  s('spTree',fmt(Math.round(ai.trees_equivalent||0)));
-  s('dlTitle','Proposal — '+name.split(' ')[0]);
-  s('dlSub','Generated '+fmtDate(ai.created_at)+(phone?' · '+phone:''));
-
+  s('stKw',round(ai.system_size_kw,2));s('stPanels',(ai.panel_number||'—')+'× '+(ai.panel_model||'—'));s('stAnnual',fmt(ai.annual_savings));s('stCost',fmt(ai.total_cost));s('stMonthlySub','R '+fmt(ai.monthly_savings)+'/mo saving');s('stPayback',ai.payback_years||'—');
+  s('spPanel',ai.panel_model||'—');s('spCount',(ai.panel_number||'—')+' units');s('spKw',round(ai.system_size_kw,2)+' kW DC');s('spInv',ai.inverter_model||'—');s('spBatt',ai.battery_model||'—');s('spBkwh',(ai.battery_capacity_kwh||'—')+' kWh');s('spLoad',(ai.required_load_kw||'—')+' kW');s('spAuto',(ai.required_autonomy_hrs||'—')+' hrs');
+  s('spCost','R '+fmt(ai.total_cost));s('spMon','R '+fmt(ai.monthly_savings)+'/mo');s('spAnn','R '+fmt(ai.annual_savings)+'/yr');s('spLife','R '+fmt(ai.lifetime_savings));s('spSol',fmt(Math.round(ai.annual_solar_kwh||0))+' kWh/yr');s('spCO2',round(ai.annual_co2_saved,1)+' t/yr');s('spCoal',round(ai.coal_avoided_tons,1)+' t/yr');s('spTree',fmt(Math.round(ai.trees_equivalent||0)));
+  s('dlTitle','Proposal — '+name.split(' ')[0]);s('dlSub','Generated '+fmtDate(ai.created_at)+(phone?' · '+phone:''));
   if(isAccepted){
-    var bkEx=document.getElementById('bkExisting');
-    var bkConf=document.getElementById('bkConfirmed');
-    bkConf.classList.remove('on');
-    if(ai.site_visit_date){
-      bkEx.className='bk-existing on';
-      bkEx.textContent='📅 Existing: '+ai.site_visit_date+(ai.site_visit_time?' at '+ai.site_visit_time:'')+(ai.site_visit_confirmed?' ✓':'');
-      document.getElementById('bkDate').value=ai.site_visit_date||'';
-      document.getElementById('bkTime').value=ai.site_visit_time||'';
-      document.getElementById('bkNotes').value=ai.site_visit_notes||'';
-    }else{
-      bkEx.className='bk-existing';
-      document.getElementById('bkDate').value='';
-      document.getElementById('bkTime').value='';
-      document.getElementById('bkNotes').value='';
-    }
+    var bkEx=document.getElementById('bkExisting');var bkConf=document.getElementById('bkConfirmed');bkConf.classList.remove('on');
+    if(ai.site_visit_date){bkEx.className='bk-existing on';bkEx.textContent='📅 Existing: '+ai.site_visit_date+(ai.site_visit_time?' at '+ai.site_visit_time:'')+(ai.site_visit_confirmed?' ✓':'');document.getElementById('bkDate').value=ai.site_visit_date||'';document.getElementById('bkTime').value=ai.site_visit_time||'';document.getElementById('bkNotes').value=ai.site_visit_notes||'';}
+    else{bkEx.className='bk-existing';document.getElementById('bkDate').value='';document.getElementById('bkTime').value='';document.getElementById('bkNotes').value='';}
   }
-
   document.getElementById('dlBtn').onclick=function(){window.open(DOWNLOAD_FN+ai.ai_id+'?source=installer','_blank');};
-
   var emailSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-  var sendBtn=document.getElementById('sendBtn');
-  sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;
-  sendBtn.onclick=async function(){
-    sendBtn.disabled=true;sendBtn.textContent='Sending…';
-    try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});
-      var data=await res.json();
-      if(res.ok&&data.success){await markAsSent(ai.ai_id,'email');sendBtn.innerHTML='✓ Sent!';setTimeout(function(){sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;},3000);}
-      else{alert('Failed: '+(data.error||'Unknown'));sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;}
-    }catch(err){alert('Connection error: '+err.message);sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;}
-  };
-
+  var sendBtn=document.getElementById('sendBtn');sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;
+  sendBtn.onclick=async function(){sendBtn.disabled=true;sendBtn.textContent='Sending…';try{var res=await fetch(SUPA+'/functions/v1/send-proposal-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({to:ai.client_email,ai_id:ai.ai_id})});var data=await res.json();if(res.ok&&data.success){await markAsSent(ai.ai_id,'email');sendBtn.innerHTML='✓ Sent!';setTimeout(function(){sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;},3000);}else{alert('Failed: '+(data.error||'Unknown'));sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;}}catch(err){alert('Connection error: '+err.message);sendBtn.innerHTML=emailSvg+' Email to Client';sendBtn.disabled=false;}};
   var waSvg='<svg viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>';
-  var waBtn=document.getElementById('waBtn');
-  waBtn.classList.remove('sent');waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;
-  waBtn.onclick=async function(){
-    waBtn.disabled=true;waBtn.textContent='Opening…';
-    try{
-      var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})});
-      var data=await res.json();
-      if(res.ok&&data.success&&data.wa_url){
-        window.open(data.wa_url,'_blank');
-        await markAsSent(ai.ai_id,'whatsapp');
-        waBtn.classList.add('sent');waBtn.innerHTML=waSvg+' Sent';
-        setTimeout(function(){waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;},4000);
-      }else{alert('Could not open WhatsApp: '+(data.error||'Unknown'));waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;}
-    }catch(err){alert('Connection error: '+err.message);waBtn.innerHTML='WhatsApp';waBtn.disabled=false;}
-  };
+  var waBtn=document.getElementById('waBtn');waBtn.classList.remove('sent');waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;
+  waBtn.onclick=async function(){waBtn.disabled=true;waBtn.textContent='Opening…';try{var res=await fetch(SUPA+'/functions/v1/send-proposal-whatsapp',{method:'POST',headers:{'Content-Type':'application/json','apikey':ANON},body:JSON.stringify({ai_id:ai.ai_id,client_phone:phone})});var data=await res.json();if(res.ok&&data.success&&data.wa_url){window.open(data.wa_url,'_blank');await markAsSent(ai.ai_id,'whatsapp');waBtn.classList.add('sent');waBtn.innerHTML=waSvg+' Sent';setTimeout(function(){waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;},4000);}else{alert('Could not open WhatsApp: '+(data.error||'Unknown'));waBtn.innerHTML=waSvg+' WhatsApp';waBtn.disabled=false;}}catch(err){alert('Connection error: '+err.message);waBtn.innerHTML='WhatsApp';waBtn.disabled=false;}};
 }
 
-function tevSet(key,iso,label){
-  var dot=document.getElementById('tev-dot-'+key);
-  var lbl=document.getElementById('tev-lbl-'+key);
-  var tim=document.getElementById('tev-time-'+key);
-  var done=!!iso;
-  if(dot) dot.classList.toggle('done',done);
-  if(lbl){lbl.textContent=label;lbl.classList.toggle('done',done);}
-  if(tim) tim.textContent=done?fmtShortDate(iso):'';
-}
-function fmtShortDate(iso){
-  if(!iso) return '';
-  var d=new Date(iso);
-  if(isNaN(d)) return '';
-  return d.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
-}
+function tevSet(key,iso,label){var dot=document.getElementById('tev-dot-'+key);var lbl=document.getElementById('tev-lbl-'+key);var tim=document.getElementById('tev-time-'+key);var done=!!iso;if(dot) dot.classList.toggle('done',done);if(lbl){lbl.textContent=label;lbl.classList.toggle('done',done);}if(tim) tim.textContent=done?fmtShortDate(iso):'';}
+function fmtShortDate(iso){if(!iso) return '';var d=new Date(iso);if(isNaN(d)) return '';return d.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});}
 
 async function saveBooking(){
   if(!activeAiId){alert('No active proposal.');return;}
-  var date=document.getElementById('bkDate').value;
-  var time=document.getElementById('bkTime').value;
-  var notes=document.getElementById('bkNotes').value.trim();
+  var date=document.getElementById('bkDate').value;var time=document.getElementById('bkTime').value;var notes=document.getElementById('bkNotes').value.trim();
   if(!date){alert('Please select a visit date.');return;}
-  var btn=document.getElementById('bkSaveBtn');
-  btn.disabled=true;btn.textContent='Saving…';
+  var btn=document.getElementById('bkSaveBtn');btn.disabled=true;btn.textContent='Saving…';
   try{
-    var sess=await sb.auth.getSession();
-    var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
+    var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
     var patch={site_visit_date:date,site_visit_time:time||null,site_visit_notes:notes||null,site_visit_confirmed:true,job_status:'site_visit_scheduled'};
     var res=await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
-    if(res.ok||res.status===204){
-      allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(activeAiId)){Object.assign(c.ai,patch);}});
-      var bkEx=document.getElementById('bkExisting');
-      bkEx.className='bk-existing on';
-      bkEx.textContent='📅 Booked: '+date+(time?' at '+time:'')+' ✓';
-      document.getElementById('bkConfirmed').classList.add('on');
-      btn.textContent='✓ Update Booking';btn.disabled=false;
-    }else{
-      alert('Save failed ('+res.status+')');btn.textContent='📅 Confirm Site Visit';btn.disabled=false;
-    }
+    if(res.ok||res.status===204){allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(activeAiId)){Object.assign(c.ai,patch);}});var bkEx=document.getElementById('bkExisting');bkEx.className='bk-existing on';bkEx.textContent='📅 Booked: '+date+(time?' at '+time:'')+' ✓';document.getElementById('bkConfirmed').classList.add('on');btn.textContent='✓ Update Booking';btn.disabled=false;}
+    else{alert('Save failed ('+res.status+')');btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
   }catch(err){alert('Network error: '+err.message);btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
 }
 
@@ -1156,8 +923,7 @@ function renderAllDashTabs(rows){
   var avgKw=avg(completed,'system_size_kw'),avgPanels=avg(completed,'panel_number'),avgYield=avg(completed,'annual_solar_kwh'),avgDailySolar=avgYield/365;
   d('sAvgKw',completed.length?avgKw.toFixed(2)+' kW':'—');d('sAvgPanels',completed.length?Math.round(avgPanels)+' panels':'—');d('sAvgSolar',completed.length?avgDailySolar.toFixed(1)+' kWh':'—');d('sAvgYield',completed.length?Math.round(avgYield).toLocaleString('en-ZA')+' kWh':'—');
   d('sKwDC',completed.length?avgKw.toFixed(2)+' kW DC':'—');d('sPanelModel',mode(completed,'panel_model')||'—');d('sPanelCount',completed.length?Math.round(avgPanels)+' units':'—');d('sPeakLoad',completed.length?avg(completed,'required_load_kw').toFixed(1)+' kW':'—');d('sAutonomy',completed.length?avg(completed,'required_autonomy_hrs').toFixed(0)+' hours':'—');
-  var db={'<5kW':0,'5-10kW':0,'10-15kW':0,'>15kW':0};
-  completed.forEach(function(r){var kw=parseFloat(r.system_size_kw)||0;if(kw<5)db['<5kW']++;else if(kw<=10)db['5-10kW']++;else if(kw<=15)db['10-15kW']++;else db['>15kW']++;});
+  var db={'<5kW':0,'5-10kW':0,'10-15kW':0,'>15kW':0};completed.forEach(function(r){var kw=parseFloat(r.system_size_kw)||0;if(kw<5)db['<5kW']++;else if(kw<=10)db['5-10kW']++;else if(kw<=15)db['10-15kW']++;else db['>15kW']++;});
   document.getElementById('sDistBody').innerHTML=Object.keys(db).map(function(k){return'<div class="wc-row"><span class="wc-k">'+k+'</span><span class="wc-v">'+db[k]+'</span></div>';}).join('')||'<div style="color:#9ca3af;font-size:11px;padding:4px 0">No data yet</div>';
   var avgBkwh=avg(completed,'battery_capacity_kwh'),avgBhours=avg(completed,'required_autonomy_hrs'),topBatt=mode(completed,'battery_model');
   d('bAvgKwh',completed.length?avgBkwh.toFixed(1)+' kWh':'—');d('bAvgHours',completed.length?avgBhours.toFixed(0)+' hrs':'—');d('bTopModel',topBatt||'—');d('bAvgCost','—');
