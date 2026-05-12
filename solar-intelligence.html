@@ -1332,7 +1332,7 @@ function getLoadBuilderValues(){
   // ── Real-world load timing analysis ──────────────────────────────────────────
 function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRuntime){
   let eveningPeakKW=0, solarKWh=0;
-  let geyserPresent=false, geyserKWh=0, geyserPeakKW=0;
+  let geyserPresent=false, geyserKWh=0, geyserPeakKW=0, geyserBackedUp=true;
   const eveningContribs=[];
 
   items.forEach(it=>{
@@ -1344,7 +1344,7 @@ function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRunt
       eveningPeakKW+=kw;
       if(kw>=0.3) eveningContribs.push({name:it.name,kw});
     }
-    if(it.id==='geyser'){geyserPresent=true;geyserKWh=kwh;geyserPeakKW=kw;}
+    if(it.id==='geyser'){geyserPresent=true;geyserKWh=kwh;geyserPeakKW=kw;geyserBackedUp=it.backedUp!==false;}
   });
 
   eveningContribs.sort((a,b)=>b.kw-a.kw);
@@ -1367,9 +1367,15 @@ function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRunt
       shiftableNames.push(it.name);
   });
 
-  return{eveningPeakKW,eveningRuntime,avgRuntime:avgBattRuntime,
-    solarKWh,solarUtilPct,eveningContribs:eveningContribs.slice(0,4),
-    geyserPresent,geyserKWh,geyserPeakKW,geyserPct,geyserOutsideSolar,
+  // If geyser is not backed up, remove it from evening peak — it's not hitting the battery
+  const eveningPeakKWEffective = (!geyserBackedUp && geyserPresent)
+    ? Math.max(eveningPeakKW - geyserPeakKW, 0) : eveningPeakKW;
+  const eveningRuntimeEffective = eveningPeakKWEffective > 0.05
+    ? battBackupKWh / eveningPeakKWEffective : 99;
+
+  return{eveningPeakKW:eveningPeakKWEffective,eveningRuntime:eveningRuntimeEffective,avgRuntime:avgBattRuntime,
+    solarKWh,solarUtilPct,eveningContribs:eveningContribs.filter(c=>geyserBackedUp||c.name!=='Geyser').slice(0,4),
+    geyserPresent,geyserKWh,geyserPeakKW,geyserPct,geyserOutsideSolar,geyserBackedUp,
     eveningPeakNoGeyser,eveningRuntimeNoGeyser,improvedSolarPct,shiftableNames};
 }
 
@@ -1387,8 +1393,8 @@ function renderRealWorld(r, tw){
   // ── Recommended actions
   const actions=[];
 
-  // Geyser timer — show exact runtime gain
-  if(tw.geyserPresent&&tw.geyserOutsideSolar){
+  // Geyser timer — only suggest if geyser IS backed up and running outside solar hours
+  if(tw.geyserPresent&&tw.geyserBackedUp&&tw.geyserOutsideSolar){
     const runtimeGain=tw.eveningRuntimeNoGeyser>=99?'unlimited':fN(tw.eveningRuntimeNoGeyser,1);
     actions.push({icon:'🕐',text:
       'Set geyser timer to 10:00–14:00 (solar hours). Evening peak drops from '+fN(tw.eveningPeakKW,1)+' kW → '+fN(tw.eveningPeakNoGeyser,1)+' kW. '
@@ -1396,8 +1402,8 @@ function renderRealWorld(r, tw){
     });
   }
 
-  // Geyser bypass — same numbers, different solution
-  if(tw.geyserPresent&&tw.geyserPct>30){
+  // Geyser bypass — only if it IS backed up and is a large portion of energy
+  if(tw.geyserPresent&&tw.geyserBackedUp&&tw.geyserPct>30){
     const runtimeGain=tw.eveningRuntimeNoGeyser>=99?'full autonomy':fN(tw.eveningRuntimeNoGeyser,1)+' hrs';
     actions.push({icon:'🔌',text:
       'Bypass geyser from battery backup circuit. Geyser draws '+fN(tw.geyserPeakKW,1)+' kW ('+fN(tw.geyserPct,0)+'% of daily energy). '
@@ -1405,33 +1411,32 @@ function renderRealWorld(r, tw){
     });
   }
 
-  // Evening peak warning — show what capacity would be needed
+  // Evening peak warning — only if it still fails AFTER geyser is excluded
   if(!pkOk){
     const extraKWh=tw.eveningPeakKW*r.autonomy - (r.battBackupKWh||0);
     actions.push({icon:'🔋',text:
       'Evening peak of '+fN(tw.eveningPeakKW,1)+' kW drains battery in '+fN(tw.eveningRuntime,1)+' hrs — '
       +(extraKWh>0?fN(extraKWh,1)+' kWh of additional battery needed to reach '+r.autonomy+' hr target. ':'')
-      +'Alternatively, shed geyser from backup to reach '+fN(tw.eveningRuntimeNoGeyser,1)+' hrs immediately.'
+      +'Reduce evening loads or increase battery capacity.'
     });
   }
 
-  // Solar utilisation — show the actual % improvement
+  // Solar utilisation
   if(!solOk){
-    const tip=tw.geyserPresent
-      ? 'Shifting geyser to solar hours alone raises utilisation from '+fN(tw.solarUtilPct,0)+'% → '+fN(tw.improvedSolarPct,0)+'%.'
-        +(tw.shiftableNames.length?' Also shift '+tw.shiftableNames.join(', ')+' to 10:00–15:00.':'')
-      : 'Shift '+( tw.shiftableNames.length?tw.shiftableNames.join(', '):'heavy loads')+' to 10:00–15:00 to increase solar from '+fN(tw.solarUtilPct,0)+'%.';
+    const tip=tw.geyserPresent&&!tw.geyserBackedUp
+      ? 'Geyser is confirmed on a separate circuit and will be heated by solar surplus during the day — good. '
+        +(tw.shiftableNames.length?'Also shift '+tw.shiftableNames.join(', ')+' to 10:00–15:00 to further raise solar utilisation from '+fN(tw.solarUtilPct,0)+'%.':'Solar utilisation is low — consider shifting washing machine and pool pump to 10:00–15:00.')
+      : 'Shift '+(tw.shiftableNames.length?tw.shiftableNames.join(', '):'heavy loads')+' to 10:00–15:00 to increase solar from '+fN(tw.solarUtilPct,0)+'%.';
     actions.push({icon:'☀️',text:tip});
   }
 
-  // Heat pump suggestion
-  if(tw.geyserPresent&&tw.geyserPct>25)
+  // Heat pump suggestion — only if geyser is backed up (if it's not, problem is already solved)
+  if(tw.geyserPresent&&tw.geyserBackedUp&&tw.geyserPct>25)
     actions.push({icon:'♨️',text:
       'A heat pump or solar geyser removes the '+fN(tw.geyserKWh,1)+' kWh/day geyser load ('+fN(tw.geyserPct,0)+'% of system) entirely — '
       +'reduces battery and panel requirements significantly.'
     });
 
-  // Keep max 4 most relevant
   const topActions=actions.slice(0,4);
 
   // ── Render
@@ -1452,11 +1457,12 @@ function renderRealWorld(r, tw){
   </div>
 
   ${tw.geyserPresent?`
-  <div class="rw-block">
-    <div class="rw-block-hd">🚿 Geyser</div>
-    <div class="rw-row"><span class="rw-lbl">% of total daily energy</span><span class="rw-val warn">${fN(tw.geyserPct,0)}%</span></div>
-    <div class="rw-row"><span class="rw-lbl">Timing alignment</span><span class="rw-val ${tw.geyserOutsideSolar?'warn':'ok'}">${tw.geyserOutsideSolar?'Outside solar hours ⚠':'Within solar hours ✓'}</span></div>
-  </div>`:''}
+  <div class=\"rw-block\">
+    <div class=\"rw-block-hd\">🚿 Geyser</div>
+    <div class=\"rw-row\"><span class=\"rw-lbl\">Circuit</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Wired through inverter 🔋':'Separate non-backup circuit ✓'}</span></div>
+    <div class=\"rw-row\"><span class=\"rw-lbl\">Heated by</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Battery / Grid (review timing)':'Solar surplus during the day ✓'}</span></div>
+    <div class=\"rw-row\"><span class=\"rw-lbl\">Battery impact</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Included in backup sizing ⚠':'Excluded from battery sizing ✓'}</span></div>
+  </div>`:''}`
 
   <div class="rw-block">
     <div class="rw-block-hd">☀️ Solar Utilisation</div>
