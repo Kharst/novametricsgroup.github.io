@@ -448,7 +448,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="section-title">Inverter Performance</div>
     <div class="status-row"><span class="lbl">Inverter AC Continuous (kW)</span><span class="val" id="i-ac-kw">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Max DC Input (kW)</span><span class="val" id="i-dc-max">&#8212;</span></div>
-    <div class="status-row"><span class="lbl">Headroom over Peak Load</span><span class="val" id="i-headroom">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Headroom over Backup Peak</span><span class="val" id="i-headroom">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">&#8212;</span></div>
     <div class="section-title">Regulatory Compliance</div>
     <div class="status-row">
@@ -845,7 +845,7 @@ function calculate(){
             :            ['Industrial Array','Multiple sections or ground mount required.'];
 
   const [dcAcTxt,dcAcColor]=dcAcLabel(dcAc);
-  const iHeadroom=invAC-peakLoad,iModel=iU>1?iU+'x '+bInv.model+' (parallel)':bInv.model;
+  const iHeadroom=invAC-(peakLoadBackup||peakLoad),iModel=iU>1?iU+'x '+bInv.model+' (parallel)':bInv.model;
   const strN=Math.ceil(pc/12),mpptReq=Math.ceil(strN/2),mpptAv=invMPPT;
   const mpptSt=mpptReq<mpptAv?'Spare inputs available':mpptReq===mpptAv?'All inputs used':'Limited headroom';
 
@@ -934,8 +934,8 @@ function renderAll(r){
   set('b-bar-tip','Daily DoD: '+fN(r.battDod*100,0)+'% | Headroom: '+fN(r.battCR,2)+'x | Ideal: 1.15x&#8211;1.35x | Max 85% DoD');
 
   setKpi('i-model',r.invModel,'green');
-  setKpi('i-load-ok','Load OK — '+fN(r.invAC,1)+' kW handles '+fN(r.peakLoad,1)+' kW','green');
-  set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+'30% safety margin applied');
+  setKpi('i-load-ok','Backup load OK — '+fN(r.invAC,1)+' kW handles '+fN(bkPeak,1)+' kW backup peak','green');
+  set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+(bkPeak<r.peakLoad?'Geyser on separate circuit · ':'')+'30% safety margin applied');
   setKpi('i-dcac',fN(r.dcAc,2),r.dcAcColor);set('i-dcac-sub',r.dcAcTxt);
   setKpi('i-batt-support','Battery OK — '+fN(r.battTotalKW,1)+' kW &#8805; peak','green');
   set('i-batt-sub','Battery '+fN(r.battTotalKW,1)+' kW &#8805; backup peak '+fN(bkPeak,1)+' kW');
