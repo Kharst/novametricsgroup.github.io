@@ -1462,7 +1462,7 @@ function renderRealWorld(r, tw){
     <div class=\"rw-row\"><span class=\"rw-lbl\">Circuit</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Wired through inverter 🔋':'Separate non-backup circuit ✓'}</span></div>
     <div class=\"rw-row\"><span class=\"rw-lbl\">Heated by</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Battery / Grid (review timing)':'Solar surplus during the day ✓'}</span></div>
     <div class=\"rw-row\"><span class=\"rw-lbl\">Battery impact</span><span class=\"rw-val ${tw.geyserBackedUp?'warn':'ok'}\">${tw.geyserBackedUp?'Included in backup sizing ⚠':'Excluded from battery sizing ✓'}</span></div>
-  </div>`:''}`
+  </div>`:''}
 
   <div class="rw-block">
     <div class="rw-block-hd">☀️ Solar Utilisation</div>
