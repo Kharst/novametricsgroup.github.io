@@ -768,7 +768,7 @@ function calculate(){
   if(!selectedLoc){toast('&#9888; Please select a location first',true);return;}
   clearNoSystemAlert();
 
-  const {peakLoad,dailyUsage}=getLoadBuilderValues();
+  const {peakLoad,dailyUsage,peakLoadBackup,dailyUsageBackup}=getLoadBuilderValues();
   if(!peakLoad||!dailyUsage){
     toast('&#9888; Add appliances in the Load Builder first',true);
     document.getElementById('lb-panel').classList.add('open');
@@ -786,7 +786,8 @@ function calculate(){
   const markup=parseFloat(document.getElementById('sel-markup').value)/100;
 
   // ── INVERTER-FIRST: find ONE best compliant combination ──────────────────
-  const sys = findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh);
+  // Use backup values for battery + inverter sizing (geyser excluded if not on inverter circuit)
+  const sys = findBestCompliantSystem(peakLoadBackup||peakLoad, dailyUsageBackup||dailyUsage, autonomy, psh);
 
   if (!sys) {
     const whyFails = [];
@@ -1199,7 +1200,7 @@ function lbApplyTemplate(idx){
   const t=LB_TEMPLATES[idx];if(!t)return;
   lbItems=t.items.map(it=>{
     const cat=lbApp(it.id)||APPLIANCE_CATALOG[APPLIANCE_CATALOG.length-1];
-    return{id:it.id,name:cat.name,icon:cat.icon,watts:it.watts,qty:it.qty,hours:it.hours};
+    return{id:it.id,name:cat.name,icon:cat.icon,watts:it.watts,qty:it.qty,hours:it.hours,backedUp:it.id==='geyser'?false:undefined};
   });
   renderLbItems();lbUpdateSummary();lbUpdateTrigger();
 }
@@ -1213,7 +1214,7 @@ function lbAdd(id){
   const cat=lbApp(id);if(!cat)return;
   const existing=lbItems.find(it=>it.id===id&&id!=='custom');
   if(existing){existing.qty++;renderLbItems();lbUpdateSummary();lbUpdateTrigger();return;}
-  lbItems.push({id:cat.id,name:cat.name,icon:cat.icon,watts:cat.watts,qty:1,hours:cat.hours});
+  lbItems.push({id:cat.id,name:cat.name,icon:cat.icon,watts:cat.watts,qty:1,hours:cat.hours,backedUp:cat.id==='geyser'?false:undefined});
   renderLbItems();lbUpdateSummary();lbUpdateTrigger();
 }
 
@@ -1261,8 +1262,9 @@ function renderLbItems(){
           onchange="lbItems[${i}].hours=Math.min(24,Math.max(0.1,parseFloat(this.value)||1));renderLbItems();lbUpdateSummary();lbUpdateTrigger();" />
         <span class="lb-unit">h/day</span>
       </div>
-      <span class="lb-item-contrib">${it.qty}× → ${contrib} kW</span>
-      <button class="lb-item-del" onclick="lbRemove(${i})" title="Remove">✕</button>
+      <span class=\"lb-item-contrib\">${it.qty}× → ${contrib} kW</span>
+      ${it.id==='geyser'?`<button onclick=\"lbToggleGeyserBackup(${i})\" title=\"Toggle whether geyser runs through the inverter\" style=\"padding:3px 9px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;border:1px solid;transition:.15s;${it.backedUp===false?'background:rgba(251,191,36,.10);border-color:rgba(251,191,36,.4);color:var(--amber)':'background:rgba(52,211,153,.10);border-color:rgba(52,211,153,.3);color:var(--green)'}\">${it.backedUp===false?'🔌 Not backed up':'🔋 Backed up'}</button>`:''}
+      <button class=\"lb-item-del\" onclick=\"lbRemove(${i})\" title=\"Remove\">✕</button>
     </div>`;
   }).join('');
 }
@@ -1298,12 +1300,30 @@ function lbUpdateTrigger(){
 
 function lbClear(){lbItems=[];renderLbItems();lbUpdateSummary();lbUpdateTrigger();}
 
-// ★ Called by calculate() — returns peakLoad (kW) and dailyUsage (kWh)
+// Toggle geyser backup status — called from the load builder row button
+function lbToggleGeyserBackup(idx){
+  if(lbItems[idx]&&lbItems[idx].id==='geyser'){
+    lbItems[idx].backedUp = lbItems[idx].backedUp===false ? true : false;
+    renderLbItems(); lbUpdateSummary(); lbUpdateTrigger();
+  }
+}
+
+// ★ Called by calculate() — returns full totals AND backup-only totals
+// Backup totals exclude geysers that are NOT wired through the inverter
 function getLoadBuilderValues(){
-  if(!lbItems.length)return{peakLoad:0,dailyUsage:0};
-  const peakLoad=parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty/1000,0).toFixed(2));
-  const dailyUsage=parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty*it.hours/1000,0).toFixed(2));
-  return{peakLoad,dailyUsage};
+  if(!lbItems.length)return{peakLoad:0,dailyUsage:0,peakLoadBackup:0,dailyUsageBackup:0};
+  const peakLoad      = parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty/1000,0).toFixed(2));
+  const dailyUsage    = parseFloat(lbItems.reduce((s,it)=>s+it.watts*it.qty*it.hours/1000,0).toFixed(2));
+  // Backup = exclude geysers where backedUp===false (installer confirmed not on inverter circuit)
+  const peakLoadBackup   = parseFloat(lbItems.reduce((s,it)=>{
+    if(it.id==='geyser'&&it.backedUp===false) return s;
+    return s+it.watts*it.qty/1000;
+  },0).toFixed(2));
+  const dailyUsageBackup = parseFloat(lbItems.reduce((s,it)=>{
+    if(it.id==='geyser'&&it.backedUp===false) return s;
+    return s+it.watts*it.qty*it.hours/1000;
+  },0).toFixed(2));
+  return{peakLoad,dailyUsage,peakLoadBackup,dailyUsageBackup};
 }
 // ══════════════════════════════════════════════════════════════════
 // END LOAD BUILDER
