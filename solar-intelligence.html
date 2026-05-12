@@ -665,11 +665,12 @@ function selectBestBattery(reqKWh, peakLoad, autonomy){
 // Iterates every valid inverter, sizes solar to achieve compliant DC/AC ratio,
 // selects batteries, then returns ONE best compliant combination.
 // Rejects anything outside NRS 097-2-1 DC/AC range [1.0 – 1.5].
-function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh) {
+function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh, totalDailyUsage) {
+  totalDailyUsage = totalDailyUsage || dailyUsage;             // fallback: same as backup
   const reqInvAC   = peakLoad * 1.3;                          // 30% safety margin (SA rule)
-  const battKWh    = dailyUsage * (autonomy / 24);            // evening backup energy
+  const battKWh    = dailyUsage * (autonomy / 24);            // battery sized on BACKUP usage only
   const battRechKWh= battKWh / BATT_ROUND_TRIP_EFF;          // recharge loss
-  const reqSolarE  = (dailyUsage - battKWh) + battRechKWh;   // solar must cover this
+  const reqSolarE  = (totalDailyUsage - battKWh) + battRechKWh; // solar covers TOTAL usage incl. geyser
   const effFactor  = psh * SYSTEM_PR * SYSTEM_AVAILABILITY;
   const minSolarKW = reqSolarE / effFactor;                   // min kWp from energy
 
@@ -787,7 +788,7 @@ function calculate(){
 
   // ── INVERTER-FIRST: find ONE best compliant combination ──────────────────
   // Use backup values for battery + inverter sizing (geyser excluded if not on inverter circuit)
-  const sys = findBestCompliantSystem(peakLoadBackup||peakLoad, dailyUsageBackup||dailyUsage, autonomy, psh);
+  const sys = findBestCompliantSystem(peakLoadBackup||peakLoad, dailyUsageBackup||dailyUsage, autonomy, psh, dailyUsage);
 
   if (!sys) {
     const whyFails = [];
@@ -872,7 +873,7 @@ function calculate(){
   const indP=Math.min(annSolar/annCons,1)*100;
   const nersaCat=sysDC<=1?'Category A (&#8804;1 kW)':sysDC<=10?'Category B (1&#8211;10 kW)':sysDC<=100?'Category C (10&#8211;100 kW) &#8212; NERSA SSEG licence required':'Category D (>100 kW) &#8212; full NERSA licence required';
 
-  calcResult={systemRecommended:true,locName,psh,peakLoad,dailyUsage,autonomy,tariff,markup,
+  calcResult={systemRecommended:true,locName,psh,peakLoad,dailyUsage,peakLoadBackup:peakLoadBackup||peakLoad,dailyUsageBackup:dailyUsageBackup||dailyUsage,autonomy,tariff,markup,
     reqSolarKW,reqSolarEnergy,sysDC,pc,panelModel:bestPanel.model,panelWatts:bestPanel.watts,
     expDaily,osP,annSolar,specYield,fp,roofFit:rfd[0],roofGuidance:rfd[1],
     battBackupKWh,iKWh:batt.installedKWh,battRuntime:batt.runtime,battModel:batt.model,
@@ -923,8 +924,9 @@ function renderAll(r){
   set('b-model',r.battModel);set('b-usable-per',fN(r.battUsable,2)+' kWh');
   set('b-cap-ratio',fN(r.battCR,2)+'x ('+r.battHS+')');
   set('b-solar-compat','&#10003; '+fN(r.expDaily,2)+' kWh net &#8805; '+fN(r.reqSolarEnergy,2)+' kWh needed');
-  set('b-load-compat','&#10003; Battery '+fN(r.battTotalKW,1)+' kW &#8805; peak '+fN(r.peakLoad,1)+' kW');
-  set('b-inv-compat','&#10003; Inverter '+fN(r.invAC,1)+' kW &#8805; '+fN(r.peakLoad*1.3,1)+' kW (peak &#215; 1.3)');
+  const bkPeak=r.peakLoadBackup||r.peakLoad;
+  set('b-load-compat','&#10003; Battery '+fN(r.battTotalKW,1)+' kW &#8805; backup peak '+fN(bkPeak,1)+' kW');
+  set('b-inv-compat','&#10003; Inverter '+fN(r.invAC,1)+' kW &#8805; '+fN(bkPeak*1.3,1)+' kW (backup peak &#215; 1.3)');
   set('b-dod-compat',r.battDod<=BATT_DOD_DESIGN_GOOD?'&#10003; '+fN(r.battDod*100,0)+'% DoD &#8804; 70% — optimal cycling':'&#10003; '+fN(r.battDod*100,0)+'% DoD — within 85% LiFePO4 limit (amber)');
   set('b-dcac-compat',r.dcAc>=DC_AC_MIN_COMPLIANT?'&#10003; DC/AC '+fN(r.dcAc,2)+' — '+r.dcAcTxt:'&#9888; DC/AC '+fN(r.dcAc,2)+' — inverter oversized vs array');
   const bC=r.battHS==='Tight'?'var(--amber)':'var(--green)';
@@ -936,7 +938,7 @@ function renderAll(r){
   set('i-load-sub',(r.invUnits>1?r.invUnits+'x parallel — ':'')+'30% safety margin applied');
   setKpi('i-dcac',fN(r.dcAc,2),r.dcAcColor);set('i-dcac-sub',r.dcAcTxt);
   setKpi('i-batt-support','Battery OK — '+fN(r.battTotalKW,1)+' kW &#8805; peak','green');
-  set('i-batt-sub','Battery '+fN(r.battTotalKW,1)+' kW &#8805; peak '+fN(r.peakLoad,1)+' kW');
+  set('i-batt-sub','Battery '+fN(r.battTotalKW,1)+' kW &#8805; backup peak '+fN(bkPeak,1)+' kW');
   const mpC=r.mpptSt==='Spare inputs available'?'green':'amber';
   setKpi('i-mppt-status',r.mpptSt,mpC);
   set('i-mppt-alloc',r.mpptReq+' of '+r.mpptAv+' MPPT inputs'+(r.invUnits>1?' ('+r.invUnits+'x)':''));
