@@ -1448,7 +1448,7 @@ function renderRealWorld(r, tw){
 
   <div class="rw-block">
     <div class="rw-block-hd">🔋 Battery Runtime</div>
-    <div class="rw-row"><span class="rw-lbl">Average load runtime</span><span class="rw-val ${avgOk?'ok':'warn'}">${fN(tw.avgRuntime,1)} hrs ${avgOk?'✓':''}</span></div>
+    <div class="rw-row"><span class="rw-lbl">${({'Low Residential':'Expected home runtime','High Residential':'Expected home runtime','Small Commercial':'Expected site runtime','Large Commercial':'Expected site runtime','Industrial':'Expected facility runtime'}[r.seg]||'Expected site runtime')}</span><span class="rw-val ${avgOk?'ok':'warn'}">${fN(tw.avgRuntime,1)} hrs ${avgOk?'✓':''}</span></div>
     <div class="rw-row"><span class="rw-lbl">Runtime if all evening loads remain ON continuously</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
   </div>
 
