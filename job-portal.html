@@ -269,7 +269,7 @@
 
       <div class="stage-panels">
 
-        <!-- STEP 1: SITE VISIT -->
+        <!-- STEP 1 -->
         <div class="panel" id="panel-0">
           <div class="panel-header" onclick="togglePanel(0)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 1</span><span class="panel-title">Site Visit Assessment</span></div>
@@ -346,7 +346,7 @@
           </div>
         </div>
 
-        <!-- STEP 2: INSTALLATION PREP -->
+        <!-- STEP 2 -->
         <div class="panel locked" id="panel-1">
           <div class="panel-header" onclick="togglePanel(1)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 2</span><span class="panel-title">Installation Preparation</span></div>
@@ -379,14 +379,14 @@
           </div>
         </div>
 
-        <!-- STEP 3: INSTALLATION CHECKLIST -->
+        <!-- STEP 3 -->
         <div class="panel locked" id="panel-2">
           <div class="panel-header" onclick="togglePanel(2)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 3</span><span class="panel-title">Installation Checklist</span></div>
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-2-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body">
-            <div class="info-card warning">Tick each item as the installation progresses. Each tick is saved immediately — you can close and return at any time.</div>
+            <div class="info-card warning">Tick each item as the installation progresses. Each tick is saved immediately.</div>
             <div class="section-label">Pre-Installation</div><div class="checklist" id="checklist-pre"></div>
             <hr class="section-sep">
             <div class="section-label">Structural &amp; Mounting</div><div class="checklist" id="checklist-structural"></div>
@@ -394,13 +394,11 @@
             <div class="section-label">Electrical</div><div class="checklist" id="checklist-electrical"></div>
             <hr class="section-sep">
             <div class="section-label">Commissioning</div><div class="checklist" id="checklist-commissioning"></div>
-            <div class="btn-row">
-              <button class="btn btn-primary" id="btn-start-install" onclick="startInstallation()">▶ Mark as In Progress</button>
-            </div>
+            <div class="btn-row"><button class="btn btn-primary" id="btn-start-install" onclick="startInstallation()">▶ Mark as In Progress</button></div>
           </div>
         </div>
 
-        <!-- STEP 4: COMPLETION -->
+        <!-- STEP 4 -->
         <div class="panel locked" id="panel-3">
           <div class="panel-header" onclick="togglePanel(3)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 4</span><span class="panel-title">Final Completion &amp; Sign-off</span></div>
@@ -426,20 +424,20 @@
           </div>
         </div>
 
-        <!-- STEP 5: HANDOVER -->
+        <!-- STEP 5 -->
         <div class="panel locked" id="panel-4">
           <div class="panel-header" onclick="togglePanel(4)">
             <div class="panel-title-group"><span class="panel-step-num">STEP 5</span><span class="panel-title">Customer Handover</span></div>
             <div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-4-badge"></span><span class="panel-toggle">▾</span></div>
           </div>
           <div class="panel-body">
-            <div class="section-label">Installer-Reported Compliance Details (COC)</div>
+            <div class="section-label">Compliance Details (COC)</div>
             <div class="form-grid">
               <div class="form-group"><label class="form-label">COC Number</label><input type="text" class="form-input" id="ho-cocnum" placeholder="e.g. COC-2025-00123"></div>
-              <div class="form-group"><label class="form-label">Issued By (Certified Electrician)</label><input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number"></div>
+              <div class="form-group"><label class="form-label">Issued By</label><input type="text" class="form-input" id="ho-cocby" placeholder="Electrician name / reg number"></div>
               <div class="form-group"><label class="form-label">COC Issue Date</label><input type="date" class="form-input" id="ho-cocdate"></div>
               <div class="form-group"><label class="form-label">Grid Application Ref</label><input type="text" class="form-input" id="ho-gridref" placeholder="NRS097 / municipal ref"></div>
-              <div class="form-group"><label class="form-label">Grid Approval Status</label><select class="form-select" id="ho-gridapproved"><option value="false">Pending</option><option value="true">Approved</option></select></div>
+              <div class="form-group"><label class="form-label">Grid Approved?</label><select class="form-select" id="ho-gridapproved"><option value="false">Pending</option><option value="true">Approved</option></select></div>
             </div>
             <hr class="section-sep">
             <div class="section-label">Customer Training</div>
@@ -466,7 +464,7 @@
           </div>
         </div>
 
-      </div><!-- /stage-panels -->
+      </div>
 
       <div style="padding:0 28px 28px">
         <div class="activity-log">
@@ -488,65 +486,44 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 const sbClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let jobs=[], currentJob=null, currentInstall=null, currentHandover=null, currentVisit=null;
-let currentInstallerProfile = null;
+let currentInstallerProfile=null;
 let activeFilter='all', _jobLoading=false, _pendingJobId=null;
+const MINOR_CHANGE_THRESHOLD=0.05, MAJOR_CHANGE_THRESHOLD=0.20;
 
-const MINOR_CHANGE_THRESHOLD = 0.05;
-const MAJOR_CHANGE_THRESHOLD = 0.20;
+function getChangeCategory(kw,batt){const m=Math.max(kw||0,batt||0);return m>=MAJOR_CHANGE_THRESHOLD?'major':m>=MINOR_CHANGE_THRESHOLD?'minor':'none';}
 
-function getChangeCategory(kwDiff, battDiff) {
-  const max = Math.max(kwDiff || 0, battDiff || 0);
-  if (max >= MAJOR_CHANGE_THRESHOLD) return 'major';
-  if (max >= MINOR_CHANGE_THRESHOLD) return 'minor';
-  return 'none';
-}
-
-let _actionInProgress = false;
-function beginAction(btnId){if(_actionInProgress)return false;_actionInProgress=true;const btn=document.getElementById(btnId);if(btn){btn.disabled=true;btn.style.opacity='0.6';}return true;}
-function endAction(btnId){_actionInProgress=false;const btn=document.getElementById(btnId);if(btn){btn.disabled=false;btn.style.opacity='';}}
+let _actionInProgress=false;
+function beginAction(id){if(_actionInProgress)return false;_actionInProgress=true;const b=document.getElementById(id);if(b){b.disabled=true;b.style.opacity='0.6';}return true;}
+function endAction(id){_actionInProgress=false;const b=document.getElementById(id);if(b){b.disabled=false;b.style.opacity='';}}
 
 (async function boot(){
   const {data:{session}}=await sbClient.auth.getSession();
   if(!session){window.location.href='nova-metrics_1.html';return;}
-  setSyncStatus('online');await loadJobs();setInterval(loadJobs,60000);
+  setSyncStatus('online');
+  await loadJobs();
+  setInterval(loadJobs,60000);
   sbClient.channel('design-approvals')
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'site_visits'},payload=>{
       if(!currentVisit||!payload.new||payload.new.id!==currentVisit.id)return;
-      const oldStatus=currentVisit.client_approval_status;
-      const newStatus=payload.new.client_approval_status;
-      if(newStatus===oldStatus)return;
+      const ns=payload.new.client_approval_status;
+      if(ns===currentVisit.client_approval_status)return;
       currentVisit={...currentVisit,...payload.new};
       renderDesignChangeAlert();renderApprovalBanner();renderPanel1DesignNote();
-      /* Bug 2 fix: also treat 'accepted' as approved (approval page may use either value) */
-      const isApproved = newStatus==='approved'||newStatus==='accepted';
-      const isDeclined = newStatus==='declined'||newStatus==='rejected';
-      if(isApproved){
-        toast('🎉 Client accepted the revised design — you can now proceed!','success');
-        /* Bug 3 fix: update ai_results with the now-approved revised specs */
-        (async()=>{
-          try{
-            const specPatch={};
-            if(currentVisit.recommended_system_kw) specPatch.system_size_kw=currentVisit.recommended_system_kw;
-            if(currentVisit.recommended_battery_kwh) specPatch.battery_capacity_kwh=currentVisit.recommended_battery_kwh;
-            if(Object.keys(specPatch).length&&currentJob){
-              await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,specPatch);
-              currentJob={...currentJob,...specPatch};
-              renderJobHeader();
-            }
-          }catch(e){}
-        })();
-      }
-      else if(isDeclined){toast('⚠ Client declined the revised design — contact them before proceeding.','error');}
+      const approved=ns==='approved'||ns==='accepted';
+      const declined=ns==='declined'||ns==='rejected';
+      if(approved){toast('🎉 Client accepted the revised design — you can now proceed!','success');}
+      else if(declined){toast('⚠ Client declined the revised design — contact them before proceeding.','error');}
     })
     .subscribe();
 })();
+
 async function doSignOut(){await sbClient.auth.signOut();window.location.href='nova-metrics_1.html';}
 
 async function sb(path,method='GET',body=null){
   const {data:{session}}=await sbClient.auth.getSession();
   const token=session?session.access_token:SUPA_ANON;
   const headers={'apikey':SUPA_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
-  if(method!=='GET') headers['Prefer']='return=representation';
+  if(method!=='GET')headers['Prefer']='return=representation';
   const opts={method,headers};if(body)opts.body=JSON.stringify(body);
   const res=await fetch(`${SUPA_URL}/rest/v1/${path}`,opts);
   if(!res.ok){const err=await res.text();throw new Error(err);}
@@ -556,11 +533,11 @@ const sbGet=(t,q='')=>sb(`${t}?${q}`);
 const sbPost=(t,d)=>sb(t,'POST',d);
 const sbPatch=(t,q,d)=>sb(`${t}?${q}`,'PATCH',d);
 
-function setSyncStatus(state){
+function setSyncStatus(s){
   const el=document.getElementById('sync-status');if(!el)return;
-  if(state==='online'){el.textContent='● online';el.style.color='var(--green)';}
-  if(state==='error'){el.textContent='● error';el.style.color='var(--red)';}
-  if(state==='loading'){el.textContent='● loading';el.style.color='var(--text3)';}
+  if(s==='online'){el.textContent='● online';el.style.color='var(--green)';}
+  else if(s==='error'){el.textContent='● error';el.style.color='var(--red)';}
+  else{el.textContent='● loading';el.style.color='var(--text3)';}
 }
 
 const STAGE_LABELS={lead:'Won — Awaiting Visit',accepted:'Won — Awaiting Visit',site_visit_scheduled:'Visit Scheduled',site_visit_complete:'Visit Complete',installation_scheduled:'Install Scheduled',installation_in_progress:'Installing',installation_complete:'Install Complete',handed_over:'Handed Over'};
@@ -571,33 +548,26 @@ const PANEL_UNLOCK=[
   ['installation_in_progress','installation_complete','handed_over'],
   ['installation_complete','handed_over'],
 ];
-const PANEL_BADGE_LABELS=[
-  {done:'Visit Complete',current:'Pending',locked:'Locked'},
-  {done:'Scheduled',current:'Pending',locked:'Locked'},
-  {done:'Complete',current:'In Progress',locked:'Locked'},
-  {done:'Signed Off',current:'Pending',locked:'Locked'},
-  {done:'✓ Handed Over',current:'Pending',locked:'Locked'},
-];
+const PANEL_BADGE={0:{done:'Visit Complete',current:'Pending',locked:'Locked'},1:{done:'Scheduled',current:'Pending',locked:'Locked'},2:{done:'Complete',current:'In Progress',locked:'Locked'},3:{done:'Signed Off',current:'Pending',locked:'Locked'},4:{done:'✓ Handed Over',current:'Pending',locked:'Locked'}};
 const STAGE_ORDER=['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'];
 function stageIndex(s){return STAGE_ORDER.indexOf(s);}
 
 async function loadJobs(){
   setSyncStatus('loading');
-  try{const data=await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');jobs=data||[];renderSidebar();setSyncStatus('online');}
+  try{const d=await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');jobs=d||[];renderSidebar();setSyncStatus('online');}
   catch(e){setSyncStatus('error');}
 }
 
-function setFilter(el,filter){document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');activeFilter=filter;renderSidebar();}
+function setFilter(el,f){document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');activeFilter=f;renderSidebar();}
 function filterJobs(){renderSidebar();}
 
 function renderSidebar(){
   const search=document.getElementById('search-input').value.toLowerCase();
   const list=document.getElementById('job-list');
-  const installStatuses=['installation_scheduled','installation_in_progress','installation_complete'];
+  const installS=['installation_scheduled','installation_in_progress','installation_complete'];
   const filtered=jobs.filter(j=>{
-    const matchFilter=activeFilter==='all'?true:activeFilter==='installation'?installStatuses.includes(j.job_status):activeFilter==='handed_over'?j.job_status==='handed_over':j.job_status===activeFilter;
-    const s=`${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase();
-    return matchFilter&&(!search||s.includes(search));
+    const mf=activeFilter==='all'?true:activeFilter==='installation'?installS.includes(j.job_status):activeFilter==='handed_over'?j.job_status==='handed_over':j.job_status===activeFilter;
+    return mf&&(!search||`${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase().includes(search));
   });
   document.getElementById('job-count').textContent=filtered.length;
   list.innerHTML='';
@@ -607,9 +577,7 @@ function renderSidebar(){
     card.className=`job-card ${currentJob?.ai_id===j.ai_id?'active':''}`;
     card.onclick=()=>openJob(j.ai_id);
     const stage=j.job_status||'lead';
-    card.innerHTML=`<div class="job-card-name">${j.client_name||'Unnamed'}</div>
-      <div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div>
-      <div class="job-card-meta"><span class="job-card-kw">${j.system_size_kw?j.system_size_kw+' kWp':'—'}</span><span class="stage-pill stage--${stage}">${STAGE_LABELS[stage]||stage}</span></div>`;
+    card.innerHTML=`<div class="job-card-name">${j.client_name||'Unnamed'}</div><div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div><div class="job-card-meta"><span class="job-card-kw">${j.system_size_kw?j.system_size_kw+' kWp':'—'}</span><span class="stage-pill stage--${stage}">${STAGE_LABELS[stage]||stage}</span></div>`;
     list.appendChild(card);
   });
 }
@@ -623,10 +591,7 @@ async function openJob(id){
     currentJob=data[0];
     currentInstallerProfile=null;
     if(currentJob.installer_id){
-      try{
-        const instRows=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation,whatsapp_number`);
-        if(instRows&&instRows[0])currentInstallerProfile=instRows[0];
-      }catch(e){}
+      try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}
     }
     const[visits,installs,handovers,logs]=await Promise.all([
       sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
@@ -642,7 +607,7 @@ async function openJob(id){
     if(ph)ph.style.display='none';if(ws)ws.style.display='flex';
     renderSidebar();
   }catch(e){toast('Error loading job: '+e.message,'error');currentJob=null;renderSidebar();}
-  finally{_jobLoading=false;if(_pendingJobId){const next=_pendingJobId;_pendingJobId=null;openJob(next);}}
+  finally{_jobLoading=false;if(_pendingJobId){const n=_pendingJobId;_pendingJobId=null;openJob(n);}}
 }
 async function refreshCurrentJob(){if(currentJob)openJob(currentJob.ai_id);}
 
@@ -674,7 +639,7 @@ function renderPanels(){
     const unlocked=unlock.includes(status);panel.classList.toggle('locked',!unlocked);
     const done={0:['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],1:['installation_scheduled','installation_in_progress','installation_complete','handed_over'],2:['installation_complete','handed_over'],3:['installation_complete','handed_over'],4:['handed_over']};
     let bState='locked';if(unlocked)bState=(done[i]||[]).includes(status)?'done':'current';
-    badge.textContent=PANEL_BADGE_LABELS[i][bState];
+    badge.textContent=PANEL_BADGE[i][bState];
     badge.className=`stage-pill ${bState==='done'?'stage--installation_complete':bState==='current'?'stage--installation_in_progress':'stage--lead'}`;
     if(bState==='current')panel.classList.add('open');
   });
@@ -687,40 +652,32 @@ function renderApprovalBanner(){
   const msg=document.getElementById('approval-alert-msg');
   if(!banner||!currentVisit)return;
   const v=currentVisit;
-  /* Bug 2 fix: normalise approval status — approval page may store 'accepted' or 'approved' */
-  const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
-  const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
+  const approved=v.client_approval_status==='approved'||v.client_approval_status==='accepted';
+  const declined=v.client_approval_status==='declined'||v.client_approval_status==='rejected';
   if(v.design_change_category==='major'){
-    if(clientApproved){
-      banner.className='approval-alert-banner show approved';
-      icon.textContent='🎉';msg.textContent='Client accepted the revised design — cleared to proceed with installation.';
-    }else if(clientDeclined){
-      banner.className='approval-alert-banner show declined';
-      icon.textContent='⚠';msg.textContent='Client declined the revised design — contact them before proceeding.';
-    }else if(v.client_notified_of_change_at){
+    if(approved){banner.className='approval-alert-banner show approved';icon.textContent='🎉';msg.textContent='Client accepted the revised design — cleared to proceed.';}
+    else if(declined){banner.className='approval-alert-banner show declined';icon.textContent='⚠';msg.textContent='Client declined the revised design — contact them before proceeding.';}
+    else if(v.client_notified_of_change_at){
       banner.className='approval-alert-banner show';
-      banner.style.background='rgba(74,158,255,.07)';banner.style.border='1px solid rgba(74,158,255,.2)';banner.style.color='var(--blue)';
-      icon.textContent='⏳';msg.textContent='Awaiting client approval on revised design — approval link sent, do not proceed until accepted.';
+      banner.style.cssText='display:flex;background:rgba(74,158,255,.07);border:1px solid rgba(74,158,255,.2);color:var(--blue);margin:16px 28px 0;padding:12px 18px;border-radius:6px;font-family:var(--mono);font-size:12px;align-items:center;gap:10px;font-weight:600';
+      icon.textContent='⏳';msg.textContent='Awaiting client approval — do not proceed until accepted.';
     }else{banner.className='approval-alert-banner';}
   }else{banner.className='approval-alert-banner';}
 }
 
 function renderNotificationStatus(){
   const v=currentVisit;
-  const dot=document.getElementById('notify-dot'),label=document.getElementById('notify-label'),sub=document.getElementById('notify-sub'),hint=document.getElementById('notify-hint');
+  const dot=document.getElementById('notify-dot'),label=document.getElementById('notify-label'),hint=document.getElementById('notify-hint');
   if(!dot||!label)return;
   if(v&&v.client_notified_at){
     dot.className='notify-dot sent';label.className='notify-label sent';
     const d=new Date(v.client_notified_at);
     label.textContent=`✓ Client notified ${d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})} at ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})} — by ${v.client_notified_by||'installer'}`;
-    if(sub)sub.textContent='';
     const btnE=document.getElementById('btn-notify-email');const btnW=document.getElementById('btn-notify-wa');
-    if(btnE){btnE.textContent='↻ Resend Email';btnE.disabled=false;}if(btnW){btnW.disabled=false;}
+    if(btnE){btnE.textContent='↻ Resend Email';btnE.disabled=false;}if(btnW)btnW.disabled=false;
     if(hint)hint.textContent='Client was notified. You can resend if needed.';
   }else{
-    dot.className='notify-dot unsent';label.className='notify-label unsent';
-    label.textContent='Client not yet notified';
-    if(sub)sub.textContent='';
+    dot.className='notify-dot unsent';label.className='notify-label unsent';label.textContent='Client not yet notified';
     checkNotifyReady();
   }
 }
@@ -729,14 +686,9 @@ function checkNotifyReady(){
   const ready=!!(getVal('sv-assessor')&&getVal('sv-datetime')&&currentJob?.client_email);
   const btnE=document.getElementById('btn-notify-email');const btnW=document.getElementById('btn-notify-wa');
   if(btnE)btnE.disabled=!ready;
-  const waReady=!!(getVal('sv-assessor')&&getVal('sv-datetime'));
-  if(btnW)btnW.disabled=!waReady;
+  if(btnW)btnW.disabled=!(getVal('sv-assessor')&&getVal('sv-datetime'));
   const hint=document.getElementById('notify-hint');
-  if(hint){
-    if(!currentJob?.client_email&&!currentJob?.client_phone)hint.textContent='No client email or phone on record — add them via the Proposal Portal first.';
-    else if(ready)hint.textContent=`Ready to send to ${currentJob.client_email}`;
-    else hint.textContent='Fill in assessor name and visit date/time to enable notifications.';
-  }
+  if(hint)hint.textContent=ready?`Ready to send to ${currentJob.client_email}`:'Fill in assessor name and visit date/time to enable notifications.';
 }
 
 async function sendVisitNotification(){
@@ -746,15 +698,12 @@ async function sendVisitNotification(){
   if(!assessor||!datetime){toast('Fill in assessor name and visit date/time first','error');return;}
   btn.disabled=true;btn.textContent='Sending...';
   try{
-    const res=await fetch(`${SUPA_URL}/functions/v1/send-visit-notification`,{
-      method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
-      body:JSON.stringify({client_name:currentJob.client_name,client_email:currentJob.client_email,client_phone:currentJob.client_phone||'',client_address:currentJob.client_address||'',assessor_name:assessor,visit_datetime:datetime,installer_name:currentJob.installer_name||'Your Solar Installer',installer_contact:currentInstallerProfile?.contact_number||currentJob.contact_number||'',system_size_kw:currentJob.system_size_kw||'',ai_id:currentJob.ai_id}),
-    });
+    const res=await fetch(`${SUPA_URL}/functions/v1/send-visit-notification`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({client_name:currentJob.client_name,client_email:currentJob.client_email,client_phone:currentJob.client_phone||'',client_address:currentJob.client_address||'',assessor_name:assessor,visit_datetime:datetime,installer_name:currentJob.installer_name||'Your Solar Installer',installer_contact:currentInstallerProfile?.contact_number||'',system_size_kw:currentJob.system_size_kw||'',ai_id:currentJob.ai_id})});
     const data=await res.json();
-    if(!data.success){throw new Error(data.error||'Failed to send');}
-    const notifyData={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
-    if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,notifyData);currentVisit={...currentVisit,...notifyData};}
-    else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...notifyData});currentVisit=r?.[0]||null;}
+    if(!data.success)throw new Error(data.error||'Failed to send');
+    const nd={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
+    if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,nd);currentVisit={...currentVisit,...nd};}
+    else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd});currentVisit=r?.[0]||null;}
     await logActivity('NOTIFICATION',`Visit email sent to ${currentJob.client_email}`,assessor);
     renderNotificationStatus();toast(`✓ Email sent to ${currentJob.client_email}`,'success');
   }catch(e){btn.disabled=false;btn.textContent='✉ Email Confirmation';toast('Failed: '+e.message,'error');}
@@ -764,49 +713,20 @@ function openWhatsApp(){
   const assessor=getVal('sv-assessor'),datetime=getVal('sv-datetime');
   if(!assessor||!datetime){toast('Fill in assessor name and visit date/time first','error');return;}
   const d=new Date(datetime);
-  const dateStr=d.toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const timeStr=d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
   const j=currentJob;
-  const msg=`Hi ${j.client_name||''},\n\nYour solar site assessment is confirmed.\n\n📅 *${dateStr} at ${timeStr}*\n📍 ${j.client_address||'Your property'}\n👷 Assessor: ${assessor}\n⚡ System: ${j.system_size_kw||''}kWp (as per your proposal)\n🔖 REF: ${String(j.ai_id).padStart(6,'0')}\n\n*Please ensure access to:*\n• Your roof\n• Electrical DB board\n\nThe assessment takes 30–60 minutes.\n\nFrom ${j.installer_name||'your solar installer'}`;
+  const msg=`Hi ${j.client_name||''},\n\nYour solar site assessment is confirmed.\n\n📅 *${d.toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}*\n📍 ${j.client_address||'Your property'}\n👷 Assessor: ${assessor}\n⚡ System: ${j.system_size_kw||''}kWp\n🔖 REF: ${String(j.ai_id).padStart(6,'0')}\n\n*Please ensure access to:*\n• Your roof\n• Electrical DB board\n\nFrom ${j.installer_name||'your solar installer'}`;
   const phone=(j.client_phone||'').replace(/\D/g,'').replace(/^0/,'27');
-  const url=`https://wa.me/${phone||''}?text=${encodeURIComponent(msg)}`;
-  window.open(url,'_blank');
-  (async()=>{
-    try{
-      const notifyData={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
-      if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,notifyData);currentVisit={...currentVisit,...notifyData};}
-      else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...notifyData});currentVisit=r?.[0]||null;}
-      await logActivity('NOTIFICATION',`WhatsApp visit message opened for ${j.client_name}`,assessor);
-      renderNotificationStatus();
-    }catch(e){}
-  })();
+  window.open(`https://wa.me/${phone||''}?text=${encodeURIComponent(msg)}`,'_blank');
+  (async()=>{try{const nd={client_notified_at:new Date().toISOString(),client_notified_by:assessor};if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,nd);currentVisit={...currentVisit,...nd};}else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd});currentVisit=r?.[0]||null;}renderNotificationStatus();}catch(e){}})();
 }
 
 function checkDesignChangeLive(){
   if(!currentJob)return;
-  const origKw=parseFloat(currentJob.system_size_kw)||0,origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
-  const newKw=parseFloat(getVal('sv-kw'))||0,newBatt=parseFloat(getVal('sv-battery'))||0;
-  const kwHint=document.getElementById('sv-kw-hint'),battHint=document.getElementById('sv-batt-hint');
-  if(origKw>0&&newKw>0){
-    const d=Math.abs((newKw-origKw)/origKw);
-    const cat=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';
-    if(kwHint){
-      if(cat==='major')kwHint.textContent=`🔴 ${newKw>origKw?'↑ larger':'↓ smaller'} than proposed ${origKw} kWp — ${(d*100).toFixed(0)}% (client approval required)`;
-      else if(cat==='minor')kwHint.textContent=`⚠ ${newKw>origKw?'↑ larger':'↓ smaller'} than proposed ${origKw} kWp — ${(d*100).toFixed(0)}% change`;
-      else kwHint.textContent=`✓ Matches proposed ${origKw} kWp`;
-      kwHint.style.color=cat==='major'?'var(--red)':cat==='minor'?'var(--amber)':'var(--green)';
-    }
-  }else if(kwHint)kwHint.textContent='';
-  if(origBatt>0&&newBatt>0){
-    const d=Math.abs((newBatt-origBatt)/origBatt);
-    const cat=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';
-    if(battHint){
-      if(cat==='major')battHint.textContent=`🔴 ${newBatt>origBatt?'↑ larger':'↓ smaller'} than proposed ${origBatt} kWh — ${(d*100).toFixed(0)}% (client approval required)`;
-      else if(cat==='minor')battHint.textContent=`⚠ ${newBatt>origBatt?'↑ larger':'↓ smaller'} than proposed ${origBatt} kWh — ${(d*100).toFixed(0)}% change`;
-      else battHint.textContent=`✓ Matches proposed ${origBatt} kWh`;
-      battHint.style.color=cat==='major'?'var(--red)':cat==='minor'?'var(--amber)':'var(--green)';
-    }
-  }else if(battHint)battHint.textContent='';
+  const ok=parseFloat(currentJob.system_size_kw)||0,ob=parseFloat(currentJob.battery_capacity_kwh)||0;
+  const nk=parseFloat(getVal('sv-kw'))||0,nb=parseFloat(getVal('sv-battery'))||0;
+  const kh=document.getElementById('sv-kw-hint'),bh=document.getElementById('sv-batt-hint');
+  if(ok>0&&nk>0){const d=Math.abs((nk-ok)/ok);const c=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';if(kh){kh.textContent=c==='major'?`🔴 ${nk>ok?'↑':'↓'} ${(d*100).toFixed(0)}% from proposed ${ok} kWp — client approval required`:c==='minor'?`⚠ ${(d*100).toFixed(0)}% change from proposed ${ok} kWp`:`✓ Matches proposed ${ok} kWp`;kh.style.color=c==='major'?'var(--red)':c==='minor'?'var(--amber)':'var(--green)';}}else if(kh)kh.textContent='';
+  if(ob>0&&nb>0){const d=Math.abs((nb-ob)/ob);const c=d>=MAJOR_CHANGE_THRESHOLD?'major':d>=MINOR_CHANGE_THRESHOLD?'minor':'none';if(bh){bh.textContent=c==='major'?`🔴 ${nb>ob?'↑':'↓'} ${(d*100).toFixed(0)}% from proposed ${ob} kWh — client approval required`:c==='minor'?`⚠ ${(d*100).toFixed(0)}% change from proposed ${ob} kWh`:`✓ Matches proposed ${ob} kWh`;bh.style.color=c==='major'?'var(--red)':c==='minor'?'var(--amber)':'var(--green)';}}else if(bh)bh.textContent='';
 }
 
 function renderDesignChangeAlert(){
@@ -825,28 +745,15 @@ function renderDesignChangeAlert(){
   alert.classList.add('visible');
   const cs=document.getElementById('dca-client-status');
   if(cs){
-    /* Bug 2 fix: normalise status values — approval page may store 'accepted' or 'approved' */
-    const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
-    const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
+    const approved=v.client_approval_status==='approved'||v.client_approval_status==='accepted';
+    const declined=v.client_approval_status==='declined'||v.client_approval_status==='rejected';
     if(v.client_notified_of_change_at){
       const nd=new Date(v.client_notified_of_change_at);
       const time=`${nd.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})} ${nd.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`;
-      if(clientApproved){
-        cs.className='approval-bar approved';cs.style.display='flex';
-        cs.innerHTML='<span>✓</span><span>Client accepted the revised design · '+time+'</span>';
-      }else if(clientDeclined){
-        cs.className='approval-bar declined';cs.style.display='flex';
-        cs.innerHTML='<span>✗</span><span>Client declined the revised design — contact them to discuss · '+time+'</span>';
-      }else if(v.design_change_category==='major'){
-        cs.className='approval-bar pending';cs.style.display='flex';
-        cs.innerHTML='<span class="pulse">⏳</span><span>Awaiting client approval · link sent '+time+' <button onclick="refreshCurrentJob()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:10px;margin-left:8px;text-decoration:underline">↻ Check status</button></span>';
-      }else if(v.design_change_category==='minor'){
-        cs.className='approval-bar notified';cs.style.display='flex';
-        cs.innerHTML='<span>✓</span><span>Client notified of minor adjustment · '+time+'</span>';
-      }else{
-        cs.className='approval-bar notified';cs.style.display='flex';
-        cs.innerHTML='<span>✓</span><span>Client notified — proceeding with original design · '+time+'</span>';
-      }
+      if(approved){cs.className='approval-bar approved';cs.style.display='flex';cs.innerHTML='<span>✓</span><span>Client accepted the revised design · '+time+'</span>';}
+      else if(declined){cs.className='approval-bar declined';cs.style.display='flex';cs.innerHTML='<span>✗</span><span>Client declined — contact them to discuss · '+time+'</span>';}
+      else if(v.design_change_category==='major'){cs.className='approval-bar pending';cs.style.display='flex';cs.innerHTML='<span class="pulse">⏳</span><span>Awaiting client approval · link sent '+time+' <button onclick="refreshCurrentJob()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:10px;margin-left:8px;text-decoration:underline">↻ Check</button></span>';}
+      else{cs.className='approval-bar notified';cs.style.display='flex';cs.innerHTML='<span>✓</span><span>Client notified · '+time+'</span>';}
     }else{cs.style.display='none';}
   }
 }
@@ -854,24 +761,13 @@ function renderDesignChangeAlert(){
 function renderPanel1DesignNote(){
   const note=document.getElementById('panel1-design-note');if(!note||!currentVisit)return;
   const v=currentVisit;if(!v.design_changed){note.style.display='none';return;}
+  const approved=v.client_approval_status==='approved'||v.client_approval_status==='accepted';
+  const declined=v.client_approval_status==='declined'||v.client_approval_status==='rejected';
+  const ok=v.original_proposal_kw||currentJob?.system_size_kw||'—';const nk=v.recommended_system_kw||'—';
   note.style.display='block';
-  /* Bug 2 fix: normalise status — approval page may store 'accepted' or 'approved' */
-  const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
-  const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
-  const origKw=v.original_proposal_kw||currentJob?.system_size_kw||'—';
-  const newKw=v.recommended_system_kw||'—';
-  if(clientDeclined){
-    note.className='info-card error';
-    note.textContent=`🔴 Client declined the revised design (${origKw} kWp → ${newKw} kWp) — contact them to discuss options before proceeding.`;
-  }else if(v.design_change_category==='major'&&!clientApproved){
-    note.className='info-card error';
-    note.textContent=`🔴 Major design change — awaiting client approval before installation. Original: ${origKw} kWp → Revised: ${newKw} kWp. Approval link sent to client.`;
-  }else{
-    note.className='info-card warning';
-    note.textContent=clientApproved
-      ?`✓ Client approved the revised design: ${origKw} → ${newKw} kWp. Plan installation to revised spec.`
-      :`⚠ Design change on record: ${origKw} → ${newKw} kWp. Reason: "${v.design_change_reason||'not yet documented'}". Plan installation to revised spec.`;
-  }
+  if(declined){note.className='info-card error';note.textContent=`🔴 Client declined the revised design (${ok} kWp → ${nk} kWp) — contact them before proceeding.`;}
+  else if(v.design_change_category==='major'&&!approved){note.className='info-card error';note.textContent=`🔴 Major design change — awaiting client approval. Original: ${ok} kWp → Revised: ${nk} kWp. Approval link sent.`;}
+  else{note.className='info-card warning';note.textContent=approved?`✓ Client approved the revised design: ${ok} → ${nk} kWp.`:`⚠ Design change on record: ${ok} → ${nk} kWp. Reason: "${v.design_change_reason||'not yet documented'}"`.;}
 }
 
 async function acknowledgeDesignChange(){
@@ -882,7 +778,7 @@ async function acknowledgeDesignChange(){
     currentVisit={...currentVisit,design_change_reason:reason,design_change_acknowledged:true};
     await logActivity('DESIGN CHANGE',`Change acknowledged. Reason: ${reason}`,getVal('sv-assessor'));
     const a=document.getElementById('dca-ack-status');if(a)a.style.display='block';
-    const alert=document.getElementById('design-change-alert');if(alert){alert.style.borderColor='rgba(46,204,138,.25)';alert.style.background='rgba(46,204,138,.04)';}
+    const al=document.getElementById('design-change-alert');if(al){al.style.borderColor='rgba(46,204,138,.25)';al.style.background='rgba(46,204,138,.04)';}
     const r=document.getElementById('design-change-reason');if(r)r.readOnly=true;
     renderPanel1DesignNote();toast('Design change documented','success');
   }catch(e){toast('Error: '+e.message,'error');}
@@ -895,118 +791,38 @@ async function dismissDesignChange(){
     await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{design_change_acknowledged:true,design_change_reason:'Installer chose to proceed with original proposal design.'});
     currentVisit={...currentVisit,design_change_acknowledged:true};
     await logActivity('DESIGN CHANGE','Installer confirmed original design — site differences noted');
-    const alert=document.getElementById('design-change-alert');if(alert)alert.classList.remove('visible');
+    const al=document.getElementById('design-change-alert');if(al)al.classList.remove('visible');
     toast('Proceeding with original design','info');
   }catch(e){toast('Error: '+e.message,'error');}
 }
 
+// ── DESIGN CHANGE NOTIFICATION ─────────────────────────────────────────────
+// Calls generate-proposal-revision (engine calculates, client emailed immediately)
 async function sendDesignChangeNotification(job, visit, category) {
-  if (!job.client_email && category === 'major') return;
-  if (category === 'none') return; // no change, nothing to send
-  try {
-    // Call the full revised-proposal engine — this recalculates all financials,
-    // generates a complete PDF, and emails the client with Approve/Decline links
-    const res = await fetch(`${SUPA_URL}/functions/v1/generate-revised-proposal`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-      body: JSON.stringify({
-        ai_id:          job.ai_id,
-        site_visit_id:  visit.id,
+  if(category==='none'||!job.client_email)return;
+  try{
+    const res=await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+      body:JSON.stringify({
+        client_name:job.client_name,client_email:job.client_email,client_address:job.client_address||'',
+        original_kw:visit.original_proposal_kw||job.system_size_kw,original_batt:visit.original_proposal_batt_kwh||job.battery_capacity_kwh,
+        new_kw:visit.recommended_system_kw,new_batt:visit.recommended_battery_kwh,
+        change_category:category,change_reason:visit.design_change_reason||'',
+        installer_name:job.installer_name||'Your Solar Installer',ai_id:job.ai_id,visit_id:visit.id,
       }),
     });
-    const data = await res.json();
-    if (data.success) {
-      // Store the approval token and revised proposal reference on the visit record
-      const patch = {
-        client_notified_of_change_at: new Date().toISOString(),
-        design_change_category:       category,
-      };
-      if (data.approval_token)   patch.client_approval_token   = data.approval_token;
-      if (data.new_ai_id)        patch.revised_proposal_ai_id  = data.new_ai_id;
-      if (data.pdf_url)          patch.revised_pdf_url          = data.pdf_url;
-      await sbPatch('site_visits', `id=eq.${visit.id}`, patch);
-      currentVisit = { ...currentVisit, ...patch };
-
-      // For minor changes: immediately update the original job record with revised specs
-      // (major changes wait for client approval via the realtime listener)
-      if (category === 'minor' && visit.recommended_system_kw) {
-        const specPatch = {};
-        if (visit.recommended_system_kw)   specPatch.system_size_kw        = visit.recommended_system_kw;
-        if (visit.recommended_battery_kwh) specPatch.battery_capacity_kwh  = visit.recommended_battery_kwh;
-        if (data.financials?.new_total_cost)     specPatch.total_cost     = data.financials.new_total_cost;
-        if (data.financials?.new_annual_savings) specPatch.annual_savings = data.financials.new_annual_savings;
-        if (Object.keys(specPatch).length) {
-          try { await sbPatch('ai_results', `ai_id=eq.${job.ai_id}`, specPatch); currentJob = { ...currentJob, ...specPatch }; } catch(e) {}
-        }
-      }
-
-      await logActivity(
-        'REVISED PROPOSAL',
-        category === 'major'
-          ? `Full revised proposal generated (${origKwLabel(visit)} → ${visit.recommended_system_kw} kWp). PDF sent to ${job.client_email} — awaiting approval.`
-          : `Revised proposal generated (minor adjustment). PDF sent to ${job.client_email}.`,
-        visit.assessor_name
-      );
-
-      toast(
-        category === 'major'
-          ? '📄 Revised proposal PDF sent — awaiting client approval'
-          : '📄 Revised proposal PDF sent to client',
-        category === 'major' ? 'info' : 'success'
-      );
-
-      renderDesignChangeAlert();
-      renderApprovalBanner();
-    } else {
-      throw new Error(data.error || 'Revised proposal generation failed');
+    const data=await res.json();
+    if(data.success){
+      const patch={client_notified_of_change_at:new Date().toISOString(),design_change_category:category};
+      if(data.approval_token)patch.client_approval_token=data.approval_token;
+      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);
+      currentVisit={...currentVisit,...patch};
+      await logActivity('DESIGN NOTIFICATION',category==='major'?'Client sent approval request for major design change':category==='minor'?'Client notified of minor design adjustment':'Client notified',visit.assessor_name);
+      toast(category==='major'?'⏳ Approval request sent — awaiting client response':category==='minor'?'✓ Client notified of minor adjustment':'✓ Client notified',category==='major'?'info':'success');
+      renderDesignChangeAlert();renderApprovalBanner();
     }
-  } catch (e) {
-    console.error('sendDesignChangeNotification error:', e);
-    toast('⚠ Could not send revised proposal: ' + e.message, 'error');
-  }
-}
-
-// Helper — gets the original kWp label for the log message
-function origKwLabel(visit) {
-  return visit.original_proposal_kw || currentJob?.system_size_kw || '?';
-}
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-      body: JSON.stringify({
-        client_name: job.client_name, client_email: job.client_email, client_address: job.client_address||'',
-        original_kw: visit.original_proposal_kw||job.system_size_kw, original_batt: visit.original_proposal_batt_kwh||job.battery_capacity_kwh,
-        new_kw: visit.recommended_system_kw, new_batt: visit.recommended_battery_kwh,
-        change_category: category, change_reason: visit.design_change_reason||'',
-        installer_name: job.installer_name||'Your Solar Installer', ai_id: job.ai_id, visit_id: visit.id,
-        /* Bug 3 fix: pass original financial data so edge function can include revised quote context */
-        send_revised_quote: category !== 'none',
-        original_total_cost: job.total_cost||null,
-        original_annual_saving: job.annual_savings||null,
-        original_monthly_saving: job.monthly_savings||null,
-        original_payback_years: job.payback_years||null,
-        original_lifetime_saving: job.lifetime_savings||null,
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      const patch = { client_notified_of_change_at: new Date().toISOString(), design_change_category: category };
-      if (data.approval_token) patch.client_approval_token = data.approval_token;
-      await sbPatch('site_visits', `id=eq.${visit.id}`, patch);
-      currentVisit = { ...currentVisit, ...patch };
-      /* Bug 3 fix: for minor changes, update ai_results specs immediately (no approval needed) */
-      if(category==='minor'&&visit.recommended_system_kw){
-        const specPatch={};
-        if(visit.recommended_system_kw) specPatch.system_size_kw=visit.recommended_system_kw;
-        if(visit.recommended_battery_kwh) specPatch.battery_capacity_kwh=visit.recommended_battery_kwh;
-        if(Object.keys(specPatch).length){
-          try{await sbPatch('ai_results',`ai_id=eq.${job.ai_id}`,specPatch);currentJob={...currentJob,...specPatch};}catch(e){}
-        }
-      }
-      await logActivity('DESIGN NOTIFICATION', category==='major'?'Client sent approval request for major design change — revised quote included':category==='minor'?'Client notified of minor design adjustment — revised quote included':'Client notified — proceeding with original design', visit.assessor_name);
-      toast(category==='major'?'⏳ Approval request sent — awaiting client response':category==='minor'?'✓ Client notified of minor adjustment':'✓ Client notified — proceeding with original design', category==='major'?'info':'success');
-      renderDesignChangeAlert(); renderApprovalBanner();
-    }
-  } catch (e) { console.error('sendDesignChangeNotification error:', e); }
+  }catch(e){console.error('sendDesignChangeNotification error:',e);}
 }
 
 function prefillForms(){
@@ -1028,27 +844,22 @@ const CHECKLIST_ITEMS={
   electrical:['DC cabling routed and secured','MC4 connectors crimped and tested','Isolators installed (DC and AC)','Inverter mounted and secured','Battery mounted and secured','AC wiring complete to DB board','Earth bonding complete','Cable management / conduit installed','All terminals torqued to spec'],
   commissioning:['Inverter powered on and configured','Battery charged and communicating','System monitoring app connected','Export / import confirmed on meter','All alerts / faults cleared','Grid voltage and frequency within range','Customer walkthrough completed','Site cleaned up'],
 };
-function buildChecklist(){Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{const c=document.getElementById(`checklist-${section}`);if(!c)return;c.innerHTML='';items.forEach((item,idx)=>{const row=document.createElement('div');row.className='check-item';row.innerHTML=`<input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})"><label for="chk-${section}-${idx}" class="check-item-label">${item}</label><input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">`;c.appendChild(row);});})}
+function buildChecklist(){Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{const c=document.getElementById(`checklist-${section}`);if(!c)return;c.innerHTML='';items.forEach((item,idx)=>{const row=document.createElement('div');row.className='check-item';row.innerHTML=`<input type="checkbox" id="chk-${section}-${idx}" onchange="updateCheck(this,'${section}',${idx})"><label for="chk-${section}-${idx}" class="check-item-label">${item}</label><input type="text" class="check-item-notes" placeholder="Notes" onchange="saveChecklistToDb()">`;c.appendChild(row);});});}
 function updateCheck(cb,section,idx){cb.closest('.check-item').classList.toggle('checked',cb.checked);saveChecklistToDb();}
-function reloadChecklist(saved){saved.forEach(entry=>{const[section,idx]=entry.key.split('-');const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;cb.checked=entry.done;cb.closest('.check-item').classList.toggle('checked',entry.done);const note=cb.closest('.check-item').querySelector('.check-item-notes');if(note&&entry.notes)note.value=entry.notes;});}
-function collectChecklist(){const result=[];Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{items.forEach((item,idx)=>{const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;result.push({key:`${section}-${idx}`,item,done:cb.checked,notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||''});});});return result;}
+function reloadChecklist(saved){saved.forEach(e=>{const[s,i]=e.key.split('-');const cb=document.getElementById(`chk-${s}-${i}`);if(!cb)return;cb.checked=e.done;cb.closest('.check-item').classList.toggle('checked',e.done);const n=cb.closest('.check-item').querySelector('.check-item-notes');if(n&&e.notes)n.value=e.notes;});}
+function collectChecklist(){const r=[];Object.entries(CHECKLIST_ITEMS).forEach(([section,items])=>{items.forEach((item,idx)=>{const cb=document.getElementById(`chk-${section}-${idx}`);if(!cb)return;r.push({key:`${section}-${idx}`,item,done:cb.checked,notes:cb.closest('.check-item').querySelector('.check-item-notes')?.value||''});});});return r;}
 async function saveChecklistToDb(){if(!currentInstall)return;try{await sbPatch('installations',`id=eq.${currentInstall.id}`,{install_checklist:collectChecklist()});}catch(e){}}
 
 async function saveSiteVisitDraft(){await _saveSiteVisit(false);}
 async function saveInstallPrepDraft(){await _saveInstallPrep(false);}
 async function saveCompletionDraft(){
   if(!currentJob||!currentInstall)return;
-  const data={final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():null,install_checklist:collectChecklist()};
-  try{await sbPatch('installations',`id=eq.${currentInstall.id}`,data);toast('Progress saved','info');}catch(e){toast('Save failed: '+e.message,'error');}
+  try{await sbPatch('installations',`id=eq.${currentInstall.id}`,{final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():null,install_checklist:collectChecklist()});toast('Progress saved','info');}catch(e){toast('Save failed: '+e.message,'error');}
 }
 async function saveHandoverDraft(){
   if(!currentJob)return;
-  const hoData={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by')};
-  try{
-    if(currentHandover){await sbPatch('handovers',`id=eq.${currentHandover.id}`,hoData);}
-    else{const res=await sbPost('handovers',hoData);currentHandover=res?.[0]||null;}
-    toast('Progress saved','info');
-  }catch(e){toast('Save failed: '+e.message,'error');}
+  const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by')};
+  try{if(currentHandover){await sbPatch('handovers',`id=eq.${currentHandover.id}`,hd);}else{const r=await sbPost('handovers',hd);currentHandover=r?.[0]||null;}toast('Progress saved','info');}catch(e){toast('Save failed: '+e.message,'error');}
 }
 
 async function completeSiteVisit(){if(!beginAction('btn-complete-sv'))return;try{await _saveSiteVisit(true);}finally{endAction('btn-complete-sv');}}
@@ -1056,21 +867,20 @@ async function completeSiteVisit(){if(!beginAction('btn-complete-sv'))return;try
 async function _saveSiteVisit(complete){
   if(!currentJob)return;
   const savingEl=document.getElementById('sv-saving');if(savingEl)savingEl.style.display='inline';
-  const newKw=parseFloat(getVal('sv-kw'))||null,newBatt=parseFloat(getVal('sv-battery'))||null;
-  const origKw=parseFloat(currentJob.system_size_kw)||0,origBatt=parseFloat(currentJob.battery_capacity_kwh)||0;
-  const kwDiff=newKw&&origKw?Math.abs((newKw-origKw)/origKw):0;
-  const battDiff=newBatt&&origBatt?Math.abs((newBatt-origBatt)/origBatt):0;
-  const designChanged=kwDiff>MINOR_CHANGE_THRESHOLD||battDiff>MINOR_CHANGE_THRESHOLD;
-  const changeCategory=getChangeCategory(kwDiff,battDiff);
-  const visitData={job_id:String(currentJob.ai_id),assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',shading_notes:getVal('sv-shadingnotes'),recommended_system_kw:newKw,recommended_battery_kwh:newBatt,additional_notes:getVal('sv-notes'),completed_at:complete?new Date().toISOString():null,design_changed:designChanged,original_proposal_kw:origKw||null,original_proposal_batt_kwh:origBatt||null};
+  const nk=parseFloat(getVal('sv-kw'))||null,nb=parseFloat(getVal('sv-battery'))||null;
+  const ok=parseFloat(currentJob.system_size_kw)||0,ob=parseFloat(currentJob.battery_capacity_kwh)||0;
+  const kd=nk&&ok?Math.abs((nk-ok)/ok):0,bd=nb&&ob?Math.abs((nb-ob)/ob):0;
+  const changed=kd>MINOR_CHANGE_THRESHOLD||bd>MINOR_CHANGE_THRESHOLD;
+  const cat=getChangeCategory(kd,bd);
+  const vd={job_id:String(currentJob.ai_id),assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',shading_notes:getVal('sv-shadingnotes'),recommended_system_kw:nk,recommended_battery_kwh:nb,additional_notes:getVal('sv-notes'),completed_at:complete?new Date().toISOString():null,design_changed:changed,original_proposal_kw:ok||null,original_proposal_batt_kwh:ob||null};
   try{
-    if(currentVisit){delete visitData.client_notified_at;delete visitData.client_notified_by;await sbPatch('site_visits',`id=eq.${currentVisit.id}`,visitData);currentVisit={...currentVisit,...visitData};}
-    else{const res=await sbPost('site_visits',visitData);currentVisit=res?.[0]||null;}
+    if(currentVisit){delete vd.client_notified_at;delete vd.client_notified_by;await sbPatch('site_visits',`id=eq.${currentVisit.id}`,vd);currentVisit={...currentVisit,...vd};}
+    else{const r=await sbPost('site_visits',vd);currentVisit=r?.[0]||null;}
     if(complete){
       await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'site_visit_complete'});
-      await logActivity('SITE VISIT',changeCategory==='major'?`Site visit complete — MAJOR design change (${origKw}→${newKw} kWp). Client approval required.`:changeCategory==='minor'?`Site visit complete — minor design adjustment (${origKw}→${newKw} kWp).`:'Site visit complete — no design changes.',visitData.assessor_name);
-      toast(changeCategory==='major'?'Site visit complete — client approval required for major change':changeCategory==='minor'?'Site visit complete — minor adjustment noted':'Site visit completed!',changeCategory==='major'?'info':'success');
-      if(currentVisit)await sendDesignChangeNotification(currentJob,currentVisit,changeCategory);
+      await logActivity('SITE VISIT',cat==='major'?`Site visit complete — MAJOR change (${ok}→${nk} kWp). Client approval required.`:cat==='minor'?`Site visit complete — minor adjustment (${ok}→${nk} kWp).`:'Site visit complete.',vd.assessor_name);
+      toast(cat==='major'?'Site visit complete — client approval required':cat==='minor'?'Site visit complete — minor adjustment noted':'Site visit completed!',cat==='major'?'info':'success');
+      if(currentVisit&&cat!=='none')await sendDesignChangeNotification(currentJob,currentVisit,cat);
       await openJob(currentJob.ai_id);
     }else{toast('Progress saved','info');}
   }catch(e){toast('Error: '+e.message,'error');}
@@ -1080,9 +890,9 @@ async function _saveSiteVisit(complete){
 async function scheduleInstallation(){if(!beginAction('btn-schedule'))return;try{await _saveInstallPrep(true);}finally{endAction('btn-schedule');}}
 async function _saveInstallPrep(schedule){
   if(!currentJob)return;
-  const instData={job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),scheduled_date:getVal('inst-date')||null,panels_brand:getVal('inst-panelbrand'),panels_watt:parseInt(getVal('inst-panelwatt'))||null,panels_qty:parseInt(getVal('inst-panelqty'))||null,inverter_brand:getVal('inst-inverterbrand'),inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,battery_brand:getVal('inst-batterybrand'),battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,battery_qty:parseInt(getVal('inst-batteryqty'))||null,install_checklist:collectChecklist()};
+  const id={job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),scheduled_date:getVal('inst-date')||null,panels_brand:getVal('inst-panelbrand'),panels_watt:parseInt(getVal('inst-panelwatt'))||null,panels_qty:parseInt(getVal('inst-panelqty'))||null,inverter_brand:getVal('inst-inverterbrand'),inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,battery_brand:getVal('inst-batterybrand'),battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,battery_qty:parseInt(getVal('inst-batteryqty'))||null,install_checklist:collectChecklist()};
   try{
-    if(currentInstall){await sbPatch('installations',`id=eq.${currentInstall.id}`,instData);}else{const res=await sbPost('installations',instData);currentInstall=res?.[0]||null;}
+    if(currentInstall){await sbPatch('installations',`id=eq.${currentInstall.id}`,id);}else{const r=await sbPost('installations',id);currentInstall=r?.[0]||null;}
     if(schedule){await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_scheduled',installation_date:getVal('inst-date')||null,assigned_team:getVal('inst-teamlead')});await logActivity('INSTALL PREP',`Installation scheduled for ${getVal('inst-date')}`,getVal('inst-teamlead'));toast('Installation scheduled!','success');await openJob(currentJob.ai_id);}
     else{toast('Progress saved','info');}
   }catch(e){toast('Error: '+e.message,'error');}
@@ -1090,19 +900,15 @@ async function _saveInstallPrep(schedule){
 
 async function startInstallation(){
   if(!beginAction('btn-start-install'))return;
-  try{
-    if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,{started_at:new Date().toISOString()});
-    await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_in_progress'});
-    await logActivity('INSTALLATION','Installation marked as in progress');
-    toast('Installation started!','success');await openJob(currentJob.ai_id);
-  }catch(e){toast('Error: '+e.message,'error');}finally{endAction('btn-start-install');}
+  try{if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,{started_at:new Date().toISOString()});await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_in_progress'});await logActivity('INSTALLATION','Installation marked as in progress');toast('Installation started!','success');await openJob(currentJob.ai_id);}
+  catch(e){toast('Error: '+e.message,'error');}finally{endAction('btn-start-install');}
 }
 
 async function completeInstallation(){
   if(!beginAction('btn-complete-install'))return;
   try{
-    const compData={final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),install_checklist:collectChecklist()};
-    if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,compData);
+    const cd={final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),install_checklist:collectChecklist()};
+    if(currentInstall)await sbPatch('installations',`id=eq.${currentInstall.id}`,cd);
     await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'installation_complete'});
     await logActivity('COMPLETION',`Final sign-off by ${getVal('comp-inspector')}`,getVal('comp-inspector'));
     toast('Installation complete! Proceed to handover.','success');await openJob(currentJob.ai_id);
@@ -1112,8 +918,8 @@ async function completeInstallation(){
 async function completeHandover(){
   if(!beginAction('btn-complete-handover'))return;
   try{
-    const hoData={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString()};
-    if(currentHandover){await sbPatch('handovers',`id=eq.${currentHandover.id}`,hoData);}else{const res=await sbPost('handovers',hoData);currentHandover=res?.[0]||null;}
+    const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString()};
+    if(currentHandover){await sbPatch('handovers',`id=eq.${currentHandover.id}`,hd);}else{const r=await sbPost('handovers',hd);currentHandover=r?.[0]||null;}
     await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,{job_status:'handed_over'});
     await logActivity('HANDOVER',`Handed over by ${getVal('ho-by')}`,getVal('ho-by'));
     toast('🎉 Job handed over!','success');
@@ -1122,61 +928,30 @@ async function completeHandover(){
     if(currentJob.client_email){
       const ip=currentInstallerProfile;
       try{
-        const emailRes=await fetch(`${SUPA_URL}/functions/v1/send-handover-email`,{
-          method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
-          body:JSON.stringify({
-            client_name:currentJob.client_name,client_email:currentJob.client_email,client_address:currentJob.client_address||'',
-            installer_name:currentJob.installer_name||'Your Solar Installer',
-            installer_contact_person:ip?.contact_person||'',
-            installer_phone:ip?.contact_number||currentJob.contact_number||'',
-            installer_email:ip?.contact_email||currentJob.contact_email||'',
-            installer_registration:ip?.registration_number||'',
-            installer_accreditation:ip?.accreditation||'',
-            system_kw:currentInstall?.final_system_kw||currentJob.system_size_kw||'',
-            battery_kwh:currentInstall?.final_battery_kwh||currentJob.battery_capacity_kwh||'',
-            panels_qty:currentInstall?.panels_qty||'',panels_brand:currentInstall?.panels_brand||'',panels_watt:currentInstall?.panels_watt||'',
-            inverter_brand:currentInstall?.inverter_brand||'',inverter_kw:currentInstall?.inverter_kw||'',
-            battery_qty:currentInstall?.battery_qty||'',battery_brand:currentInstall?.battery_brand||'',battery_unit_kwh:currentInstall?.battery_kwh||'',
-            coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate'),
-            grid_application:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved'),
-            handed_over_by:getVal('ho-by'),handover_date:new Date().toISOString(),ai_id:currentJob.ai_id,
-          }),
-        });
-        const emailData=await emailRes.json();
-        const statusEl=document.getElementById('handover-email-status');
-        if(emailData.success){
-          await logActivity('HANDOVER EMAIL',`Handover certificate emailed to ${currentJob.client_email}`);
-          if(statusEl){statusEl.style.display='block';statusEl.textContent=`✓ Handover certificate emailed to ${currentJob.client_email}`;}
-          toast(`✓ Handover email sent to ${currentJob.client_email}`,'success');
-        }else{
-          if(statusEl){statusEl.style.display='block';statusEl.className='info-card warning';statusEl.textContent=`⚠ Handover saved but email not sent — ${emailData.error||'unknown error'}`;}
-        }
-      }catch(emailErr){
-        const statusEl=document.getElementById('handover-email-status');
-        if(statusEl){statusEl.style.display='block';statusEl.className='info-card warning';statusEl.textContent='⚠ Handover saved but email could not be sent. Print and share the document manually.';}
-      }
+        const er=await fetch(`${SUPA_URL}/functions/v1/send-handover-email`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({client_name:currentJob.client_name,client_email:currentJob.client_email,client_address:currentJob.client_address||'',installer_name:currentJob.installer_name||'Your Solar Installer',installer_contact_person:ip?.contact_person||'',installer_phone:ip?.contact_number||'',installer_email:ip?.contact_email||'',installer_registration:ip?.registration_number||'',installer_accreditation:ip?.accreditation||'',system_kw:currentInstall?.final_system_kw||currentJob.system_size_kw||'',battery_kwh:currentInstall?.final_battery_kwh||currentJob.battery_capacity_kwh||'',panels_qty:currentInstall?.panels_qty||'',panels_brand:currentInstall?.panels_brand||'',panels_watt:currentInstall?.panels_watt||'',inverter_brand:currentInstall?.inverter_brand||'',inverter_kw:currentInstall?.inverter_kw||'',battery_qty:currentInstall?.battery_qty||'',battery_brand:currentInstall?.battery_brand||'',battery_unit_kwh:currentInstall?.battery_kwh||'',coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate'),grid_application:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved'),handed_over_by:getVal('ho-by'),handover_date:new Date().toISOString(),ai_id:currentJob.ai_id})});
+        const ed=await er.json();
+        const se=document.getElementById('handover-email-status');
+        if(ed.success){await logActivity('HANDOVER EMAIL',`Handover certificate emailed to ${currentJob.client_email}`);if(se){se.style.display='block';se.textContent=`✓ Handover certificate emailed to ${currentJob.client_email}`;}}
+        else if(se){se.style.display='block';se.className='info-card warning';se.textContent=`⚠ Handover saved but email not sent — ${ed.error||'unknown error'}`;}
+      }catch(emailErr){const se=document.getElementById('handover-email-status');if(se){se.style.display='block';se.className='info-card warning';se.textContent='⚠ Handover saved but email could not be sent. Print manually.';}}
     }
     await openJob(currentJob.ai_id);
   }catch(e){toast('Error: '+e.message,'error');}finally{endAction('btn-complete-handover');}
 }
 
-// ── HANDOVER DOCUMENT ─────────────────────────────────────────────────────
 function renderHandoverDoc(){
-  const j=currentJob,inst=currentInstall,ho=currentHandover,v=currentVisit;
-  const ip=currentInstallerProfile;
-  const totalKwp=inst?.final_system_kw||v?.recommended_system_kw||j?.system_size_kw||'—';
-  const totalBattery=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
-  const battPerUnit=inst?.battery_kwh||'—';
+  const j=currentJob,inst=currentInstall,ho=currentHandover,v=currentVisit,ip=currentInstallerProfile;
+  const kwp=inst?.final_system_kw||v?.recommended_system_kw||j?.system_size_kw||'—';
+  const batt=inst?.final_battery_kwh||v?.recommended_battery_kwh||j?.battery_capacity_kwh||'—';
   const now=new Date().toLocaleDateString('en-ZA',{day:'2-digit',month:'long',year:'numeric'});
-  const designNote=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${totalKwp} kWp / ${totalBattery} kWh. Reason: ${v.design_change_reason}</div>${v.client_approval_status==='approved'?'<div style="font-size:10px;color:var(--green);margin-top:6px">✓ Client approved the revised design.</div>':''}</div>`:'';
+  const dn=(v?.design_changed&&v?.design_change_reason)?`<div style="margin-top:16px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:5px"><div style="font-family:var(--mono);font-size:9px;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Design Change on Record</div><div style="font-size:11px;color:var(--text2)">Originally proposed: ${v.original_proposal_kw||j?.system_size_kw||'—'} kWp / ${v.original_proposal_batt_kwh||j?.battery_capacity_kwh||'—'} kWh. As-installed: ${kwp} kWp / ${batt} kWh. Reason: ${v.design_change_reason}</div></div>`:'';
   const isVerified=!!(ip?.registration_number&&ip?.accreditation);
-  
-  // Use installer company name in the document header — not Nova Metrics branding
-  const installerName=j?.installer_name||ip?.installer_name||'Solar Installer';
+  const vbadge=isVerified?`<div class="verified-badge" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;background:rgba(46,204,138,.1);border:1px solid rgba(46,204,138,.35);border-radius:5px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);letter-spacing:.05em"><span style="font-size:13px">✓</span> VERIFIED INSTALLER</div>`:'';
+  const iname=j?.installer_name||ip?.installer_name||'Solar Installer';
   const doc=document.getElementById('handover-doc');if(!doc)return;
   doc.innerHTML=`
-<div class="hd-logo">${installerName}</div>
-<div class="hd-title">Solar Installation Handover Summary & Record</div>
+<div class="hd-logo">${iname}</div>
+<div class="hd-title">Solar Installation Handover Certificate</div>
 <div class="hd-grid">
   <div>
     <div class="hd-section-title">Customer Details</div>
@@ -1188,17 +963,17 @@ function renderHandoverDoc(){
   </div>
   <div>
     <div class="hd-section-title">System Installed</div>
-    <div class="hd-row"><span class="hd-row-key">Total Capacity</span><span class="hd-row-val">${totalKwp} kWp</span></div>
-    <div class="hd-row"><span class="hd-row-key">Battery Storage</span><span class="hd-row-val">${totalBattery} kWh</span></div>
+    <div class="hd-row"><span class="hd-row-key">Total Capacity</span><span class="hd-row-val">${kwp} kWp</span></div>
+    <div class="hd-row"><span class="hd-row-key">Battery Storage</span><span class="hd-row-val">${batt} kWh</span></div>
     <div class="hd-row"><span class="hd-row-key">Panels</span><span class="hd-row-val">${inst?.panels_qty||'—'} × ${inst?.panels_brand||'—'} ${inst?.panels_watt||'—'}W</span></div>
     <div class="hd-row"><span class="hd-row-key">Inverter</span><span class="hd-row-val">${inst?.inverter_brand||'—'} ${inst?.inverter_kw||'—'} kW</span></div>
-    <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty||'—'} × ${inst?.battery_brand||'—'} ${battPerUnit} kWh</span></div>
+    <div class="hd-row"><span class="hd-row-key">Battery</span><span class="hd-row-val">${inst?.battery_qty||'—'} × ${inst?.battery_brand||'—'} ${inst?.battery_kwh||'—'} kWh</span></div>
     <div class="hd-row"><span class="hd-row-key">Phase</span><span class="hd-row-val">${v?.phase||'—'} phase</span></div>
   </div>
 </div>
-${designNote}
+${dn}
 <div style="margin-top:20px">
-  <div class="hd-section-title">Installer-Reported Compliance &amp; Approvals</div>
+  <div class="hd-section-title">Compliance &amp; Approvals</div>
   <div class="hd-grid">
     <div>
       <div class="hd-row"><span class="hd-row-key">COC Number</span><span class="hd-row-val">${ho?.coc_number||getVal('ho-cocnum')||'—'}</span></div>
@@ -1225,7 +1000,7 @@ ${designNote}
   <div class="hd-section-title">Installer Details</div>
   <div class="hd-grid">
     <div>
-      <div class="hd-row"><span class="hd-row-key">Company</span><span class="hd-row-val">${installerName}</span></div>
+      <div class="hd-row"><span class="hd-row-key">Company</span><span class="hd-row-val">${iname}</span></div>
       <div class="hd-row"><span class="hd-row-key">Contact Person</span><span class="hd-row-val">${ip?.contact_person||'—'}</span></div>
       <div class="hd-row"><span class="hd-row-key">Phone</span><span class="hd-row-val">${ip?.contact_number||j?.contact_number||'—'}</span></div>
     </div>
@@ -1235,14 +1010,13 @@ ${designNote}
       <div class="hd-row"><span class="hd-row-key">Accreditation</span><span class="hd-row-val">${ip?.accreditation||'—'}</span></div>
     </div>
   </div>
+  ${vbadge}
 </div>
 <div class="hd-sign-block">
   <div><div class="sign-line">Customer Signature</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${j?.client_name||'...................'}<br>Date: ${now}</div></div>
-  <div><div class="sign-line">Installed & Commissioned by ${installerName}</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
+  <div><div class="sign-line">Authorised by ${iname}</div><div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">${ho?.handed_over_by||getVal('ho-by')||'...................'}<br>Date: ${now}</div></div>
 </div>
-<div style="margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--text3);line-height:1.6">
-  <strong>Disclaimer:</strong> This document is a system-generated summary of project and compliance-related information recorded by the installer. COC certificates, regulatory approvals, and compliance determinations are issued by accredited third-party professionals and relevant authorities. Responsibility for compliance rests solely with the licensed installer and certifying professionals.  All data presented is based on information provided by the installer or third parties.
-</div>`;
+<div style="margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:var(--text3);line-height:1.6"><strong>Disclaimer:</strong> This document is a system-generated summary recorded by the installer. COC certificates and compliance determinations are issued by accredited third-party professionals. Responsibility for compliance rests solely with the licensed installer.</div>`;
   const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
 }
 
