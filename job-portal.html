@@ -901,9 +901,75 @@ async function dismissDesignChange(){
 }
 
 async function sendDesignChangeNotification(job, visit, category) {
-  if (!job.client_email) return;
+  if (!job.client_email && category === 'major') return;
+  if (category === 'none') return; // no change, nothing to send
   try {
-    const res = await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`, {
+    // Call the full revised-proposal engine — this recalculates all financials,
+    // generates a complete PDF, and emails the client with Approve/Decline links
+    const res = await fetch(`${SUPA_URL}/functions/v1/generate-revised-proposal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({
+        ai_id:          job.ai_id,
+        site_visit_id:  visit.id,
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Store the approval token and revised proposal reference on the visit record
+      const patch = {
+        client_notified_of_change_at: new Date().toISOString(),
+        design_change_category:       category,
+      };
+      if (data.approval_token)   patch.client_approval_token   = data.approval_token;
+      if (data.new_ai_id)        patch.revised_proposal_ai_id  = data.new_ai_id;
+      if (data.pdf_url)          patch.revised_pdf_url          = data.pdf_url;
+      await sbPatch('site_visits', `id=eq.${visit.id}`, patch);
+      currentVisit = { ...currentVisit, ...patch };
+
+      // For minor changes: immediately update the original job record with revised specs
+      // (major changes wait for client approval via the realtime listener)
+      if (category === 'minor' && visit.recommended_system_kw) {
+        const specPatch = {};
+        if (visit.recommended_system_kw)   specPatch.system_size_kw        = visit.recommended_system_kw;
+        if (visit.recommended_battery_kwh) specPatch.battery_capacity_kwh  = visit.recommended_battery_kwh;
+        if (data.financials?.new_total_cost)     specPatch.total_cost     = data.financials.new_total_cost;
+        if (data.financials?.new_annual_savings) specPatch.annual_savings = data.financials.new_annual_savings;
+        if (Object.keys(specPatch).length) {
+          try { await sbPatch('ai_results', `ai_id=eq.${job.ai_id}`, specPatch); currentJob = { ...currentJob, ...specPatch }; } catch(e) {}
+        }
+      }
+
+      await logActivity(
+        'REVISED PROPOSAL',
+        category === 'major'
+          ? `Full revised proposal generated (${origKwLabel(visit)} → ${visit.recommended_system_kw} kWp). PDF sent to ${job.client_email} — awaiting approval.`
+          : `Revised proposal generated (minor adjustment). PDF sent to ${job.client_email}.`,
+        visit.assessor_name
+      );
+
+      toast(
+        category === 'major'
+          ? '📄 Revised proposal PDF sent — awaiting client approval'
+          : '📄 Revised proposal PDF sent to client',
+        category === 'major' ? 'info' : 'success'
+      );
+
+      renderDesignChangeAlert();
+      renderApprovalBanner();
+    } else {
+      throw new Error(data.error || 'Revised proposal generation failed');
+    }
+  } catch (e) {
+    console.error('sendDesignChangeNotification error:', e);
+    toast('⚠ Could not send revised proposal: ' + e.message, 'error');
+  }
+}
+
+// Helper — gets the original kWp label for the log message
+function origKwLabel(visit) {
+  return visit.original_proposal_kw || currentJob?.system_size_kw || '?';
+}
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
       body: JSON.stringify({
