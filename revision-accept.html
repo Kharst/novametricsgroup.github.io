@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Your Revised Solar Proposal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--navy:#0A2540;--gold:#F5A623;--green:#27ae60;--red:#e74c3c;--text:#1a1a2e;--muted:#667;--border:#e0e6ed;--bg:#f7f9fb}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  .topbar{background:var(--navy);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-logo{font-weight:700;font-size:16px;color:var(--gold);letter-spacing:.04em}
+  .topbar-sub{font-size:12px;color:rgba(255,255,255,.5)}
+  .container{max-width:680px;margin:0 auto;padding:32px 20px 60px}
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+  .card-header{padding:20px 24px;border-bottom:1px solid var(--border)}
+  .card-body{padding:24px}
+  .label-sm{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
+  .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .compare-col{padding:16px 20px}
+  .compare-col.original{border-right:1px solid var(--border)}
+  .col-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+  .compare-col.original .col-title{color:var(--muted)}
+  .compare-col.revised .col-title{color:var(--gold)}
+  .big-val{font-size:24px;font-weight:600;margin-bottom:2px}
+  .compare-col.original .big-val{color:#555}
+  .compare-col.revised .big-val{color:var(--navy)}
+  .sub-val{font-size:13px;color:var(--muted)}
+  .delta-banner{padding:14px 20px;font-size:13px;font-weight:500;border-top:1px solid var(--border)}
+  .delta-banner.none{background:#f0faf5;color:var(--green)}
+  .delta-banner.minor{background:#fffbe6;color:#c0820a}
+  .delta-banner.major{background:#fff0f0;color:var(--red)}
+  .line-items-table{width:100%;border-collapse:collapse;font-size:13px}
+  .line-items-table th{text-align:left;padding:8px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border)}
+  .line-items-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+  .line-items-table tr:last-child td{border-bottom:none}
+  .cost-summary{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-top:16px}
+  .cost-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+  .cost-row.total{font-size:16px;font-weight:700;border-top:1px solid var(--border);margin-top:8px;padding-top:12px}
+  .action-section{text-align:center;padding:32px 24px}
+  .action-title{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:8px}
+  .action-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+  .btn-accept{background:var(--green);color:#fff;border:none;padding:16px 40px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;width:100%;margin-bottom:12px;font-family:'DM Sans',sans-serif;transition:filter .15s}
+  .btn-accept:hover:not(:disabled){filter:brightness(1.1)}
+  .btn-decline{background:#fff;color:var(--red);border:2px solid var(--red);padding:14px 40px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif}
+  .btn-decline:hover:not(:disabled){background:#fff0f0}
+  .btn-accept:disabled,.btn-decline:disabled{opacity:.45;cursor:not-allowed}
+  .decline-form{display:none;margin-top:16px;text-align:left}
+  .decline-form textarea{width:100%;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'DM Sans',sans-serif;font-size:13px;min-height:80px;resize:vertical;outline:none}
+  .decline-form textarea:focus{border-color:var(--red)}
+  .confirm-submit{background:var(--red);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;font-family:'DM Sans',sans-serif}
+  .cancel-decline{background:transparent;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:10px 16px;font-family:'DM Sans',sans-serif}
+  .state-screen{min-height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:16px;padding:40px}
+  .state-icon{font-size:56px}
+  .state-title{font-family:'DM Serif Display',serif;font-size:1.8rem}
+  .state-sub{font-size:14px;color:var(--muted);max-width:440px;line-height:1.6}
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .spec-item{background:#f7f9fb;border-radius:6px;padding:10px 12px}
+  .spec-item-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+  .spec-item-val{font-size:13px;font-weight:600;color:var(--navy)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+  @media(max-width:520px){.compare-grid{grid-template-columns:1fr}.compare-col.original{border-right:none;border-bottom:1px solid var(--border)}.spec-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-logo" id="installer-name-header">Solar Installer</div>
+    <div class="topbar-sub">Revised Proposal — Your Action Required</div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="state-screen" id="state-loading">
+  <div class="state-icon">⚡</div>
+  <div class="state-title">Loading your proposal…</div>
+  <div class="state-sub">Fetching your revised system details.</div>
+</div>
+
+<!-- ERROR -->
+<div class="state-screen" id="state-error" style="display:none">
+  <div class="state-icon">🔗</div>
+  <div class="state-title">Link Not Found</div>
+  <div class="state-sub" id="error-msg">This link may be invalid or has already been used. Contact your installer for assistance.</div>
+</div>
+
+<!-- ALREADY RESPONDED -->
+<div class="state-screen" id="state-already" style="display:none">
+  <div class="state-icon" id="already-icon">✅</div>
+  <div class="state-title" id="already-title">Already Responded</div>
+  <div class="state-sub" id="already-sub">You have already submitted a response to this proposal.</div>
+</div>
+
+<!-- SUCCESS -->
+<div class="state-screen" id="state-success" style="display:none">
+  <div class="state-icon">🎉</div>
+  <div class="state-title">Proposal Accepted!</div>
+  <div class="state-sub">Thank you — your installer has been notified and will be in contact to confirm next steps. Your installation will proceed with the revised system.</div>
+</div>
+
+<!-- DECLINED -->
+<div class="state-screen" id="state-declined" style="display:none">
+  <div class="state-icon">📋</div>
+  <div class="state-title">Response Recorded</div>
+  <div class="state-sub">Thank you for your feedback. Your installer will be in contact to discuss your options.</div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content" style="display:none">
+  <div class="container">
+    <div style="margin-bottom:24px">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:4px">Revised proposal for</p>
+      <h1 style="font-family:'DM Serif Display',serif;font-size:1.8rem;color:var(--navy)" id="client-name-heading">—</h1>
+      <p style="font-size:13px;color:var(--muted);margin-top:4px" id="client-address-heading">—</p>
+    </div>
+
+    <!-- Comparison -->
+    <div class="card">
+      <div class="card-header">
+        <div class="label-sm">System Comparison</div>
+        <h2 style="font-size:16px;font-weight:600;margin-top:4px">Original vs Revised Design</h2>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col original">
+          <div class="col-title">Original (v1)</div>
+          <div class="big-val" id="v1-kw">—</div>
+          <div class="sub-val" id="v1-batt">—</div>
+          <div style="margin-top:14px;font-size:13px;color:var(--muted)" id="v1-cost">—</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--green)">✓ Previously accepted</div>
+        </div>
+        <div class="compare-col revised">
+          <div class="col-title">Revised (after site visit)</div>
+          <div class="big-val" id="v2-kw">—</div>
+          <div class="sub-val" id="v2-batt">—</div>
+          <div style="margin-top:14px;font-size:13px;color:var(--navy);font-weight:600" id="v2-cost">—</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--muted)">Engine calculated from site data</div>
+        </div>
+      </div>
+      <div class="delta-banner" id="delta-banner">—</div>
+    </div>
+
+    <!-- Reason -->
+    <div class="card">
+      <div class="card-header"><div class="label-sm">Why Was This Changed?</div></div>
+      <div class="card-body">
+        <p style="font-size:14px;line-height:1.7;color:#444" id="delta-reason">—</p>
+        <div class="spec-grid" id="spec-breakdown"></div>
+      </div>
+    </div>
+
+    <!-- Line items (conditional) -->
+    <div class="card" id="line-items-card" style="display:none">
+      <div class="card-header"><div class="label-sm">Additional Items Identified on Site</div></div>
+      <div class="card-body" style="padding:0">
+        <table class="line-items-table">
+          <thead><tr><th>Item</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th></tr></thead>
+          <tbody id="line-items-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cost summary -->
+    <div class="card">
+      <div class="card-header"><div class="label-sm">Investment Summary</div></div>
+      <div class="card-body">
+        <div class="cost-summary">
+          <div class="cost-row"><span>System cost (revised)</span><span id="sum-system-cost">—</span></div>
+          <div class="cost-row" id="sum-extras-row" style="display:none"><span>Additional site items</span><span id="sum-extras">—</span></div>
+          <div class="cost-row total"><span>Total investment</span><span id="sum-total">—</span></div>
+          <div class="cost-row" style="font-size:12px;color:var(--muted);padding-top:4px"><span>Change from original</span><span id="sum-diff">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action -->
+    <div class="card">
+      <div class="action-section">
+        <div class="action-title">Your Decision</div>
+        <div class="action-sub">Please review the changes above. If you accept, your installation will proceed with the revised system. If you have concerns, click below and we will be in contact.</div>
+        <button class="btn-accept" id="btn-accept" onclick="submitResponse('accept')">✓ I Accept the Revised Proposal</button>
+        <button class="btn-decline" id="btn-decline" onclick="showDeclineForm()">I Have Concerns / Decline</button>
+        <div class="decline-form" id="decline-form">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:8px">Let us know your concern — your installer will be in contact:</p>
+          <textarea id="decline-reason-input" placeholder="e.g. The price increase is higher than expected. Can we discuss options?"></textarea>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="confirm-submit" onclick="submitResponse('decline')">Submit Response</button>
+            <button class="cancel-decline" onclick="hideDeclineForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:11px;color:var(--muted);line-height:1.6">This proposal is valid for 14 days from the date it was sent.<br>Your decision is recorded securely and shared with your installer immediately.</p>
+  </div>
+</div>
+
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+
+const token = new URLSearchParams(window.location.search).get('token');
+let versionData = null, v1Data = null, jobData = null, lineItemsData = [];
+
+async function sbGet(path) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON }
+  });
+  return res.json();
+}
+
+async function loadProposal() {
+  if (!token) { showState('error', 'No proposal token found in the URL. Check the link in your email.'); return; }
+  try {
+    const versions = await sbGet(`proposal_versions?client_approval_token=eq.${token}&select=*`);
+    if (!versions || !versions[0]) { showState('error', 'This link is invalid or has expired. Please contact your installer.'); return; }
+    versionData = versions[0];
+
+    if (versionData.client_accepted_at) { showState('already', true); return; }
+    if (versionData.client_declined_at) { showState('already', false); return; }
+
+    // Mark seen
+    fetch(`${SUPA_URL}/rest/v1/proposal_versions?id=eq.${versionData.id}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ client_seen_at: new Date().toISOString() })
+    });
+
+    const [v1Rows, jobRows, allLines] = await Promise.all([
+      sbGet(`proposal_versions?ai_id=eq.${versionData.ai_id}&version_number=eq.1&select=*`),
+      sbGet(`ai_results?ai_id=eq.${versionData.ai_id}&select=client_name,client_address,installer_name`),
+      sbGet(`revision_line_items?proposal_version_id=eq.${versionData.id}&select=*`),
+    ]);
+
+    v1Data        = v1Rows?.[0] ?? null;
+    jobData       = jobRows?.[0] ?? null;
+    lineItemsData = allLines ?? [];
+
+    renderProposal();
+  } catch(e) {
+    showState('error', 'Failed to load your proposal. Please try again or contact your installer.');
+  }
+}
+
+function fmt(n) { return n != null ? `R${Number(n).toLocaleString('en-ZA')}` : '—'; }
+
+function renderProposal() {
+  const installerName = jobData?.installer_name ?? 'Your Solar Installer';
+  document.getElementById('installer-name-header').textContent = installerName;
+  document.title = `Revised Proposal — ${installerName}`;
+  document.getElementById('client-name-heading').textContent    = jobData?.client_name ?? '—';
+  document.getElementById('client-address-heading').textContent = jobData?.client_address ?? '—';
+
+  document.getElementById('v1-kw').textContent   = `${v1Data?.system_kw ?? '—'} kWp`;
+  document.getElementById('v1-batt').textContent = `${v1Data?.battery_kwh ?? '—'} kWh battery`;
+  document.getElementById('v1-cost').textContent = fmt(v1Data?.total_cost);
+  document.getElementById('v2-kw').textContent   = `${versionData.system_kw} kWp`;
+  document.getElementById('v2-batt').textContent = `${versionData.battery_kwh} kWh battery`;
+  document.getElementById('v2-cost').textContent = fmt(versionData.total_cost);
+
+  const cat = versionData.delta_category ?? 'none';
+  const pct = versionData.delta_pct ?? 0;
+  const deltaBanner = document.getElementById('delta-banner');
+  deltaBanner.className = `delta-banner ${cat}`;
+  deltaBanner.textContent = `${pct >= 0 ? '+' : ''}${pct.toFixed(1)}% cost change · ${versionData.delta_summary ?? ''}`;
+
+  document.getElementById('delta-reason').textContent = versionData.delta_summary ?? 'Site conditions required adjustments to the system design.';
+
+  const specs = [];
+  if (versionData.panels_qty)     specs.push(['Solar Panels',   `${versionData.panels_qty} × ${versionData.panel_brand} ${versionData.panel_watt}W`]);
+  if (versionData.inverter_kw)    specs.push(['Inverter',       `${versionData.inverter_brand} ${versionData.inverter_kw} kW`]);
+  if (versionData.battery_qty)    specs.push(['Battery',        `${versionData.battery_qty} × ${versionData.battery_brand} ${versionData.battery_unit_kwh} kWh`]);
+  if (versionData.roof_area_m2)   specs.push(['Roof Area Used', `${versionData.roof_area_m2} m²`]);
+  if (versionData.shading_factor) specs.push(['Shading Found',  versionData.shading_factor.charAt(0).toUpperCase() + versionData.shading_factor.slice(1)]);
+  if (versionData.daily_consumption_kwh) specs.push(['Daily Consumption', `${versionData.daily_consumption_kwh} kWh/day`]);
+  document.getElementById('spec-breakdown').innerHTML = specs.map(([k,v]) => `<div class="spec-item"><div class="spec-item-label">${k}</div><div class="spec-item-val">${v}</div></div>`).join('');
+
+  if (lineItemsData.length > 0) {
+    document.getElementById('line-items-card').style.display = 'block';
+    document.getElementById('line-items-tbody').innerHTML = lineItemsData.map(li =>
+      `<tr><td>${li.description}</td><td style="text-align:right">${li.quantity} ${li.unit ?? ''}</td><td style="text-align:right">${fmt(li.total_price)}</td></tr>`
+    ).join('');
+  }
+
+  document.getElementById('sum-system-cost').textContent = fmt(versionData.system_cost);
+  if (versionData.line_items_total > 0) {
+    document.getElementById('sum-extras-row').style.display = 'flex';
+    document.getElementById('sum-extras').textContent = fmt(versionData.line_items_total);
+  }
+  document.getElementById('sum-total').textContent = fmt(versionData.total_cost);
+  const costDiff = (versionData.total_cost ?? 0) - (v1Data?.total_cost ?? 0);
+  const diffEl   = document.getElementById('sum-diff');
+  diffEl.textContent = costDiff === 0 ? 'No change' : `${costDiff > 0 ? '+' : '−'}${fmt(Math.abs(costDiff))}`;
+  diffEl.style.color = costDiff > 0 ? 'var(--red)' : costDiff < 0 ? 'var(--green)' : '#888';
+
+  showState('main');
+}
+
+async function submitResponse(action) {
+  const btnA = document.getElementById('btn-accept');
+  const btnD = document.getElementById('btn-decline');
+  const btnS = document.querySelector('.confirm-submit');
+  [btnA, btnD, btnS].forEach(b => { if(b) b.disabled = true; });
+  if (btnA && action === 'accept') btnA.innerHTML = '<span class="spinner"></span> Confirming…';
+
+  const decline_reason = action === 'decline'
+    ? (document.getElementById('decline-reason-input')?.value?.trim() ?? '') : '';
+
+  try {
+    const res  = await fetch(`${SUPA_URL}/functions/v1/handle-revision-response`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({ token, action, decline_reason }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    showState(action === 'accept' ? 'success' : 'declined');
+  } catch(e) {
+    [btnA, btnD, btnS].forEach(b => { if(b) b.disabled = false; });
+    if (btnA) btnA.innerHTML = '✓ I Accept the Revised Proposal';
+    alert('Error: ' + e.message + '\n\nPlease try again or contact your installer.');
+  }
+}
+
+function showDeclineForm()  { document.getElementById('decline-form').style.display='block'; document.getElementById('btn-decline').style.display='none'; }
+function hideDeclineForm()  { document.getElementById('decline-form').style.display='none';  document.getElementById('btn-decline').style.display='block'; }
+
+function showState(state, extra) {
+  ['loading','error','already','success','declined'].forEach(s => {
+    const el = document.getElementById(`state-${s}`);
+    if (el) el.style.display = 'none';
+  });
+  document.getElementById('main-content').style.display = 'none';
+
+  if (state === 'main') {
+    document.getElementById('main-content').style.display = 'block';
+  } else if (state === 'already') {
+    const accepted = extra === true;
+    document.getElementById('already-icon').textContent  = accepted ? '✅' : '📋';
+    document.getElementById('already-title').textContent = accepted ? 'Proposal Already Accepted' : 'Response Already Recorded';
+    document.getElementById('already-sub').textContent   = accepted ? 'You already accepted this revised proposal. Your installer has been notified.' : 'You have already submitted your response. Your installer will be in contact.';
+    document.getElementById('state-already').style.display = 'flex';
+  } else if (state === 'error') {
+    if (extra) document.getElementById('error-msg').textContent = extra;
+    document.getElementById('state-error').style.display = 'flex';
+  } else {
+    const el = document.getElementById(`state-${state}`);
+    if (el) el.style.display = 'flex';
+  }
+}
+
+loadProposal();
+</script>
+</body>
+</html>
