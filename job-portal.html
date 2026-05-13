@@ -516,9 +516,27 @@ function endAction(btnId){_actionInProgress=false;const btn=document.getElementB
       const newStatus=payload.new.client_approval_status;
       if(newStatus===oldStatus)return;
       currentVisit={...currentVisit,...payload.new};
-      renderDesignChangeAlert();renderApprovalBanner();
-      if(newStatus==='approved'){toast('🎉 Client accepted the revised design — you can now proceed!','success');}
-      else if(newStatus==='declined'){toast('⚠ Client declined the revised design — contact them before proceeding.','error');}
+      renderDesignChangeAlert();renderApprovalBanner();renderPanel1DesignNote();
+      /* Bug 2 fix: also treat 'accepted' as approved (approval page may use either value) */
+      const isApproved = newStatus==='approved'||newStatus==='accepted';
+      const isDeclined = newStatus==='declined'||newStatus==='rejected';
+      if(isApproved){
+        toast('🎉 Client accepted the revised design — you can now proceed!','success');
+        /* Bug 3 fix: update ai_results with the now-approved revised specs */
+        (async()=>{
+          try{
+            const specPatch={};
+            if(currentVisit.recommended_system_kw) specPatch.system_size_kw=currentVisit.recommended_system_kw;
+            if(currentVisit.recommended_battery_kwh) specPatch.battery_capacity_kwh=currentVisit.recommended_battery_kwh;
+            if(Object.keys(specPatch).length&&currentJob){
+              await sbPatch('ai_results',`ai_id=eq.${currentJob.ai_id}`,specPatch);
+              currentJob={...currentJob,...specPatch};
+              renderJobHeader();
+            }
+          }catch(e){}
+        })();
+      }
+      else if(isDeclined){toast('⚠ Client declined the revised design — contact them before proceeding.','error');}
     })
     .subscribe();
 })();
@@ -669,11 +687,14 @@ function renderApprovalBanner(){
   const msg=document.getElementById('approval-alert-msg');
   if(!banner||!currentVisit)return;
   const v=currentVisit;
+  /* Bug 2 fix: normalise approval status — approval page may store 'accepted' or 'approved' */
+  const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
+  const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
   if(v.design_change_category==='major'){
-    if(v.client_approval_status==='approved'){
+    if(clientApproved){
       banner.className='approval-alert-banner show approved';
       icon.textContent='🎉';msg.textContent='Client accepted the revised design — cleared to proceed with installation.';
-    }else if(v.client_approval_status==='declined'){
+    }else if(clientDeclined){
       banner.className='approval-alert-banner show declined';
       icon.textContent='⚠';msg.textContent='Client declined the revised design — contact them before proceeding.';
     }else if(v.client_notified_of_change_at){
@@ -804,14 +825,28 @@ function renderDesignChangeAlert(){
   alert.classList.add('visible');
   const cs=document.getElementById('dca-client-status');
   if(cs){
+    /* Bug 2 fix: normalise status values — approval page may store 'accepted' or 'approved' */
+    const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
+    const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
     if(v.client_notified_of_change_at){
-      const d=new Date(v.client_notified_of_change_at);
-      const time=`${d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})} ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`;
-      if(v.client_approval_status==='approved'){cs.className='approval-bar approved';cs.style.display='flex';cs.innerHTML='<span>✓</span><span>Client accepted the revised design · '+time+'</span>';}
-      else if(v.client_approval_status==='declined'){cs.className='approval-bar declined';cs.style.display='flex';cs.innerHTML='<span>✗</span><span>Client declined the revised design · '+time+'</span>';}
-      else if(v.design_change_category==='major'){cs.className='approval-bar pending';cs.style.display='flex';cs.innerHTML='<span class="pulse">⏳</span><span>Awaiting client approval · link sent '+time+'</span>';}
-      else if(v.design_change_category==='minor'){cs.className='approval-bar notified';cs.style.display='flex';cs.innerHTML='<span>✓</span><span>Client notified of minor adjustment · '+time+'</span>';}
-      else{cs.className='approval-bar notified';cs.style.display='flex';cs.innerHTML='<span>✓</span><span>Client notified — proceeding with original design · '+time+'</span>';}
+      const nd=new Date(v.client_notified_of_change_at);
+      const time=`${nd.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})} ${nd.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`;
+      if(clientApproved){
+        cs.className='approval-bar approved';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client accepted the revised design · '+time+'</span>';
+      }else if(clientDeclined){
+        cs.className='approval-bar declined';cs.style.display='flex';
+        cs.innerHTML='<span>✗</span><span>Client declined the revised design — contact them to discuss · '+time+'</span>';
+      }else if(v.design_change_category==='major'){
+        cs.className='approval-bar pending';cs.style.display='flex';
+        cs.innerHTML='<span class="pulse">⏳</span><span>Awaiting client approval · link sent '+time+' <button onclick="refreshCurrentJob()" style="background:none;border:none;color:var(--blue);cursor:pointer;font-family:var(--mono);font-size:10px;margin-left:8px;text-decoration:underline">↻ Check status</button></span>';
+      }else if(v.design_change_category==='minor'){
+        cs.className='approval-bar notified';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client notified of minor adjustment · '+time+'</span>';
+      }else{
+        cs.className='approval-bar notified';cs.style.display='flex';
+        cs.innerHTML='<span>✓</span><span>Client notified — proceeding with original design · '+time+'</span>';
+      }
     }else{cs.style.display='none';}
   }
 }
@@ -820,11 +855,23 @@ function renderPanel1DesignNote(){
   const note=document.getElementById('panel1-design-note');if(!note||!currentVisit)return;
   const v=currentVisit;if(!v.design_changed){note.style.display='none';return;}
   note.style.display='block';
-  const approvalNeeded=v.design_change_category==='major'&&v.client_approval_status!=='approved';
-  note.className=approvalNeeded?'info-card error':'info-card warning';
-  note.textContent=approvalNeeded
-    ?`🔴 Major design change — client approval required before installation. Original: ${v.original_proposal_kw||currentJob?.system_size_kw||'—'} kWp → Revised: ${v.recommended_system_kw||'—'} kWp. Awaiting client response.`
-    :`⚠ Design change on record: ${v.original_proposal_kw||currentJob?.system_size_kw||'—'} → ${v.recommended_system_kw||'—'} kWp. Reason: "${v.design_change_reason||'not yet documented'}". Plan installation to revised spec.`;
+  /* Bug 2 fix: normalise status — approval page may store 'accepted' or 'approved' */
+  const clientApproved = v.client_approval_status==='approved' || v.client_approval_status==='accepted';
+  const clientDeclined = v.client_approval_status==='declined' || v.client_approval_status==='rejected';
+  const origKw=v.original_proposal_kw||currentJob?.system_size_kw||'—';
+  const newKw=v.recommended_system_kw||'—';
+  if(clientDeclined){
+    note.className='info-card error';
+    note.textContent=`🔴 Client declined the revised design (${origKw} kWp → ${newKw} kWp) — contact them to discuss options before proceeding.`;
+  }else if(v.design_change_category==='major'&&!clientApproved){
+    note.className='info-card error';
+    note.textContent=`🔴 Major design change — awaiting client approval before installation. Original: ${origKw} kWp → Revised: ${newKw} kWp. Approval link sent to client.`;
+  }else{
+    note.className='info-card warning';
+    note.textContent=clientApproved
+      ?`✓ Client approved the revised design: ${origKw} → ${newKw} kWp. Plan installation to revised spec.`
+      :`⚠ Design change on record: ${origKw} → ${newKw} kWp. Reason: "${v.design_change_reason||'not yet documented'}". Plan installation to revised spec.`;
+  }
 }
 
 async function acknowledgeDesignChange(){
@@ -865,6 +912,13 @@ async function sendDesignChangeNotification(job, visit, category) {
         new_kw: visit.recommended_system_kw, new_batt: visit.recommended_battery_kwh,
         change_category: category, change_reason: visit.design_change_reason||'',
         installer_name: job.installer_name||'Your Solar Installer', ai_id: job.ai_id, visit_id: visit.id,
+        /* Bug 3 fix: pass original financial data so edge function can include revised quote context */
+        send_revised_quote: category !== 'none',
+        original_total_cost: job.total_cost||null,
+        original_annual_saving: job.annual_savings||null,
+        original_monthly_saving: job.monthly_savings||null,
+        original_payback_years: job.payback_years||null,
+        original_lifetime_saving: job.lifetime_savings||null,
       })
     });
     const data = await res.json();
@@ -873,7 +927,16 @@ async function sendDesignChangeNotification(job, visit, category) {
       if (data.approval_token) patch.client_approval_token = data.approval_token;
       await sbPatch('site_visits', `id=eq.${visit.id}`, patch);
       currentVisit = { ...currentVisit, ...patch };
-      await logActivity('DESIGN NOTIFICATION', category==='major'?'Client sent approval request for major design change':category==='minor'?'Client notified of minor design adjustment':'Client notified — proceeding with original design', visit.assessor_name);
+      /* Bug 3 fix: for minor changes, update ai_results specs immediately (no approval needed) */
+      if(category==='minor'&&visit.recommended_system_kw){
+        const specPatch={};
+        if(visit.recommended_system_kw) specPatch.system_size_kw=visit.recommended_system_kw;
+        if(visit.recommended_battery_kwh) specPatch.battery_capacity_kwh=visit.recommended_battery_kwh;
+        if(Object.keys(specPatch).length){
+          try{await sbPatch('ai_results',`ai_id=eq.${job.ai_id}`,specPatch);currentJob={...currentJob,...specPatch};}catch(e){}
+        }
+      }
+      await logActivity('DESIGN NOTIFICATION', category==='major'?'Client sent approval request for major design change — revised quote included':category==='minor'?'Client notified of minor design adjustment — revised quote included':'Client notified — proceeding with original design', visit.assessor_name);
       toast(category==='major'?'⏳ Approval request sent — awaiting client response':category==='minor'?'✓ Client notified of minor adjustment':'✓ Client notified — proceeding with original design', category==='major'?'info':'success');
       renderDesignChangeAlert(); renderApprovalBanner();
     }
