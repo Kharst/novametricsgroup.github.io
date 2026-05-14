@@ -891,7 +891,7 @@ function calculate(){
   calcResult.timingAnalysis=tw;
 renderAll(calcResult);
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
-  toast('&#10003; Compliant system designed — all SA checks passed');
+  toast('&#10003; Compliant system designed — All automated design checks passed');
 }
 
 function fN(n,d=1){return Number(n).toFixed(d);}
@@ -912,7 +912,7 @@ function renderAll(r){
 
   document.getElementById('sys-rec-kpi').className='kpi green';
   set('sys-rec-value','&#10003; Compliant System — Ready to Propose');
-  set('sys-rec-sub','Solar covers load+recharge · DoD '+fN(r.battDod*100,0)+'% &#8804; 85% &#10003; · DC/AC '+fN(r.dcAc,2)+' · All SA checks passed'+(r.invUnits>1?' · '+r.invUnits+'x inverters parallel':''));
+  set('sys-rec-sub','Solar covers load+recharge · DoD '+fN(r.battDod*100,0)+'% &#8804; 85% &#10003; · DC/AC '+fN(r.dcAc,2)+' · All automated design checks passed'+(r.invUnits>1?' · '+r.invUnits+'x inverters parallel':''));
 
   setKpi('b-verdict',r.battVerdict,r.battHS==='Tight'?'amber':'green');
   setKpi('b-stress',r.battStress,r.battDod<=BATT_DOD_DESIGN_GOOD?'green':'amber');
