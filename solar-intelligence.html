@@ -1341,7 +1341,8 @@ function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRunt
     const t=LOAD_TIMING[it.id]||LOAD_TIMING.custom;
     const kw=it.watts*it.qty/1000;
     const kwh=kw*it.hours;
-    solarKWh+=kwh*t.solarFrac;
+    const effectiveSolarFrac=(it.id==='geyser'&&it.backedUp===false)?1.0:t.solarFrac;
+    solarKWh+=kwh*effectiveSolarFrac;
     if(t.eveningLoad){
       eveningPeakKW+=kw;
       if(kw>=0.3) eveningContribs.push({name:it.name,kw});
@@ -1354,12 +1355,12 @@ function analyseLoadTiming(items, battBackupKWh, autonomy, dailyKWh, avgBattRunt
   const eveningRuntime=eveningPeakKW>0?battBackupKWh/eveningPeakKW:99;
   const geyserPct=dailyKWh>0&&geyserPresent?geyserKWh/dailyKWh*100:0;
   // Geyser default timing = morning+evening, zero solar fraction → outside solar hours
-  const geyserOutsideSolar=geyserPresent&&LOAD_TIMING.geyser.solarFrac===0;
+  const geyserOutsideSolar=geyserPresent&&geyserBackedUp&&LOAD_TIMING.geyser.solarFrac===0;
 
   // What-if: geyser shifts to solar hours
   const eveningPeakNoGeyser = Math.max(eveningPeakKW - (geyserPresent ? geyserPeakKW : 0), 0);
   const eveningRuntimeNoGeyser = eveningPeakNoGeyser > 0.05 ? battBackupKWh / eveningPeakNoGeyser : 99;
-  const improvedSolarPct = dailyKWh > 0 ? (solarKWh + (geyserPresent ? geyserKWh : 0)) / dailyKWh * 100 : solarUtilPct;
+  const improvedSolarPct = dailyKWh > 0 ? (solarKWh + (geyserPresent && geyserBackedUp ? geyserKWh : 0)) / dailyKWh * 100 : solarUtilPct;
 
   // Shiftable non-geyser items (solarFrac < 0.5 and not already evening primary)
   const shiftableNames = [];
