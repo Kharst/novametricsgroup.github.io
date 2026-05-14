@@ -887,7 +887,7 @@ function calculate(){
     pCost,bosCost,hwCost,totCost,sellP,profit,cPkW,
     monthly,annSavY1,grossLT,netLT,roi,simpPb,realPb,npv,irr,annOM,battRep,
     annCons,co2T,trees,coal,water,seg,indP,nersaCat};
-  const tw=analyseLoadTiming(lbItems,sys.battKWh,autonomy,dailyUsage,batt.runtime);
+  const tw=analyseLoadTiming(lbItems,batt.installedKWh,autonomy,dailyUsage,batt.runtime);
   calcResult.timingAnalysis=tw;
 renderAll(calcResult);
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
@@ -1388,7 +1388,7 @@ function renderRealWorld(r, tw){
 
   // ── Battery runtimes
   const avgOk=tw.avgRuntime>=r.autonomy;
-  const pkOk=tw.eveningRuntime>=r.autonomy*0.75;
+  const pkOk=tw.eveningRuntime>=r.autonomy*0.5;
 
   // ── Solar utilisation
   const solOk=tw.solarUtilPct>=40;
@@ -1450,7 +1450,7 @@ function renderRealWorld(r, tw){
   <div class="rw-block">
     <div class="rw-block-hd">🔋 Battery Runtime</div>
     <div class="rw-row"><span class="rw-lbl">${({'Low Residential':'Expected home runtime','High Residential':'Expected home runtime','Small Commercial':'Expected site runtime','Large Commercial':'Expected site runtime','Industrial':'Expected facility runtime'}[r.seg]||'Expected site runtime')}</span><span class="rw-val ${avgOk?'ok':'warn'}">${fN(tw.avgRuntime,1)} hrs ${avgOk?'✓':''}</span></div>
-    <div class="rw-row"><span class="rw-lbl">Continuous full-load runtime</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
+    <div class="rw-row"><span class="rw-lbl">Worst-case peak runtime (all loads simultaneous)</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
   </div>
 
   <div class="rw-block">
