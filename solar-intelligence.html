@@ -391,6 +391,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Annual Solar Production (Net)</span><span class="val" id="r-annual-solar">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Specific Yield (kWh/kWp/year)</span><span class="val" id="r-specific-yield">&#8212;</span></div>
   </div>
+  <div class="section-title">Generation Assumptions</div>
+  <div class="status-row"><span class="lbl">Location GTI (Design Value)</span><span class="val" id="r-assump-gti">&#8212;</span></div>
+  <div class="status-row"><span class="lbl">Panel Orientation</span><span class="val" id="r-assump-orient">&#8212;</span></div>
+  <div class="status-row"><span class="lbl">Performance Ratio (PR)</span><span class="val">80% — thermal losses, wiring resistance &amp; module mismatch</span></div>
+  <div class="status-row"><span class="lbl">System Availability</span><span class="val">97% — maintenance &amp; downtime allowance (SA grid spec)</span></div>
+  <div class="status-row"><span class="lbl">Combined Yield Factor</span><span class="val" id="r-assump-yield">&#8212;</span></div>
+  <div class="status-row"><span class="lbl">Temperature &amp; Soiling Derating</span><span class="val">Included in PR — assumes quarterly panel cleaning</span></div>
+  <div class="status-row"><span class="lbl">Reserve Margin</span><span class="val">None applied — panel count rounds up; oversizing provides buffer</span></div>
   <div id="tab-battery" class="tab-panel">
     <div class="kpi-grid" style="margin-bottom:8px">
       <div class="kpi green" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
@@ -665,9 +673,13 @@ function selectBestBattery(reqKWh, peakLoad, autonomy){
 // Iterates every valid inverter, sizes solar to achieve compliant DC/AC ratio,
 // selects batteries, then returns ONE best compliant combination.
 // Rejects anything outside NRS 097-2-1 DC/AC range [1.0 – 1.5].
-function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh, totalDailyUsage) {
+function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh, totalDailyUsage, surgePeakKW) {
   totalDailyUsage = totalDailyUsage || dailyUsage;             // fallback: same as backup
-  const reqInvAC   = peakLoad * 1.3;                          // 30% safety margin (SA rule)
+  surgePeakKW     = surgePeakKW     || 0;
+  // reqInvAC: whichever is larger —
+  //   (a) NRS 097 1.3× continuous peak (compliance floor)
+  //   (b) surgePeakKW ÷ 2.0 (inverter surge cap = 2× continuous; motor/compressor inrush)
+  const reqInvAC  = Math.max(peakLoad * 1.3, surgePeakKW / 2.0);
   const battKWh    = dailyUsage * (autonomy / 24);            // battery sized on BACKUP usage only
   const battRechKWh= battKWh / BATT_ROUND_TRIP_EFF;          // recharge loss
   const reqSolarE  = (totalDailyUsage - battKWh) + battRechKWh; // solar covers TOTAL usage incl. geyser
@@ -788,7 +800,8 @@ function calculate(){
 
   // ── INVERTER-FIRST: find ONE best compliant combination ──────────────────
   // Use backup values for battery + inverter sizing (geyser excluded if not on inverter circuit)
-  const sys = findBestCompliantSystem(peakLoadBackup||peakLoad, dailyUsageBackup||dailyUsage, autonomy, psh, dailyUsage);
+  const surgePeakKW = getSurgePeakKW(lbItems, true); // backup-scope surge (geyser excluded if not backed up)
+  const sys = findBestCompliantSystem(peakLoadBackup||peakLoad, dailyUsageBackup||dailyUsage, autonomy, psh, dailyUsage, surgePeakKW);
 
   if (!sys) {
     const whyFails = [];
@@ -909,6 +922,9 @@ function renderAll(r){
   set('r-psh',fN(r.psh,2)+' hrs/day');set('r-req-energy',fN(r.reqSolarEnergy,2)+' kWh/day');
   set('r-footprint',fN(r.fp,1)+' m\u00B2');set('r-annual-solar',Math.round(r.annSolar).toLocaleString('en-ZA')+' kWh/yr');
   set('r-specific-yield',fN(r.specYield,0)+' kWh/kWp/yr');
+  set('r-assump-gti',fN(r.psh,2)+' kWh/m²/day — horizontal irradiance, design value for '+r.locName);
+  set('r-assump-orient','North-facing, optimised tilt for '+r.locName+' latitude (assumed — deviate for E/W split only)');
+  set('r-assump-yield',fN(SYSTEM_PR*SYSTEM_AVAILABILITY*100,1)+'% effective (PR 80% × Availability 97%)');
 
   document.getElementById('sys-rec-kpi').className='kpi green';
   set('sys-rec-value','&#10003; Compliant System — Ready to Propose');
@@ -1169,6 +1185,44 @@ const LOAD_TIMING={
   gate:      {solarFrac:0.15,eveningLoad:false,morningLoad:true },
   custom:    {solarFrac:0.30,eveningLoad:true, morningLoad:false},
 };
+
+  // Appliance startup surge multipliers — ratio of inrush to steady-state draw
+// Used to size inverter surge capability (standard inverter = 2× continuous for ~10s)
+const SURGE_MULT={
+  lights:    1.1,  // LED — negligible inrush
+  tv:        1.1,  // switch-mode PSU — minimal
+  fridge:    2.5,  // compressor startup
+  geyser:    1.0,  // resistive element — no surge
+  ac:        3.5,  // compressor + fan startup (worst case)
+  stove:     1.0,  // resistive — no surge
+  pool:      3.5,  // motor startup (DOL — direct-on-line)
+  washing:   2.5,  // motor startup
+  microwave: 1.2,  // magnetron startup
+  dishwasher:1.5,  // pump + heater combo
+  computer:  1.2,  // PSU inrush
+  security:  1.1,  // low-power electronics
+  gate:      3.0,  // motor startup
+  custom:    2.0,  // conservative unknown
+};
+
+  // Computes worst-case surge demand: all loads running + worst single-unit startup inrush
+// backupOnly=true excludes non-backed-up geysers (matches inverter sizing scope)
+function getSurgePeakKW(items, backupOnly){
+  const eligible=backupOnly
+    ? items.filter(it=>!(it.id==='geyser'&&it.backedUp===false))
+    : items;
+  const totalRunKW=eligible.reduce((s,it)=>s+it.watts*it.qty/1000,0);
+  let maxSurgeAdd=0;
+  eligible.forEach(it=>{
+    const mult=SURGE_MULT[it.id]||SURGE_MULT.custom;
+    if(mult<=1)return;
+    // Worst single unit of this type starting while all else already running
+    const singleKW=it.watts/1000;
+    const surgeAdd=singleKW*(mult-1);
+    if(surgeAdd>maxSurgeAdd)maxSurgeAdd=surgeAdd;
+  });
+  return totalRunKW+maxSurgeAdd;
+}
 
 // Quick templates — pre-populate the builder with a common load set
 const LB_TEMPLATES=[
