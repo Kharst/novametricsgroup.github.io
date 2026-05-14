@@ -685,18 +685,50 @@ async function dismissDesignChange(){
 
 async function sendDesignChangeNotification(job,visit,category){
   if(category==='none'||!job.client_email)return;
+  const ackEl=document.getElementById('dca-ack-status');
+  if(ackEl){ackEl.style.display='block';ackEl.textContent='⏳ Generating revised proposal PDF and notifying client...';}
   try{
-    const res=await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({client_name:job.client_name,client_email:job.client_email,client_address:job.client_address||'',original_kw:visit.original_proposal_kw||job.system_size_kw,original_batt:visit.original_proposal_batt_kwh||job.battery_capacity_kwh,new_kw:visit.recommended_system_kw,new_batt:visit.recommended_battery_kwh,change_category:category,change_reason:visit.design_change_reason||'',installer_name:job.installer_name||'Your Solar Installer',ai_id:job.ai_id,visit_id:visit.id})});
-    const data=await res.json();
-    if(data.success){
+    if(category==='major'){
+      // MAJOR change: run the full engine — recalculates all financials,
+      // generates a complete new proposal PDF, emails the client with
+      // PDF link, full comparison table, and Accept / Decline buttons.
+      const res=await fetch(`${SUPA_URL}/functions/v1/generate-revised-proposal`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+        body:JSON.stringify({ai_id:job.ai_id,site_visit_id:visit.id})
+      });
+      const data=await res.json();
+      if(!data.success)throw new Error(data.error||'generate-revised-proposal failed');
       const patch={client_notified_of_change_at:new Date().toISOString(),design_change_category:category};
       if(data.approval_token)patch.client_approval_token=data.approval_token;
-      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);currentVisit={...currentVisit,...patch};
-      await logActivity('DESIGN NOTIFICATION',category==='major'?'Client sent approval request':'Client notified of design adjustment',visit.assessor_name);
-      toast(category==='major'?'⏳ Approval request sent':'✓ Client notified',category==='major'?'info':'success');
-      renderDesignChangeAlert();renderApprovalBanner();
+      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);
+      currentVisit={...currentVisit,...patch};
+      await logActivity('DESIGN NOTIFICATION',`Revised proposal PDF (ref ${data.new_ai_id||'—'}) generated and sent to client for approval`,visit.assessor_name);
+      toast('⏳ Revised proposal sent — awaiting client approval','info');
+      if(ackEl){ackEl.textContent='✓ Revised proposal PDF sent to client — awaiting their approval.';}
+    }else{
+      // MINOR change: informational email only, no PDF needed.
+      const res=await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
+        body:JSON.stringify({client_name:job.client_name,client_email:job.client_email,client_address:job.client_address||'',original_kw:visit.original_proposal_kw||job.system_size_kw,original_batt:visit.original_proposal_batt_kwh||job.battery_capacity_kwh,new_kw:visit.recommended_system_kw,new_batt:visit.recommended_battery_kwh,change_category:category,change_reason:visit.design_change_reason||'',installer_name:job.installer_name||'Your Solar Installer',ai_id:job.ai_id,visit_id:visit.id})
+      });
+      const data=await res.json();
+      if(!data.success)throw new Error(data.error||'send-design-change-notification failed');
+      const patch={client_notified_of_change_at:new Date().toISOString(),design_change_category:category};
+      if(data.approval_token)patch.client_approval_token=data.approval_token;
+      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);
+      currentVisit={...currentVisit,...patch};
+      await logActivity('DESIGN NOTIFICATION','Client notified of minor design adjustment',visit.assessor_name);
+      toast('✓ Client notified of adjustment','success');
+      if(ackEl){ackEl.textContent='✓ Client notified of design adjustment.';}
     }
-  }catch(e){console.error('sendDesignChangeNotification:',e);}
+    renderDesignChangeAlert();renderApprovalBanner();
+  }catch(e){
+    console.error('sendDesignChangeNotification:',e);
+    if(ackEl){ackEl.style.display='block';ackEl.textContent='⚠ Design change saved but failed to notify client — check console or try refreshing.';}
+    toast('Failed to send notification: '+e.message,'error');
+  }
 }
 
 function prefillForms(){
