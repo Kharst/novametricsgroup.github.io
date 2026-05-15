@@ -44,6 +44,16 @@ body{font-family:'DM Sans',sans-serif;background:#f4f6f8;min-height:100vh;displa
 .result-sub{font-size:14px;color:#6b7280;line-height:1.6}
 .error-box{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 16px;color:#dc2626;font-size:13px}
 .notice{font-size:12px;color:#9ca3af;line-height:1.6;margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.on{display:flex}
+.confirm-box{background:#fff;border-radius:12px;padding:28px 32px;max-width:380px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.2)}
+.confirm-title{font-size:18px;font-weight:600;color:#1a2332;margin-bottom:8px}
+.confirm-sub{font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:24px}
+.confirm-btns{display:flex;gap:10px}
+.confirm-yes{flex:1;padding:11px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.confirm-yes.accept{background:#0B1F3A;color:#fff}
+.confirm-yes.decline{background:#dc2626;color:#fff}
+.confirm-no{flex:1;padding:11px;border:1px solid #e5e7eb;background:#fff;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:#6b7280}
 </style>
 </head>
 <body>
@@ -60,42 +70,80 @@ body{font-family:'DM Sans',sans-serif;background:#f4f6f8;min-height:100vh;displa
   </div>
 </div>
 
+<!-- Confirmation overlay — prevents accidental clicks -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Are you sure?</div>
+    <div class="confirm-sub" id="confirm-sub"></div>
+    <div class="confirm-btns">
+      <button class="confirm-no" onclick="closeConfirm()">Go back</button>
+      <button class="confirm-yes" id="confirm-yes-btn" onclick="confirmAction()">Confirm</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 
 const params = new URLSearchParams(window.location.search);
 const token  = params.get('token');
-let visitData = null;
+let visitData    = null;
+let pendingAction = null; // holds action until confirmation overlay is confirmed
 
 async function init() {
   const body = document.getElementById('page-body');
-  if (!token) { body.innerHTML = `<div class="error-box">Invalid link — no approval token found.</div>`; return; }
+  if (!token) {
+    body.innerHTML = `<div class="error-box">Invalid link — no approval token found.</div>`;
+    return;
+  }
 
-  // Load visit by token
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/site_visits?client_approval_token=eq.${token}&select=*&limit=1`, {
-      headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON }
-    });
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/site_visits?client_approval_token=eq.${token}&select=*&limit=1`,
+      { headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON } }
+    );
     const rows = await res.json();
-    if (!rows || !rows.length) { body.innerHTML = `<div class="error-box">This approval link is invalid or has expired. Please contact your installer.</div>`; return; }
+    if (!rows || !rows.length) {
+      body.innerHTML = `<div class="error-box">This approval link is invalid or has expired. Please contact your installer.</div>`;
+      return;
+    }
     visitData = rows[0];
 
-    if (visitData.client_approval_status === 'approved') { showResult('approved', false); return; }
-    if (visitData.client_approval_status === 'declined') { showResult('declined', false); return; }
+    // ── KEY FIX ──────────────────────────────────────────────────────────────
+    // Only treat the status as final if client_approval_responded_at is set.
+    // That timestamp is written ONLY when the client clicks a button and
+    // confirms. Background processes (edge functions, triggers) may set
+    // client_approval_status without setting this timestamp — those must
+    // never be treated as a real client decision.
+    const status    = visitData.client_approval_status;
+    const responded = visitData.client_approval_responded_at; // null until button clicked
 
+    if (responded) {
+      if (status === 'approved' || status === 'accepted') {
+        showResult('approved', false);
+        return;
+      }
+      if (status === 'declined' || status === 'rejected') {
+        showResult('declined', false);
+        return;
+      }
+    }
+
+    // No confirmed response yet → always show the form
     showApprovalForm();
+
   } catch (e) {
     body.innerHTML = `<div class="error-box">Could not load design details: ${e.message}</div>`;
   }
 }
 
 function showApprovalForm() {
-  const v = visitData;
-  const origKw   = v.original_proposal_kw    || '—';
-  const origBatt = v.original_proposal_batt_kwh || '—';
-  const newKw    = v.recommended_system_kw    || '—';
-  const newBatt  = v.recommended_battery_kwh  || '—';
+  const v        = visitData;
+  const origKw   = v.original_proposal_kw       || '—';
+  const origBatt = v.original_proposal_batt_kwh  || '—';
+  const newKw    = v.recommended_system_kw        || '—';
+  const newBatt  = v.recommended_battery_kwh      || '—';
   const reason   = v.design_change_reason || '';
 
   document.getElementById('page-body').innerHTML = `
@@ -120,30 +168,89 @@ function showApprovalForm() {
     </p>
     <div id="action-result" style="display:none;margin-bottom:16px"></div>
     <div class="btn-row">
-      <button class="btn btn-accept" id="btn-accept" onclick="submitAction('approve')">✓ Accept Revised Design</button>
-      <button class="btn btn-decline" id="btn-decline" onclick="submitAction('decline')">✗ Decline — Contact Installer</button>
+      <button class="btn btn-accept" id="btn-accept" onclick="askConfirm('approve')">✓ Accept Revised Design</button>
+      <button class="btn btn-decline" id="btn-decline" onclick="askConfirm('decline')">✗ Decline — Contact Installer</button>
     </div>
-    <p class="notice">This link is unique to you and can only be used once. Your decision will be recorded and your installer will be notified immediately.</p>
+    <p class="notice">This link is unique to you. Your decision will be recorded and your installer will be notified immediately.</p>
   `;
 }
 
+// ── Show confirmation overlay before doing anything ───────────────────────────
+function askConfirm(action) {
+  pendingAction = action;
+  const title = document.getElementById('confirm-title');
+  const sub   = document.getElementById('confirm-sub');
+  const btn   = document.getElementById('confirm-yes-btn');
+  if (action === 'approve') {
+    title.textContent = 'Accept the revised design?';
+    sub.textContent   = 'Your installer will be notified and will contact you to confirm the installation date.';
+    btn.textContent   = 'Yes, accept';
+    btn.className     = 'confirm-yes accept';
+  } else {
+    title.textContent = 'Decline the revised design?';
+    sub.textContent   = 'Your installer will be notified and will contact you to discuss alternatives.';
+    btn.textContent   = 'Yes, decline';
+    btn.className     = 'confirm-yes decline';
+  }
+  document.getElementById('confirm-overlay').classList.add('on');
+}
+
+function closeConfirm() {
+  pendingAction = null;
+  document.getElementById('confirm-overlay').classList.remove('on');
+}
+
+function confirmAction() {
+  document.getElementById('confirm-overlay').classList.remove('on');
+  if (pendingAction) submitAction(pendingAction);
+}
+
+// ── Actual submission ─────────────────────────────────────────────────────────
 async function submitAction(action) {
-  const btnA = document.getElementById('btn-accept');
-  const btnD = document.getElementById('btn-decline');
+  const btnA    = document.getElementById('btn-accept');
+  const btnD    = document.getElementById('btn-decline');
   const resultEl = document.getElementById('action-result');
   if (btnA) btnA.disabled = true;
   if (btnD) btnD.disabled = true;
-  if (resultEl) { resultEl.style.display = 'none'; }
+  if (resultEl) resultEl.style.display = 'none';
 
   try {
-    const res = await fetch(`${SUPA_URL}/functions/v1/handle-design-approval`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-      body: JSON.stringify({ token, action })
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Submission failed');
+    // Step 1: write client_approval_responded_at directly — this is the
+    // definitive proof a real button click happened. Without this timestamp
+    // init() will always show the form again, preventing ghost "declined" states.
+    await fetch(
+      `${SUPA_URL}/rest/v1/site_visits?client_approval_token=eq.${token}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPA_ANON,
+          'Authorization': 'Bearer ' + SUPA_ANON,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          client_approval_status:       action === 'approve' ? 'approved' : 'declined',
+          client_approval_responded_at: new Date().toISOString(),
+        }),
+      }
+    );
+
+    // Step 2: call the edge function to notify the installer (best-effort)
+    try {
+      const res  = await fetch(`${SUPA_URL}/functions/v1/handle-design-approval`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+        body:    JSON.stringify({ token, action }),
+      });
+      const data = await res.json();
+      if (!data.success) console.warn('handle-design-approval:', data.error);
+    } catch (edgeErr) {
+      // Edge function failure is non-fatal — the DB is already updated above
+      console.warn('Edge function notification failed:', edgeErr);
+    }
+
     showResult(action === 'approve' ? 'approved' : 'declined', true);
+
   } catch (e) {
     if (resultEl) {
       resultEl.innerHTML = `<div class="error-box">Something went wrong: ${e.message}. Please try again or contact your installer.</div>`;
@@ -155,14 +262,14 @@ async function submitAction(action) {
 }
 
 function showResult(status, wasAction) {
-  const body = document.getElementById('page-body');
+  const body  = document.getElementById('page-body');
   const title = document.getElementById('page-title');
   if (status === 'approved') {
     if (title) title.textContent = 'Design Accepted';
     body.innerHTML = `
       <div class="result">
         <div class="result-icon">✅</div>
-        <div class="result-title" style="color:#166534">${wasAction ? 'Thank you — design accepted!' : 'You already accepted this design.'}</div>
+        <div class="result-title" style="color:#166534">${wasAction ? 'Thank you — design accepted!' : 'You have already accepted this design.'}</div>
         <div class="result-sub">Your installer has been notified and will be in touch to confirm the installation date. No further action is needed from you.</div>
       </div>`;
   } else {
@@ -170,7 +277,7 @@ function showResult(status, wasAction) {
     body.innerHTML = `
       <div class="result">
         <div class="result-icon">📞</div>
-        <div class="result-title" style="color:#b45309">${wasAction ? 'Response recorded.' : 'You already declined this design.'}</div>
+        <div class="result-title" style="color:#b45309">${wasAction ? 'Response recorded.' : 'You have already declined this design.'}</div>
         <div class="result-sub">Your installer has been notified of your decision. Please contact them directly to discuss alternatives before any changes are made.</div>
       </div>`;
   }
