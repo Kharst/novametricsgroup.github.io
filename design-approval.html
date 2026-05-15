@@ -116,22 +116,21 @@ async function init() {
     // confirms. Background processes (edge functions, triggers) may set
     // client_approval_status without setting this timestamp — those must
     // never be treated as a real client decision.
-    const status    = visitData.client_approval_status;
-    const responded = visitData.client_approval_responded_at; // null until button clicked
+    const status = visitData.client_approval_status;
 
-    if (responded) {
-      if (status === 'approved' || status === 'accepted') {
-        showResult('approved', false);
-        return;
-      }
-      if (status === 'declined' || status === 'rejected') {
-        showResult('declined', false);
-        return;
-      }
-    }
+// Only auto-show APPROVED — it's unambiguous and safe.
+// NEVER auto-show "declined" from DB state alone. A column default,
+// edge-function placeholder, or DB trigger can write 'declined' before
+// the client has clicked anything. The only safe signal is 'approved'.
+if (status === 'approved' || status === 'accepted') {
+  showResult('approved', false);
+  return;
+}
 
-    // No confirmed response yet → always show the form
-    showApprovalForm();
+// For everything else (null, pending, declined, rejected) → always show the form.
+// If the client genuinely declined last time, they can confirm again — a small
+// extra click is far better than showing a false "you declined" screen.
+showApprovalForm();
 
   } catch (e) {
     body.innerHTML = `<div class="error-box">Could not load design details: ${e.message}</div>`;
@@ -207,46 +206,27 @@ function confirmAction() {
 
 // ── Actual submission ─────────────────────────────────────────────────────────
 async function submitAction(action) {
-  const btnA    = document.getElementById('btn-accept');
-  const btnD    = document.getElementById('btn-decline');
+  const btnA     = document.getElementById('btn-accept');
+  const btnD     = document.getElementById('btn-decline');
   const resultEl = document.getElementById('action-result');
   if (btnA) btnA.disabled = true;
   if (btnD) btnD.disabled = true;
   if (resultEl) resultEl.style.display = 'none';
 
   try {
-    // Step 1: write client_approval_responded_at directly — this is the
-    // definitive proof a real button click happened. Without this timestamp
-    // init() will always show the form again, preventing ghost "declined" states.
-    await fetch(
-      `${SUPA_URL}/rest/v1/site_visits?client_approval_token=eq.${token}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPA_ANON,
-          'Authorization': 'Bearer ' + SUPA_ANON,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({
-          client_approval_status:       action === 'approve' ? 'approved' : 'declined',
-          client_approval_responded_at: new Date().toISOString(),
-        }),
-      }
-    );
+    // Single source of truth: the edge function handles the DB write with
+    // the service role key (bypasses RLS). The direct anon PATCH was removed
+    // because it silently fails under RLS, leaving client_approval_responded_at
+    // unwritten and causing the guard in init() to never fire.
+    const res  = await fetch(`${SUPA_URL}/functions/v1/handle-design-approval`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body:    JSON.stringify({ token, action }),
+    });
+    const data = await res.json();
 
-    // Step 2: call the edge function to notify the installer (best-effort)
-    try {
-      const res  = await fetch(`${SUPA_URL}/functions/v1/handle-design-approval`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
-        body:    JSON.stringify({ token, action }),
-      });
-      const data = await res.json();
-      if (!data.success) console.warn('handle-design-approval:', data.error);
-    } catch (edgeErr) {
-      // Edge function failure is non-fatal — the DB is already updated above
-      console.warn('Edge function notification failed:', edgeErr);
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Server error — please try again.');
     }
 
     showResult(action === 'approve' ? 'approved' : 'declined', true);
