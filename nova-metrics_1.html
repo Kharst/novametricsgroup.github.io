@@ -154,7 +154,9 @@
     var sbClient = null;
     try {
       if (typeof supabase !== 'undefined') {
-        sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+          auth: { flowType: 'pkce' }
+        });
       }
     } catch(e) {}
 
