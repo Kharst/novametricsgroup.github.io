@@ -458,57 +458,231 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div style="font-size:12px;color:var(--muted);line-height:1.6">AI-powered proposal via Nova Metrics pipeline.<br><b style="color:var(--text)">🏠 Homeowner PDF — clear, simple, deal-closing</b></div>
       <button class="btn-generate" id="btn-gen" onclick="generatePDF()">Generate Proposal</button>
     </div>
-    <!-- PDF PREVIEW -->
+   <!-- PDF PREVIEW — matches real Nova Metrics output -->
     <div class="pdf-preview" id="pdf-preview">
-      <div class="pdf-header">
-        <div style="display:flex;align-items:flex-start;gap:12px">
-          <div class="pdf-logo">BS</div>
-          <div><div class="pdf-company">BRIGHT SOLAR SOLUTIONS</div><div class="pdf-tagline">Certified Solar Installer · SETA Registered · NRS 097 Compliant</div></div>
+
+      <!-- COVER PAGE -->
+      <div style="background:#0B1F3A;padding:36px 32px 28px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:rgba(255,215,0,.04)"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px">
+          <div style="width:38px;height:38px;background:#FFD700;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#0B1F3A;font-family:'DM Serif Display',serif">N</div>
+          <div style="font-size:11px;color:rgba(255,215,0,.7);font-weight:600;letter-spacing:.12em;text-transform:uppercase">Nova Metrics</div>
         </div>
-        <div class="pdf-ref">Ref: #001247<br>16 May 2026<br><span style="color:rgba(255,215,0,.6);font-weight:700">CONFIDENTIAL</span></div>
-      </div>
-      <div class="pdf-gold-bar"></div>
-      <div class="pdf-section">
-        <div class="pdf-client-name">Solar System Proposal for Thabo Nkosi</div>
-        <div class="pdf-address">14 Morningside Rd, Johannesburg, Gauteng · thabo@gmail.com · +27 82 555 0123</div>
-        <div class="pdf-sys-grid">
-          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Solar Array</div><div class="pdf-sys-val">5.50<span class="pdf-sys-unit"> kWp</span></div></div>
-          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Battery Storage</div><div class="pdf-sys-val">10.2<span class="pdf-sys-unit"> kWh</span></div></div>
-          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Backup</div><div class="pdf-sys-val">8<span class="pdf-sys-unit"> hrs</span></div></div>
+        <div style="font-size:38px;font-weight:900;color:#fff;letter-spacing:-.5px;line-height:1;font-family:'DM Serif Display',serif">SOLAR ENERGY</div>
+        <div style="font-size:38px;font-weight:900;color:rgba(255,255,255,.25);letter-spacing:-.5px;line-height:1.2;margin-bottom:28px;font-family:'DM Serif Display',serif">PROPOSAL</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px">PREPARED FOR</div>
+        <div style="font-size:24px;font-weight:700;color:#fff;margin-bottom:4px">Thabo Nkosi</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.45)">14 Morningside Rd, Johannesburg</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:28px">
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px">
+            <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">SYSTEM SIZE</div>
+            <div style="font-size:22px;font-weight:700;color:#fff">5.50 kW DC</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">10 panels</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px">
+            <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">TOTAL INVESTMENT</div>
+            <div style="font-size:22px;font-weight:700;color:#fff">R142,500</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">R25,909/kW</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px">
+            <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">ANNUAL SAVINGS (YR 1)</div>
+            <div style="font-size:22px;font-weight:700;color:#FFD700">R18,200</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">R1,517/month</div>
+          </div>
+          <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:14px">
+            <div style="font-size:9px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">SA MODEL IRR</div>
+            <div style="font-size:22px;font-weight:700;color:#34d399">19.2%</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">NPV +R142,000 @ 12%</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:6px;padding:8px 10px;font-size:10px;color:rgba(255,255,255,.5);text-align:center">8,833 kWh/yr</div>
+          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:6px;padding:8px 10px;font-size:10px;color:rgba(255,255,255,.5);text-align:center">63% energy independent</div>
+          <div style="flex:1;background:rgba(255,255,255,.05);border-radius:6px;padding:8px 10px;font-size:10px;color:rgba(255,255,255,.5);text-align:center">NERSA SSEG Cat. B</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:11px;color:rgba(255,255,255,.3)">Johannesburg, Gauteng | 16 May 2026</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,215,0,.6)">Powered by Nova Metrics</div>
         </div>
       </div>
-      <div class="pdf-section">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">Your Savings</div>
-        <div class="pdf-savings-grid">
-          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Monthly</div><div class="pdf-sav-val">R1,517</div></div>
-          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Year 1</div><div class="pdf-sav-val">R18,200</div></div>
-          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Payback</div><div class="pdf-sav-val" style="color:#0B1F3A">7.8 yrs</div></div>
-          <div class="pdf-sav-item"><div class="pdf-sav-lbl">25-yr Net</div><div class="pdf-sav-val">R198k</div></div>
+
+      <!-- DIVIDER -->
+      <div style="height:4px;background:linear-gradient(90deg,#FFD700,#c8911c)"></div>
+
+      <!-- EXECUTIVE SUMMARY -->
+      <div style="background:#fff;padding:22px 28px;border-bottom:1px solid #f0f0f0">
+        <div style="font-size:9px;font-weight:700;color:#0B1F3A;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          Nova Metrics Executive Summary
+          <span style="flex:1;height:1px;background:#e5e7eb;display:inline-block"></span>
+          <span style="color:#9ca3af;font-weight:400">Page 2 / 8</span>
         </div>
-        <div class="pdf-timeline" style="margin-top:14px">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9ca3af;letter-spacing:.08em;margin-bottom:8px">Cumulative Savings Projection</div>
-          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 1</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:12%;background:#0B1F3A">R18k</div></div></div>
-          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 5</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:45%;background:#0B1F3A">R72k</div></div></div>
-          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 8 ✓</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:73%;background:#166534">R143k</div></div></div>
-          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 25</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:100%;background:#166534">R341k gross</div></div></div>
-          <div style="font-size:10px;color:#9ca3af;margin-top:6px">■ Investment recovered · ■ Pure profit</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+          <div style="background:#f9fafb;border-radius:7px;padding:11px;text-align:center">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">DC CAPACITY</div>
+            <div style="font-size:16px;font-weight:700;color:#0B1F3A">5.50 kW</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px">10 panels</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:7px;padding:11px;text-align:center">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">ANNUAL SAVINGS</div>
+            <div style="font-size:16px;font-weight:700;color:#166534">R18,200</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px">R1,517/month</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:7px;padding:11px;text-align:center">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">AFTER-COST PAYBACK</div>
+            <div style="font-size:16px;font-weight:700;color:#0B1F3A">Year 8</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px">Incl. O&amp;M &amp; battery</div>
+          </div>
+          <div style="background:#f9fafb;border-radius:7px;padding:11px;text-align:center">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">BACKUP RUNTIME</div>
+            <div style="font-size:16px;font-weight:700;color:#0B1F3A">13.7 hrs</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px">avg. daily draw</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#4a5568;line-height:1.7;margin-bottom:14px">We've designed a 5.50 kW DC solar system for your residential property in Johannesburg, Gauteng, providing a significant reduction in electricity bills. You'll be using 10 high-efficiency JA Solar 550W panels, paired with a Sunsynk 5kW Hybrid inverter and a 10.2 kWh LiFePO4 battery system (2× units). The geyser runs on solar surplus during the day — excluded from battery backup — which keeps the system right-sized and cost-efficient.</div>
+        <!-- System Flow -->
+        <div style="background:#f9fafb;border-radius:8px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:14px;font-size:11px;text-align:center">
+          <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px">
+            <div style="font-size:16px;margin-bottom:4px">☀️</div>
+            <div style="font-weight:700;color:#0B1F3A">SOLAR ARRAY</div>
+            <div style="color:#9ca3af">5.50 kW DC</div>
+          </div>
+          <div style="color:#9ca3af;font-size:16px">→</div>
+          <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px">
+            <div style="font-size:16px;margin-bottom:4px">⚡</div>
+            <div style="font-weight:700;color:#0B1F3A">INVERTER</div>
+            <div style="color:#9ca3af">Sunsynk 5kW</div>
+          </div>
+          <div style="color:#9ca3af;font-size:16px">→</div>
+          <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px">
+            <div style="font-size:16px;margin-bottom:4px">🔋</div>
+            <div style="font-weight:700;color:#0B1F3A">BATTERY</div>
+            <div style="color:#9ca3af">10.2 kWh</div>
+          </div>
+          <div style="color:#9ca3af;font-size:16px">→</div>
+          <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px">
+            <div style="font-size:16px;margin-bottom:4px">🏠</div>
+            <div style="font-weight:700;color:#0B1F3A">LOADS</div>
+            <div style="color:#9ca3af">0.87 kW peak</div>
+          </div>
         </div>
       </div>
-      <div class="pdf-section">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">Equipment Specification</div>
-        <div class="pdf-equipment">
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Solar Panels</span><span class="pdf-eq-val">10× JA Solar 550W (5.50 kWp)</span></div>
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Inverter</span><span class="pdf-eq-val">Sunsynk 5kW Hybrid · NRS 097 ✓</span></div>
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Battery</span><span class="pdf-eq-val">2× Sunsynk 5.1kWh LiFePO4 (10.2 kWh)</span></div>
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">DC/AC Ratio</span><span class="pdf-eq-val">1.32:1 — NRS 097-2-1 Compliant</span></div>
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Annual CO₂ Saved</span><span class="pdf-eq-val">7.91 tonnes (≈ 377 trees)</span></div>
-          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Total Investment</span><span class="pdf-eq-val" style="color:#0B1F3A;font-weight:700">R142,500</span></div>
+
+      <!-- FINANCIAL ANALYSIS -->
+      <div style="background:#fff;padding:22px 28px;border-bottom:1px solid #f0f0f0">
+        <div style="font-size:9px;font-weight:700;color:#0B1F3A;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          SA-Compliant Financial Analysis
+          <span style="flex:1;height:1px;background:#e5e7eb;display:inline-block"></span>
+          <span style="color:#9ca3af;font-weight:400">Page 3 / 8</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+          <div style="text-align:center;padding:12px;background:#f9fafb;border-radius:7px">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">TOTAL INVESTMENT</div>
+            <div style="font-size:18px;font-weight:700;color:#0B1F3A">R142,500</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:#f0fdf4;border-radius:7px;border:1px solid #86efac">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">NPV @ 12%</div>
+            <div style="font-size:18px;font-weight:700;color:#166534">+R142,000</div>
+          </div>
+          <div style="text-align:center;padding:12px;background:#f0fdf4;border-radius:7px;border:1px solid #86efac">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">SA MODEL IRR</div>
+            <div style="font-size:18px;font-weight:700;color:#166534">19.2%</div>
+          </div>
+        </div>
+        <!-- Cost Breakdown -->
+        <div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">HARDWARE COST BREAKDOWN</div>
+        <div style="background:#f9fafb;border-radius:7px;overflow:hidden;margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:12px"><span style="color:#6b7280">Solar Panels — 10× JA Solar 550W</span><span style="font-weight:600;color:#0B1F3A">R55,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:12px"><span style="color:#6b7280">Balance of System — cabling, mounting</span><span style="font-weight:600;color:#0B1F3A">R16,500</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:12px"><span style="color:#6b7280">Battery System — 2× Sunsynk 5.1kWh</span><span style="font-weight:600;color:#0B1F3A">R59,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e5e7eb;font-size:12px"><span style="color:#6b7280">Inverter — Sunsynk 5kW Hybrid</span><span style="font-weight:600;color:#0B1F3A">R12,000</span></div>
+          <div style="display:flex;justify-content:space-between;padding:9px 12px;font-size:12px;background:#f3f4f6"><span style="font-weight:700;color:#0B1F3A">TOTAL HARDWARE COST</span><span style="font-weight:700;color:#0B1F3A">R142,500</span></div>
+        </div>
+        <!-- Year by Year -->
+        <div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">YEAR-BY-YEAR MILESTONES (SA NERSA ESCALATION)</div>
+        <div style="background:#f9fafb;border-radius:7px;overflow:hidden;font-size:11px">
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;background:#0B1F3A;padding:8px 12px;font-size:9px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em">
+            <span>Year</span><span>Gross Sav.</span><span>O&amp;M+Ins.</span><span>Cumulative</span>
+          </div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="color:#6b7280">1</span><span>R18,200</span><span>R3,563</span><span style="color:#dc2626">-R127,863</span></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid #e5e7eb;background:#fafafa"><span style="color:#6b7280">3</span><span>R21,354</span><span>R3,780</span><span style="color:#dc2626">-R87,240</span></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="color:#6b7280">5</span><span>R23,096</span><span>R4,042</span><span style="color:#dc2626">-R41,330</span></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid #e5e7eb;background:#fafafa"><span style="color:#6b7280">8 ★</span><span>R27,001</span><span>R63,408*</span><span style="color:#166534;font-weight:700">+R2,840</span></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid #e5e7eb"><span style="color:#6b7280">15</span><span>R35,619</span><span>R5,736</span><span style="color:#166534">+R176,200</span></div>
+          <div style="display:grid;grid-template-columns:60px 1fr 1fr 1fr;padding:8px 12px;font-size:10px;color:#9ca3af" style="font-style:italic"><span colspan="4">★ Payback year. *Includes battery replacement Yr 10 @ 70% of installed cost.</span></div>
         </div>
       </div>
-      <div class="pdf-footer">
-        <div class="pdf-footer-txt">Projections based on published NERSA tariff escalation rates · NRS 097-2-1 compliant design</div>
-        <div class="pdf-footer-badge">Nova Metrics Certified ✓</div>
+
+      <!-- EQUIPMENT + COMPLIANCE -->
+      <div style="background:#fff;padding:22px 28px;border-bottom:1px solid #f0f0f0">
+        <div style="font-size:9px;font-weight:700;color:#0B1F3A;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+          System Components &amp; Compliance
+          <span style="flex:1;height:1px;background:#e5e7eb;display:inline-block"></span>
+          <span style="color:#9ca3af;font-weight:400">Pages 5–8</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div style="background:#f9fafb;border-radius:7px;padding:12px">
+            <div style="font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">EQUIPMENT</div>
+            <div style="font-size:12px;color:#374151;line-height:2">
+              <div>☀️ <b>10× JA Solar 550W</b> (5.50 kWp)</div>
+              <div>⚡ <b>Sunsynk 5kW Hybrid</b> · NRS 097 ✓</div>
+              <div>🔋 <b>2× Sunsynk 5.1kWh LiFePO4</b></div>
+              <div style="font-size:11px;color:#9ca3af;padding-left:18px">DC/AC 1.32:1 · DoD 68% · Runtime 13.7 hrs</div>
+            </div>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:7px;padding:12px">
+            <div style="font-size:9px;color:#166534;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">COMPLIANCE STATUS</div>
+            <div style="font-size:12px;line-height:2;color:#374151">
+              <div>✅ NRS 097-2-1:2017 — DC/AC 1.32:1</div>
+              <div>✅ SANS 10142-1 — Electrical install</div>
+              <div>✅ IEC 62619 — LiFePO4 DoD 68% ≤ 85%</div>
+              <div>⚠️ NERSA SSEG Cat. B registration req.</div>
+            </div>
+          </div>
+        </div>
+        <!-- Environmental -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+          <div style="text-align:center;background:#f0fdf4;border-radius:7px;padding:10px">
+            <div style="font-size:18px;margin-bottom:4px">🌱</div>
+            <div style="font-size:14px;font-weight:700;color:#166534">7.91t</div>
+            <div style="font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">CO₂/yr</div>
+          </div>
+          <div style="text-align:center;background:#f0fdf4;border-radius:7px;padding:10px">
+            <div style="font-size:18px;margin-bottom:4px">🌳</div>
+            <div style="font-size:14px;font-weight:700;color:#166534">377</div>
+            <div style="font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Trees equiv.</div>
+          </div>
+          <div style="text-align:center;background:#f0fdf4;border-radius:7px;padding:10px">
+            <div style="font-size:18px;margin-bottom:4px">⛏️</div>
+            <div style="font-size:14px;font-weight:700;color:#166534">3.59t</div>
+            <div style="font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Coal avoided</div>
+          </div>
+          <div style="text-align:center;background:#f0fdf4;border-radius:7px;padding:10px">
+            <div style="font-size:18px;margin-bottom:4px">💧</div>
+            <div style="font-size:14px;font-weight:700;color:#166534">15,899L</div>
+            <div style="font-size:9px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Water/yr</div>
+          </div>
+        </div>
+        <!-- Signature block -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-top:14px;border-top:1px solid #e5e7eb">
+          <div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24px">Client Signature</div>
+            <div style="border-bottom:1.5px solid #0B1F3A;width:80%"></div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:4px">Thabo Nkosi · Date</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:24px">Installer Authorised Signature</div>
+            <div style="border-bottom:1.5px solid #0B1F3A;width:80%"></div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:4px">Bright Solar Solutions · Date</div>
+          </div>
+        </div>
       </div>
+
+      <!-- FOOTER -->
+      <div style="background:#0B1F3A;padding:14px 28px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:10px;color:rgba(255,255,255,.3);max-width:72%">Projections are estimates based on NERSA tariff data, SAURAN solar atlas and SA engineering standards. Not financial advice. Section 12B benefits apply to qualifying businesses only.</div>
+        <div style="font-size:10px;font-weight:700;color:#FFD700;padding:4px 10px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:20px;white-space:nowrap">Nova Metrics Certified ✓</div>
+      </div>
+
     </div>
   </div>
 
