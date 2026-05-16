@@ -946,7 +946,7 @@ async function saveBooking(){
     var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;
     var patch={site_visit_date:date,site_visit_time:time||null,site_visit_notes:notes||null,site_visit_confirmed:true,job_status:'site_visit_scheduled'};
     var res=await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(activeAiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});
-    if(res.ok||res.status===204){allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(activeAiId)){Object.assign(c.ai,patch);}});var bkEx=document.getElementById('bkExisting');bkEx.className='bk-existing on';bkEx.textContent='📅 Booked: '+date+(time?' at '+time:'')+' ✓';document.getElementById('bkConfirmed').classList.add('on');btn.textContent='✓ Update Booking';btn.disabled=false;}
+    if(res.ok||res.status===204){allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(activeAiId)){Object.assign(c.ai,patch);}});var bkEx=document.getElementById('bkExisting');bkEx.className='bk-existing on';bkEx.textContent='📅 Booked: '+date+(time?' at '+time:'')+' ✓';document.getElementById('bkConfirmed').classList.add('on');btn.textContent='✓ Redirecting to Job Portal…';btn.disabled=true;setTimeout(function(){window.location.href='job-portal.html?ai_id='+encodeURIComponent(activeAiId);},1200);}
     else{alert('Save failed ('+res.status+')');btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
   }catch(err){alert('Network error: '+err.message);btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
 }
