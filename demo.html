@@ -4,572 +4,860 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nova Metrics Solar Intelligence — Interactive Tour</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#0B1F3A;--gold:#F0B429;--green:#22c78a;--red:#f04f4f;--bg:#f0f2f5;--white:#ffffff;--text:#1a2332;--muted:#6b7280;--border:#e5e7eb;--tooltip-bg:#0f2542;--spotlight:rgba(0,0,0,0.68)}
+/* ═══════════════════ EXACT REAL TOOL THEME ═══════════════════ */
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --surface:#112840;--surface2:#0e2035;--green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-#welcome{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 30% 40%,#0d2a4a 0%,#060f1e 70%);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .5s,visibility .5s}
-#welcome.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.welcome-inner{max-width:560px;width:100%;text-align:center}
-.welcome-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:40px}
-.welcome-logo-mark{width:40px;height:40px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.welcome-logo-mark svg{width:22px;height:22px}
-.welcome-logo-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase}
-.welcome-eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
-.welcome-h1{font-family:'Syne',sans-serif;font-size:clamp(32px,6vw,52px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:20px}
-.welcome-h1 em{font-style:normal;color:var(--gold)}
-.welcome-sub{font-size:16px;color:#7fa3cc;line-height:1.75;margin-bottom:36px;max-width:420px;margin-left:auto;margin-right:auto}
-.welcome-btn{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;padding:16px 36px;border-radius:10px;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;letter-spacing:.03em}
-.welcome-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,180,41,.4)}
-.welcome-btn svg{width:18px;height:18px}
-.welcome-steps{display:flex;justify-content:center;gap:28px;margin-top:40px;flex-wrap:wrap}
-.welcome-step{display:flex;align-items:center;gap:8px;font-size:12px;color:#5580a0}
-.welcome-step-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;opacity:.6}
-#progress-bar{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(11,31,58,.96);backdrop-filter:blur(10px);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);transform:translateY(-100%);transition:transform .4s ease}
-#progress-bar.visible{transform:translateY(0)}
-.pb-logo{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:.08em;opacity:.9}
-.pb-logo span{color:var(--gold)}
-.pb-steps{display:flex;align-items:center;gap:6px}
-.pb-dot{width:28px;height:6px;border-radius:3px;background:rgba(255,255,255,.15);cursor:pointer;transition:background .3s,width .3s}
-.pb-dot.done{background:var(--gold);opacity:.7}
-.pb-dot.active{background:var(--gold);width:36px}
-.pb-skip{font-size:12px;color:#5580a0;cursor:pointer;padding:6px 10px;border-radius:6px;transition:color .2s}
-.pb-skip:hover{color:#fff}
-#spotlight{position:fixed;inset:0;z-index:700;pointer-events:none;background:var(--spotlight);opacity:0;transition:opacity .4s}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ═══════════════════ TOUR OVERLAY SYSTEM ═══════════════════ */
+#spotlight{position:fixed;inset:0;z-index:700;pointer-events:none;background:rgba(0,0,0,.72);opacity:0;transition:opacity .4s}
 #spotlight.on{opacity:1;pointer-events:all}
-#tooltip{position:fixed;z-index:800;background:var(--tooltip-bg);border:1px solid rgba(240,180,41,.25);border-radius:14px;padding:22px 24px;max-width:320px;width:calc(100vw - 48px);box-shadow:0 20px 60px rgba(0,0,0,.5);opacity:0;transform:scale(.94);pointer-events:none;transition:opacity .35s,transform .35s}
-#tooltip.on{opacity:1;transform:scale(1);pointer-events:all}
-.tt-step{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
-.tt-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3}
-.tt-body{font-size:13px;color:#7fa3cc;line-height:1.7;margin-bottom:20px}
-.tt-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.tt-btn{display:flex;align-items:center;gap:6px;background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;transition:transform .15s,box-shadow .15s}
-.tt-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(240,180,41,.35)}
-.tt-btn svg{width:14px;height:14px}
-.tt-back{font-size:12px;color:#5580a0;cursor:pointer;padding:8px;border-radius:6px;border:none;background:none;transition:color .2s}
-.tt-back:hover{color:#7fa3cc}
-.pulse-ring{position:fixed;z-index:750;pointer-events:none;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;border:2.5px solid var(--gold);opacity:0;animation:pulseOut 1.6s ease-out infinite}
-@keyframes pulseOut{0%{transform:scale(.6);opacity:.9}100%{transform:scale(1.8);opacity:0}}
-.click-dot{position:fixed;z-index:751;pointer-events:none;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(240,180,41,.3)}
-#app{opacity:0;transition:opacity .5s;padding-top:56px}
-#app.visible{opacity:1}
-.topbar{background:var(--navy);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)}
-.topbar-logo{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.06em}
-.topbar-logo span{color:var(--gold)}
-.topbar-right{display:flex;align-items:center;gap:12px}
-.topbar-badge{font-size:11px;background:rgba(240,180,41,.15);color:var(--gold);padding:4px 10px;border-radius:20px;font-weight:600}
-.topbar-user{width:30px;height:30px;border-radius:50%;background:#1e3d6b;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#7fa3cc}
-.tab-bar{background:var(--white);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;overflow-x:auto}
-.tab-item{padding:14px 20px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;white-space:nowrap}
-.tab-item.active{color:var(--navy);border-bottom-color:var(--gold)}
-.layout{display:grid;grid-template-columns:340px 1fr;gap:0;min-height:calc(100vh - 56px - 52px - 45px)}
-@media(max-width:760px){.layout{grid-template-columns:1fr}}
-.left-panel{background:var(--white);border-right:1px solid var(--border);padding:20px}
-.panel-section{margin-bottom:24px}
-.panel-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;margin-bottom:12px}
-.appliance-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f9fafb;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color .2s,background .2s}
-.appliance-item.backed{background:#f0fdf4;border-color:#86efac}
-.appliance-icon{width:32px;height:32px;border-radius:6px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.appliance-name{font-size:13px;font-weight:600;color:var(--navy);flex:1}
-.appliance-kwh{font-size:11px;color:var(--muted)}
-.backed-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#dcfce7;color:#166534}
-.add-appliance-btn{width:100%;padding:10px;border:1.5px dashed var(--border);border-radius:8px;background:none;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:border-color .2s,color .2s}
-.add-appliance-btn:hover{border-color:var(--navy);color:var(--navy)}
-.slider-wrap{margin-top:8px}
-.slider-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px}
-input[type=range]{width:100%;accent-color:var(--gold);cursor:pointer}
-.slider-value{font-size:22px;font-weight:700;color:var(--navy);text-align:center;margin-top:6px}
-.slider-value span{font-size:13px;font-weight:400;color:var(--muted)}
-.location-select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;color:var(--navy);background:#fff;font-family:'DM Sans',sans-serif;cursor:pointer;transition:border-color .2s}
-.location-select:focus{outline:none;border-color:var(--gold)}
-.right-panel{padding:20px 24px;background:var(--bg)}
-.system-card{background:var(--navy);border-radius:14px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
-.system-card::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(240,180,41,.12) 0%,transparent 70%)}
-.sc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
-.sc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#5580a0;margin-bottom:4px}
-.sc-value{font-size:22px;font-weight:700;color:#fff;line-height:1.1}
-.sc-unit{font-size:12px;font-weight:400;color:#5580a0;margin-left:2px}
-.sc-model{font-size:11px;color:#3d6a9e;margin-top:3px}
-.generate-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#e09a20);color:var(--navy);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;letter-spacing:.03em;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s,box-shadow .2s}
-.generate-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(240,180,41,.4)}
-.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
-@media(max-width:900px){.metrics-row{grid-template-columns:repeat(2,1fr)}}
-.metric-card{background:var(--white);border-radius:10px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px}
-.metric-value{font-size:20px;font-weight:700;color:var(--navy)}
-.metric-unit{font-size:11px;color:var(--muted);font-weight:400}
-.metric-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.metric-card.green .metric-value{color:#166534}
-.metric-card.green{border-top:3px solid var(--green)}
-.savings-card{background:var(--white);border-radius:10px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:16px}
-.sc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:16px}
-.bar-group{display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:4px}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bar-fill-wrap{flex:1;width:100%;display:flex;align-items:flex-end}
-.bar-fill-inner{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--gold),#c8911c);transition:height .8s cubic-bezier(.34,1.56,.64,1);min-height:4px}
-.bar-fill-inner.past{background:linear-gradient(180deg,var(--green),#16a370)}
-.bar-yr{font-size:10px;color:var(--muted);font-weight:600}
-.proposal-preview{background:var(--white);border-radius:10px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:16px}
-.pp-header{background:var(--navy);padding:16px 20px;display:flex;align-items:center;gap:12px}
-.pp-logo-box{width:36px;height:36px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.pp-company{font-size:12px;font-weight:700;color:#fff;letter-spacing:.04em}
-.pp-tagline{font-size:10px;color:#5580a0}
-.pp-body{padding:16px 20px}
-.pp-client{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px}
-.pp-detail{font-size:12px;color:var(--muted);margin-bottom:12px}
-.pp-specs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pp-spec-item{background:#f9fafb;border-radius:6px;padding:10px}
-.pp-spec-label{font-size:10px;color:var(--muted);margin-bottom:2px}
-.pp-spec-val{font-size:14px;font-weight:700;color:var(--navy)}
-.pp-footer{border-top:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
-.pp-status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
-.pp-status-dot{width:8px;height:8px;border-radius:50%}
-.pp-status-dot.sent{background:#3b82f6;animation:blink 1.5s ease infinite}
-.pp-status-dot.approved{background:var(--green)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.approval-card{background:var(--white);border-radius:10px;padding:20px;box-shadow:0 1px 6px rgba(0,0,0,.06);margin-bottom:16px}
-.approval-timeline{margin-top:12px}
-.at-item{display:flex;align-items:flex-start;gap:12px;padding-bottom:16px;position:relative}
-.at-item:not(:last-child)::before{content:'';position:absolute;left:13px;top:26px;bottom:0;width:1.5px;background:var(--border)}
-.at-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-.at-dot.done{background:#dcfce7;color:#166534}
-.at-dot.active{background:#eff6ff;color:#1d4ed8;animation:blink 1.5s ease infinite}
-.at-dot.pending{background:#f3f4f6;color:var(--muted)}
-.at-title{font-size:13px;font-weight:600;color:var(--navy)}
-.at-sub{font-size:12px;color:var(--muted);margin-top:2px}
-#completion{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 50% 40%,#0d2a4a 0%,#060f1e 70%);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
-#completion.on{opacity:1;visibility:visible}
-.comp-inner{max-width:480px;width:100%;text-align:center}
-.comp-icon{font-size:56px;margin-bottom:20px;animation:bounce .6s ease}
-@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
-.comp-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;margin-bottom:12px}
-.comp-sub{font-size:15px;color:#7fa3cc;line-height:1.7;margin-bottom:32px}
-.comp-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.comp-btn-primary{background:var(--gold);color:var(--navy);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;display:inline-block;transition:transform .2s,box-shadow .2s}
-.comp-btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,180,41,.4)}
-.comp-btn-sec{background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;border:1px solid rgba(255,255,255,.15);cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s}
-.comp-btn-sec:hover{background:rgba(255,255,255,.14)}
-.highlight-ring{position:fixed;z-index:710;pointer-events:none;border:2.5px solid var(--gold);border-radius:12px;box-shadow:0 0 0 4px rgba(240,180,41,.18),0 0 32px rgba(240,180,41,.25);transition:all .35s cubic-bezier(.34,1.2,.64,1);opacity:0}
+.highlight-ring{position:fixed;z-index:710;pointer-events:none;border:2.5px solid var(--gold);border-radius:10px;box-shadow:0 0 0 4px rgba(255,215,0,.18),0 0 40px rgba(255,215,0,.25);transition:all .4s cubic-bezier(.34,1.2,.64,1);opacity:0}
 .highlight-ring.on{opacity:1}
+#tooltip{position:fixed;z-index:800;background:#0a1c34;border:1px solid var(--gold-border);border-radius:14px;padding:22px 24px;max-width:320px;width:calc(100vw - 48px);box-shadow:0 20px 60px rgba(0,0,0,.7);opacity:0;transform:scale(.94);pointer-events:none;transition:opacity .3s,transform .3s}
+#tooltip.on{opacity:1;transform:scale(1);pointer-events:all}
+.tt-step{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.tt-title{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:10px;line-height:1.3}
+.tt-body{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+.tt-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tt-btn{display:flex;align-items:center;gap:6px;background:var(--gold);color:var(--navy);font-size:13px;font-weight:700;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:transform .15s}
+.tt-btn:hover{transform:translateY(-1px)}
+.tt-back{font-size:12px;color:var(--muted);cursor:pointer;padding:8px;border-radius:6px;border:none;background:none;font-family:'DM Sans',sans-serif;transition:color .2s}
+.tt-back:hover{color:var(--text)}
+.pulse-ring{position:fixed;z-index:750;pointer-events:none;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;border:2.5px solid var(--gold);opacity:0;animation:pulseOut 1.6s ease-out infinite}
+@keyframes pulseOut{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+.click-dot{position:fixed;z-index:751;pointer-events:none;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,.3)}
+
+/* ═══════════════════ WELCOME SCREEN ═══════════════════ */
+#welcome{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 30% 40%,#0d2a4a 0%,#040d1a 70%);display:flex;align-items:center;justify-content:center;padding:24px;transition:opacity .5s,visibility .5s}
+#welcome.out{opacity:0;visibility:hidden;pointer-events:none}
+.wc-inner{max-width:580px;width:100%;text-align:center}
+.wc-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:40px}
+.wc-logo-mark{width:42px;height:42px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:18px;font-weight:700;color:var(--navy)}
+.wc-brand{font-size:15px;font-weight:600;color:var(--text);letter-spacing:.04em}
+.wc-brand span{color:var(--gold)}
+.wc-eye{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.wc-h1{font-family:'DM Serif Display',serif;font-size:clamp(32px,6vw,52px);color:var(--text);font-weight:400;line-height:1.15;margin-bottom:16px}
+.wc-h1 em{font-style:italic;color:var(--gold)}
+.wc-sub{font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:36px;max-width:440px;margin-left:auto;margin-right:auto}
+.wc-btn{display:inline-flex;align-items:center;gap:10px;background:var(--gold);color:var(--navy);font-size:15px;font-weight:700;padding:15px 36px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:transform .2s,box-shadow .2s}
+.wc-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,215,0,.4)}
+.wc-steps{display:flex;justify-content:center;gap:24px;margin-top:36px;flex-wrap:wrap}
+.wc-step{font-size:12px;color:#4a6a8a;display:flex;align-items:center;gap:7px}
+.wc-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;opacity:.55}
+
+/* ═══════════════════ PROGRESS BAR ═══════════════════ */
+#pbar{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(11,31,58,.97);backdrop-filter:blur(12px);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);transform:translateY(-100%);transition:transform .4s}
+#pbar.on{transform:translateY(0)}
+.pb-brand{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.pb-icon{width:26px;height:26px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:12px;font-weight:700;color:var(--navy)}
+.pb-dots{display:flex;gap:5px;align-items:center}
+.pb-dot{height:5px;width:26px;border-radius:3px;background:rgba(255,255,255,.12);cursor:pointer;transition:all .3s}
+.pb-dot.done{background:var(--gold);opacity:.65}
+.pb-dot.act{background:var(--gold);width:36px}
+.pb-skip{font-size:12px;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:6px;transition:color .2s}
+.pb-skip:hover{color:var(--text)}
+
+/* ═══════════════════ REAL TOOL NAV ═══════════════════ */
+#app{opacity:0;transition:opacity .5s;padding-top:54px}
+#app.on{opacity:1}
+.top-nav{background:var(--navy);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-icon{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:15px;font-weight:700;color:var(--navy)}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}
+.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-center{display:flex;gap:5px}
+.nav-chip{font-size:11px;padding:5px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.nav-chip.active{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.portal-link{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s}
+.portal-link.ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.portal-link.ghost:hover{background:rgba(255,255,255,.10);color:var(--gold)}
+.portal-link.gold{background:var(--gold);color:var(--navy)}
+
+/* ═══════════════════ INPUT STRIP ═══════════════════ */
+.input-strip{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:16px 24px 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.inp-g{display:flex;flex-direction:column;gap:5px}
+.inp-g label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+.inp-g select,.inp-g input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 11px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;min-width:140px}
+.inp-g select:focus,.inp-g input:focus{outline:none;border-color:var(--gold)}
+.loc-input{cursor:pointer;min-width:180px}
+.lb-trigger-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;transition:all .2s;white-space:nowrap}
+.lb-trigger-btn.active{border-color:var(--gold-border);background:var(--gold-dim);color:var(--gold)}
+.lb-trigger-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+.btn-calc{background:var(--gold);color:var(--navy);border:none;padding:9px 24px;border-radius:8px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;height:38px;transition:all .2s}
+.btn-calc:hover{background:#fff}
+
+/* ═══════════════════ LOAD BUILDER PANEL ═══════════════════ */
+.lb-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin:0 24px 12px;display:none}
+.lb-panel.open{display:block;animation:upIn .25s ease}
+@keyframes upIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.lb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.lb-title{font-size:11px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.1em}
+.lb-badge{background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--gold);font-weight:600}
+.lb-shd{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin:10px 0 6px}
+.lb-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.lb-chip{padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--muted);cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:.15s}
+.lb-chip:hover{border-color:var(--gold-border);color:var(--text);background:var(--gold-dim)}
+.lb-items{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.lb-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 12px;font-size:12.5px;color:var(--text)}
+.lb-item-name{flex:1;font-weight:500}
+.lb-item-kwh{font-size:11px;color:var(--gold);font-weight:600}
+.lb-item-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.badge-backed{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:var(--green)}
+.badge-solar{background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+
+/* ═══════════════════ RESULT TABS ═══════════════════ */
+.tabs-row{display:flex;gap:3px;margin:0 24px 0;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:8px 8px 0 0;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);border-bottom:none;background:var(--surface);color:var(--muted);transition:.15s;font-family:'DM Sans',sans-serif}
+.tab.active{background:var(--surface2);color:var(--gold);border-color:var(--gold-border)}
+.tab:hover:not(.active){color:var(--text)}
+.tab-content{margin:0 24px 24px;background:var(--surface);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:22px;display:none}
+.tab-content.active{display:block}
+
+/* ═══════════════════ KPI GRID ═══════════════════ */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;margin-bottom:14px}
+.kpi{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:13px 15px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;border-radius:0 0 10px 10px;background:var(--gold)}
+.kpi.green::after{background:var(--green)}.kpi.amber::after{background:var(--amber)}.kpi.white::after{background:rgba(255,255,255,.2)}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;font-weight:500}
+.kpi .val{font-size:1.4rem;font-weight:600;color:var(--gold);line-height:1.1;font-family:'DM Serif Display',serif}
+.kpi.green .val{color:var(--green)}.kpi.white .val{color:var(--text)}.kpi.amber .val{color:var(--amber)}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.sec-title{font-size:10px;font-weight:600;color:var(--gold);margin:16px 0 10px;text-transform:uppercase;letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.status-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.status-row:last-child{border-bottom:none}
+.status-row .lbl{color:var(--muted)}.status-row .val{font-weight:500;color:var(--text);text-align:right}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chart-lbl{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
+.chart-outer{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:22px;overflow:hidden}
+.chart-inner{height:100%;border-radius:4px}
+.chart-val{font-size:11px;color:var(--text);min-width:80px}
+
+/* ═══════════════════ PROPOSAL TAB ═══════════════════ */
+.client-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.client-form input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:10px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif}
+.client-form label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.proposal-strip{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.btn-generate{background:var(--green);color:#064e3b;border:none;padding:12px 28px;border-radius:9px;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-generate:hover{background:#10b981}
+
+/* ═══════════════════ PROPOSAL PDF PREVIEW ═══════════════════ */
+.pdf-preview{background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,.4);max-width:640px;margin:20px auto 0;font-family:'DM Sans',sans-serif;display:none}
+.pdf-preview.on{display:block;animation:upIn .4s ease}
+.pdf-header{background:#0B1F3A;padding:24px 28px;display:flex;align-items:flex-start;justify-content:space-between}
+.pdf-logo{width:42px;height:42px;background:#FFD700;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#0B1F3A;font-family:'DM Serif Display',serif;flex-shrink:0}
+.pdf-company{color:#fff;font-size:13px;font-weight:700;letter-spacing:.04em;margin-left:12px}
+.pdf-tagline{color:rgba(255,255,255,.45);font-size:10px;margin-top:2px}
+.pdf-ref{color:rgba(255,255,255,.3);font-size:10px;text-align:right}
+.pdf-gold-bar{height:4px;background:linear-gradient(90deg,#FFD700,#c8911c)}
+.pdf-section{padding:20px 28px;border-bottom:1px solid #f0f0f0}
+.pdf-client-name{font-size:18px;font-weight:700;color:#0B1F3A;font-family:'DM Serif Display',serif}
+.pdf-address{font-size:12px;color:#6b7280;margin-top:4px}
+.pdf-sys-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pdf-sys-item{background:#f9fafb;border-radius:7px;padding:12px;text-align:center}
+.pdf-sys-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:4px}
+.pdf-sys-val{font-size:17px;font-weight:700;color:#0B1F3A;font-family:'DM Serif Display',serif}
+.pdf-sys-unit{font-size:10px;color:#9ca3af;font-weight:400}
+.pdf-savings-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.pdf-sav-item{text-align:center;background:#fff;border:1px solid #e5e7eb;border-radius:7px;padding:10px}
+.pdf-sav-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;font-weight:600;margin-bottom:4px}
+.pdf-sav-val{font-size:14px;font-weight:700;color:#166534}
+.pdf-timeline{margin-top:12px}
+.pdf-tl-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.pdf-tl-lbl{font-size:11px;color:#6b7280;min-width:70px;text-align:right}
+.pdf-tl-track{flex:1;background:#f3f4f6;border-radius:3px;height:18px;overflow:hidden}
+.pdf-tl-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff}
+.pdf-equipment{background:#f9fafb;border-radius:8px;padding:14px}
+.pdf-eq-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #e5e7eb;font-size:12px}
+.pdf-eq-row:last-child{border-bottom:none}
+.pdf-eq-lbl{color:#6b7280}.pdf-eq-val{font-weight:600;color:#0B1F3A}
+.pdf-footer{background:#0B1F3A;padding:14px 28px;display:flex;justify-content:space-between;align-items:center}
+.pdf-footer-txt{font-size:10px;color:rgba(255,255,255,.35)}
+.pdf-footer-badge{font-size:10px;font-weight:600;color:#FFD700;padding:4px 10px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:20px}
+
+/* ═══════════════════ JOB PORTAL VIEW ═══════════════════ */
+.job-portal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0;overflow:hidden;display:none;margin:0 24px 24px}
+.job-portal.on{display:block}
+.jp-header{background:var(--surface2);padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.jp-title{font-size:14px;font-weight:600;color:var(--text)}
+.jp-stats{display:flex;gap:16px}
+.jp-stat{font-size:12px;color:var(--muted)}
+.jp-stat b{color:var(--gold)}
+.jp-table-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 1fr;gap:0;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);padding:10px 20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.jp-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr 1fr;gap:0;padding:13px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s;cursor:pointer}
+.jp-row:last-child{border-bottom:none}
+.jp-row:hover{background:rgba(255,255,255,.03)}
+.jp-client{font-size:13px;font-weight:500;color:var(--text)}
+.jp-addr{font-size:11px;color:var(--muted);margin-top:2px}
+.jp-sys{font-size:12px;color:var(--muted)}
+.jp-date{font-size:12px;color:var(--muted)}
+.jp-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px}
+.jp-badge.approved{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.jp-badge.pending{background:rgba(251,191,36,.10);color:var(--amber);border:1px solid rgba(251,191,36,.22)}
+.jp-badge.draft{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border)}
+.jp-badge.visit{background:rgba(122,200,248,.10);color:var(--blue);border:1px solid rgba(122,200,248,.22)}
+.jp-action{font-size:11px;color:var(--gold);cursor:pointer;font-weight:600}
+
+/* ═══════════════════ COMPLETION ═══════════════════ */
+#done{position:fixed;inset:0;z-index:1000;background:radial-gradient(ellipse at 50% 40%,#0d2a4a 0%,#040d1a 70%);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .5s,visibility .5s}
+#done.on{opacity:1;visibility:visible}
+.done-inner{max-width:480px;width:100%;text-align:center}
+.done-icon{font-size:54px;margin-bottom:18px;animation:bounce .6s ease}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.done-title{font-family:'DM Serif Display',serif;font-size:32px;color:var(--text);margin-bottom:10px}
+.done-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px}
+.done-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.done-btn-p{background:var(--gold);color:var(--navy);font-size:14px;font-weight:700;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;transition:all .2s}
+.done-btn-p:hover{background:#fff;transform:translateY(-2px)}
+.done-btn-s{background:rgba(255,255,255,.08);color:var(--text);font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;border:1px solid rgba(255,255,255,.15);cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s}
+
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
+<!-- ═══════════════ WELCOME ═══════════════ -->
 <div id="welcome">
-  <div class="welcome-inner">
-    <div class="welcome-logo">
-      <div class="welcome-logo-mark">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#0B1F3A"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="#0B1F3A" stroke-width="2" stroke-linecap="round"/></svg>
-      </div>
-      <div class="welcome-logo-text">Nova Metrics</div>
+  <div class="wc-inner">
+    <div class="wc-logo">
+      <div class="wc-logo-mark">N</div>
+      <div><div class="wc-brand">Nova <span>Metrics</span></div><div style="font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase">Solar Intelligence</div></div>
     </div>
-    <div class="welcome-eyebrow">Interactive Product Tour</div>
-    <h1 class="welcome-h1">Design &amp; quote solar<br>in <em>minutes</em>, not hours</h1>
-    <p class="welcome-sub">See how South African solar installers use Nova Metrics to size systems accurately, generate branded proposals, and track client approvals — all in one platform.</p>
-    <button class="welcome-btn" onclick="startTour()">
-      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
-      Start the tour — 6 steps
-    </button>
-    <div class="welcome-steps">
-      <div class="welcome-step"><div class="welcome-step-dot"></div>Load Builder</div>
-      <div class="welcome-step"><div class="welcome-step-dot"></div>System Sizing</div>
-      <div class="welcome-step"><div class="welcome-step-dot"></div>Financials</div>
-      <div class="welcome-step"><div class="welcome-step-dot"></div>AI Proposal</div>
-      <div class="welcome-step"><div class="welcome-step-dot"></div>Client Approval</div>
-      <div class="welcome-step"><div class="welcome-step-dot"></div>Site Visit</div>
+    <div class="wc-eye">Interactive Product Tour</div>
+    <h1 class="wc-h1">See the <em>exact</em> tool<br>your installer uses</h1>
+    <p class="wc-sub">This is a live walkthrough of the real Nova Metrics interface — same screen, same design, same logic. We'll guide you through every key feature, step by step.</p>
+    <button class="wc-btn" onclick="startTour()">▶ Start the Tour — 8 steps</button>
+    <div class="wc-steps">
+      <div class="wc-step"><div class="wc-dot"></div>Location</div>
+      <div class="wc-step"><div class="wc-dot"></div>Load Builder</div>
+      <div class="wc-step"><div class="wc-dot"></div>System Design</div>
+      <div class="wc-step"><div class="wc-dot"></div>Financials</div>
+      <div class="wc-step"><div class="wc-dot"></div>Generate Proposal</div>
+      <div class="wc-step"><div class="wc-dot"></div>PDF Output</div>
+      <div class="wc-step"><div class="wc-dot"></div>Job Portal</div>
+      <div class="wc-step"><div class="wc-dot"></div>Approval Tracking</div>
     </div>
   </div>
 </div>
 
-<div id="progress-bar">
-  <div class="pb-logo">Nova <span>Metrics</span></div>
-  <div class="pb-steps" id="pb-steps"></div>
-  <div class="pb-skip" onclick="finishTour()">Skip tour →</div>
+<!-- ═══════════════ TOUR OVERLAYS ═══════════════ -->
+<div id="progress-bar" style="display:none"><!-- kept for compat --></div>
+<div id="pbar">
+  <div class="pb-brand"><div class="pb-icon">N</div>Nova Metrics · Demo Tour</div>
+  <div class="pb-dots" id="pb-dots"></div>
+  <div class="pb-skip" onclick="finishTour()">Skip →</div>
 </div>
-
 <div id="spotlight" onclick="nextStep()"></div>
-<div class="highlight-ring" id="highlight-ring"></div>
-
+<div class="highlight-ring" id="ring"></div>
 <div id="tooltip">
   <div class="tt-step" id="tt-step"></div>
   <div class="tt-title" id="tt-title"></div>
   <div class="tt-body" id="tt-body"></div>
   <div class="tt-actions">
     <button class="tt-back" id="tt-back" onclick="prevStep()">← Back</button>
-    <button class="tt-btn" id="tt-next" onclick="nextStep()">
-      <span id="tt-next-label">Next</span>
-      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-    </button>
+    <button class="tt-btn" id="tt-btn" onclick="nextStep()"><span id="tt-label">Next →</span></button>
   </div>
 </div>
+<div class="pulse-ring" id="pulse"></div>
+<div class="click-dot" id="dot"></div>
 
-<div class="pulse-ring" id="pulse1"></div>
-<div class="click-dot" id="dot1"></div>
-
+<!-- ═══════════════ REAL TOOL UI ═══════════════ -->
 <div id="app">
-  <div class="topbar">
-    <div class="topbar-logo">Nova <span>Metrics</span> · Solar Intelligence</div>
-    <div class="topbar-right">
-      <div class="topbar-badge">DEMO MODE</div>
-      <div class="topbar-user">JD</div>
+
+  <!-- Nav — exact match to real tool -->
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <div class="nav-icon">N</div>
+      <div><div class="nav-brand-name">Nova Metrics</div><div class="nav-brand-sub">Solar Intelligence</div></div>
     </div>
-  </div>
-  <div class="tab-bar">
-    <div class="tab-item active" id="tab-loads" onclick="switchTab('loads')">📋 Load Builder</div>
-    <div class="tab-item" id="tab-system">⚡ System</div>
-    <div class="tab-item" id="tab-solar">☀️ Solar</div>
-    <div class="tab-item" id="tab-finance" onclick="switchTab('finance')">📈 Financials</div>
-    <div class="tab-item" id="tab-proposal" onclick="switchTab('proposal')">📄 Proposal</div>
+    <div class="nav-center">
+      <div class="nav-chip active">⚡ System Sizing Engine</div>
+      <div class="nav-chip">🤖 AI Proposals</div>
+      <div class="nav-chip">📊 Analytics</div>
+    </div>
+    <div class="nav-right">
+      <button class="portal-link ghost" id="btn-job-portal" onclick="showJobPortal()">🔧 Job Portal</button>
+      <button class="portal-link ghost">⚙ My Hardware</button>
+      <button class="portal-link gold">▦ Proposal Portal</button>
+    </div>
+  </nav>
+
+  <!-- Input Strip — exact layout -->
+  <div class="input-strip" id="input-strip">
+    <div class="inp-g" id="loc-group">
+      <label>Location</label>
+      <input class="loc-input" id="loc-input" type="text" value="Johannesburg, Gauteng" readonly onclick="pickLocation()">
+    </div>
+    <div class="inp-g" id="lb-group">
+      <label>Load Builder</label>
+      <button class="lb-trigger-btn active" id="lb-btn" onclick="toggleLB()">⚡ <span id="lb-label">3.15 kW — 4 appliances</span></button>
+    </div>
+    <div class="inp-g" id="backup-group">
+      <label>Evening Backup Hours</label>
+      <select id="sel-auto" onchange="updateBackup(this.value)">
+        <option value="4">4 hrs</option><option value="6">6 hrs</option>
+        <option value="8" selected>8 hrs</option><option value="10">10 hrs</option>
+        <option value="12">12 hrs</option>
+      </select>
+    </div>
+    <div class="inp-g">
+      <label>Tariff (R/kWh)</label>
+      <select><option value="2.75" selected>R2.75</option><option value="3.00">R3.00</option></select>
+    </div>
+    <div class="inp-g">
+      <label>Markup %</label>
+      <select><option value="10" selected>10%</option><option value="15">15%</option></select>
+    </div>
+    <button class="btn-calc" id="btn-design" onclick="runDesign()">⚡ Design System</button>
   </div>
 
-  <!-- LOADS TAB -->
-  <div class="layout" id="view-loads">
-    <div class="left-panel">
-      <div class="panel-section" id="section-location">
-        <div class="panel-label">Client Location</div>
-        <select class="location-select" id="loc-select" onchange="recalc()">
-          <option value="JHB">Johannesburg, Gauteng (PSH 5.5)</option>
-          <option value="CPT">Cape Town, Western Cape (PSH 5.8)</option>
-          <option value="DBN">Durban, KwaZulu-Natal (PSH 4.9)</option>
-          <option value="PTA">Pretoria, Gauteng (PSH 5.6)</option>
-          <option value="PE">Gqeberha, Eastern Cape (PSH 5.4)</option>
-        </select>
-      </div>
-      <div class="panel-section" id="section-appliances">
-        <div class="panel-label">Appliances</div>
-        <div id="appliance-list">
-          <div class="appliance-item backed"><div class="appliance-icon">💡</div><div style="flex:1"><div class="appliance-name">LED Lights ×10</div><div class="appliance-kwh">3.0 kWh/day</div></div><div class="backed-badge">Backed up</div></div>
-          <div class="appliance-item backed"><div class="appliance-icon">🧊</div><div style="flex:1"><div class="appliance-name">Fridge / Freezer</div><div class="appliance-kwh">3.6 kWh/day</div></div><div class="backed-badge">Backed up</div></div>
-          <div class="appliance-item backed"><div class="appliance-icon">📺</div><div style="flex:1"><div class="appliance-name">Television</div><div class="appliance-kwh">0.75 kWh/day</div></div><div class="backed-badge">Backed up</div></div>
-          <div class="appliance-item"><div class="appliance-icon">🚿</div><div style="flex:1"><div class="appliance-name">Geyser (3 kW)</div><div class="appliance-kwh">6.0 kWh/day</div></div><div style="font-size:10px;color:var(--muted)">Solar only</div></div>
-        </div>
-        <button class="add-appliance-btn" id="btn-add-appliance" onclick="addAppliance()">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-          Add appliance
-        </button>
-      </div>
-      <div class="panel-section" id="section-autonomy">
-        <div class="panel-label">Backup Autonomy</div>
-        <div class="slider-wrap">
-          <div class="slider-labels"><span>4 hrs</span><span>24 hrs</span></div>
-          <input type="range" min="4" max="24" value="8" id="autonomy-slider" oninput="updateAutonomy(this.value)">
-          <div class="slider-value" id="autonomy-val">8 <span>hours backup</span></div>
-        </div>
-      </div>
+  <!-- Load Builder Panel -->
+  <div class="lb-panel" id="lb-panel">
+    <div class="lb-head">
+      <span class="lb-title">⚡ Load Builder</span>
+      <span class="lb-badge" id="lb-badge">Total: 3.15 kW peak · 21.0 kWh/day</span>
     </div>
-    <div class="right-panel">
-      <div class="system-card" id="system-result-card">
-        <div class="sc-row">
-          <div><div class="sc-label">Solar Array</div><div class="sc-value" id="res-kw">5.0<span class="sc-unit">kWp</span></div><div class="sc-model" id="res-panels">9× JA Solar 550W</div></div>
-          <div><div class="sc-label">Inverter</div><div class="sc-value">5<span class="sc-unit">kW</span></div><div class="sc-model">Sunsynk 5kW Hybrid</div></div>
-          <div><div class="sc-label">Battery</div><div class="sc-value" id="res-batt">10<span class="sc-unit">kWh</span></div><div class="sc-model" id="res-batt-model">Sunsynk 5.1kWh ×2</div></div>
-        </div>
-        <button class="generate-btn" id="btn-generate" onclick="generateProposal()">
-          <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
-          Generate AI Proposal
-        </button>
-      </div>
-      <div class="metrics-row">
-        <div class="metric-card green"><div class="metric-label">Annual Savings</div><div class="metric-value" id="met-savings">R18,200</div><div class="metric-sub">Year 1 estimate</div></div>
-        <div class="metric-card"><div class="metric-label">Payback</div><div class="metric-value" id="met-payback">7.8<span class="metric-unit"> yrs</span></div><div class="metric-sub">At current tariff</div></div>
-        <div class="metric-card"><div class="metric-label">Battery Runtime</div><div class="metric-value" id="met-runtime">13.7<span class="metric-unit"> hrs</span></div><div class="metric-sub">Expected average</div></div>
-        <div class="metric-card green"><div class="metric-label">CO₂ Avoided</div><div class="metric-value">8.2<span class="metric-unit"> t/yr</span></div><div class="metric-sub">≈ 391 trees</div></div>
-      </div>
+    <div class="lb-shd">Add Appliance</div>
+    <div class="lb-chips">
+      <button class="lb-chip" onclick="addAppliance('ac')">❄️ Air Con</button>
+      <button class="lb-chip" onclick="addAppliance('pool')">🏊 Pool Pump</button>
+      <button class="lb-chip" onclick="addAppliance('washing')">🫧 Washing Machine</button>
+      <button class="lb-chip">🍳 Stove</button>
+      <button class="lb-chip">🔒 Security</button>
+      <button class="lb-chip">⚡ Custom</button>
     </div>
-  </div>
-
-  <!-- FINANCE TAB -->
-  <div style="display:none;padding:24px" id="view-finance">
-    <div class="savings-card">
-      <div class="sc-title">📈 Cumulative Savings — 25 Year Projection</div>
-      <div class="bar-group" id="savings-chart"></div>
-      <div style="display:flex;gap:16px;margin-top:12px">
-        <div style="font-size:12px;color:var(--muted)">■ <span style="color:#c8911c">Before payback</span></div>
-        <div style="font-size:12px;color:var(--muted)">■ <span style="color:#16a370">After payback</span></div>
-      </div>
-    </div>
-    <div class="metrics-row">
-      <div class="metric-card green"><div class="metric-label">25-yr Net Savings</div><div class="metric-value">R198k</div><div class="metric-sub">After all costs</div></div>
-      <div class="metric-card green"><div class="metric-label">NPV @ 12%</div><div class="metric-value">R142k</div><div class="metric-sub">Risk-adjusted</div></div>
-      <div class="metric-card"><div class="metric-label">IRR</div><div class="metric-value">19.2<span class="metric-unit">%</span></div><div class="metric-sub">vs 8% fixed deposit</div></div>
-      <div class="metric-card"><div class="metric-label">Investment</div><div class="metric-value">R142k</div><div class="metric-sub">All-in cost</div></div>
+    <div class="lb-shd">Your Load</div>
+    <div class="lb-items" id="lb-items">
+      <div class="lb-item"><span>💡</span><span class="lb-item-name">LED Lights ×12</span><span class="lb-item-kwh">0.6 kW · 3.0 kWh/day</span><span class="lb-item-badge badge-backed">🔋 Backed up</span></div>
+      <div class="lb-item"><span>🧊</span><span class="lb-item-name">Fridge / Freezer ×1</span><span class="lb-item-kwh">0.15 kW · 3.6 kWh/day</span><span class="lb-item-badge badge-backed">🔋 Backed up</span></div>
+      <div class="lb-item"><span>📺</span><span class="lb-item-name">Television ×1</span><span class="lb-item-kwh">0.12 kW · 0.6 kWh/day</span><span class="lb-item-badge badge-backed">🔋 Backed up</span></div>
+      <div class="lb-item"><span>🚿</span><span class="lb-item-name">Geyser ×1</span><span class="lb-item-kwh">3.0 kW · 9.0 kWh/day</span><span class="lb-item-badge badge-solar">🌞 Not backed up</span></div>
     </div>
   </div>
 
-  <!-- PROPOSAL TAB -->
-  <div style="display:none;padding:24px" id="view-proposal">
-    <div class="proposal-preview">
-      <div class="pp-header"><div class="pp-logo-box">☀️</div><div><div class="pp-company">BRIGHT SOLAR SOLUTIONS</div><div class="pp-tagline">Your trusted solar installer</div></div></div>
-      <div class="pp-body">
-        <div class="pp-client">Thabo Nkosi — 14 Morningside Rd, Johannesburg</div>
-        <div class="pp-detail">Proposal ref: #001247 · Generated 16 May 2026</div>
-        <div class="pp-specs">
-          <div class="pp-spec-item"><div class="pp-spec-label">System Size</div><div class="pp-spec-val">5.0 kWp</div></div>
-          <div class="pp-spec-item"><div class="pp-spec-label">Battery</div><div class="pp-spec-val">10 kWh</div></div>
-          <div class="pp-spec-item"><div class="pp-spec-label">Investment</div><div class="pp-spec-val">R142,500</div></div>
-          <div class="pp-spec-item"><div class="pp-spec-label">Annual Savings</div><div class="pp-spec-val" style="color:#166534">R18,200</div></div>
+  <!-- Tabs -->
+  <div class="tabs-row" id="tabs-row">
+    <div class="tab active" id="tab-solar" onclick="showTab('solar')">☀️ Solar Array</div>
+    <div class="tab" id="tab-battery" onclick="showTab('battery')">🔋 Battery</div>
+    <div class="tab" id="tab-inverter" onclick="showTab('inverter')">⚡ Inverter</div>
+    <div class="tab" id="tab-fin" onclick="showTab('fin')">💰 Financials</div>
+    <div class="tab" id="tab-env" onclick="showTab('env')">🌿 Environment</div>
+    <div class="tab" id="tab-prop" onclick="showTab('prop')">📋 Generate Proposal</div>
+  </div>
+
+  <!-- Solar Tab -->
+  <div class="tab-content active" id="tc-solar">
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="lbl">Recommended Panel</div><div class="val">JA Solar 550W</div></div>
+      <div class="kpi green"><div class="lbl">DC Array Size</div><div class="val">5.50<span style="font-size:.9rem;color:var(--muted)"> kWp</span></div></div>
+      <div class="kpi green"><div class="lbl">Panel Quantity</div><div class="val">10<span style="font-size:.9rem;color:var(--muted)"> Panels</span></div></div>
+      <div class="kpi green"><div class="lbl">Daily Solar Net</div><div class="val">24.2<span style="font-size:.9rem;color:var(--muted)"> kWh</span></div></div>
+      <div class="kpi white"><div class="lbl">Array Oversizing</div><div class="val">8.4<span style="font-size:.9rem;color:var(--muted)">%</span></div><div class="sub">Optimal sizing</div></div>
+      <div class="kpi white"><div class="lbl">Roof Fit</div><div class="val" style="font-size:1rem">Easy Fit</div><div class="sub">Single roof plane — 22m²</div></div>
+    </div>
+    <div class="sec-title">Array Details</div>
+    <div class="status-row"><span class="lbl">Peak Sun Hours (Johannesburg)</span><span class="val">5.50 hrs/day</span></div>
+    <div class="status-row"><span class="lbl">Performance Ratio (SA spec)</span><span class="val">80%</span></div>
+    <div class="status-row"><span class="lbl">Annual Solar Production</span><span class="val">8,833 kWh/yr</span></div>
+    <div class="status-row"><span class="lbl">Specific Yield</span><span class="val">1,606 kWh/kWp/yr</span></div>
+  </div>
+
+  <!-- Battery Tab -->
+  <div class="tab-content" id="tc-battery">
+    <div class="kpi-grid">
+      <div class="kpi green" style="grid-column:1/-1;border:1.5px solid rgba(52,211,153,.3)"><div class="lbl">⚡ System Compliance — All checks passed</div><div class="val" style="font-size:1rem">✓ Compliant System — Ready to Propose</div><div class="sub">Solar covers load+recharge · DoD 68% ≤ 85% ✓ · DC/AC 1.32 ✓</div></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="lbl">Battery Design</div><div class="val" style="font-size:1rem">Balanced — well designed</div></div>
+      <div class="kpi white"><div class="lbl">Installed Capacity</div><div class="val">10.2<span style="font-size:.9rem;color:var(--muted)"> kWh</span></div></div>
+      <div class="kpi white"><div class="lbl">Battery Units</div><div class="val">2<span style="font-size:.9rem;color:var(--muted)"> units</span></div></div>
+      <div class="kpi white"><div class="lbl">Runtime (avg)</div><div class="val">13.7<span style="font-size:.9rem;color:var(--muted)"> hrs</span></div></div>
+    </div>
+    <div class="sec-title">Battery Model</div>
+    <div class="status-row"><span class="lbl">Selected Battery</span><span class="val">Sunsynk 5.1kWh LiFePO4</span></div>
+    <div class="status-row"><span class="lbl">DoD (daily cycling)</span><span class="val">68% — within 85% limit ✓</span></div>
+    <div class="status-row"><span class="lbl">Headroom</span><span class="val">1.22× (Balanced)</span></div>
+  </div>
+
+  <!-- Inverter Tab -->
+  <div class="tab-content" id="tc-inverter">
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="lbl">Recommended Inverter</div><div class="val" style="font-size:.95rem">Sunsynk 5kW Hybrid</div></div>
+      <div class="kpi green"><div class="lbl">DC/AC Ratio</div><div class="val">1.32</div><div class="sub">✓ Meets NRS 097 target 1.3:1</div></div>
+      <div class="kpi green"><div class="lbl">Load Handling</div><div class="val" style="font-size:.85rem">Backup load OK</div><div class="sub">5.0 kW handles 0.87 kW backup</div></div>
+      <div class="kpi white"><div class="lbl">NRS 097 Compliance</div><div class="val" style="font-size:.9rem;color:var(--green)">✓ Compliant</div></div>
+    </div>
+    <div class="sec-title">MPPT & String Details</div>
+    <div class="status-row"><span class="lbl">String Allocation</span><span class="val">1 of 2 MPPT inputs used</span></div>
+    <div class="status-row"><span class="lbl">NERSA SSEG Registration</span><span class="val">⚠ Required — Category B (1–10 kW)</span></div>
+  </div>
+
+  <!-- Financials Tab -->
+  <div class="tab-content" id="tc-fin">
+    <div class="kpi-grid">
+      <div class="kpi white"><div class="lbl">Total System Cost</div><div class="val">R142,500</div></div>
+      <div class="kpi white"><div class="lbl">Suggested Client Price</div><div class="val">R156,750</div></div>
+      <div class="kpi green"><div class="lbl">Year 1 Savings</div><div class="val">R18,200</div></div>
+      <div class="kpi green"><div class="lbl">Simple Payback</div><div class="val">7.8<span style="font-size:.9rem;color:var(--muted)"> yrs</span></div></div>
+    </div>
+    <div class="sec-title">Cost Breakdown</div>
+    <div class="chart-row"><div class="chart-lbl">Panels</div><div class="chart-outer"><div class="chart-inner" style="width:62%;background:var(--gold)"></div></div><div class="chart-val">R55,000</div></div>
+    <div class="chart-row"><div class="chart-lbl">BOS</div><div class="chart-outer"><div class="chart-inner" style="width:37%;background:var(--blue)"></div></div><div class="chart-val">R33,000</div></div>
+    <div class="chart-row"><div class="chart-lbl">Battery</div><div class="chart-outer"><div class="chart-inner" style="width:48%;background:var(--green)"></div></div><div class="chart-val">R42,500</div></div>
+    <div class="chart-row"><div class="chart-lbl">Inverter</div><div class="chart-outer"><div class="chart-inner" style="width:14%;background:#a78bfa)"></div></div><div class="chart-val">R12,000</div></div>
+    <div class="sec-title">25-Year Model</div>
+    <div class="status-row"><span class="lbl">Monthly Savings (Yr 1)</span><span class="val">R1,517</span></div>
+    <div class="status-row"><span class="lbl">NPV @ 12%</span><span class="val">+R142,000 ✓ Positive NPV</span></div>
+    <div class="status-row"><span class="lbl">IRR (25-yr)</span><span class="val">19.2% ✓ Exceeds 12% hurdle</span></div>
+    <div class="status-row"><span class="lbl">Net Lifetime Savings</span><span class="val">R198,400</span></div>
+  </div>
+
+  <!-- Environment Tab -->
+  <div class="tab-content" id="tc-env">
+    <div class="kpi-grid">
+      <div class="kpi green"><div class="lbl">Annual CO₂ Saved</div><div class="val">7.91</div><div class="sub">tonnes</div></div>
+      <div class="kpi green"><div class="lbl">Trees Equivalent</div><div class="val">377</div></div>
+      <div class="kpi green"><div class="lbl">Coal Avoided</div><div class="val">3.59</div><div class="sub">tonnes</div></div>
+      <div class="kpi green"><div class="lbl">Water Saved</div><div class="val">15,899</div><div class="sub">litres/year</div></div>
+    </div>
+  </div>
+
+  <!-- Generate Proposal Tab -->
+  <div class="tab-content" id="tc-prop">
+    <div class="sec-title">Client Details</div>
+    <div class="client-form" id="client-form">
+      <div><label>Client Name</label><input type="text" id="p-name" value="Thabo Nkosi" /></div>
+      <div><label>Client Email</label><input type="email" id="p-email" value="thabo@gmail.com" /></div>
+      <div><label>Client Phone</label><input type="tel" value="+27 82 555 0123" /></div>
+      <div><label>Client Address</label><input type="text" value="14 Morningside Rd, Johannesburg" /></div>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Client Type</div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(122,200,248,.4);background:rgba(122,200,248,.10);cursor:pointer">
+          <div style="font-size:18px;margin-bottom:4px">🏠</div>
+          <div style="font-size:13px;font-weight:600;color:var(--blue)">Residential</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">4-page homeowner proposal</div>
+        </div>
+        <div style="flex:1;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);cursor:pointer">
+          <div style="font-size:18px;margin-bottom:4px">🏢</div>
+          <div style="font-size:13px;font-weight:600;color:var(--muted)">Commercial</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">8-page technical proposal — NPV, IRR, NERSA</div>
         </div>
       </div>
-      <div class="pp-footer">
-        <div class="pp-status"><div class="pp-status-dot sent"></div><span id="proposal-status-text" style="color:#3b82f6">Sent to client</span></div>
-        <div style="font-size:12px;color:var(--muted)">Awaiting approval</div>
-      </div>
     </div>
-    <div class="approval-card" id="approval-timeline-card">
-      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">Client Approval Tracking</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Thabo Nkosi · thabo@email.com</div>
-      <div class="approval-timeline">
-        <div class="at-item"><div class="at-dot done">✓</div><div><div class="at-title">Proposal generated</div><div class="at-sub">Today, 14:32</div></div></div>
-        <div class="at-item"><div class="at-dot done">✓</div><div><div class="at-title">Email sent to client</div><div class="at-sub">Today, 14:33 · Delivered</div></div></div>
-        <div class="at-item"><div class="at-dot done">✓</div><div><div class="at-title">Client viewed proposal</div><div class="at-sub">Today, 15:01</div></div></div>
-        <div class="at-item"><div class="at-dot active" id="at-dot-approval">⏳</div><div><div class="at-title" id="at-title-approval">Awaiting client decision</div><div class="at-sub" id="at-sub-approval">Approval link sent · Expires in 7 days</div></div></div>
-        <div class="at-item"><div class="at-dot pending">○</div><div><div class="at-title">Site visit scheduled</div><div class="at-sub">Pending approval</div></div></div>
+    <div class="proposal-strip" id="proposal-strip">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">AI-powered proposal via Nova Metrics pipeline.<br><b style="color:var(--text)">🏠 Homeowner PDF — clear, simple, deal-closing</b></div>
+      <button class="btn-generate" id="btn-gen" onclick="generatePDF()">Generate Proposal</button>
+    </div>
+    <!-- PDF PREVIEW -->
+    <div class="pdf-preview" id="pdf-preview">
+      <div class="pdf-header">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <div class="pdf-logo">BS</div>
+          <div><div class="pdf-company">BRIGHT SOLAR SOLUTIONS</div><div class="pdf-tagline">Certified Solar Installer · SETA Registered · NRS 097 Compliant</div></div>
+        </div>
+        <div class="pdf-ref">Ref: #001247<br>16 May 2026<br><span style="color:rgba(255,215,0,.6);font-weight:700">CONFIDENTIAL</span></div>
+      </div>
+      <div class="pdf-gold-bar"></div>
+      <div class="pdf-section">
+        <div class="pdf-client-name">Solar System Proposal for Thabo Nkosi</div>
+        <div class="pdf-address">14 Morningside Rd, Johannesburg, Gauteng · thabo@gmail.com · +27 82 555 0123</div>
+        <div class="pdf-sys-grid">
+          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Solar Array</div><div class="pdf-sys-val">5.50<span class="pdf-sys-unit"> kWp</span></div></div>
+          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Battery Storage</div><div class="pdf-sys-val">10.2<span class="pdf-sys-unit"> kWh</span></div></div>
+          <div class="pdf-sys-item"><div class="pdf-sys-lbl">Backup</div><div class="pdf-sys-val">8<span class="pdf-sys-unit"> hrs</span></div></div>
+        </div>
+      </div>
+      <div class="pdf-section">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">Your Savings</div>
+        <div class="pdf-savings-grid">
+          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Monthly</div><div class="pdf-sav-val">R1,517</div></div>
+          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Year 1</div><div class="pdf-sav-val">R18,200</div></div>
+          <div class="pdf-sav-item"><div class="pdf-sav-lbl">Payback</div><div class="pdf-sav-val" style="color:#0B1F3A">7.8 yrs</div></div>
+          <div class="pdf-sav-item"><div class="pdf-sav-lbl">25-yr Net</div><div class="pdf-sav-val">R198k</div></div>
+        </div>
+        <div class="pdf-timeline" style="margin-top:14px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9ca3af;letter-spacing:.08em;margin-bottom:8px">Cumulative Savings Projection</div>
+          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 1</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:12%;background:#0B1F3A">R18k</div></div></div>
+          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 5</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:45%;background:#0B1F3A">R72k</div></div></div>
+          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 8 ✓</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:73%;background:#166534">R143k</div></div></div>
+          <div class="pdf-tl-row"><div class="pdf-tl-lbl">Year 25</div><div class="pdf-tl-track"><div class="pdf-tl-fill" style="width:100%;background:#166534">R341k gross</div></div></div>
+          <div style="font-size:10px;color:#9ca3af;margin-top:6px">■ Investment recovered · ■ Pure profit</div>
+        </div>
+      </div>
+      <div class="pdf-section">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">Equipment Specification</div>
+        <div class="pdf-equipment">
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Solar Panels</span><span class="pdf-eq-val">10× JA Solar 550W (5.50 kWp)</span></div>
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Inverter</span><span class="pdf-eq-val">Sunsynk 5kW Hybrid · NRS 097 ✓</span></div>
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Battery</span><span class="pdf-eq-val">2× Sunsynk 5.1kWh LiFePO4 (10.2 kWh)</span></div>
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">DC/AC Ratio</span><span class="pdf-eq-val">1.32:1 — NRS 097-2-1 Compliant</span></div>
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Annual CO₂ Saved</span><span class="pdf-eq-val">7.91 tonnes (≈ 377 trees)</span></div>
+          <div class="pdf-eq-row"><span class="pdf-eq-lbl">Total Investment</span><span class="pdf-eq-val" style="color:#0B1F3A;font-weight:700">R142,500</span></div>
+        </div>
+      </div>
+      <div class="pdf-footer">
+        <div class="pdf-footer-txt">Projections based on published NERSA tariff escalation rates · NRS 097-2-1 compliant design</div>
+        <div class="pdf-footer-badge">Nova Metrics Certified ✓</div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="completion">
-  <div class="comp-inner">
-    <div class="comp-icon">🎉</div>
-    <div class="comp-title">Tour complete!</div>
-    <p class="comp-sub">You've seen how Nova Metrics takes a client from load assessment to signed approval — in minutes. Ready to use it for real?</p>
-    <div class="comp-btns">
-      <a href="mailto:info@novametricsgroup.com?subject=Request access — Solar Intelligence" class="comp-btn-primary">Request Access</a>
-      <a href="/terms.html" class="comp-btn-sec">Security &amp; Terms</a>
+  <!-- Job Portal View (hidden initially) -->
+  <div class="job-portal" id="job-portal">
+    <div class="jp-header">
+      <div class="jp-title">🔧 Job Portal — Active Proposals</div>
+      <div class="jp-stats"><span class="jp-stat"><b>12</b> total</span><span class="jp-stat" style="color:var(--green)"><b>4</b> approved</span><span class="jp-stat" style="color:var(--amber)"><b>5</b> pending</span></div>
+    </div>
+    <div class="jp-table-head"><span>Client</span><span>System</span><span>Location</span><span>Sent</span><span>Status</span><span>Action</span></div>
+    <div class="jp-row">
+      <div><div class="jp-client">Thabo Nkosi</div><div class="jp-addr">14 Morningside Rd, JHB</div></div>
+      <div class="jp-sys">5.5 kWp · 10 kWh</div>
+      <div class="jp-sys">Johannesburg</div>
+      <div class="jp-date">Today 14:33</div>
+      <div><span class="jp-badge approved">✓ Approved</span></div>
+      <div class="jp-action">View →</div>
+    </div>
+    <div class="jp-row">
+      <div><div class="jp-client">Sarah van der Berg</div><div class="jp-addr">8 Vineyard Cres, CPT</div></div>
+      <div class="jp-sys">8.0 kWp · 15 kWh</div>
+      <div class="jp-sys">Cape Town</div>
+      <div class="jp-date">14 May</div>
+      <div><span class="jp-badge visit">🔧 Site Visit</span></div>
+      <div class="jp-action">Update →</div>
+    </div>
+    <div class="jp-row">
+      <div><div class="jp-client">MTN Franchise Pty Ltd</div><div class="jp-addr">Industrial Park, Pretoria</div></div>
+      <div class="jp-sys">30 kWp · 50 kWh</div>
+      <div class="jp-sys">Pretoria</div>
+      <div class="jp-date">12 May</div>
+      <div><span class="jp-badge pending">⏳ Pending</span></div>
+      <div class="jp-action">Follow up →</div>
+    </div>
+    <div class="jp-row">
+      <div><div class="jp-client">Pieter Botha</div><div class="jp-addr">Farm Rietfontein, Bloemfontein</div></div>
+      <div class="jp-sys">4.4 kWp · 10 kWh</div>
+      <div class="jp-sys">Bloemfontein</div>
+      <div class="jp-date">10 May</div>
+      <div><span class="jp-badge draft">📝 Draft</span></div>
+      <div class="jp-action">Finalise →</div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ═══════════════ DONE ═══════════════ -->
+<div id="done">
+  <div class="done-inner">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">Tour complete</div>
+    <p class="done-sub">You've seen the exact interface your installer uses — from load profile to PDF proposal to job tracking. Ready to get started?</p>
+    <div class="done-btns">
+      <a href="mailto:info@novametricsgroup.com?subject=Request access — Solar Intelligence" class="done-btn-p">Request Access</a>
+      <a href="/terms.html" class="done-btn-s" style="border:none;background:rgba(255,255,255,.08);color:var(--text)">Security &amp; Terms</a>
     </div>
   </div>
 </div>
 
 <script>
-let currentStep = -1;
-let applianceAdded = false;
-let proposalGenerated = false;
-const TOTAL_STEPS = 6;
-
+// ═══════════════ TOUR DATA ═══════════════
 const STEPS = [
-  { targetId:'section-location',   title:'Start with the client\'s location',    body:'Solar yield varies significantly across South Africa. Johannesburg gets 5.5 peak sun hours per day — Cape Town gets 5.8. Select a location and every calculation adjusts automatically.',                                                                                               placement:'right',  actionLabel:'Got it' },
-  { targetId:'section-appliances', title:'Build the load profile',               body:'Add the client\'s appliances one by one. For each item, choose whether it runs on battery backup or solar-only. The engine uses real wattage data — no guesswork.',                                                                                                                        placement:'right',  actionLabel:'Click "Add appliance"', promptEl:'btn-add-appliance' },
-  { targetId:'section-autonomy',   title:'Set backup autonomy',                  body:'How many hours must the system run during load shedding? Drag the slider to match the client\'s requirement. The battery size updates instantly — no manual calculation needed.',                                                                                                           placement:'right',  actionLabel:'Try moving the slider',  promptEl:'autonomy-slider' },
-  { targetId:'system-result-card', title:'The engine sizes the system',          body:'Based on your load profile and autonomy requirement, the engine recommends the correct inverter (NRS 097 compliant), battery (DoD-adjusted), and PV array size — all calculated in real time.',                                                                                            placement:'left',   actionLabel:'See the financials', switchTo:'finance' },
-  { targetId:'view-finance',       title:'25-year financial model',              body:'Every proposal includes a full financial model — Year 1 savings, payback period, NPV and IRR — using published NERSA tariff escalation data. Clients can see exactly what they\'re investing in.',                                                                                          placement:'center', actionLabel:'Generate the proposal', switchTo:'proposal' },
-  { targetId:'approval-timeline-card', title:'Track client approval in real time', body:'The client receives a secure link by email. When they open it, view it, and click accept — you see it here instantly. If a site visit changes the design, the revision workflow sends an updated proposal automatically.',                                                                placement:'left',   actionLabel:'Finish tour 🎉', isLast:true },
+  {
+    id:'loc-group',
+    placement:'right',
+    step:'Step 1 of 8 — Location',
+    title:'Select the client\'s location',
+    body:'The installer clicks this dropdown and types to search. Johannesburg, Cape Town, Durban, Pretoria — each location carries its own Peak Sun Hours (PSH) value. Everything downstream adjusts automatically. Watch what happens when we change it.',
+    label:'See it selected →',
+    action: ()=>{ document.getElementById('loc-input').style.borderColor='var(--gold)'; document.getElementById('loc-input').style.background='var(--gold-dim)'; }
+  },
+  {
+    id:'lb-group',
+    placement:'right',
+    step:'Step 2 of 8 — Load Builder',
+    title:'Build the appliance load profile',
+    body:'The Load Builder replaces manual kW estimates. The installer adds real appliances — lights, fridge, geyser, TV — and assigns backup status. The geyser here is marked "Not backed up" which means it runs off solar surplus only — saving significant battery capacity.',
+    label:'Open Load Builder →',
+    action: ()=>{ document.getElementById('lb-panel').classList.add('open'); }
+  },
+  {
+    id:'lb-panel',
+    placement:'right',
+    step:'Step 3 of 8 — Load Profiles',
+    title:'Each appliance is independently configured',
+    body:'The geyser (3kW) is set to solar-only — it\'s off the battery circuit. This correctly excludes it from battery sizing while including its energy in the solar generation requirement. The engine tracks backed-up vs total load separately throughout all calculations.',
+    label:'Design the system →',
+    action: ()=>{ document.getElementById('lb-panel').classList.remove('open'); runDesignAnimate(); }
+  },
+  {
+    id:'tc-solar',
+    placement:'left',
+    step:'Step 4 of 8 — System Design',
+    title:'The engine sizes everything instantly',
+    body:'10 panels × 550W = 5.50 kWp. The algorithm finds the optimal inverter (NRS 097 compliant DC/AC ratio of 1.32:1), correctly sizes the battery at 10.2 kWh (68% DoD — within the 85% LiFePO4 limit), and validates every compliance check before showing results.',
+    label:'See the financials →',
+    action: ()=>{ showTab('fin'); }
+  },
+  {
+    id:'tc-fin',
+    placement:'left',
+    step:'Step 5 of 8 — Financials',
+    title:'25-year financial model, live',
+    body:'Every proposal includes the full financial model: monthly savings, NPV at 12% discount rate, IRR, real payback (including O&M, battery replacement, NERSA tariff escalation). The client sees exactly what they\'re investing in — not estimates, but engineered projections.',
+    label:'Generate the proposal →',
+    action: ()=>{ showTab('prop'); }
+  },
+  {
+    id:'tc-prop',
+    placement:'left',
+    step:'Step 6 of 8 — Generate Proposal',
+    title:'Client details → AI-generated PDF',
+    body:'The installer fills in client name, email, address, and selects Residential or Commercial. One click generates a branded PDF via the Nova Metrics AI pipeline — sent directly to the client\'s email with a secure approval link.',
+    label:'See the PDF output →',
+    action: ()=>{ generatePDF(); }
+  },
+  {
+    id:'pdf-preview',
+    placement:'left',
+    step:'Step 7 of 8 — PDF Proposal',
+    title:'This is the actual document the client receives',
+    body:'A fully branded PDF with the installer\'s logo, colours, and contact details. It shows system size, savings projection, 25-year cumulative chart, equipment spec, and compliance status. The client receives this by email with a one-click Accept or Decline button.',
+    label:'See the Job Portal →',
+    action: ()=>{ showJobPortalAnim(); }
+  },
+  {
+    id:'job-portal',
+    placement:'top',
+    step:'Step 8 of 8 — Job Portal',
+    title:'Track every proposal in one place',
+    body:'The Job Portal shows all active proposals across the installer\'s client base — approval status, site visit scheduling, revision requests, and follow-up actions. When a client clicks Accept on their proposal link, the status updates here in real time.',
+    label:'Finish tour 🎉',
+    isLast:true
+  },
 ];
 
+let step = -1;
+const TOTAL = STEPS.length;
+
 function startTour(){
-  document.getElementById('welcome').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
-  document.getElementById('progress-bar').classList.add('visible');
+  document.getElementById('welcome').classList.add('out');
+  document.getElementById('app').classList.add('on');
+  document.getElementById('pbar').classList.add('on');
   buildDots();
-  setTimeout(()=>goTo(0),400);
+  setTimeout(()=>go(0), 400);
 }
 
 function buildDots(){
-  const w=document.getElementById('pb-steps');
-  w.innerHTML='';
-  for(let i=0;i<TOTAL_STEPS;i++){
-    const d=document.createElement('div');
-    d.className='pb-dot';d.id='pb-dot-'+i;
-    d.onclick=()=>goTo(i);w.appendChild(d);
+  const w = document.getElementById('pb-dots');
+  w.innerHTML = '';
+  for(let i=0;i<TOTAL;i++){
+    const d = document.createElement('div');
+    d.className = 'pb-dot';
+    d.id = 'pd'+i;
+    d.onclick = ()=>go(i);
+    w.appendChild(d);
   }
 }
 
 function updateDots(s){
-  for(let i=0;i<TOTAL_STEPS;i++){
-    const d=document.getElementById('pb-dot-'+i);
-    if(d) d.className='pb-dot'+(i<s?' done':i===s?' active':'');
+  for(let i=0;i<TOTAL;i++){
+    const d = document.getElementById('pd'+i);
+    if(d) d.className='pb-dot'+(i<s?' done':i===s?' act':'');
   }
 }
 
-function goTo(idx){
-  if(idx<0||idx>=TOTAL_STEPS)return;
-  currentStep=idx;
-  const s=STEPS[idx];
+function go(idx){
+  if(idx<0||idx>=TOTAL) return;
+  step = idx;
+  const s = STEPS[idx];
   updateDots(idx);
-  if(s.switchTo) switchTab(s.switchTo);
-  document.getElementById('tt-step').textContent=`Step ${idx+1} of ${TOTAL_STEPS}`;
-  document.getElementById('tt-title').textContent=s.title;
-  document.getElementById('tt-body').textContent=s.body;
-  document.getElementById('tt-next-label').textContent=s.isLast?'Finish':(s.actionLabel||'Next');
-  document.getElementById('tt-back').style.display=idx===0?'none':'block';
-  spotlight(s.targetId,s.placement);
-  if(s.promptEl) pulse(s.promptEl); else hidePulse();
+
+  // Run the associated action
+  if(s.action) s.action();
+
+  // Update tooltip
+  document.getElementById('tt-step').textContent = s.step;
+  document.getElementById('tt-title').textContent = s.title;
+  document.getElementById('tt-body').textContent = s.body;
+  document.getElementById('tt-label').textContent = s.label || 'Next →';
+  document.getElementById('tt-back').style.display = idx===0 ? 'none' : 'block';
+
+  // Spotlight + ring
+  setTimeout(()=>spotlight(s.id, s.placement), 80);
 }
 
 function nextStep(){
-  if(currentStep>=TOTAL_STEPS-1){finishTour();return;}
-  goTo(currentStep+1);
+  if(step >= TOTAL-1){ finishTour(); return; }
+  go(step+1);
 }
 
 function prevStep(){
-  if(currentStep>0) goTo(currentStep-1);
+  if(step>0) go(step-1);
 }
 
 function finishTour(){
-  acceptProposal();
+  document.getElementById('spotlight').classList.remove('on');
+  document.getElementById('ring').classList.remove('on');
+  document.getElementById('tooltip').classList.remove('on');
+  hidePulse();
+  setTimeout(()=>document.getElementById('done').classList.add('on'), 400);
+}
+
+function spotlight(targetId, placement){
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  // Scroll into view
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
   setTimeout(()=>{
-    document.getElementById('spotlight').classList.remove('on');
-    document.getElementById('highlight-ring').classList.remove('on');
-    document.getElementById('tooltip').classList.remove('on');
-    hidePulse();
-    document.getElementById('completion').classList.add('on');
-  },700);
+    const r = el.getBoundingClientRect();
+    const pad = 10;
+    const ring = document.getElementById('ring');
+    ring.style.left   = (r.left-pad)+'px';
+    ring.style.top    = (r.top-pad)+'px';
+    ring.style.width  = (r.width+pad*2)+'px';
+    ring.style.height = (r.height+pad*2)+'px';
+    ring.classList.add('on');
+    document.getElementById('spotlight').classList.add('on');
+    posTooltip(r, placement||'right');
+    // Pulse on element center
+    const cx=r.left+r.width/2, cy=r.top+r.height/2;
+    document.getElementById('pulse').style.cssText=`left:${cx}px;top:${cy}px;opacity:1;`;
+    document.getElementById('dot').style.cssText=`left:${cx}px;top:${cy}px;opacity:1;`;
+    setTimeout(hidePulse, 2400);
+  }, 120);
 }
 
-function spotlight(targetId,placement){
-  const el=document.getElementById(targetId);
-  if(!el)return;
-  const r=el.getBoundingClientRect(),pad=10;
-  const ring=document.getElementById('highlight-ring');
-  ring.style.cssText=`left:${r.left-pad}px;top:${r.top-pad}px;width:${r.width+pad*2}px;height:${r.height+pad*2}px;`;
-  ring.classList.add('on');
-  document.getElementById('spotlight').classList.add('on');
-  posTooltip(r,placement);
-}
-
-function posTooltip(r,placement){
-  const tt=document.getElementById('tooltip');
+function posTooltip(r, placement){
+  const tt = document.getElementById('tooltip');
   tt.classList.add('on');
-  const pad=18,w=Math.min(320,window.innerWidth-48);
+  const pad=18, w=Math.min(320, window.innerWidth-48);
   let l,t;
-  if(placement==='right'){l=r.right+pad;t=r.top+r.height/2-80;if(l+w>window.innerWidth-12)l=r.left-w-pad;}
-  else if(placement==='left'){l=r.left-w-pad;t=r.top+r.height/2-80;if(l<12)l=r.right+pad;}
-  else{l=window.innerWidth/2-w/2;t=r.bottom+pad;if(t+220>window.innerHeight)t=r.top-240;}
-  t=Math.max(72,Math.min(t,window.innerHeight-260));
-  l=Math.max(12,Math.min(l,window.innerWidth-w-12));
+  if(placement==='right'){
+    l=r.right+pad; t=r.top+r.height/2-90;
+    if(l+w>window.innerWidth-12) l=r.left-w-pad;
+  } else if(placement==='left'){
+    l=r.left-w-pad; t=r.top+r.height/2-90;
+    if(l<12) l=r.right+pad;
+  } else if(placement==='top'){
+    l=window.innerWidth/2-w/2;
+    t=r.top-240;
+    if(t<70) t=r.bottom+pad;
+  } else {
+    l=window.innerWidth/2-w/2;
+    t=r.bottom+pad;
+    if(t+240>window.innerHeight) t=r.top-260;
+  }
+  t=Math.max(70, Math.min(t, window.innerHeight-280));
+  l=Math.max(12, Math.min(l, window.innerWidth-w-12));
   tt.style.cssText=`left:${l}px;top:${t}px;width:${w}px;`;
 }
 
-function pulse(id){
-  const el=document.getElementById(id);if(!el)return;
-  const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-  const p=document.getElementById('pulse1'),d=document.getElementById('dot1');
-  p.style.cssText=`left:${cx}px;top:${cy}px;opacity:1;`;
-  d.style.cssText=`left:${cx}px;top:${cy}px;opacity:1;`;
-}
-
 function hidePulse(){
-  document.getElementById('pulse1').style.opacity='0';
-  document.getElementById('dot1').style.opacity='0';
+  document.getElementById('pulse').style.opacity='0';
+  document.getElementById('dot').style.opacity='0';
 }
 
-function switchTab(tab){
-  ['loads','finance','proposal'].forEach(t=>{
-    const v=document.getElementById('view-'+t);
-    const tb=document.getElementById('tab-'+(t==='loads'?'loads':t==='finance'?'finance':'proposal'));
-    if(v)v.style.display='none';
-    if(tb)tb.classList.remove('active');
+// ═══════════════ INTERACTIONS ═══════════════
+function pickLocation(){
+  const el = document.getElementById('loc-input');
+  const locs = ['Johannesburg, Gauteng','Cape Town, Western Cape','Durban, KwaZulu-Natal','Pretoria, Gauteng','Gqeberha, Eastern Cape'];
+  const cur = locs.indexOf(el.value);
+  el.value = locs[(cur+1)%locs.length];
+}
+
+let lbOpen=true;
+function toggleLB(){
+  lbOpen=!lbOpen;
+  document.getElementById('lb-panel').classList.toggle('open',lbOpen);
+}
+
+let applianceAdded=false;
+function addAppliance(id){
+  if(applianceAdded) return;
+  applianceAdded=true;
+  const icons={ac:'❄️',pool:'🏊',washing:'🫧'};
+  const names={ac:'Air Conditioner',pool:'Pool Pump',washing:'Washing Machine'};
+  const kwh={ac:'1.2 kW · 7.2 kWh/day',pool:'0.75 kW · 4.5 kWh/day',washing:'0.5 kW · 0.5 kWh/day'};
+  const li=document.createElement('div');
+  li.className='lb-item';li.style.animation='upIn .3s ease';
+  li.innerHTML=`<span>${icons[id]||'⚡'}</span><span class="lb-item-name">${names[id]||'Load'}</span><span class="lb-item-kwh">${kwh[id]||''}</span><span class="lb-item-badge badge-backed">🔋 Backed up</span>`;
+  document.getElementById('lb-items').appendChild(li);
+  document.getElementById('lb-badge').textContent='Total: 4.90 kW peak · 28.3 kWh/day';
+  document.getElementById('lb-label').textContent='4.90 kW — 5 appliances';
+}
+
+function updateBackup(val){
+  // Visual feedback
+  document.getElementById('sel-auto').style.borderColor='var(--gold)';
+  setTimeout(()=>document.getElementById('sel-auto').style.borderColor='',1200);
+}
+
+let designed=false;
+function runDesignAnimate(){
+  if(designed) return;
+  designed=true;
+  const btn=document.getElementById('btn-design');
+  btn.textContent='⚙ Calculating…';
+  btn.style.background='rgba(255,215,0,.5)';
+  setTimeout(()=>{ btn.textContent='✓ System Designed'; btn.style.background='var(--green)'; btn.style.color='#064e3b'; showTab('solar'); }, 1200);
+}
+
+function runDesign(){
+  runDesignAnimate();
+  // If in tour advance
+  if(step===2) setTimeout(()=>nextStep(),1600);
+}
+
+function showTab(t){
+  ['solar','battery','inverter','fin','env','prop'].forEach(k=>{
+    document.getElementById('tc-'+k).classList.toggle('active',k===t);
+    document.getElementById('tab-'+k).classList.toggle('active',k===t);
   });
-  if(tab==='finance'){
-    document.getElementById('view-finance').style.display='block';
-    document.getElementById('tab-finance').classList.add('active');
-    renderChart();
-  }else if(tab==='proposal'){
-    document.getElementById('view-proposal').style.display='block';
-    document.getElementById('tab-proposal').classList.add('active');
-  }else{
-    document.getElementById('view-loads').style.display='grid';
-    document.getElementById('tab-loads').classList.add('active');
-  }
+  // If in tour reposition ring
   setTimeout(()=>{
-    const s=STEPS[currentStep];
-    if(s&&document.getElementById(s.targetId)) spotlight(s.targetId,s.placement);
+    const s=STEPS[step];
+    if(s&&document.getElementById(s.id)) spotlight(s.id,s.placement);
   },80);
 }
 
-function addAppliance(){
-  if(applianceAdded)return;
-  applianceAdded=true;
-  const item=document.createElement('div');
-  item.className='appliance-item backed';item.style.animation='fadeIn .4s ease';
-  item.innerHTML='<div class="appliance-icon">🖥️</div><div style="flex:1"><div class="appliance-name">Laptop / Router</div><div class="appliance-kwh">0.8 kWh/day</div></div><div class="backed-badge">Backed up</div>';
-  document.getElementById('appliance-list').appendChild(item);
-  recalc();hidePulse();
-  setTimeout(()=>nextStep(),700);
-}
-
-function updateAutonomy(val){
-  document.getElementById('autonomy-val').innerHTML=val+' <span>hours backup</span>';
-  recalc();
-  if(currentStep===2) setTimeout(()=>nextStep(),1200);
-}
-
-function recalc(){
-  const a=parseInt(document.getElementById('autonomy-slider').value);
-  const loc=document.getElementById('loc-select').value;
-  const psh={JHB:5.5,CPT:5.8,DBN:4.9,PTA:5.6,PE:5.4}[loc]||5.5;
-  const b=Math.max(5,Math.round(a*1.1/5)*5);
-  const kw=Math.round(b*0.5*10)/10;
-  const panels=Math.ceil(kw*1000/550);
-  const sav=Math.round(kw*psh*365*2.89*0.8);
-  const cost=Math.round((kw*12000+b*3800+15000)/1000)*1000;
-  const pb=Math.round(cost/sav*10)/10;
-  const rt=Math.round(b/0.8*10)/10;
-  document.getElementById('res-kw').innerHTML=kw+'<span class="sc-unit">kWp</span>';
-  document.getElementById('res-panels').textContent=panels+'× JA Solar 550W';
-  document.getElementById('res-batt').innerHTML=b+'<span class="sc-unit">kWh</span>';
-  document.getElementById('res-batt-model').textContent='Sunsynk 5.1kWh ×'+Math.ceil(b/5.12);
-  document.getElementById('met-savings').textContent='R'+sav.toLocaleString('en-ZA');
-  document.getElementById('met-payback').innerHTML=pb+'<span class="metric-unit"> yrs</span>';
-  document.getElementById('met-runtime').innerHTML=rt+'<span class="metric-unit"> hrs</span>';
-}
-
-function generateProposal(){
-  if(proposalGenerated){switchTab('proposal');nextStep();return;}
-  proposalGenerated=true;
-  const btn=document.getElementById('btn-generate');
-  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="animation:spin .8s linear infinite"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg> Generating…';
+let pdfShown=false;
+function generatePDF(){
+  if(pdfShown) return;
+  pdfShown=true;
+  const btn=document.getElementById('btn-gen');
+  btn.textContent='⚙ Generating…';
+  btn.style.background='rgba(52,211,153,.4)';
   btn.disabled=true;
   setTimeout(()=>{
-    btn.innerHTML='✅ Proposal sent to client';
-    btn.style.background='linear-gradient(135deg,#22c78a,#16a370)';
-    switchTab('proposal');
-    setTimeout(()=>nextStep(),600);
-  },1800);
+    btn.textContent='✓ Sent to client';
+    btn.style.background='var(--green)';
+    document.getElementById('pdf-preview').classList.add('on');
+    // If in tour, ring repositions to pdf preview
+    if(step===5) setTimeout(()=>nextStep(),800);
+  },1600);
 }
 
-function acceptProposal(){
-  const d=document.getElementById('at-dot-approval');
-  const tt=document.getElementById('at-title-approval');
-  const ts=document.getElementById('at-sub-approval');
-  const sd=document.querySelector('.pp-status-dot');
-  const st=document.getElementById('proposal-status-text');
-  if(d){d.className='at-dot done';d.textContent='✓';}
-  if(tt) tt.textContent='Client accepted the design';
-  if(ts) ts.textContent='Today, 15:47 · Confirmed via approval link';
-  if(sd) sd.className='pp-status-dot approved';
-  if(st){st.textContent='Accepted by client';st.style.color='#166534';}
+function showJobPortal(){
+  document.getElementById('job-portal').classList.add('on');
+  document.getElementById('job-portal').scrollIntoView({behavior:'smooth'});
 }
 
-function renderChart(){
-  const c=document.getElementById('savings-chart');
-  if(!c||c.children.length>0)return;
-  const yrs=[1,3,5,7,10,15,20,25],pb=7.8;
-  const vals=yrs.map(yr=>{
-    let s=0;
-    for(let y=1;y<=yr;y++){
-      const d=Math.pow(1-.0055,y-1);
-      const tf=y<=1?1:y===2?1.0876:y===3?1.0876*1.0883:1.0876*1.0883*Math.pow(1.05,y-3);
-      s+=18200*d*tf;
-    }
-    return Math.round(s);
-  });
-  const max=Math.max(...vals);
-  yrs.forEach((yr,i)=>{
-    const pct=Math.round(vals[i]/max*90)+10;
-    const col=document.createElement('div');
-    col.className='bar-col';
-    col.innerHTML=`<div class="bar-fill-wrap"><div class="bar-fill-inner ${yr>pb?'past':''}" style="height:0" data-h="${pct}"></div></div><div class="bar-yr">Yr ${yr}</div>`;
-    c.appendChild(col);
-  });
-  setTimeout(()=>document.querySelectorAll('.bar-fill-inner').forEach(b=>b.style.height=b.dataset.h+'%'),100);
+function showJobPortalAnim(){
+  showJobPortal();
+  setTimeout(()=>{ if(step===6) spotlight('job-portal','top'); },300);
 }
 
 window.addEventListener('resize',()=>{
-  if(currentStep>=0){const s=STEPS[currentStep];if(s&&document.getElementById(s.targetId))spotlight(s.targetId,s.placement);}
+  if(step>=0){const s=STEPS[step];if(s&&document.getElementById(s.id))spotlight(s.id,s.placement);}
 });
 </script>
 </body>
