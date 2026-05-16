@@ -412,6 +412,13 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
     setSyncStatus('online');
     await loadJobs();
     setInterval(loadJobs,60000);
+    const _urlParams=new URLSearchParams(window.location.search);
+    const _urlAiId=_urlParams.get('ai_id');
+    if(_urlAiId){
+      await openJob(_urlAiId);
+      const _jobItem=Array.from(document.querySelectorAll('.job-card')).find(function(el){return el.dataset.aiId===String(_urlAiId);});
+      if(_jobItem)_jobItem.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
     sbClient.channel('design-approvals')
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'site_visits'},payload=>{
         if(!currentVisit||!payload.new||payload.new.id!==currentVisit.id)return;
@@ -462,7 +469,8 @@ function si(s){return SO.indexOf(s);}
 
 async function loadJobs(){
   setSyncStatus('loading');
-  try{const d=await sbGet('ai_results','select=*&proposal_status=eq.accepted&order=created_at.desc');jobs=d||[];renderSidebar();setSyncStatus('online');}
+  const won='accepted,site_visit_scheduled,site_visit_complete,installation_scheduled,installation_in_progress,installation_complete,handed_over';
+  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');}
   catch(e){setSyncStatus('error');}
 }
 
@@ -480,7 +488,7 @@ function renderSidebar(){
   document.getElementById('job-count').textContent=f.length;list.innerHTML='';
   if(!f.length){list.innerHTML='<div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:12px"><div style="font-size:24px;margin-bottom:8px">📋</div>No won jobs yet</div>';return;}
   f.forEach(j=>{
-    const c=document.createElement('div');c.className=`job-card ${currentJob?.ai_id===j.ai_id?'active':''}`;c.onclick=()=>openJob(j.ai_id);
+    const c=document.createElement('div');c.className=`job-card ${currentJob?.ai_id===j.ai_id?'active':''}`;c.dataset.aiId=String(j.ai_id);c.onclick=()=>openJob(j.ai_id);
     const s=j.job_status||'lead';
     c.innerHTML=`<div class="job-card-name">${j.client_name||'Unnamed'}</div><div class="job-card-ref">${String(j.ai_id).padStart(6,'0')} · ${(j.client_address||'—').slice(0,28)}</div><div class="job-card-meta"><span class="job-card-kw">${j.system_size_kw?j.system_size_kw+' kWp':'—'}</span><span class="stage-pill stage--${s}">${STAGE_LABELS[s]||s}</span></div>`;
     list.appendChild(c);
