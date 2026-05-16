@@ -576,72 +576,91 @@ const STEPS = [
     placement:'right',
     step:'Step 1 of 8 — Location',
     title:'Select the client\'s location',
-    body:'The installer clicks this dropdown and types to search. Johannesburg, Cape Town, Durban, Pretoria — each location carries its own Peak Sun Hours (PSH) value. Everything downstream adjusts automatically. Watch what happens when we change it.',
-    label:'See it selected →',
-    action: ()=>{ document.getElementById('loc-input').style.borderColor='var(--gold)'; document.getElementById('loc-input').style.background='var(--gold-dim)'; }
+    body:'Every design starts here. The installer searches by city — Johannesburg, Cape Town, Durban, Pretoria. Each location holds a Peak Sun Hours (PSH) value sourced from the SAURAN Solar Atlas. Change the location and every solar production figure, financial model, and payback period recalculates automatically.',
+    label:'Next: Load Builder →',
+    prepare: ()=>{
+      document.getElementById('lb-panel').classList.remove('open');
+      showTab('solar');
+      document.getElementById('loc-input').style.borderColor='var(--gold)';
+      document.getElementById('loc-input').style.background='var(--gold-dim)';
+    }
   },
   {
     id:'lb-group',
     placement:'right',
     step:'Step 2 of 8 — Load Builder',
-    title:'Build the appliance load profile',
-    body:'The Load Builder replaces manual kW estimates. The installer adds real appliances — lights, fridge, geyser, TV — and assigns backup status. The geyser here is marked "Not backed up" which means it runs off solar surplus only — saving significant battery capacity.',
-    label:'Open Load Builder →',
-    action: ()=>{ document.getElementById('lb-panel').classList.add('open'); }
+    title:'The Load Builder — click to open it',
+    body:'This button replaces the old "select a load profile" dropdown. When the installer clicks it, a panel expands below showing every appliance in the client\'s home. The button already shows the total: 3.15 kW across 4 appliances. Click Next to see inside the panel.',
+    label:'Open the appliance panel →',
+    prepare: ()=>{
+      document.getElementById('loc-input').style.borderColor='';
+      document.getElementById('loc-input').style.background='';
+      document.getElementById('lb-panel').classList.remove('open');
+    }
   },
   {
     id:'lb-panel',
     placement:'right',
-    step:'Step 3 of 8 — Load Profiles',
-    title:'Each appliance is independently configured',
-    body:'The geyser (3kW) is set to solar-only — it\'s off the battery circuit. This correctly excludes it from battery sizing while including its energy in the solar generation requirement. The engine tracks backed-up vs total load separately throughout all calculations.',
-    label:'Design the system →',
-    action: ()=>{ document.getElementById('lb-panel').classList.remove('open'); runDesignAnimate(); }
+    step:'Step 3 of 8 — Appliance List',
+    title:'Every appliance configured individually',
+    body:'Look at the list below — 4 appliances. Lights, fridge, and TV are green (🔋 Backed up by battery). The geyser is amber (🌞 Not backed up) meaning it runs on solar surplus during the day only. That one toggle removes 3 kW and 9 kWh/day from the battery sizing — cutting battery cost significantly.',
+    label:'Run the system design →',
+    prepare: ()=>{
+      document.getElementById('lb-panel').classList.add('open');
+    }
   },
   {
     id:'tc-solar',
     placement:'left',
-    step:'Step 4 of 8 — System Design',
-    title:'The engine sizes everything instantly',
-    body:'10 panels × 550W = 5.50 kWp. The algorithm finds the optimal inverter (NRS 097 compliant DC/AC ratio of 1.32:1), correctly sizes the battery at 10.2 kWh (68% DoD — within the 85% LiFePO4 limit), and validates every compliance check before showing results.',
+    step:'Step 4 of 8 — System Design: Solar Tab',
+    title:'The Solar Array results — live on screen',
+    body:'The engine has just run. You can see the Solar Array tab: 10 × 550W panels = 5.50 kWp, daily net solar production of 24.2 kWh, 8.4% array oversizing (optimal), and a roof fit assessment. All of these feed the financial model. The battery and inverter tabs have their own compliance checks.',
     label:'See the financials →',
-    action: ()=>{ showTab('fin'); }
+    prepare: ()=>{
+      document.getElementById('lb-panel').classList.remove('open');
+      runDesignAnimate();
+      setTimeout(()=>showTab('solar'), 300);
+    }
   },
   {
     id:'tc-fin',
     placement:'left',
-    step:'Step 5 of 8 — Financials',
-    title:'25-year financial model, live',
-    body:'Every proposal includes the full financial model: monthly savings, NPV at 12% discount rate, IRR, real payback (including O&M, battery replacement, NERSA tariff escalation). The client sees exactly what they\'re investing in — not estimates, but engineered projections.',
-    label:'Generate the proposal →',
-    action: ()=>{ showTab('prop'); }
+    step:'Step 5 of 8 — Financials Tab',
+    title:'Full SA-compliant financial model',
+    body:'This is the Financials tab — what you see on screen now. Total cost R142,500, suggested client price R156,750, Year 1 savings R18,200 / month R1,517. The cost bars below show the panel, BOS, battery and inverter split. Scroll further and you see NPV +R142,000, IRR 19.2%, and net 25-year savings R198,400.',
+    label:'Go to Generate Proposal →',
+    prepare: ()=>{ showTab('fin'); }
   },
   {
     id:'tc-prop',
     placement:'left',
-    step:'Step 6 of 8 — Generate Proposal',
-    title:'Client details → AI-generated PDF',
-    body:'The installer fills in client name, email, address, and selects Residential or Commercial. One click generates a branded PDF via the Nova Metrics AI pipeline — sent directly to the client\'s email with a secure approval link.',
-    label:'See the PDF output →',
-    action: ()=>{ generatePDF(); }
+    step:'Step 6 of 8 — Generate Proposal Tab',
+    title:'Client details — one click generates the PDF',
+    body:'This is the Generate Proposal tab. The installer fills in client name, email, phone and address. Then picks Residential (homeowner-friendly 4-page PDF) or Commercial (8-page technical PDF with NPV, IRR, and Section 12B tax analysis). One click generates and emails the branded PDF with a secure approval link.',
+    label:'Generate the PDF →',
+    prepare: ()=>{ showTab('prop'); }
   },
   {
     id:'pdf-preview',
     placement:'left',
-    step:'Step 7 of 8 — PDF Proposal',
-    title:'This is the actual document the client receives',
-    body:'A fully branded PDF with the installer\'s logo, colours, and contact details. It shows system size, savings projection, 25-year cumulative chart, equipment spec, and compliance status. The client receives this by email with a one-click Accept or Decline button.',
+    step:'Step 7 of 8 — The PDF Document',
+    title:'The actual document the client receives',
+    body:'This matches the real output — cover page, executive summary, SA financial analysis with Section 12B tax breakdown, 25-year ROI chart, equipment specifications, environmental impact, assumptions table, and a regulatory compliance page. The client gets this by email with a one-click Accept or Decline button.',
     label:'See the Job Portal →',
-    action: ()=>{ showJobPortalAnim(); }
+    prepare: ()=>{
+      showTab('prop');
+      setTimeout(()=>generatePDF(), 100);
+    }
   },
   {
     id:'job-portal',
     placement:'top',
     step:'Step 8 of 8 — Job Portal',
-    title:'Track every proposal in one place',
-    body:'The Job Portal shows all active proposals across the installer\'s client base — approval status, site visit scheduling, revision requests, and follow-up actions. When a client clicks Accept on their proposal link, the status updates here in real time.',
+    title:'Every proposal tracked in real time',
+    body:'The Job Portal is the installer\'s live dashboard. You can see the proposal just generated — Thabo Nkosi, already marked Approved. Below that: a site visit in progress, a pending commercial quote, and a draft. When a client clicks Accept on their email link, the status here updates instantly.',
     label:'Finish tour 🎉',
-    isLast:true
+    isLast:true,
+    prepare: ()=>{ showJobPortal(); }
   },
 ];
 
@@ -681,18 +700,18 @@ function go(idx){
   const s = STEPS[idx];
   updateDots(idx);
 
-  // Run the associated action
-  if(s.action) s.action();
-
-  // Update tooltip
+  // Update tooltip first
   document.getElementById('tt-step').textContent = s.step;
   document.getElementById('tt-title').textContent = s.title;
   document.getElementById('tt-body').textContent = s.body;
   document.getElementById('tt-label').textContent = s.label || 'Next →';
   document.getElementById('tt-back').style.display = idx===0 ? 'none' : 'block';
 
-  // Spotlight + ring
-  setTimeout(()=>spotlight(s.id, s.placement), 80);
+  // Prepare the view for this step
+  if(s.prepare) s.prepare();
+
+  // Give DOM time to render, then spotlight what's now visible
+  setTimeout(()=>spotlight(s.id, s.placement), 250);
 }
 
 function nextStep(){
