@@ -324,6 +324,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   .stats{grid-template-columns:repeat(2,1fr);}
   .specs{grid-template-columns:1fr;}
 }
+.sb-controls{display:flex;gap:5px;padding:6px 9px 7px;border-bottom:1px solid var(--border);}
+.sb-select{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;padding:6px 8px;border-radius:7px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a95af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;transition:border-color .15s;text-transform:uppercase;letter-spacing:.04em;}
+.sb-select:focus{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.06);}
+.sb-select option{background:#0d2240;color:var(--text);}  
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -353,19 +357,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <div class="sidebar-search-wrap">
     <input type="text" class="sidebar-search" id="sidebarSearch" placeholder="🔍  Search client…" autocomplete="off"/>
   </div>
-  <div class="sidebar-ftabs" id="sidebarFtabs">
-    <button class="ftab active" data-tab="all">All</button>
-    <button class="ftab" data-tab="needs_action" id="ftab-needs-action">⚠ Action</button>
-    <button class="ftab" data-tab="sent">Sent</button>
-    <button class="ftab" data-tab="viewed">Viewed</button>
-    <button class="ftab" data-tab="won">Won</button>
-  </div>
-  <div class="sidebar-sortbar">
-    <span class="sort-lbl">Sort:</span>
-    <button class="sort-btn active" data-sort="newest">Newest</button>
-    <button class="sort-btn" data-sort="oldest">Oldest</button>
-    <button class="sort-btn" data-sort="value">Value</button>
-  </div>
+  <div class="sb-controls">
+  <select class="sb-select" id="filterSelect" onchange="handleFilterChange(this.value)">
+    <option value="all">ALL CLIENTS</option>
+    <option value="needs_action">⚠ NEEDS ACTION</option>
+    <option value="sent">SENT</option>
+    <option value="viewed">VIEWED</option>
+    <option value="won">WON</option>
+  </select>
+  <select class="sb-select" id="sortSelect" onchange="handleSortChange(this.value)">
+    <option value="newest">NEWEST</option>
+    <option value="oldest">OLDEST</option>
+    <option value="value">BY VALUE</option>
+  </select>
+</div>
   <div class="c-list-section">
     <div class="c-list-header"><div class="s-lbl" id="clientCount">Loading…</div></div>
     <div class="c-list" id="clientList"><div class="loading-row">Loading clients…</div></div>
@@ -700,8 +705,8 @@ function renderClientList(){
   var list=document.getElementById('clientList');
   var visible=filterAndSortClients();
   var needsCount=allClients.filter(needsAttention).length;
-  var naTab=document.getElementById('ftab-needs-action');
-  if(naTab) naTab.innerHTML='⚠ Action'+(needsCount>0?' <span class="ftab-dot"></span>':'');
+  var filterSel=document.getElementById('filterSelect');
+if(filterSel){var naOpt=Array.from(filterSel.options).find(function(o){return o.value==='needs_action';});if(naOpt)naOpt.text=needsCount>0?'⚠ NEEDS ACTION ('+needsCount+')':'⚠ NEEDS ACTION';}
   var shown=Math.min(displayCount,visible.length);
   document.getElementById('clientCount').textContent=allClients.length+' Client'+(allClients.length!==1?'s':'')+(activeFilterTab!=='all'||searchQuery?' · '+visible.length+' shown':'');
   list.innerHTML='';
@@ -813,9 +818,7 @@ function showPortal(){
 }
 function initSidebarControls(){
   document.getElementById('sidebarSearch').addEventListener('input',function(){searchQuery=this.value;displayCount=PAGE_SIZE;renderClientList();});
-  document.getElementById('sidebarFtabs').addEventListener('click',function(e){var btn=e.target.closest('.ftab');if(!btn)return;document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});btn.classList.add('active');activeFilterTab=btn.dataset.tab;displayCount=PAGE_SIZE;renderClientList();});
-  document.querySelector('.sidebar-sortbar').addEventListener('click',function(e){var btn=e.target.closest('.sort-btn');if(!btn)return;document.querySelectorAll('.sort-btn').forEach(function(t){t.classList.remove('active');});btn.classList.add('active');sortMode=btn.dataset.sort;displayCount=PAGE_SIZE;renderClientList();});
-}
+  }
 document.getElementById('signOutBtn').addEventListener('click',async function(){
   try{await sb.auth.signOut();}finally{localStorage.removeItem(SESSION_KEY);window.location.href='solar-intelligence.html';}
 });
@@ -1014,6 +1017,8 @@ function round(v,dp){var n=parseFloat(v);return isNaN(n)?'—':n.toFixed(dp||0);
 function fmtDate(iso){if(!iso)return'—';var dt=new Date(iso);return isNaN(dt)?'—':dt.toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'});}
 function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=show?(dv||'block'):'none';}
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
+function handleFilterChange(val){activeFilterTab=val;displayCount=PAGE_SIZE;renderClientList();}
+function handleSortChange(val){sortMode=val;displayCount=PAGE_SIZE;renderClientList();}  
 </script>
 </body>
 </html>
