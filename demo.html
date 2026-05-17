@@ -935,7 +935,7 @@ const STEPS = [
   },
   {
     id:'handover-cert',
-    placement:'top',
+    placement:'peek',
     step:'Step 9 of 9 — Handover Certificate',
     title:'Deliverable 2 — the signed handover record',
     body:'Every completed job ends here. This is the handover certificate generated automatically from the job pipeline — COC number, compliance status, equipment details, warranty schedule, and dual signatures. It emails to your client the moment you click Complete Handover, and lives permanently in the job record.',
@@ -1044,6 +1044,12 @@ function posTooltip(r, placement){
   tt.classList.add('on');
   const pad=18, w=Math.min(320, window.innerWidth-48);
   let l,t;
+  if(placement==='peek'){
+    const pw=Math.min(320,window.innerWidth-48);
+    const pl=Math.max(12,window.innerWidth/2-pw/2);
+    tt.style.cssText=`left:${pl}px;top:72px;width:${pw}px;`;
+    return;
+  }
   if(placement==='right'){
     l=r.right+pad; t=r.top+r.height/2-90;
     if(l+w>window.innerWidth-12) l=r.left-w-pad;
