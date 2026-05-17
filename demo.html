@@ -232,9 +232,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div><div class="wc-brand">Nova <span>Metrics</span></div><div style="font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase">Solar Intelligence</div></div>
     </div>
     <div class="wc-eye">Interactive Product Tour</div>
-    <h1 class="wc-h1">See the <em>exact</em> tool<br>your installer uses</h1>
-    <p class="wc-sub">This is a live walkthrough of the real Nova Metrics interface — same screen, same design, same logic. We'll guide you through every key feature, step by step.</p>
-    <button class="wc-btn" onclick="startTour()">▶ Start the Tour — 8 steps</button>
+    <h1 class="wc-h1">Your complete solar<br><em>business platform</em></h1>
+    <p class="wc-sub">Walk through your actual workspace — the same platform you'll use every day to size systems, generate winning proposals, and hand over compliant jobs.</p>
+    <button class="wc-btn" onclick="startTour()">▶ Start the Tour — 9 steps</button>
     <div class="wc-steps">
       <div class="wc-step"><div class="wc-dot"></div>Location</div>
       <div class="wc-step"><div class="wc-dot"></div>Load Builder</div>
@@ -244,6 +244,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="wc-step"><div class="wc-dot"></div>PDF Output</div>
       <div class="wc-step"><div class="wc-dot"></div>Job Portal</div>
       <div class="wc-step"><div class="wc-dot"></div>Approval Tracking</div>
+      <div class="wc-step"><div class="wc-dot"></div>Handover Certificate</div>
     </div>
   </div>
 </div>
@@ -729,12 +730,109 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 
 </div><!-- /app -->
 
+  <!-- ═══════════════ HANDOVER CERTIFICATE PREVIEW ═══════════════ -->
+<div id="handover-cert" style="display:none;margin:0 24px 32px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,.4);max-width:700px;font-family:'DM Sans',sans-serif">
+
+  <!-- header band -->
+  <div style="background:#0B1F3A;padding:22px 28px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:36px;height:36px;background:#FFD700;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#0B1F3A">N</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:.04em">Nova Metrics</div>
+        <div style="font-size:9px;color:rgba(255,215,0,.6);letter-spacing:.1em;text-transform:uppercase">Solar Installation</div>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:16px;font-weight:300;color:#fff;letter-spacing:-.3px">Handover Certificate</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px">REF: 004034 · Issued 06 May 2026</div>
+    </div>
+  </div>
+  <div style="height:3px;background:linear-gradient(90deg,#FFD700,#c8911c)"></div>
+
+  <!-- body -->
+  <div style="padding:22px 28px;background:#fff">
+
+    <!-- two-column top -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:18px">
+
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #f0f0f0;padding-bottom:5px;margin-bottom:10px">Customer Details</div>
+        <div style="font-size:12px;color:#374151;line-height:1.9">
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Name</span><span style="font-weight:600">Mandla Khumalo</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Address</span><span style="font-weight:600">54 Bath Ave, Rosebank</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Municipality</span><span style="font-weight:600">Waterberg</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Meter Type</span><span style="font-weight:600">Prepaid (Smart)</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Grid Ref</span><span style="font-weight:600;font-family:monospace">9836263</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #f0f0f0;padding-bottom:5px;margin-bottom:10px">System Installed</div>
+        <div style="font-size:12px;color:#374151;line-height:1.9">
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Total Capacity</span><span style="font-weight:700;color:#0B1F3A">8 kWp</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Battery Storage</span><span style="font-weight:700;color:#0B1F3A">9 kWh</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Panels</span><span style="font-weight:600">14 × Jinko Tiger 575W</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Inverter</span><span style="font-weight:600">SYNK 4.4 kW</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Battery</span><span style="font-weight:600">1 × US5000 9 kWh</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- compliance -->
+    <div style="font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #f0f0f0;padding-bottom:5px;margin-bottom:10px">Compliance &amp; Approvals</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;font-size:12px;color:#374151">
+      <div style="line-height:1.9">
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">COC Number</span><span style="font-weight:600;font-family:monospace">COC-2026-1254</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">COC Issued By</span><span style="font-weight:600">Dankie Masgovener</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">COC Date</span><span style="font-weight:600">2026-05-29</span></div>
+      </div>
+      <div style="line-height:1.9">
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Grid Application</span><span style="font-weight:600">NRS097 Waterberg</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Grid Status</span><span style="font-weight:600;color:#d97706">Pending</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#9ca3af">Inspector</span><span style="font-weight:600">Hlanyiso Maswayi</span></div>
+      </div>
+    </div>
+
+    <!-- warranty -->
+    <div style="font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid #f0f0f0;padding-bottom:5px;margin-bottom:10px">Warranty &amp; Support</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:16px;font-size:12px;color:#374151">
+      <div style="display:flex;align-items:center;gap:6px"><span style="color:#16a34a;font-weight:700">✓</span> Solar panels — 25 year performance warranty</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="color:#16a34a;font-weight:700">✓</span> Inverter — 10 year manufacturer warranty</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="color:#16a34a;font-weight:700">✓</span> Battery — 10 year manufacturer warranty</div>
+      <div style="display:flex;align-items:center;gap:6px"><span style="color:#16a34a;font-weight:700">✓</span> Workmanship — 2 year installation warranty</div>
+    </div>
+
+    <!-- signatures -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;padding-top:16px;border-top:1px solid #e5e7eb">
+      <div>
+        <div style="font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:28px">Customer Signature</div>
+        <div style="border-bottom:1.5px solid #0B1F3A;width:80%"></div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:5px">Mandla Khumalo · 06 May 2026</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:28px">Installed &amp; Commissioned by Nova Metrics</div>
+        <div style="border-bottom:1.5px solid #0B1F3A;width:80%"></div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:5px">Reuben Siwela · 06 May 2026</div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0f0f0;font-size:10px;color:#9ca3af;line-height:1.6">
+      <strong style="color:#6b7280">Disclaimer:</strong> This document is a system-generated summary recorded by the installer. COC certificates and compliance determinations are issued by accredited third-party professionals. Responsibility rests solely with the licensed installer.
+    </div>
+  </div>
+
+  <div style="background:#0B1F3A;padding:12px 28px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:10px;color:rgba(255,255,255,.3)">Nova Metrics · Handover &amp; Compliance Record</div>
+    <div style="font-size:10px;font-weight:700;color:#FFD700;padding:3px 10px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:20px">✓ Verified Installer</div>
+  </div>
+</div>
+
 <!-- ═══════════════ DONE ═══════════════ -->
 <div id="done">
   <div class="done-inner">
     <div class="done-icon">🎉</div>
     <div class="done-title">Tour complete</div>
-    <p class="done-sub">You've seen the exact interface your installer uses — from load profile to PDF proposal to job tracking. Ready to get started?</p>
+    <p class="done-sub">You've seen your full workflow — from first load profile to signed handover certificate. Ready to put it to work?</p>
     <div class="done-btns">
       <a href="mailto:info@novametricsgroup.com?subject=Request access — Solar Intelligence" class="done-btn-p">Request Access</a>
       <a href="/terms.html" class="done-btn-s" style="border:none;background:rgba(255,255,255,.08);color:var(--text)">Security &amp; Terms</a>
@@ -750,7 +848,7 @@ const STEPS = [
     placement:'right',
     step:'Step 1 of 8 — Location',
     title:'Select the client\'s location',
-    body:'Every design starts here. The installer searches by city — Johannesburg, Cape Town, Durban, Pretoria. Each location holds a Peak Sun Hours (PSH) value sourced from the SAURAN Solar Atlas. Change the location and every solar production figure, financial model, and payback period recalculates automatically.',
+    body:'Every design starts here. You search by city — Johannesburg, Cape Town, Durban, Pretoria. Each location holds a Peak Sun Hours (PSH) value sourced from the SAURAN Solar Atlas. Change the location and every solar production figure, financial model, and payback period recalculates automatically.',
     label:'Next: Load Builder →',
     prepare: ()=>{
       document.getElementById('lb-panel').classList.remove('open');
@@ -764,7 +862,7 @@ const STEPS = [
     placement:'right',
     step:'Step 2 of 8 — Load Builder',
     title:'The Load Builder — click to open it',
-    body:'This button replaces the old "select a load profile" dropdown. When the installer clicks it, a panel expands below showing every appliance in the client\'s home. The button already shows the total: 3.15 kW across 4 appliances. Click Next to see inside the panel.',
+    body:'This button replaces the old \\"select a load profile\\" dropdown. Click it and a panel expands below showing every appliance in the client\\'s home — already showing 3.15 kW across 4 appliances. Click Next to see inside the panel.',
     label:'Open the appliance panel →',
     prepare: ()=>{
       document.getElementById('loc-input').style.borderColor='';
@@ -829,12 +927,24 @@ const STEPS = [
   {
     id:'job-portal',
     placement:'top',
-    step:'Step 8 of 8 — Job Portal',
+    step:'Step 8 of 9 — Job Portal',
     title:'Every proposal tracked in real time',
-    body:'The Job Portal is the installer\'s live dashboard. You can see the proposal just generated — Thabo Nkosi, already marked Approved. Below that: a site visit in progress, a pending commercial quote, and a draft. When a client clicks Accept on their email link, the status here updates instantly.',
+    body:'The Job Portal is your live dashboard. You can see the proposal just generated — Thabo Nkosi, already marked Approved. Below that: a site visit in progress, a pending commercial quote, and a draft. When a client clicks Accept on their email link, the status here updates instantly.',
+    label:'See your Handover Certificate →',
+    prepare: ()=>{ showJobPortal(); }
+  },
+  {
+    id:'handover-cert',
+    placement:'top',
+    step:'Step 9 of 9 — Handover Certificate',
+    title:'Deliverable 2 — the signed handover record',
+    body:'Every completed job ends here. This is the handover certificate generated automatically from the job pipeline — COC number, compliance status, equipment details, warranty schedule, and dual signatures. It emails to your client the moment you click Complete Handover, and lives permanently in the job record.',
     label:'Finish tour 🎉',
     isLast:true,
-    prepare: ()=>{ showJobPortal(); }
+    prepare: ()=>{
+      document.getElementById('handover-cert').style.display='block';
+      document.getElementById('handover-cert').scrollIntoView({behavior:'smooth',block:'center'});
+    }
   },
 ];
 
@@ -1042,6 +1152,10 @@ function generatePDF(){
 function showJobPortal(){
   document.getElementById('job-portal').classList.add('on');
   document.getElementById('job-portal').scrollIntoView({behavior:'smooth'});
+}
+function showHandoverCert(){
+  document.getElementById('handover-cert').style.display='block';
+  document.getElementById('handover-cert').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
 function showJobPortalAnim(){
