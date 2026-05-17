@@ -1054,18 +1054,18 @@ function posTooltip(r, placement){
     l=r.right+pad; t=r.top+r.height/2-90;
     if(l+w>window.innerWidth-12) l=r.left-w-pad;
   } else if(placement==='left'){
-    l=r.left-w-pad; t=r.top+r.height/2-90;
+    l=r.left-w-pad; t=r.top+20;
     if(l<12) l=r.right+pad;
   } else if(placement==='top'){
     l=window.innerWidth/2-w/2;
-    t=r.top-240;
-    if(t<70) t=r.bottom+pad;
+    t=r.top-260;
+    if(t<70) t=72;
   } else {
     l=window.innerWidth/2-w/2;
     t=r.bottom+pad;
     if(t+240>window.innerHeight) t=r.top-260;
   }
-  t=Math.max(70, Math.min(t, window.innerHeight-280));
+  t=Math.max(70, Math.min(t, window.innerHeight-340));
   l=Math.max(12, Math.min(l, window.innerWidth-w-12));
   tt.style.cssText=`left:${l}px;top:${t}px;width:${w}px;`;
 }
