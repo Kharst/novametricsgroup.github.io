@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing &amp; Subscription — Solar Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--gold-dim:rgba(255,215,0,.10);--gold-border:rgba(255,215,0,.22);
+  --text:#f0f4f8;--muted:#7a95af;--border:rgba(255,255,255,.07);--card:rgba(255,255,255,.04);
+  --surface:#112840;--surface2:#0e2035;
+  --green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+
+/* NAV */
+.top-nav{background:var(--navy);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.nav-brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.nav-icon{width:34px;height:34px;background:var(--gold);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--navy);font-family:'DM Serif Display',serif;flex-shrink:0}
+.nav-brand-name{font-size:14px;font-weight:600;color:var(--text)}
+.nav-brand-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-right{display:flex;align-items:center;gap:10px}
+.portal-link{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--muted)}
+.portal-link:hover{color:var(--gold);border-color:var(--gold-border);background:var(--gold-dim)}
+.sign-out-link{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:5px 8px}
+.sign-out-link:hover{color:var(--red)}
+
+/* LOADING */
+.data-loading{display:none;position:fixed;inset:0;background:var(--navy);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.data-loading.on{display:flex}
+.dl-spinner{width:32px;height:32px;border:3px solid rgba(255,215,0,.15);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+.dl-msg{font-size:13px;color:var(--muted)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#login-screen{display:none;align-items:center;justify-content:center;min-height:calc(100vh - 58px);padding:32px 20px}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;text-align:center;position:relative;overflow:hidden}
+.login-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),transparent)}
+.login-logo{width:52px;height:52px;background:var(--gold);border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin:0 auto 18px}
+.login-title{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--text);margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px}
+.login-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);padding:12px 16px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;margin-bottom:12px;display:block;transition:border-color .2s}
+.login-box input:focus{outline:none;border-color:var(--gold)}
+.login-box input::placeholder{color:rgba(255,255,255,.2)}
+.btn-primary{background:var(--gold);color:var(--navy);border:none;padding:13px 24px;border-radius:9px;font-weight:700;font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%;transition:all .2s;margin-top:4px}
+.btn-primary:hover:not(:disabled){background:#fff}
+.btn-primary:disabled{background:#333;color:#666;cursor:not-allowed}
+.error-msg{color:var(--red);font-size:12px;margin-top:8px;min-height:18px;text-align:left}
+.spin-sm{display:inline-block;width:13px;height:13px;border:2px solid var(--navy);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+
+/* MAIN */
+#billing-screen{display:none;padding:32px 28px;max-width:900px;margin:0 auto}
+
+/* STATUS BANNER */
+.status-banner{border-radius:14px;padding:26px 30px;margin-bottom:28px;position:relative;overflow:hidden;border:1px solid var(--border)}
+.status-banner.trial{background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));border-color:rgba(251,191,36,.28)}
+.status-banner.active{background:linear-gradient(135deg,rgba(52,211,153,.09),rgba(52,211,153,.03));border-color:rgba(52,211,153,.25)}
+.status-banner.expired,.status-banner.overdue,.status-banner.cancelled{background:linear-gradient(135deg,rgba(248,113,113,.09),rgba(248,113,113,.03));border-color:rgba(248,113,113,.25)}
+.status-banner.grace{background:linear-gradient(135deg,rgba(251,191,36,.09),rgba(251,191,36,.03));border-color:rgba(251,191,36,.25)}
+.sb-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.trial .sb-eyebrow,.grace .sb-eyebrow{color:var(--amber)}
+.active .sb-eyebrow{color:var(--green)}
+.expired .sb-eyebrow,.overdue .sb-eyebrow,.cancelled .sb-eyebrow{color:var(--red)}
+.sb-plan{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--text);margin-bottom:6px}
+.sb-meta{font-size:13px;color:var(--muted);line-height:1.7}
+.sb-meta strong{color:var(--text)}
+.sb-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+
+/* COUNTDOWN */
+.trial-countdown{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap}
+.cd-cell{background:rgba(0,0,0,.28);border-radius:10px;padding:14px 20px;text-align:center;min-width:72px}
+.cd-num{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--amber);line-height:1}
+.cd-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px}
+
+/* USAGE BAR */
+.usage-wrap{margin-top:18px}
+.usage-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px}
+.usage-lbl strong{color:var(--text)}
+.usage-track{background:rgba(255,255,255,.08);border-radius:6px;height:8px;overflow:hidden}
+.usage-fill{height:100%;border-radius:6px;transition:width .4s}
+
+/* SUCCESS ALERT */
+.success-alert{display:none;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25);border-radius:12px;padding:22px 26px;margin-bottom:24px;animation:slideUp .3s ease}
+.success-alert.on{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sa-title{font-size:15px;font-weight:600;color:var(--green);margin-bottom:5px}
+.sa-body{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* PLAN GRID */
+.section-hd{font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--text);margin-bottom:20px}
+.section-hd em{color:var(--gold);font-style:italic}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-bottom:32px}
+.plan-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;position:relative;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s}
+.plan-card.featured{border-color:rgba(255,215,0,.40);background:linear-gradient(160deg,rgba(255,215,0,.06),var(--surface))}
+.plan-card.current{border-color:rgba(52,211,153,.40)}
+.plan-badge{position:absolute;top:14px;right:14px;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.plan-badge.recommended{background:rgba(255,215,0,.14);color:var(--gold);border:1px solid var(--gold-border)}
+.plan-badge.current-b{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.25)}
+.plan-name{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--text);margin-bottom:4px}
+.plan-price{margin:12px 0 4px}
+.plan-price .amount{font-size:2rem;font-weight:700;color:var(--gold)}
+.plan-price .cycle{font-size:12px;color:var(--muted);font-weight:400}
+.plan-desc{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.65}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:20px;flex:1}
+.plan-features li{font-size:12px;color:var(--muted);display:flex;align-items:flex-start;gap:7px;line-height:1.45}
+.plan-features li .ic{flex-shrink:0;margin-top:1px;font-style:normal}
+.plan-features li.yes .ic{color:var(--green)}
+.plan-features li.no .ic{color:rgba(255,255,255,.2)}
+.plan-features li.partial .ic{color:var(--amber)}
+.plan-cta{width:100%;padding:12px;border-radius:9px;border:none;font-weight:700;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;margin-top:auto}
+.plan-cta.gold{background:var(--gold);color:var(--navy)}
+.plan-cta.gold:hover{background:#fff;transform:translateY(-1px)}
+.plan-cta.ghost{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--border)}
+.plan-cta.ghost:hover:not(:disabled){background:rgba(255,255,255,.10)}
+.plan-cta.disabled{background:transparent;color:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.10);cursor:default}
+
+/* ACTION BUTTON */
+.action-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.action-btn.gold{background:var(--gold);color:var(--navy)}
+.action-btn.gold:hover{background:#fff;transform:translateY(-1px)}
+.action-btn.outline{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+.action-btn.outline:hover{color:var(--text);background:rgba(255,255,255,.09)}
+
+/* FOOTER NOTE */
+.footer-note{font-size:11px;color:var(--muted);text-align:center;padding:18px 0;border-top:1px solid var(--border);margin-top:8px}
+.footer-note strong{color:var(--text)}
+
+/* TOAST */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid rgba(52,211,153,.35);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#toast.show{opacity:1}
+#toast.err{border-color:rgba(248,113,113,.35);color:var(--red)}
+
+@media(max-width:600px){#billing-screen{padding:20px 16px}.sb-plan{font-size:1.5rem}.plan-price .amount{font-size:1.6rem}}
+</style>
+</head>
+<body>
+
+<div class="data-loading" id="dataLoading">
+  <div class="nav-icon" style="width:48px;height:48px;font-size:20px;margin-bottom:4px">N</div>
+  <div class="dl-spinner"></div>
+  <div class="dl-msg">Loading billing status&#8230;</div>
+</div>
+
+<nav class="top-nav">
+  <a href="solar-intelligence.html" class="nav-brand">
+    <div class="nav-icon">N</div>
+    <div>
+      <div class="nav-brand-name">Nova Metrics</div>
+      <div class="nav-brand-sub">Solar Intelligence</div>
+    </div>
+  </a>
+  <div class="nav-right">
+    <a href="solar-intelligence.html" class="portal-link">&#9889; Design Tool</a>
+    <a href="prposal_portal.html" class="portal-link">&#128203; Proposals</a>
+    <a href="job-portal.html" class="portal-link">&#128296; Jobs</a>
+    <button class="sign-out-link" id="sign-out-btn">Sign out</button>
+  </div>
+</nav>
+
+<!-- Minimal login for direct access -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">N</div>
+    <div class="login-title">Sign <em style="font-style:italic;color:var(--gold)">In</em></div>
+    <div class="login-sub">Sign in to manage your subscription</div>
+    <input type="email" id="login-email" placeholder="Installer email address" autocomplete="email" />
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password" />
+    <div id="login-error" class="error-msg"></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- Main billing content -->
+<div id="billing-screen">
+
+  <!-- PayFast return success -->
+  <div class="success-alert" id="success-alert">
+    <div class="sa-title">&#127881; Subscription activated!</div>
+    <div class="sa-body">Welcome to Solar Intelligence Professional. Your account is now active and you have unlimited proposal generation. Head back to the design tool to keep working.</div>
+  </div>
+
+  <!-- Current plan status card -->
+  <div class="status-banner trial" id="status-banner">
+    <div class="sb-eyebrow" id="sb-eyebrow">Loading&#8230;</div>
+    <div class="sb-plan" id="sb-plan">&#8212;</div>
+    <div class="sb-meta" id="sb-meta"></div>
+    <div class="trial-countdown" id="sb-countdown" style="display:none">
+      <div class="cd-cell"><div class="cd-num" id="cd-days">&#8212;</div><div class="cd-lbl">Days left</div></div>
+      <div class="cd-cell"><div class="cd-num" id="cd-rem">&#8212;</div><div class="cd-lbl">Proposals left</div></div>
+    </div>
+    <div class="usage-wrap" id="sb-usage" style="display:none">
+      <div class="usage-lbl"><span>Trial proposals used</span><strong><span id="ub-used">0</span>&thinsp;/&thinsp;<span id="ub-limit">5</span></strong></div>
+      <div class="usage-track"><div class="usage-fill" id="ub-fill" style="width:0%;background:var(--amber)"></div></div>
+    </div>
+    <div class="sb-actions" id="sb-actions"></div>
+  </div>
+
+  <!-- Plan comparison -->
+  <div class="section-hd">Choose your <em>plan</em></div>
+
+  <div class="plan-grid">
+
+    <!-- Trial -->
+    <div class="plan-card" id="card-trial">
+      <div class="plan-badge" id="badge-trial" style="display:none">Current</div>
+      <div class="plan-name">Trial</div>
+      <div class="plan-price"><span class="amount">R0</span> <span class="cycle">/ 60 days</span></div>
+      <div class="plan-desc">Evaluate Solar Intelligence with your first clients &#8212; no card required.</div>
+      <ul class="plan-features">
+        <li class="partial"><i class="ic">&#9632;</i> 5 proposals total</li>
+        <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
+        <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
+        <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+        <li class="no"><i class="ic">&#10007;</i> Unlimited proposals</li>
+      </ul>
+      <button class="plan-cta disabled" disabled>Free Trial</button>
+    </div>
+
+    <!-- Starter -->
+    <div class="plan-card" id="card-starter">
+      <div class="plan-badge current-b" id="badge-starter" style="display:none">Current</div>
+      <div class="plan-name">Starter</div>
+      <div class="plan-price"><span class="amount">R1,500</span> <span class="cycle">/ month</span></div>
+      <div class="plan-desc">For installers doing 5&#8211;10 jobs a month who want a professional proposal workflow.</div>
+      <ul class="plan-features">
+        <li class="partial"><i class="ic">&#9632;</i> 15 proposals / month</li>
+        <li class="yes"><i class="ic">&#10003;</i> Custom branding on proposals</li>
+        <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
+        <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
+        <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+      </ul>
+      <button class="plan-cta gold" id="cta-starter" onclick="startUpgrade('starter')">Upgrade to Starter</button>
+    </div>
+
+    <!-- Professional -->
+    <div class="plan-card featured" id="card-professional">
+      <div class="plan-badge recommended" id="badge-professional">Recommended</div>
+      <div class="plan-name">Professional</div>
+      <div class="plan-price"><span class="amount">R2,000</span> <span class="cycle">/ month</span></div>
+      <div class="plan-desc">For active installers running proposals every day. Unlimited, no caps, no surprises. Less than 0.3% of monthly turnover for a team doing 5 installs.</div>
+      <ul class="plan-features">
+        <li class="yes"><i class="ic">&#10003;</i> <strong>Unlimited proposals</strong></li>
+        <li class="yes"><i class="ic">&#10003;</i> Custom branding on proposals</li>
+        <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
+        <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
+        <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+        <li class="yes"><i class="ic">&#10003;</i> Priority support</li>
+      </ul>
+      <button class="plan-cta gold" id="cta-professional" onclick="startUpgrade('professional')">Upgrade to Professional</button>
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    Payments processed by <strong>PayFast</strong> &middot; ZAR &middot; No cross-border fees &middot; Cancel anytime via your PayFast dashboard
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
+
+let installer = null;
+let billingStatus = null;
+
+const usp = new URLSearchParams(window.location.search);
+const returnStatus = usp.get('status');
+const returnPlan   = usp.get('plan');
+
+// ── Boot ────────────────────────────────────────────────────────────────────
+(async function boot(){
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    document.getElementById('dataLoading').classList.add('on');
+    try {
+      await loadProfile(session.user.email);
+      await loadBilling();
+      document.getElementById('dataLoading').classList.remove('on');
+      showBillingScreen();
+    } catch(e) {
+      document.getElementById('dataLoading').classList.remove('on');
+      toast('Error loading account: ' + e.message, true);
+    }
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+})();
+
+async function loadProfile(email) {
+  const rows = await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email&limit=1');
+  if (!rows || !rows.length) throw new Error('No installer profile found');
+  installer = rows[0];
+}
+
+async function loadBilling() {
+  const { data, error } = await supabaseClient.rpc('check_billing_status', { p_installer_id: installer.installer_id });
+  if (error) throw error;
+  billingStatus = data;
+}
+
+function showBillingScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('billing-screen').style.display = 'block';
+  renderStatus();
+  if (returnStatus === 'success') {
+    document.getElementById('success-alert').classList.add('on');
+    window.history.replaceState({}, '', 'billing.html');
+  } else if (returnStatus === 'cancelled') {
+    toast('Payment cancelled — no charge was made', false);
+    window.history.replaceState({}, '', 'billing.html');
+  }
+}
+
+function renderStatus() {
+  const s = billingStatus;
+  if (!s) return;
+  const banner  = document.getElementById('status-banner');
+  const eyebrow = document.getElementById('sb-eyebrow');
+  const planEl  = document.getElementById('sb-plan');
+  const metaEl  = document.getElementById('sb-meta');
+  const actions = document.getElementById('sb-actions');
+
+  banner.className = 'status-banner';
+
+  if (s.status === 'trialing') {
+    banner.classList.add('trial');
+    eyebrow.textContent = '\u23F3 Free Trial';
+
+    if (!s.allowed && s.reason === 'trial_expired') {
+      banner.className = 'status-banner expired';
+      eyebrow.textContent = '\u26A0 Trial Expired';
+      planEl.textContent = 'Trial Ended';
+      metaEl.innerHTML = 'Your 60-day trial has ended. <strong>Subscribe to continue generating proposals</strong> for your clients.';
+      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,000/mo');
+      return;
+    }
+    if (!s.allowed && s.reason === 'trial_limit_reached') {
+      banner.className = 'status-banner expired';
+      eyebrow.textContent = '\u26A0 Proposal Limit Reached';
+      planEl.textContent = 'Trial Limit';
+      metaEl.innerHTML = 'You\u2019ve used all 5 trial proposals. <strong>Subscribe to generate unlimited proposals.</strong>';
+      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,000/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
+      return;
+    }
+
+    const days = s.days_remaining || 0;
+    const used = s.proposals_used || 0;
+    const limit = s.proposals_limit || 5;
+    const rem = limit - used;
+
+    planEl.textContent = 'Trial Plan';
+    metaEl.innerHTML = '<strong>'+days+' days</strong> remaining &middot; <strong>'+(rem)+' proposal'+(rem!==1?'s':'')+' left</strong> in your trial period';
+
+    const cd = document.getElementById('sb-countdown');
+    cd.style.display = 'flex';
+    document.getElementById('cd-days').textContent = days;
+    document.getElementById('cd-rem').textContent = rem;
+
+    const uw = document.getElementById('sb-usage');
+    uw.style.display = 'block';
+    document.getElementById('ub-used').textContent = used;
+    document.getElementById('ub-limit').textContent = limit;
+    const pct = Math.min(used / limit * 100, 100);
+    const fillEl = document.getElementById('ub-fill');
+    fillEl.style.width = pct + '%';
+    fillEl.style.background = pct >= 80 ? 'var(--red)' : pct >= 60 ? 'var(--amber)' : 'var(--green)';
+
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#9650; Upgrade to Professional &mdash; R2,000/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
+
+    document.getElementById('badge-trial').className = 'plan-badge current-b';
+    document.getElementById('badge-trial').style.display = 'block';
+    document.getElementById('badge-trial').textContent = 'Current';
+
+  } else if (s.status === 'active') {
+    banner.classList.add('active');
+    eyebrow.textContent = '\u2713 Active Subscription';
+    const names = { starter:'Starter', professional:'Professional', enterprise:'Enterprise' };
+    planEl.textContent = (names[s.plan] || s.plan) + ' Plan';
+    const nextDate = s.next_billing_date ? new Date(s.next_billing_date).toLocaleDateString('en-ZA', {day:'numeric',month:'long',year:'numeric'}) : '\u2014';
+    const usedNote = s.plan === 'starter' ? ' &middot; <strong>'+(s.proposals_used||0)+' proposals</strong> this month' : '';
+    metaEl.innerHTML = 'Your subscription is active'+usedNote+'. Next billing: <strong>'+nextDate+'</strong>';
+
+    markCurrentPlan(s.plan);
+
+  } else if (s.status === 'grace') {
+    banner.classList.add('grace');
+    eyebrow.textContent = '\u26A0 Payment Overdue';
+    planEl.textContent = 'Grace Period';
+    metaEl.innerHTML = 'Your last payment failed. Please renew before your access is suspended.';
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\''+s.plan+'\' )', 'Update Payment &mdash; '+(s.plan==='starter'?'R1,500':'R2,000')+'/mo');
+    markCurrentPlan(s.plan);
+
+  } else {
+    banner.classList.add('expired');
+    eyebrow.textContent = '\u2715 Inactive';
+    planEl.textContent = 'Subscription Required';
+    metaEl.textContent = 'Your account is inactive. Subscribe to continue using Solar Intelligence.';
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Subscribe Now &mdash; R2,000/mo');
+  }
+}
+
+function markCurrentPlan(plan) {
+  const card = document.getElementById('card-'+plan);
+  const badge = document.getElementById('badge-'+plan);
+  if (card) card.classList.add('current');
+  if (badge) { badge.className = 'plan-badge current-b'; badge.textContent = 'Current'; badge.style.display = 'block'; }
+  const cta = document.getElementById('cta-'+plan);
+  if (cta) { cta.textContent = 'Current Plan'; cta.className = 'plan-cta disabled'; cta.disabled = true; }
+  // Remove recommended badge from professional if it's already on that plan
+  const proBadge = document.getElementById('badge-professional');
+  if (plan === 'professional' && proBadge && proBadge.textContent === 'Current') {
+    proBadge.className = 'plan-badge current-b';
+  }
+}
+
+function actionBtn(type, onclick, label) {
+  return `<button class="action-btn ${type}" onclick="${onclick}">${label}</button>`;
+}
+
+async function startUpgrade(plan) {
+  if (!installer) { toast('Not logged in', true); return; }
+  toast('Preparing secure payment&#8230;');
+  try {
+    const { data:{ session } } = await supabaseClient.auth.getSession();
+    const token = session?.access_token || SUPA_ANON;
+    const res = await fetch(SUPA_URL + '/functions/v1/payfast-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan, installer_id: installer.installer_id })
+    });
+    const data = await res.json();
+    if (!data.payfast_url) throw new Error(data.error || 'Checkout failed');
+    // Build and auto-submit PayFast form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = data.payfast_url;
+    Object.entries(data.params).forEach(([k,v]) => {
+      const inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = k; inp.value = String(v);
+      form.appendChild(inp);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  } catch(e) {
+    console.error(e);
+    toast('Payment setup failed: ' + e.message, true);
+  }
+}
+
+async function sbFetch(path) {
+  const { data:{ session } } = await supabaseClient.auth.getSession();
+  const token = session ? session.access_token : SUPA_ANON;
+  const res = await fetch(SUPA_URL + path, {
+    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
+  });
+  if (!res.ok) throw new Error(path + ' -> ' + res.status);
+  return res.json();
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  const btn   = document.getElementById('login-btn');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password.'; return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin-sm"></span>Signing in&#8230;';
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    errEl.textContent = 'Incorrect email or password.';
+    btn.disabled = false; btn.textContent = 'Sign In';
+    return;
+  }
+  try {
+    document.getElementById('dataLoading').classList.add('on');
+    document.getElementById('login-screen').style.display = 'none';
+    await loadProfile(data.user.email);
+    await loadBilling();
+    document.getElementById('dataLoading').classList.remove('on');
+    showBillingScreen();
+  } catch(e) {
+    document.getElementById('dataLoading').classList.remove('on');
+    errEl.textContent = String(e.message);
+    btn.disabled = false; btn.textContent = 'Sign In';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+}
+
+document.getElementById('sign-out-btn').addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  window.location.href = 'nova-metrics_1.html';
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') doLogin();
+});
+
+function toast(msg, isErr = false) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = isErr ? 'show err' : 'show';
+  setTimeout(() => t.className = '', 3500);
+}
+</script>
+</body>
+</html>
