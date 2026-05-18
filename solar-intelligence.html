@@ -280,6 +280,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </div>
 <div id="app-screen">
+  <div id="billing-wall" style="display:none;margin:24px;padding:32px;text-align:center;
+  background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:14px;position:relative;z-index:10">
+  <div style="font-size:2rem;margin-bottom:10px">🔒</div>
+  <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--text);margin-bottom:8px" id="bwall-title">Subscription Required</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto" id="bwall-msg"></div>
+  <a href="billing.html" style="display:inline-block;background:var(--gold);color:var(--navy);
+    padding:12px 28px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">
+    Manage Subscription →
+  </a>
+</div>
+<div id="trial-banner" style="display:none;background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);
+  border-radius:10px;padding:11px 18px;margin-bottom:14px;font-size:12px;
+  align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+  <span id="trial-banner-text" style="color:var(--amber)"></span>
+  <a href="billing.html" style="color:var(--gold);font-weight:600;text-decoration:none;font-size:12px;flex-shrink:0">Upgrade →</a>
+</div>
   <div id="hw-source-banner" class="hw-banner"></div>
   <div class="no-system-alert" id="no-system-alert">
     <div class="nsa-title">&#9888; No Compliant System Found</div>
@@ -1076,6 +1092,7 @@ function showApp(){
   document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';
   const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';
   showHwBanner();
+  checkBillingStatus();
 }
 function showHwBanner(){
   const banner=document.getElementById('hw-source-banner');if(!banner||!DB.hwSource)return;
@@ -1124,6 +1141,13 @@ function showTab(id){
   document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
 }
 async function generateProposal(){
+const __bs = window.__billingStatus;
+if (__bs && !__bs.allowed) {
+  toast('⚠ Subscription required — upgrade to generate proposals');
+  setTimeout(() => window.location.href = 'billing.html', 1800);
+  return;
+}
+  
   if(!calcResult||!calcResult.systemRecommended){toast('&#9888; Only compliant systems can generate proposals',true);return;}
   const r=calcResult,btn=document.getElementById('btn-gen');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Generating\u2026';
@@ -1598,6 +1622,53 @@ async function findCompliantAlternative(brand){
     if(rows&&rows.length>0)return rows;
   }catch(e){}
   return null;
+}
+  async function checkBillingStatus() {
+  if (!installer) return;
+  try {
+    const { data: bs, error } = await supabaseClient.rpc('check_billing_status',
+      { p_installer_id: installer.installer_id });
+    if (error) { console.warn('Billing check failed:', error); return; }
+    window.__billingStatus = bs;
+
+    const wall       = document.getElementById('billing-wall');
+    const banner     = document.getElementById('trial-banner');
+    const bannerText = document.getElementById('trial-banner-text');
+
+    if (!bs.allowed) {
+      // Dim the tool and show the wall
+      const appInner = document.getElementById('app-screen');
+      if (appInner) { appInner.style.pointerEvents = 'none'; appInner.style.opacity = '0.35'; }
+      wall.style.display = 'block';
+      if (bs.reason === 'trial_expired') {
+        document.getElementById('bwall-title').textContent = 'Trial Period Ended';
+        document.getElementById('bwall-msg').textContent = 'Your 60-day trial has ended. Subscribe to keep designing solar systems and generating proposals.';
+      } else if (bs.reason === 'trial_limit_reached') {
+        document.getElementById('bwall-title').textContent = 'Trial Proposal Limit Reached';
+        document.getElementById('bwall-msg').textContent = 'You\'ve used all 5 trial proposals. Upgrade to continue.';
+      } else {
+        document.getElementById('bwall-title').textContent = 'Subscription Inactive';
+        document.getElementById('bwall-msg').textContent = 'Please renew your subscription to continue using Solar Intelligence.';
+      }
+      wall.style.pointerEvents = 'all';
+      wall.style.opacity = '1';
+      return;
+    }
+
+    // Show trial countdown banner
+    if (bs.status === 'trialing') {
+      const rem = (bs.proposals_limit || 5) - (bs.proposals_used || 0);
+      banner.style.display = 'flex';
+      bannerText.innerHTML = `⏳ Trial: <strong style="color:var(--text)">${bs.days_remaining} days</strong> left &nbsp;·&nbsp; <strong style="color:var(--text)">${rem} proposal${rem!==1?'s':''}</strong> remaining`;
+    }
+    // Show grace warning
+    if (bs.status === 'grace') {
+      banner.style.display = 'flex';
+      bannerText.innerHTML = `⚠ Payment overdue — <a href="billing.html" style="color:var(--gold)">update payment details</a> to avoid interruption`;
+    }
+  } catch(e) {
+    console.warn('Billing check error:', e);
+  }
 }
 </script>
 </body>
