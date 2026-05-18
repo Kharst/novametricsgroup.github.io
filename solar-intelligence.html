@@ -1159,6 +1159,9 @@ if (__bs && !__bs.allowed) {
     const res=await fetch(SUPA_URL+'/functions/v1/generate-solar-proposal',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
     const data=await res.json();
     if(data.success){
+      // Billing counter — increment proposals used this month
+      try { await supabaseClient.rpc('increment_proposal_count', { p_installer_id: installer.installer_id }); }
+      catch(e) { console.warn('Billing count update failed:', e); }
       const portalUrl='prposal_portal.html?ai_id='+encodeURIComponent(data.ai_id)+'&email='+encodeURIComponent(installer.contact_email);
       document.getElementById('success-ai-label').innerHTML='AI Proposal ID <span class="ai-id-tag">'+data.ai_id+'</span>';
       document.getElementById('btn-open-portal').href=portalUrl;
