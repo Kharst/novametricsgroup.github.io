@@ -107,7 +107,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .new-calc-topbtn{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;background:var(--navy);color:#fff;font-size:11px;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;white-space:nowrap;}
 .new-calc-topbtn:hover{background:#1e3a5f;}
 .new-calc-topbtn svg{width:10px;height:10px;flex-shrink:0;}
-.tab-content{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.tab-content{display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden;}
 .tab-content.on{display:flex;}
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:12px;}
 .e-icon{width:56px;height:56px;background:#f0f2f5;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;}
@@ -115,8 +115,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .e-cta{display:flex;align-items:center;gap:7px;padding:8px 18px;border-radius:9px;background:var(--navy);color:#fff;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:4px;border:none;cursor:pointer;}
 .e-cta:hover{background:#1e3a5f;transform:translateY(-1px);}
 
-.detail{flex:1;overflow-y:auto;overflow-x:hidden;padding:5px 10px;display:none;flex-direction:column;gap:5px;animation:up .22s ease;}
+.detail{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:5px 10px;display:flex;flex-direction:column;gap:5px;animation:up .22s ease;}
 .detail.on{display:flex;}
+.detail>*{flex-shrink:0;}
 @keyframes up{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
 .arrival-banner{background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(52,211,153,.03));border-bottom:1px solid rgba(52,211,153,.2);padding:6px 14px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0;}
