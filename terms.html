@@ -3,230 +3,300 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terms of Service & Privacy Policy — Nova Metrics</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="description" content="Nova Metrics Terms of Service — the agreement between Nova Metrics and solar installers using the Solar Intelligence platform.">
+<title>Terms of Service — Nova Metrics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:#f4f6f8;color:#1a2332;padding:32px 16px}
-.wrap{max-width:780px;margin:0 auto}
-.header{background:#0B1F3A;border-radius:12px;padding:32px 40px;margin-bottom:32px}
-.brand{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#c8911c;margin-bottom:8px}
-.title{font-size:28px;font-weight:300;color:#fff;line-height:1.3}
-.updated{font-size:12px;color:#8a9ab8;margin-top:8px}
-.toc{background:#fff;border-radius:10px;padding:20px 28px;margin-bottom:28px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-.toc-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:12px}
-.toc a{display:block;font-size:14px;color:#0B1F3A;text-decoration:none;padding:4px 0;border-bottom:1px solid #f3f4f6}
-.toc a:last-child{border-bottom:none}
-.toc a:hover{color:#c8911c}
-.card{background:#fff;border-radius:10px;padding:28px 36px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-h2{font-size:16px;font-weight:600;color:#0B1F3A;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #f0b429}
-h3{font-size:14px;font-weight:600;color:#374151;margin:16px 0 8px}
-p{font-size:14px;color:#4a5568;line-height:1.8;margin-bottom:12px}
+:root{
+  --black:#07090e;--dark:#0d1017;--dark-2:#111620;
+  --border:rgba(255,255,255,.07);--muted:#4a6080;--subtle:#7a90a8;--light:#c0ccd8;--white:#edf1f6;
+  --gold:#c8911c;--gold-dim:rgba(200,145,28,.10);
+  --sans:'DM Sans',system-ui,sans-serif;
+  --serif:'DM Serif Display',Georgia,serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--black);color:var(--light);-webkit-font-smoothing:antialiased;line-height:1.7}
+
+header{background:var(--dark-2);border-bottom:1px solid var(--border);padding:22px 0}
+.header-inner{max-width:780px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo-mark{width:30px;height:30px;background:var(--gold);border-radius:7px;display:grid;place-items:center;font-family:var(--serif);font-size:14px;color:var(--black)}
+.logo-name{font-size:15px;font-weight:500;color:var(--white)}
+.back-link{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.back-link:hover{color:var(--light)}
+
+.doc-hero{background:var(--dark-2);border-bottom:1px solid var(--border);padding:48px 0 40px}
+.doc-hero-inner{max-width:780px;margin:0 auto;padding:0 32px}
+.doc-type{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.doc-title{font-family:var(--serif);font-size:38px;font-weight:400;color:var(--white);line-height:1.1;margin-bottom:14px}
+.doc-meta{display:flex;gap:20px;flex-wrap:wrap}
+.doc-meta-item{font-size:12px;color:var(--muted)}
+.doc-meta-item strong{color:var(--subtle);font-weight:400}
+
+.doc-body{max-width:780px;margin:0 auto;padding:52px 32px 80px}
+
+h2{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--white);margin:44px 0 14px;padding-top:44px;border-top:1px solid var(--border)}
+h2:first-of-type{margin-top:0;padding-top:0;border-top:none}
+h3{font-size:14px;font-weight:600;color:var(--white);margin:22px 0 8px}
+p{font-size:14px;font-weight:300;color:var(--subtle);line-height:1.8;margin-bottom:14px}
 p:last-child{margin-bottom:0}
-ul{font-size:14px;color:#4a5568;line-height:1.8;padding-left:20px;margin-bottom:12px}
-li{margin-bottom:6px}
-.badge{display:inline-block;background:#f0fdf4;border:1px solid #86efac;color:#166534;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-right:6px;margin-bottom:6px}
-.badge.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
-.badge.info{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
-.highlight{background:#fffbeb;border-left:3px solid #f0b429;padding:12px 16px;border-radius:0 6px 6px 0;margin:16px 0;font-size:13px;color:#374151;line-height:1.7}
-.contact-box{background:#0B1F3A;border-radius:10px;padding:24px 28px;color:#fff;margin-top:28px}
-.contact-box h3{color:#f0b429;margin-top:0}
-.contact-box p{color:#c8d6e8;margin-bottom:6px}
-.contact-box a{color:#f0b429;text-decoration:none}
-footer{text-align:center;font-size:12px;color:#9ca3af;margin-top:28px;padding-bottom:24px}
+ul,ol{margin:10px 0 16px 20px;display:flex;flex-direction:column;gap:7px}
+li{font-size:14px;font-weight:300;color:var(--subtle);line-height:1.7}
+strong{font-weight:500;color:var(--light)}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.summary-box{background:var(--dark-2);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:36px}
+.summary-box-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.summary-row{display:flex;gap:12px;margin-bottom:10px;font-size:13px;line-height:1.6}
+.summary-row:last-child{margin-bottom:0}
+.summary-icon{flex-shrink:0;color:var(--gold)}
+.summary-text{font-weight:300;color:var(--subtle)}
+.summary-text strong{font-weight:500;color:var(--light)}
+
+.highlight-box{background:var(--dark-2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:18px 22px;margin:20px 0}
+.highlight-box p{margin:0;font-size:13px}
+.highlight-box.important{border-left-color:#e03535;background:rgba(224,53,53,.04)}
+
+.contact-card{background:var(--dark-2);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin:24px 0}
+.contact-card-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.contact-row{display:flex;gap:12px;margin-bottom:8px;font-size:13px}
+.contact-row:last-child{margin-bottom:0}
+.contact-label{color:var(--muted);width:110px;flex-shrink:0}
+.contact-val{color:var(--light);font-weight:300}
+
+.flag{background:rgba(200,145,28,.08);border:1px solid rgba(200,145,28,.2);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:12px;color:var(--light);display:flex;gap:9px}
+
+footer{background:var(--dark-2);border-top:1px solid var(--border);padding:28px 32px;text-align:center;font-size:12px;color:var(--muted)}
+footer a{color:var(--muted)}footer a:hover{color:var(--light)}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="header">
-    <div class="brand">Nova Metrics · Legal</div>
-    <div class="title">Terms of Service,<br>Privacy & Data Security</div>
-    <div class="updated">Last updated: May 2026 &nbsp;·&nbsp; Governing jurisdiction: Republic of South Africa</div>
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">N</div>
+      <span class="logo-name">Nova Metrics</span>
+    </a>
+    <a href="index.html" class="back-link">← Back to website</a>
   </div>
+</header>
 
-  <div class="toc">
-    <div class="toc-title">On this page</div>
-    <a href="#scope">1. Scope of Service</a>
-    <a href="#tool">2. Nature of the Tool — Design Assistance, Not Certification</a>
-    <a href="#data">3. What Data We Collect & Why</a>
-    <a href="#storage">4. Where Data Is Stored</a>
-    <a href="#security">5. Security Measures</a>
-    <a href="#retention">6. Data Retention & Deletion</a>
-    <a href="#liability">7. Liability & Disclaimer</a>
-    <a href="#installers">8. Installer Accounts</a>
-    <a href="#popi">9. POPIA Compliance</a>
-    <a href="#changes">10. Changes to These Terms</a>
-    <a href="#contact">11. Contact</a>
-  </div>
-
-  <!-- 1 -->
-  <div class="card" id="scope">
-    <h2>1. Scope of Service</h2>
-    <p>Nova Metrics Solar Intelligence ("the Platform") is a software-as-a-service tool designed to assist registered solar installers and energy consultants in South Africa to size, design, quote, and propose photovoltaic and battery backup systems for residential and commercial clients.</p>
-    <p>The Platform is accessed via <strong>novametricsgroup.com</strong> and associated subpages. Access is provided to registered installer accounts only. End clients interact with client-facing pages (proposal views, design approval pages) generated on their behalf by a registered installer.</p>
-    <span class="badge info">B2B SaaS</span>
-    <span class="badge info">Installer-facing</span>
-    <span class="badge info">South Africa</span>
-  </div>
-
-  <!-- 2 -->
-  <div class="card" id="tool">
-    <h2>2. Nature of the Tool — Design Assistance, Not Certification</h2>
-    <div class="highlight">
-      The Platform produces <strong>recommended system designs</strong> based on engineering algorithms aligned with South African standards. It does not produce certified electrical designs or constitute a professional engineering sign-off.
+<div class="doc-hero">
+  <div class="doc-hero-inner">
+    <div class="doc-type">Legal Document</div>
+    <div class="doc-title">Terms of Service</div>
+    <div class="doc-meta">
+      <span class="doc-meta-item"><strong>Effective date:</strong> 19 May 2026</span>
+      <span class="doc-meta-item"><strong>Version:</strong> 1.0</span>
+      <span class="doc-meta-item"><strong>Applies to:</strong> All Nova Metrics installer accounts</span>
     </div>
-    <h3>What the engine does</h3>
-    <ul>
-      <li>Sizes inverters against NRS 097 continuous load requirements and startup surge profiles</li>
-      <li>Sizes battery capacity against autonomy requirements using DoD-adjusted usable kWh</li>
-      <li>Sizes PV arrays against regional irradiance, system PR and degradation curves</li>
-      <li>Models 25-year financial returns using published NERSA tariff escalation data</li>
-    </ul>
-    <h3>What the engine does not do</h3>
-    <ul>
-      <li>Replace a physical site assessment by a qualified person</li>
-      <li>Constitute an electrical compliance certificate (CoC) or engineering certificate</li>
-      <li>Account for site-specific shading, orientation deviations, or non-standard wiring without installer input</li>
-    </ul>
-    <p>The licensed installer is the responsible party for verifying all designs against actual site conditions before installation. The post-site-assessment revision workflow within the Platform is designed to facilitate this.</p>
-    <span class="badge warn">Design tool only</span>
-    <span class="badge warn">Not a CoC substitute</span>
+  </div>
+</div>
+
+<div class="doc-body">
+
+  <div class="summary-box">
+    <div class="summary-box-title">Plain-language summary — read this first</div>
+    <div class="summary-row"><span class="summary-icon">→</span><span class="summary-text"><strong>What this is:</strong> The agreement between you (a solar installer) and Nova Metrics when you use the Solar Intelligence platform.</span></div>
+    <div class="summary-row"><span class="summary-icon">→</span><span class="summary-text"><strong>Financial outputs are estimates only:</strong> Every figure the platform produces — savings, payback periods, NPV, IRR — is an indicative projection, not financial advice and not a guarantee.</span></div>
+    <div class="summary-row"><span class="summary-icon">→</span><span class="summary-text"><strong>You are the installer:</strong> Nova Metrics produces the design and paperwork. You are responsible for every installation, every COC, and every compliance obligation.</span></div>
+    <div class="summary-row"><span class="summary-icon">→</span><span class="summary-text"><strong>Your clients' data:</strong> You are responsible for having a lawful reason to enter your clients' information. We protect it — but you own that relationship.</span></div>
+    <div class="summary-row"><span class="summary-icon">→</span><span class="summary-text"><strong>Paying for the service:</strong> You pay monthly or annually. Non-payment leads to account suspension after notice.</span></div>
   </div>
 
-  <!-- 3 -->
-  <div class="card" id="data">
-    <h2>3. What Data We Collect & Why</h2>
-    <h3>Installer account data</h3>
-    <ul>
-      <li>Name, email address, company name, contact number — required for account authentication and proposal branding</li>
-      <li>Company logo and brand colours — used to generate branded client proposals</li>
-    </ul>
-    <h3>Client data (collected by installers on behalf of their clients)</h3>
-    <ul>
-      <li>Client name, email address, phone number, physical address — required to generate and deliver proposals</li>
-      <li>Energy consumption data (appliance lists, usage hours) — used solely for system sizing calculations</li>
-      <li>Approval decisions and timestamps — recorded for audit trail purposes</li>
-    </ul>
-    <h3>System usage data</h3>
-    <ul>
-      <li>Proposal views (open tracking pixel) — to inform installers when clients view proposals</li>
-      <li>Approval page interactions — timestamps of when clients open, respond to, or leave approval pages</li>
-    </ul>
-    <p>We do not collect payment card data. We do not sell data to third parties. We do not use client data for marketing purposes.</p>
+  <h2>1. Definitions</h2>
+  <p>In these Terms, the following words have the meanings set out below:</p>
+  <ul>
+    <li><strong>"Nova Metrics"</strong> means Nova Metrics (Pty) Ltd, a company registered in the Republic of South Africa.</li>
+    <li><strong>"Platform"</strong> means the Solar Intelligence software-as-a-service product accessible at novametricsgroup.com and its associated subdomains and applications.</li>
+    <li><strong>"Installer"</strong> or <strong>"you"</strong> means the solar installation business or individual that has registered for an account on the Platform.</li>
+    <li><strong>"End-Client"</strong> means the customer of the Installer whose information is entered into the Platform for the purpose of generating proposals or managing installations.</li>
+    <li><strong>"Outputs"</strong> means any system designs, financial projections, proposals, reports, installation checklists, handover documents, or other content generated by the Platform.</li>
+    <li><strong>"Subscription"</strong> means the monthly or annual paid plan under which an Installer accesses the Platform.</li>
+    <li><strong>"POPIA"</strong> means the Protection of Personal Information Act, No. 4 of 2013.</li>
+  </ul>
+
+  <h2>2. Acceptance of these Terms</h2>
+  <p>By creating an account on the Platform, ticking the acceptance checkbox at signup, or by continuing to use the Platform after these Terms have been updated and notified to you, you agree to be bound by these Terms of Service in full.</p>
+  <p>If you are registering on behalf of a company or other legal entity, you represent that you have the authority to bind that entity to these Terms. If you do not have that authority, do not register.</p>
+  <p>These Terms constitute a legally binding agreement between you and Nova Metrics and are governed by the laws of the Republic of South Africa.</p>
+
+  <h2>3. The service we provide</h2>
+  <p>Nova Metrics provides the Solar Intelligence platform — a software tool that assists solar installers in South Africa to:</p>
+  <ul>
+    <li>Design solar systems based on client load profiles, site location, and hardware specifications</li>
+    <li>Generate indicative financial projections for proposed systems</li>
+    <li>Produce branded PDF proposals for delivery to end-clients</li>
+    <li>Manage installation pipelines through the Job Portal</li>
+    <li>Record site visits, installation checklists, and customer handover documentation</li>
+    <li>Manage design change approvals between installers and their clients</li>
+    <li>Track proposal engagement (delivery, opens, views, downloads)</li>
+  </ul>
+  <p>We provide the platform as a tool. We do not provide engineering certification, electrical inspection, regulatory compliance sign-off, or financial advice services.</p>
+
+  <h2>4. Critical disclaimer — financial outputs are indicative estimates only</h2>
+
+  <div class="highlight-box important">
+    <p><strong>This section is important. Please read it carefully.</strong></p>
   </div>
 
-  <!-- 4 -->
-  <div class="card" id="storage">
-    <h2>4. Where Data Is Stored</h2>
-    <p>All platform data is stored on <strong>Supabase</strong>, a managed PostgreSQL database service hosted on Amazon Web Services (AWS) infrastructure in the <strong>eu-west-1 (Ireland)</strong> region.</p>
-    <p>Supabase holds SOC 2 Type II certification. Data is encrypted at rest (AES-256) and in transit (TLS 1.2+).</p>
-    <p>Proposal PDFs are stored in Supabase Storage (S3-compatible). Email delivery is handled by <strong>Brevo</strong> (formerly Sendinblue), a GDPR-compliant email infrastructure provider headquartered in the EU.</p>
-    <span class="badge info">AWS eu-west-1</span>
-    <span class="badge info">SOC 2 Type II</span>
-    <span class="badge info">AES-256 at rest</span>
-    <span class="badge info">TLS 1.2+ in transit</span>
+  <p>All financial outputs generated by the Platform — including but not limited to estimated annual savings, payback periods, net present value (NPV), internal rate of return (IRR), and 25-year financial projections — are <strong>indicative estimates only</strong>.</p>
+  <p>These outputs are based on:</p>
+  <ul>
+    <li>Information entered by the Installer (load profile, tariff rate, tariff escalation assumption, system cost)</li>
+    <li>Industry-standard assumptions about system performance, degradation, and availability</li>
+    <li>Modelled tariff escalation scenarios based on NERSA guidelines and historical data</li>
+    <li>Simplified financial models that do not account for all variables affecting actual returns</li>
+  </ul>
+  <p><strong>Actual results will differ</strong> from projected outputs due to real-world variables including but not limited to: actual electricity consumption patterns, changes in utility tariffs, system downtime, local weather variation, financing costs, insurance claims, and battery replacement timing.</p>
+  <p>Nova Metrics outputs are <strong>not financial advice</strong> as defined under the Financial Advisory and Intermediary Services Act, 2002 (FAIS). Installers must not present platform outputs to end-clients as guaranteed returns, investment advice, or certified financial projections. You are responsible for communicating the indicative and estimated nature of all financial outputs to your clients before they rely on them to make purchasing decisions.</p>
+  <p>Nova Metrics accepts no liability for any loss suffered by an Installer or an End-Client arising from reliance on financial outputs generated by the Platform.</p>
+
+  <h2>5. Standards alignment — not a compliance certification service</h2>
+  <p>The Platform is designed to assist installers in producing system designs that align with South African standards including NRS 097-2-1 and NERSA SSEG guidelines as understood at the time of platform development. The Platform references the South African Master Inverter Compliance Register for informational purposes.</p>
+  <p><strong>Nova Metrics does not:</strong></p>
+  <ul>
+    <li>Certify that any system design produced by the Platform is compliant with any standard, regulation, or municipal requirement</li>
+    <li>Guarantee that the Master Inverter Compliance Register is current or complete at any given time</li>
+    <li>Accept responsibility for changes to standards or regulations that occur after platform content was last updated</li>
+  </ul>
+  <p><strong>The Installer is solely responsible</strong> for verifying compliance of every installation with all applicable standards, municipal by-laws, utility connection requirements, and any other legal or regulatory obligation. The fact that the Platform produced a design does not constitute engineering sign-off, and does not substitute for the Installer's professional judgment and legal obligations.</p>
+
+  <h2>6. Installer responsibilities</h2>
+  <p>By using the Platform, you agree that you are responsible for:</p>
+  <ul>
+    <li><strong>All installations:</strong> Every physical installation carried out using Platform outputs is your responsibility. This includes all safety obligations, workmanship standards, and post-installation support.</li>
+    <li><strong>Certificate of Compliance (COC):</strong> Obtaining a valid COC from a licensed electrician for every installation is your legal obligation under the Occupational Health and Safety Act. The Platform's COC tracking feature is a record-keeping tool only — it does not issue, verify, or certify COCs.</li>
+    <li><strong>Grid connection and NERSA SSEG applications:</strong> Submitting and managing any SSEG or grid-tie application to the relevant municipality or utility is your responsibility. The Platform provides guidance information only.</li>
+    <li><strong>Client communication:</strong> Communicating the indicative nature of all financial projections to your clients before they make a purchasing decision.</li>
+    <li><strong>Data accuracy:</strong> Ensuring that all information entered into the Platform — client details, system costs, tariff rates, load profiles — is accurate.</li>
+    <li><strong>Lawful use of client data:</strong> Having a lawful basis to enter your clients' personal information into the Platform and complying with all obligations under POPIA in relation to your clients' data.</li>
+    <li><strong>Your own POPIA obligations:</strong> If you are a business that processes personal information, you have your own obligations as a Responsible Party under POPIA independent of your use of this Platform.</li>
+    <li><strong>Professional qualifications:</strong> Ensuring that all electrical work is performed by appropriately qualified and registered persons.</li>
+  </ul>
+
+  <h2>7. Account registration and security</h2>
+  <p>You must provide accurate information when registering for an account. You are responsible for maintaining the confidentiality of your login credentials and for all activity that occurs under your account.</p>
+  <p>You must notify us immediately at <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a> if you suspect unauthorised access to your account.</p>
+  <p>You may not share your account credentials with third parties or allow multiple people to use a single account without our written consent. If you require multiple user accounts, contact us to discuss team or enterprise options.</p>
+  <p>Each account is for use by a single installer business. You may not create multiple accounts to circumvent plan limits or usage restrictions.</p>
+
+  <h2>8. Acceptable use</h2>
+  <p>You agree not to use the Platform to:</p>
+  <ul>
+    <li>Generate proposals for projects you do not intend to install</li>
+    <li>Enter false, fabricated, or misleading information about clients or projects</li>
+    <li>Circumvent any security or access control measures</li>
+    <li>Attempt to access another installer's data</li>
+    <li>Use automated tools, bots, or scripts to scrape, extract, or misuse Platform data</li>
+    <li>Resell, sublicense, or white-label Platform access to third parties without a written enterprise agreement with Nova Metrics</li>
+    <li>Use Platform outputs in a manner that misrepresents their indicative nature to end-clients</li>
+    <li>Violate any applicable South African law or regulation</li>
+  </ul>
+
+  <h2>9. Subscription, payment, and cancellation</h2>
+
+  <h3>9.1 Subscription plans</h3>
+  <p>Access to the Platform requires a paid Subscription. Plan details, features, and pricing are published at novametricsgroup.com/pricing. Nova Metrics reserves the right to change plan pricing with 30 days' written notice to active subscribers.</p>
+
+  <h3>9.2 Trial period</h3>
+  <p>New accounts may be provided with a free trial period as stated at the time of registration. At the end of the trial period, continued use of the Platform requires an active paid Subscription. No payment information is required during the trial period.</p>
+
+  <h3>9.3 Payment</h3>
+  <p>Subscriptions are billed monthly or annually in advance, in South African Rand (ZAR), exclusive of VAT. Payment is processed through PayFast. By providing payment details you authorise Nova Metrics to charge the applicable subscription fee to your payment method on the billing date.</p>
+
+  <h3>9.4 Late payment and suspension</h3>
+  <p>If payment fails, we will notify you by email. If payment is not received within 7 days of that notice, your account may be suspended. Suspended accounts retain their data for 30 days, during which payment may be made to restore access. After 30 days of unpaid suspension, the account may be terminated and data deleted in accordance with our retention policy.</p>
+
+  <h3>9.5 Cancellation</h3>
+  <p>You may cancel your Subscription at any time. Cancellation takes effect at the end of the current billing period — we do not provide refunds for unused portions of a billing period. After cancellation your account will remain accessible in a read-only state until the end of the period, then be suspended.</p>
+  <p>To cancel, contact us at <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a> or use the cancellation option in your account settings if available.</p>
+
+  <h2>10. Your data and our data</h2>
+
+  <h3>10.1 Your data belongs to you</h3>
+  <p>All client data, proposal data, and job records you enter into the Platform remain your property. Nova Metrics does not claim ownership over your data.</p>
+
+  <h3>10.2 Our data</h3>
+  <p>The Platform itself — including all software, engineering calculation logic, reference datasets (including the Master Inverter Compliance Register, irradiance data, and load profiles), proposal templates, and all intellectual property — belongs to Nova Metrics and is protected by copyright and other applicable intellectual property laws. You may not copy, reproduce, or reverse engineer any part of the Platform.</p>
+
+  <h3>10.3 Data export and deletion</h3>
+  <p>You may request an export of your data at any time by contacting <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a>. On termination of your account, we will provide you with a data export upon request and then delete your data in accordance with our retention obligations as set out in our Privacy Policy.</p>
+
+  <h2>11. Liability and indemnity</h2>
+
+  <h3>11.1 Limitation of liability</h3>
+  <p>To the maximum extent permitted by South African law, Nova Metrics' total liability to you for any claim arising out of or in connection with these Terms or your use of the Platform is limited to the total subscription fees you paid to Nova Metrics in the 12 months immediately preceding the event giving rise to the claim.</p>
+  <p>Nova Metrics is not liable — under any legal theory including contract, delict, or otherwise — for:</p>
+  <ul>
+    <li>Any loss arising from reliance on financial outputs, system designs, or standards-alignment information produced by the Platform</li>
+    <li>Any injury, property damage, or legal liability arising from an installation carried out using Platform outputs</li>
+    <li>Any loss arising from a COC not being issued, being invalid, or being based on Platform records</li>
+    <li>Any loss arising from a failed or rejected SSEG or grid-tie application</li>
+    <li>Any indirect, consequential, incidental, or punitive loss</li>
+    <li>Loss of profit, loss of revenue, or loss of business opportunity</li>
+  </ul>
+
+  <h3>11.2 Indemnity</h3>
+  <p>You agree to indemnify and hold Nova Metrics harmless from any claim, loss, damage, liability, or expense (including legal fees) arising from:</p>
+  <ul>
+    <li>Your breach of these Terms</li>
+    <li>Any installation you carry out using Platform outputs</li>
+    <li>Any misrepresentation you make to an end-client about the nature of Platform outputs</li>
+    <li>Your violation of any applicable law, including POPIA</li>
+    <li>Any third-party claim arising from your use of end-client data entered into the Platform</li>
+  </ul>
+
+  <h2>12. Platform availability and changes</h2>
+  <p>We aim to keep the Platform available and operational at all times but do not guarantee uninterrupted access. We may carry out maintenance, updates, or improvements that result in temporary unavailability. We will give reasonable advance notice for planned maintenance where possible.</p>
+  <p>Nova Metrics reserves the right to modify, add to, or remove features from the Platform at any time. We will notify active subscribers of material changes. If a material change significantly reduces the functionality you subscribed for, you may cancel your Subscription and receive a pro-rata refund for the unused portion of your billing period.</p>
+
+  <h2>13. Termination</h2>
+  <p>Nova Metrics may suspend or terminate your account immediately, without prior notice, if:</p>
+  <ul>
+    <li>You breach any material term of these Terms of Service</li>
+    <li>You use the Platform in a manner that causes harm to other users, end-clients, or Nova Metrics</li>
+    <li>You provide false registration information</li>
+    <li>We are required to do so by law</li>
+  </ul>
+  <p>In all other cases of termination initiated by Nova Metrics (such as a decision to discontinue the service), we will give you 30 days' written notice and provide a data export.</p>
+
+  <h2>14. Disputes and governing law</h2>
+  <p>These Terms are governed by the laws of the Republic of South Africa. Any dispute arising out of or in connection with these Terms that cannot be resolved by the parties directly will be referred to mediation before either party initiates litigation. If mediation fails, disputes will be resolved in the courts of the Republic of South Africa having jurisdiction.</p>
+  <p>To raise a dispute, contact us first at <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a>. We will make good-faith efforts to resolve any issue within 14 days of being notified.</p>
+
+  <h2>15. General</h2>
+  <ul>
+    <li><strong>Entire agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and Nova Metrics regarding your use of the Platform.</li>
+    <li><strong>Severability:</strong> If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force.</li>
+    <li><strong>No waiver:</strong> A failure by Nova Metrics to enforce any provision of these Terms does not constitute a waiver of that provision.</li>
+    <li><strong>Assignment:</strong> You may not assign your rights or obligations under these Terms without our written consent. Nova Metrics may assign these Terms in connection with a merger, acquisition, or sale of assets.</li>
+    <li><strong>Notices:</strong> Formal notices to Nova Metrics must be sent to <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a>. Notices to you will be sent to the email address registered on your account.</li>
+  </ul>
+
+  <h2>16. Contact</h2>
+  <div class="contact-card">
+    <div class="contact-card-title">Nova Metrics (Pty) Ltd</div>
+    <div class="contact-row"><span class="contact-label">Email</span><span class="contact-val"><a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></span></div>
+    <div class="contact-row"><span class="contact-label">Phone</span><span class="contact-val">+27 67 716 7716</span></div>
+    <div class="contact-row"><span class="contact-label">Contact</span><span class="contact-val">Reuben Siwela</span></div>
+    <div class="contact-row"><span class="contact-label">Reg number</span><span class="contact-val">[CONFIRM REG NUMBER BEFORE PUBLISHING]</span></div>
   </div>
 
-  <!-- 5 -->
-  <div class="card" id="security">
-    <h2>5. Security Measures</h2>
-    <h3>Authentication</h3>
-    <ul>
-      <li>Installer accounts are protected by Supabase Auth (email + password with bcrypt hashing)</li>
-      <li>Session tokens are short-lived JWTs. Password reset requires email verification</li>
-    </ul>
-    <h3>API access</h3>
-    <ul>
-      <li>The browser-exposed API key (anon key) has row-level-security enforced — it cannot access other installers' data</li>
-      <li>All sensitive operations (proposal generation, email dispatch, PDF storage) run through server-side edge functions using the service role key, which never reaches the browser</li>
-    </ul>
-    <h3>Client approval links</h3>
-    <ul>
-      <li>Each approval link contains a cryptographically random UUID token (128-bit entropy)</li>
-      <li>Tokens are single-use and tied to a specific site visit record</li>
-      <li>Once a client responds, the responded_at timestamp is written, preventing status changes without a confirmed button click</li>
-    </ul>
-    <h3>What we do not do</h3>
-    <ul>
-      <li>We do not log proposal content to any third-party analytics service</li>
-      <li>We do not use cookies for tracking. The open-tracking pixel is a 1×1 image request to our own edge function only</li>
-    </ul>
+  <div class="flag">
+    <span>⚠️</span>
+    <span><strong>Before publishing:</strong> (1) Confirm your company registration number and replace the placeholder. (2) Confirm your pricing page URL exists at novametricsgroup.com/pricing or update the reference in Section 9. (3) Remove this notice.</span>
   </div>
-
-  <!-- 6 -->
-  <div class="card" id="retention">
-    <h2>6. Data Retention & Deletion</h2>
-    <p>Proposal and client records are retained for the duration of an active installer account plus <strong>24 months</strong> thereafter, to support warranty, SETA audit, and dispute resolution requirements common in the solar installation industry.</p>
-    <p>If an installer account is closed, the account holder may request full data deletion by contacting us. Deletion is completed within 30 days. PDF files in storage are purged as part of the same process.</p>
-    <p>Clients whose data was captured by an installer may request access to or deletion of their personal information by contacting the installer directly, or Nova Metrics if the installer account is no longer active.</p>
-  </div>
-
-  <!-- 7 -->
-  <div class="card" id="liability">
-    <h2>7. Liability & Disclaimer</h2>
-    <div class="highlight">
-      Financial projections produced by the Platform are estimates based on published tariff data, standard engineering assumptions, and regional irradiance values. Actual savings will vary based on real-world conditions, tariff changes, and system performance.
-    </div>
-    <p>Nova Metrics shall not be liable for:</p>
-    <ul>
-      <li>Financial loss arising from discrepancies between projected and actual solar savings</li>
-      <li>Installation defects or safety issues arising from a failure to conduct a proper site assessment</li>
-      <li>Data loss resulting from third-party infrastructure failures (AWS, Supabase, Brevo)</li>
-      <li>Interruptions to service due to scheduled or emergency maintenance</li>
-    </ul>
-    <p>The Platform's maximum aggregate liability to any installer for any claim arising under these terms shall not exceed the total subscription fees paid by that installer in the 12 months preceding the claim.</p>
-  </div>
-
-  <!-- 8 -->
-  <div class="card" id="installers">
-    <h2>8. Installer Accounts</h2>
-    <p>By registering for an installer account, you confirm that:</p>
-    <ul>
-      <li>You are a registered solar installation contractor or energy consultant operating lawfully in South Africa</li>
-      <li>You hold the relevant qualifications or employ qualified persons for any electrical work arising from designs produced on the Platform</li>
-      <li>You accept responsibility for verifying all system designs against actual site conditions before presenting them to clients as final</li>
-      <li>You will not use the Platform to produce proposals for systems you are not qualified to install or supervise</li>
-    </ul>
-    <p>Nova Metrics reserves the right to suspend or terminate accounts found to be in violation of these terms or engaged in fraudulent, misleading, or harmful activity toward clients.</p>
-  </div>
-
-  <!-- 9 -->
-  <div class="card" id="popi">
-    <h2>9. POPIA Compliance</h2>
-    <p>Nova Metrics processes personal information in accordance with the <strong>Protection of Personal Information Act, 2013 (POPIA)</strong>.</p>
-    <ul>
-      <li><strong>Responsible party:</strong> Nova Metrics Group (Pty) Ltd</li>
-      <li><strong>Information officer:</strong> Contact via info@novametricsgroup.com</li>
-      <li><strong>Purpose limitation:</strong> Personal information is collected only for the purposes described in Section 3 above</li>
-      <li><strong>Data subject rights:</strong> Clients and installers have the right to access, correct, or request deletion of their personal information</li>
-      <li><strong>Breach notification:</strong> In the event of a data breach, affected parties will be notified within 72 hours of discovery, as required by POPIA</li>
-    </ul>
-    <p>To exercise your rights under POPIA, contact us at <a href="mailto:info@novametricsgroup.com" style="color:#0B1F3A;font-weight:600">info@novametricsgroup.com</a>.</p>
-  </div>
-
-  <!-- 10 -->
-  <div class="card" id="changes">
-    <h2>10. Changes to These Terms</h2>
-    <p>Nova Metrics may update these terms from time to time. Registered installers will be notified by email of material changes at least 14 days before they take effect. Continued use of the Platform after the effective date constitutes acceptance of the revised terms.</p>
-    <p>The current version of these terms is always available at <strong>novametricsgroup.com/terms</strong>.</p>
-  </div>
-
-  <!-- Contact -->
-  <div class="contact-box" id="contact">
-    <h3>11. Contact & Data Requests</h3>
-    <p>For any questions about these terms, data access requests, or security concerns:</p>
-    <p>📧 <a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></p>
-    <p>🌐 <a href="https://novametricsgroup.com">novametricsgroup.com</a></p>
-    <p style="margin-top:12px;font-size:12px;color:#8a9ab8">Nova Metrics Group · Republic of South Africa · Registered under the Companies Act 71 of 2008</p>
-  </div>
-
-  <footer>
-    &copy; 2026 Nova Metrics Group &nbsp;·&nbsp;
-    <a href="/terms.html" style="color:#9ca3af">Terms & Privacy</a> &nbsp;·&nbsp;
-    <a href="/solar-intelligence.html" style="color:#9ca3af">Solar Intelligence</a>
-  </footer>
 
 </div>
+
+<footer>
+  <p>© 2026 Nova Metrics (Pty) Ltd &nbsp;·&nbsp; <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="terms.html">Terms of Service</a> &nbsp;·&nbsp; <a href="index.html">Back to website</a></p>
+  <p style="margin-top:8px">Version 1.0 &nbsp;·&nbsp; Effective 19 May 2026 &nbsp;·&nbsp; Governed by the laws of the Republic of South Africa</p>
+</footer>
+
 </body>
 </html>

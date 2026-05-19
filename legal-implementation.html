@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal Implementation — Nova Metrics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#07090e;--dark:#0d1017;--dark-2:#111620;--dark-3:#161c2a;
+  --border:rgba(255,255,255,.07);--muted:#4a6080;--subtle:#7a90a8;--light:#c0ccd8;--white:#edf1f6;
+  --gold:#c8911c;--gold-dim:rgba(200,145,28,.10);
+  --red:#e03535;--red-dim:rgba(224,53,53,.08);--red-border:rgba(224,53,53,.18);
+  --amber:#d4780a;--amber-dim:rgba(212,120,10,.08);--amber-border:rgba(212,120,10,.2);
+  --green:#2ecc88;--green-dim:rgba(46,204,136,.07);--green-border:rgba(46,204,136,.18);
+  --blue:#4a90d9;--blue-dim:rgba(74,144,217,.07);--blue-border:rgba(74,144,217,.18);
+  --purple:#9b72e8;--purple-dim:rgba(155,114,232,.07);--purple-border:rgba(155,114,232,.18);
+  --sans:'DM Sans',system-ui,sans-serif;
+  --serif:'DM Serif Display',Georgia,serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--black);color:var(--light);-webkit-font-smoothing:antialiased;line-height:1.6}
+
+/* TOP */
+.top{background:var(--dark-2);border-bottom:1px solid var(--border);padding:18px 44px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.top-left{display:flex;align-items:center;gap:12px}
+.top-mark{width:26px;height:26px;background:var(--gold);border-radius:6px;display:grid;place-items:center;font-family:var(--serif);font-size:12px;color:var(--black)}
+.top-title{font-size:14px;font-weight:500;color:var(--white)}
+.top-sub{font-size:11px;color:var(--muted)}
+.top-pills{display:flex;gap:6px}
+.pill{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
+
+/* CHECKLIST STRIP */
+.checklist-strip{background:var(--dark-3);border-bottom:1px solid var(--border);padding:14px 44px;display:flex;align-items:center;gap:0;overflow-x:auto}
+.cs-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:0 20px;border-right:1px solid var(--border);white-space:nowrap}
+.cs-item:first-child{padding-left:0}
+.cs-item:last-child{border-right:none}
+.cs-check{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0}
+.cs-check.done{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
+.cs-check.todo{background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber)}
+
+/* LAYOUT */
+.wrap{display:flex}
+.sidebar{width:248px;flex-shrink:0;background:var(--dark-3);border-right:1px solid var(--border);padding:22px 16px;position:sticky;top:93px;height:calc(100vh - 93px);overflow-y:auto}
+.sb-group{margin-bottom:18px}
+.sb-label{font-size:9px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:7px}
+.sb-links{list-style:none;display:flex;flex-direction:column;gap:1px}
+.sb-links a{font-size:12px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;line-height:1.35;transition:all .16s}
+.sb-links a:hover{color:var(--light);background:rgba(255,255,255,.05)}
+.sb-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:700;flex-shrink:0}
+.sb-num.sql{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue)}
+.sb-num.code{background:var(--purple-dim);border:1px solid var(--purple-border);color:var(--purple)}
+.sb-num.push{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
+.sb-divider{height:1px;background:var(--border);margin:8px 0}
+
+/* CONTENT */
+.content{flex:1;padding:44px 52px;max-width:960px}
+
+/* SECTION */
+.sec{margin-bottom:56px;scroll-margin-top:100px}
+.sec-eyebrow{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.sec-title{font-family:var(--serif);font-size:26px;color:var(--white);line-height:1.15;margin-bottom:8px}
+.sec-sub{font-size:13px;font-weight:300;color:var(--subtle);line-height:1.75;max-width:600px;margin-bottom:24px}
+hr{border:none;border-top:1px solid var(--border);margin-bottom:28px}
+
+/* STEP */
+.step{background:var(--dark-2);border:1px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:18px}
+.step-head{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.step-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+.sql{background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue)}
+.code{background:var(--purple-dim);border:1px solid var(--purple-border);color:var(--purple)}
+.push{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green)}
+.warn{background:var(--amber-dim);border:1px solid var(--amber-border);color:var(--amber)}
+.step-info{flex:1}
+.step-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:3px;line-height:1.3}
+.step-desc{font-size:12px;font-weight:300;color:var(--subtle);line-height:1.65}
+.step-tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
+.tag{font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:9px}
+.tag-sql{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+.tag-code{background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple-border)}
+.tag-push{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+.tag-safe{background:rgba(46,204,136,.05);color:var(--green);border:1px solid var(--green-border)}
+.tag-warn{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber-border)}
+
+/* NOTICE */
+.notice{display:flex;align-items:flex-start;gap:10px;padding:12px 22px;font-size:12px;font-weight:300;color:var(--light);line-height:1.65;border-bottom:1px solid var(--border)}
+.notice.blue{background:rgba(74,144,217,.04)}
+.notice.amber{background:rgba(212,120,10,.04)}
+.notice.green{background:rgba(46,204,136,.04)}
+.notice-icon{flex-shrink:0;font-size:14px}
+
+/* WHERE */
+.where{background:rgba(0,0,0,.3);padding:11px 22px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.where-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex-shrink:0;min-width:70px}
+.where-path{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.path-step{font-size:11px;font-weight:500;color:var(--light);background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-family:var(--mono)}
+.path-arr{color:var(--muted);font-size:10px}
+
+/* FIND/REPLACE */
+.fr-wrap{padding:14px 22px 18px}
+.fr-block{margin-top:14px}
+.fr-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.fr-lbl.find{color:var(--red)}.fr-lbl.add{color:var(--blue)}.fr-lbl.replace{color:var(--green)}
+.lbl-pill{font-size:9px;font-weight:600;padding:1px 7px;border-radius:8px}
+.find .lbl-pill{background:var(--red-dim);color:var(--red);border:1px solid var(--red-border)}
+.add .lbl-pill{background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue-border)}
+.replace .lbl-pill{background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)}
+
+/* CODE */
+.code-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 22px;background:rgba(0,0,0,.3);border-top:1px solid var(--border)}
+.code-file{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.copy-btn{font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:5px;color:var(--muted);padding:3px 9px;cursor:pointer;transition:all .17s}
+.copy-btn:hover{color:var(--light);border-color:rgba(255,255,255,.15)}
+.copy-btn.done{color:var(--green);border-color:var(--green-border)}
+pre{font-family:var(--mono);font-size:12px;line-height:1.85;padding:16px 22px;overflow-x:auto;color:var(--light);margin:0;background:rgba(0,0,0,.4)}
+.c{color:#4a6580}.k{color:#79b8ff}.kw{color:#f97583}.fn{color:#b392f0}
+.str{color:#9ecbff}.num{color:#79b8ff}.tbl{color:#ffea7f}.col{color:#d1bcff}
+.hi-add{background:rgba(46,204,136,.1);border-radius:2px;padding:0 2px}
+.hi-find{background:rgba(224,53,53,.1);border-radius:2px;padding:0 2px}
+
+/* EFFECTS */
+.effects{list-style:none;display:flex;flex-direction:column;gap:7px;padding:14px 22px;background:rgba(0,0,0,.2);border-top:1px solid var(--border)}
+.effects li{display:flex;align-items:flex-start;gap:9px;font-size:12px;font-weight:300;color:var(--subtle);line-height:1.55}
+.effects li::before{content:'→';color:var(--muted);flex-shrink:0}
+
+/* PUSH TABLE */
+.push-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:0}
+.push-table th{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:9px 14px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border)}
+.push-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--subtle);vertical-align:top;line-height:1.55;font-weight:300;font-size:12px}
+.push-table tr:last-child td{border-bottom:none}
+td.white{color:var(--white);font-weight:500;font-family:var(--mono);font-size:11px}
+td.dest{color:var(--subtle);font-family:var(--mono);font-size:11px}
+
+footer{border-top:1px solid var(--border);padding:22px 44px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted);background:var(--dark-2)}
+@media(max-width:860px){.sidebar{display:none}.content{padding:28px 20px}.top{padding:14px 20px}.checklist-strip{padding:12px 20px}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-left">
+    <div class="top-mark">N</div>
+    <div>
+      <div class="top-title">Legal Implementation — Nova Metrics</div>
+      <div class="top-sub">SQL + code + where to put everything &middot; 19 May 2026</div>
+    </div>
+  </div>
+  <div class="top-pills">
+    <span class="pill">SQL = Supabase Editor</span>
+    <span class="pill">CODE = edit your files</span>
+    <span class="pill">PUSH = upload to GitHub</span>
+  </div>
+</div>
+
+<div class="checklist-strip">
+  <div class="cs-item"><span class="cs-check done">✓</span> privacy.html — done</div>
+  <div class="cs-item"><span class="cs-check done">✓</span> terms.html — done</div>
+  <div class="cs-item"><span class="cs-check todo">→</span> SQL — terms tracking columns</div>
+  <div class="cs-item"><span class="cs-check todo">→</span> CODE — signup consent checkboxes</div>
+  <div class="cs-item"><span class="cs-check todo">→</span> CODE — proposal email footer</div>
+  <div class="cs-item"><span class="cs-check todo">→</span> CODE — footer links on index.html</div>
+  <div class="cs-item"><span class="cs-check todo">→</span> PUSH — upload all files to GitHub</div>
+</div>
+
+<div class="wrap">
+<nav class="sidebar">
+  <div class="sb-group">
+    <div class="sb-label">SQL — Supabase Editor</div>
+    <ul class="sb-links">
+      <li><a href="#sql1"><span class="sb-num sql">1</span> Terms tracking columns</a></li>
+    </ul>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-group">
+    <div class="sb-label">CODE — Your Files</div>
+    <ul class="sb-links">
+      <li><a href="#code1"><span class="sb-num code">A</span> Signup consent checkboxes</a></li>
+      <li><a href="#code2"><span class="sb-num code">B</span> Save acceptance to DB</a></li>
+      <li><a href="#code3"><span class="sb-num code">C</span> Proposal email footer</a></li>
+      <li><a href="#code4"><span class="sb-num code">D</span> Footer links on index.html</a></li>
+    </ul>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-group">
+    <div class="sb-label">PUSH — GitHub Upload</div>
+    <ul class="sb-links">
+      <li><a href="#push"><span class="sb-num push">↑</span> Where every file goes</a></li>
+    </ul>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-group">
+    <div class="sb-label">Before publishing</div>
+    <ul class="sb-links">
+      <li><a href="#checklist"><span class="sb-num warn">!</span> 4 things to confirm first</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════════════════ -->
+<!-- SQL -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="sql1">
+  <div class="sec-eyebrow">SQL — Supabase Dashboard → SQL Editor → New query</div>
+  <div class="sec-title">Record when each installer accepted your Terms</div>
+  <div class="sec-sub">Adds two columns to your installers table: when they accepted, and which version they accepted. If you ever update the Terms, you can see which installers have seen the new version and which haven't. Without this, you have no proof of consent if it's ever disputed.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge sql">1</div>
+      <div class="step-info">
+        <div class="step-title">Add terms_accepted_at and terms_version columns to installers</div>
+        <div class="step-desc">These two columns record the exact moment an installer ticked the checkbox at signup, and which version of the Terms they agreed to. Existing installers get a NULL — you will prompt them to accept the next time they log in (see Code B).</div>
+        <div class="step-tags">
+          <span class="tag tag-sql">SQL</span>
+          <span class="tag tag-safe">Non-destructive — adds columns only</span>
+        </div>
+      </div>
+    </div>
+    <div class="code-bar">
+      <span class="code-file">Supabase SQL Editor</span>
+      <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+    </div>
+    <pre><span class="c">-- Add terms acceptance tracking to the installers table</span>
+<span class="kw">ALTER TABLE</span> <span class="tbl">installers</span>
+
+  <span class="c">-- Timestamp of when they ticked the checkbox</span>
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> <span class="col">terms_accepted_at</span>
+    <span class="fn">TIMESTAMPTZ</span> <span class="k">DEFAULT NULL</span>,
+
+  <span class="c">-- Which version of the Terms they accepted ("v1.0 May 2026")</span>
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> <span class="col">terms_version</span>
+    <span class="fn">TEXT</span> <span class="k">DEFAULT NULL</span>,
+
+  <span class="c">-- Their IP address at the time of acceptance (optional but useful)</span>
+  <span class="kw">ADD COLUMN IF NOT EXISTS</span> <span class="col">terms_accepted_ip</span>
+    <span class="fn">TEXT</span> <span class="k">DEFAULT NULL</span>;
+
+<span class="c">-- Confirm the columns were added</span>
+<span class="k">SELECT</span> <span class="col">column_name</span>, <span class="col">data_type</span>
+<span class="k">FROM</span> <span class="fn">information_schema.columns</span>
+<span class="k">WHERE</span> <span class="col">table_name</span> <span class="k">=</span> <span class="str">'installers'</span>
+  <span class="k">AND</span> <span class="col">column_name</span> <span class="k">IN</span> (<span class="str">'terms_accepted_at'</span>, <span class="str">'terms_version'</span>, <span class="str">'terms_accepted_ip'</span>);
+<span class="c">-- Expected: 3 rows returned</span></pre>
+    <ul class="effects">
+      <li>Existing 16 installers will have NULL for these columns — you will prompt them to accept when they next log in (Code B below handles this)</li>
+      <li>Every new installer who signs up will have a precise timestamp and version recorded the moment they tick the checkbox</li>
+      <li>When you update the Terms in future, change the version string (e.g. "v1.1 August 2026") and the system will know who has seen the new version</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- CODE A — SIGNUP CONSENT CHECKBOXES -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="code1">
+  <div class="sec-eyebrow">Code A — solar-intelligence.html (signup / registration screen)</div>
+  <div class="sec-title">Two checkboxes on the signup form</div>
+  <div class="sec-sub">Every new installer must tick both boxes before they can create an account. The first confirms they've read the Terms. The second confirms they understand they're responsible for their clients' data. Both are required — the signup button stays disabled until both are ticked.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge code">A</div>
+      <div class="step-info">
+        <div class="step-title">Add consent checkboxes to the signup form</div>
+        <div class="step-desc">Find your signup form and add these two checkboxes immediately above the submit/register button. The form submit is blocked until both are checked.</div>
+        <div class="step-tags"><span class="tag tag-code">CODE</span></div>
+      </div>
+    </div>
+    <div class="where">
+      <span class="where-lbl">File</span>
+      <div class="where-path">
+        <span class="path-step">solar-intelligence.html</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">Ctrl+F</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">search: register OR sign up OR createAccount</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">find the submit button</span>
+      </div>
+    </div>
+    <div class="fr-wrap">
+      <div class="fr-block">
+        <div class="fr-lbl find"><span class="lbl-pill">FIND THIS</span> — your signup submit button</div>
+        <pre><span class="c">&lt;!-- Find whatever your current signup submit button looks like, e.g.: --&gt;
+<span class="hi-find">&lt;button type="button" onclick="createAccount()"&gt;Create Account&lt;/button&gt;</span>
+<span class="c">&lt;!-- or --&gt;
+<span class="hi-find">&lt;button type="submit" id="signup-btn"&gt;Register&lt;/button&gt;</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl add"><span class="lbl-pill">ADD ABOVE IT</span> — paste these two checkboxes directly above the button</div>
+        <pre><span class="c">&lt;!-- ── Legal consent checkboxes ──────────────────────────── --&gt;
+&lt;div style=<span class="str">"margin-bottom:16px;display:flex;flex-direction:column;gap:12px"</span>&gt;
+
+  &lt;label style=<span class="str">"display:flex;align-items:flex-start;gap:11px;cursor:pointer"</span>&gt;
+    &lt;input
+      type=<span class="str">"checkbox"</span>
+      id=<span class="str">"consent-terms"</span>
+      onchange=<span class="str">"checkConsentReady()"</span>
+      style=<span class="str">"margin-top:3px;flex-shrink:0;accent-color:#c8911c;width:16px;height:16px"</span>
+    &gt;
+    &lt;span style=<span class="str">"font-size:13px;font-weight:300;color:#7a90a8;line-height:1.6"</span>&gt;
+      I have read and agree to the Nova Metrics
+      &lt;a href=<span class="str">"terms.html"</span> target=<span class="str">"_blank"</span>
+         style=<span class="str">"color:#c8911c;text-decoration:underline"</span>&gt;Terms of Service&lt;/a&gt;
+      and
+      &lt;a href=<span class="str">"privacy.html"</span> target=<span class="str">"_blank"</span>
+         style=<span class="str">"color:#c8911c;text-decoration:underline"</span>&gt;Privacy Policy&lt;/a&gt;.
+    &lt;/span&gt;
+  &lt;/label&gt;
+
+  &lt;label style=<span class="str">"display:flex;align-items:flex-start;gap:11px;cursor:pointer"</span>&gt;
+    &lt;input
+      type=<span class="str">"checkbox"</span>
+      id=<span class="str">"consent-data"</span>
+      onchange=<span class="str">"checkConsentReady()"</span>
+      style=<span class="str">"margin-top:3px;flex-shrink:0;accent-color:#c8911c;width:16px;height:16px"</span>
+    &gt;
+    &lt;span style=<span class="str">"font-size:13px;font-weight:300;color:#7a90a8;line-height:1.6"</span>&gt;
+      I understand that client information I enter into the platform is processed
+      in accordance with the Nova Metrics Privacy Policy, and that I am responsible
+      for having a lawful reason to enter my clients' personal information.
+    &lt;/span&gt;
+  &lt;/label&gt;
+
+&lt;/div&gt;
+<span class="c">&lt;!-- ── End consent checkboxes ──────────────────────────────── --&gt;</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl add"><span class="lbl-pill">ALSO ADD</span> — this JavaScript function anywhere in your &lt;script&gt; block</div>
+        <pre><span class="c">// Keeps the signup button disabled until both checkboxes are ticked</span>
+function checkConsentReady() {
+  const termsOk = document.getElementById(<span class="str">'consent-terms'</span>).checked;
+  const dataOk  = document.getElementById(<span class="str">'consent-data'</span>).checked;
+  const signupBtn = document.getElementById(<span class="str">'signup-btn'</span>); <span class="c">// ← use your button's actual ID</span>
+  if (signupBtn) {
+    signupBtn.disabled = !(termsOk && dataOk);
+    signupBtn.style.opacity = (termsOk && dataOk) ? <span class="str">'1'</span> : <span class="str">'0.45'</span>;
+    signupBtn.style.cursor  = (termsOk && dataOk) ? <span class="str">'pointer'</span> : <span class="str">'not-allowed'</span>;
+  }
+}
+
+<span class="c">// Call once on page load so button starts disabled</span>
+document.addEventListener(<span class="str">'DOMContentLoaded'</span>, () => checkConsentReady());</pre>
+      </div>
+    </div>
+    <ul class="effects">
+      <li>The submit/register button is greyed out and unclickable until both boxes are ticked</li>
+      <li>Both documents open in a new tab so the installer can actually read them before accepting</li>
+      <li>The checkbox IDs (consent-terms, consent-data) are used in Code B below to record the acceptance</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- CODE B — SAVE ACCEPTANCE TO DB -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="code2">
+  <div class="sec-eyebrow">Code B — solar-intelligence.html (the createAccount / signup function)</div>
+  <div class="sec-title">Save the acceptance timestamp when the account is created</div>
+  <div class="sec-sub">When the installer clicks Register and the account is created in Supabase, write terms_accepted_at and terms_version to their installer row at the same moment. Also: prompt existing installers (who have NULL) to accept when they log in.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge code">B</div>
+      <div class="step-info">
+        <div class="step-title">Write terms_accepted_at to the database on signup</div>
+        <div class="step-desc">Find your createAccount (or register) function and add two lines where you write to the installers table.</div>
+        <div class="step-tags"><span class="tag tag-code">CODE</span></div>
+      </div>
+    </div>
+    <div class="where">
+      <span class="where-lbl">File</span>
+      <div class="where-path">
+        <span class="path-step">solar-intelligence.html</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">Ctrl+F</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">search: createAccount OR insertInstaller OR .insert</span>
+      </div>
+    </div>
+    <div class="fr-wrap">
+      <div class="fr-block">
+        <div class="fr-lbl find"><span class="lbl-pill">FIND THIS</span> — where you insert or update the installer row after signup</div>
+        <pre><span class="c">// Your existing insert to the installers table — looks something like:</span>
+<span class="hi-find">await supabase.from('installers').insert({
+  installer_name: companyName,
+  contact_email:  email,
+  auth_user_id:   user.id,
+  // ... other fields
+});</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl replace"><span class="lbl-pill">REPLACE WITH THIS</span> — same insert, two lines added</div>
+        <pre>await supabase.from(<span class="str">'installers'</span>).insert({
+  installer_name:    companyName,
+  contact_email:     email,
+  auth_user_id:      user.id,
+  <span class="c">// ... your other existing fields ...</span>
+  <span class="hi-add">terms_accepted_at: new Date().toISOString(),       // timestamp of acceptance</span>
+  <span class="hi-add">terms_version:     'v1.0 May 2026',               // version they agreed to</span>
+});</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge code">B2</div>
+      <div class="step-info">
+        <div class="step-title">Prompt existing installers to accept on their next login</div>
+        <div class="step-desc">Your 16 existing installers have never been shown the Terms. Add a check after login: if terms_accepted_at is NULL, show a modal before they can use the platform. They accept once, it gets recorded, they never see it again.</div>
+        <div class="step-tags"><span class="tag tag-code">CODE</span></div>
+      </div>
+    </div>
+    <div class="where">
+      <span class="where-lbl">File</span>
+      <div class="where-path">
+        <span class="path-step">solar-intelligence.html</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">Ctrl+F</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">search: onAuthStateChange OR signIn OR after login</span>
+      </div>
+    </div>
+    <div class="fr-wrap">
+      <div class="fr-block">
+        <div class="fr-lbl find"><span class="lbl-pill">FIND THIS</span> — where you load the installer's profile after login</div>
+        <pre><span class="c">// After login you fetch the installer row — look for something like:</span>
+<span class="hi-find">const { data: installer } = await supabase
+  .from('installers')
+  .select('*')
+  .eq('auth_user_id', user.id)
+  .single();</span>
+
+<span class="c">// Then you probably load the dashboard here</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl add"><span class="lbl-pill">ADD AFTER IT</span> — terms acceptance check</div>
+        <pre><span class="c">// The fetch stays exactly as it is. Add this block immediately after:</span>
+<span class="hi-add">if (installer && !installer.terms_accepted_at) {
+  // Show a modal overlay asking them to accept the Terms
+  // They cannot dismiss it without clicking Accept
+  showTermsAcceptanceModal(installer.installer_id);
+}</span>
+
+<span class="c">// ── Add this function anywhere in your script block ──────────</span>
+<span class="hi-add">function showTermsAcceptanceModal(installerId) {
+  // Create a full-screen overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'terms-modal';
+  overlay.style.cssText = `
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(7,9,14,.97);
+    display:flex;align-items:center;justify-content:center;padding:24px`;
+
+  overlay.innerHTML = `
+    &lt;div style="max-width:520px;background:#111620;border:1px solid rgba(255,255,255,.08);
+                border-radius:16px;padding:36px 32px;text-align:center"&gt;
+      &lt;div style="font-family:'DM Serif Display',serif;font-size:26px;
+                  color:#edf1f6;margin-bottom:14px"&gt;
+        We've updated our Terms
+      &lt;/div&gt;
+      &lt;p style="font-size:14px;font-weight:300;color:#7a90a8;line-height:1.7;margin-bottom:24px"&gt;
+        Nova Metrics now has formal Terms of Service and a Privacy Policy.
+        Please read and accept them to continue using the platform.
+      &lt;/p&gt;
+      &lt;div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px"&gt;
+        &lt;a href="terms.html" target="_blank"
+           style="font-size:13px;color:#c8911c;text-decoration:underline"&gt;
+          Read Terms of Service ↗
+        &lt;/a&gt;
+        &lt;span style="color:#4a6080"&gt;·&lt;/span&gt;
+        &lt;a href="privacy.html" target="_blank"
+           style="font-size:13px;color:#c8911c;text-decoration:underline"&gt;
+          Read Privacy Policy ↗
+        &lt;/a&gt;
+      &lt;/div&gt;
+      &lt;label style="display:flex;align-items:flex-start;gap:10px;
+                     text-align:left;margin-bottom:20px;cursor:pointer"&gt;
+        &lt;input type="checkbox" id="modal-consent"
+               style="margin-top:3px;accent-color:#c8911c;flex-shrink:0"&gt;
+        &lt;span style="font-size:13px;font-weight:300;color:#7a90a8;line-height:1.6"&gt;
+          I have read and agree to the Terms of Service and Privacy Policy.
+        &lt;/span&gt;
+      &lt;/label&gt;
+      &lt;button id="modal-accept-btn"
+              onclick="acceptTermsFromModal(${installerId})"
+              disabled
+              style="width:100%;padding:13px;border-radius:9px;border:none;
+                     background:#c8911c;color:#07090e;font-size:14px;
+                     font-weight:500;cursor:not-allowed;opacity:0.45;
+                     font-family:'DM Sans',sans-serif;transition:all .2s"&gt;
+        I accept — continue to platform
+      &lt;/button&gt;
+    &lt;/div&gt;`;
+
+  // Enable button only when checkbox is ticked
+  overlay.querySelector('#modal-consent').addEventListener('change', function() {
+    const btn = overlay.querySelector('#modal-accept-btn');
+    btn.disabled = !this.checked;
+    btn.style.opacity = this.checked ? '1' : '0.45';
+    btn.style.cursor  = this.checked ? 'pointer' : 'not-allowed';
+  });
+
+  document.body.appendChild(overlay);
+}</span>
+
+<span class="hi-add">async function acceptTermsFromModal(installerId) {
+  await supabase.from('installers').update({
+    terms_accepted_at: new Date().toISOString(),
+    terms_version:     'v1.0 May 2026'
+  }).eq('installer_id', installerId);
+
+  // Remove the modal and let them in
+  document.getElementById('terms-modal')?.remove();
+}</span></pre>
+      </div>
+    </div>
+    <ul class="effects">
+      <li>Existing installers see a clean modal on their next login — can't dismiss it, can read both documents in new tabs, must tick and click Accept</li>
+      <li>After they accept, the modal never shows again — terms_accepted_at is now set</li>
+      <li>New installers accept at signup (Code A) so they never see this modal at all</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- CODE C — PROPOSAL EMAIL FOOTER -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="code3">
+  <div class="sec-eyebrow">Code C — proposal email / PDF generation</div>
+  <div class="sec-title">One paragraph added to every proposal email</div>
+  <div class="sec-sub">Every proposal sent through the platform tracks opens and views. POPIA requires you to tell the recipient this is happening. One short paragraph at the bottom of the email is all it takes — it's already referenced in the Privacy Policy you just published.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge code">C</div>
+      <div class="step-info">
+        <div class="step-title">Add disclosure footer to the proposal email</div>
+        <div class="step-desc">Find where you build the proposal email body and add this paragraph to the very bottom, after the proposal content and before any closing signature.</div>
+        <div class="step-tags"><span class="tag tag-code">CODE</span></div>
+      </div>
+    </div>
+    <div class="where">
+      <span class="where-lbl">File</span>
+      <div class="where-path">
+        <span class="path-step">solar-intelligence.html</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">Ctrl+F</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">search: email_sent_at OR sendEmail OR emailBody</span>
+      </div>
+    </div>
+    <div class="fr-wrap">
+      <div class="fr-block">
+        <div class="fr-lbl find"><span class="lbl-pill">FIND THIS</span> — where you assemble the proposal email HTML body</div>
+        <pre><span class="c">// Your email body will look something like this — find the closing part:</span>
+<span class="hi-find">const emailBody = `
+  &lt;html&gt;
+    ...proposal content...
+    &lt;p&gt;Kind regards,&lt;/p&gt;
+    &lt;p&gt;${installerName}&lt;/p&gt;
+  &lt;/html&gt;
+`;</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl add"><span class="lbl-pill">ADD BEFORE THE CLOSING &lt;/html&gt;</span> — the disclosure paragraph</div>
+        <pre><span class="c">// Add this block immediately before the closing &lt;/html&gt; tag in your email template:</span>
+<span class="hi-add">&lt;!-- Legal disclosure footer --&gt;
+&lt;div style="margin-top:32px;padding-top:20px;
+            border-top:1px solid #1e2840;
+            font-size:11px;color:#4a6080;
+            font-family:Arial,sans-serif;line-height:1.7"&gt;
+  This proposal was prepared using the Nova Metrics Solar Intelligence platform.
+  Opening and viewing activity on this email and proposal document is tracked to
+  help your installer follow up at the right time. Your information is handled in
+  accordance with the Nova Metrics
+  &lt;a href="https://novametricsgroup.com/privacy.html"
+     style="color:#c8911c"&gt;Privacy Policy&lt;/a&gt;.
+  If you have any questions about how your information is used, contact
+  &lt;a href="mailto:info@novametricsgroup.com"
+     style="color:#c8911c"&gt;info@novametricsgroup.com&lt;/a&gt;.
+&lt;/div&gt;</span></pre>
+      </div>
+    </div>
+    <ul class="effects">
+      <li>Every proposal email now informs the recipient that tracking is in place — satisfying the POPIA legitimate interest requirement</li>
+      <li>Links directly to the live Privacy Policy so anyone who wants to know more can read it</li>
+      <li>Gives the Information Officer email address for opt-out requests</li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- CODE D — FOOTER LINKS -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="code4">
+  <div class="sec-eyebrow">Code D — index.html</div>
+  <div class="sec-title">Link to both documents from your website footer</div>
+  <div class="sec-sub">The Privacy Policy and Terms of Service need to be publicly accessible from your website. Add them to the footer that's already there.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge code">D</div>
+      <div class="step-info">
+        <div class="step-title">Add Privacy Policy and Terms links to the website footer</div>
+        <div class="step-desc">Open index.html, find the footer copyright line, and add the two links next to it.</div>
+        <div class="step-tags"><span class="tag tag-code">CODE</span></div>
+      </div>
+    </div>
+    <div class="where">
+      <span class="where-lbl">File</span>
+      <div class="where-path">
+        <span class="path-step">index.html</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">Ctrl+F</span>
+        <span class="path-arr">→</span>
+        <span class="path-step">search: 2026 Nova Metrics</span>
+      </div>
+    </div>
+    <div class="fr-wrap">
+      <div class="fr-block">
+        <div class="fr-lbl find"><span class="lbl-pill">FIND THIS</span> — the footer copyright line</div>
+        <pre><span class="hi-find">&lt;span&gt;&copy; 2026 Nova Metrics. All rights reserved.&lt;/span&gt;</span></pre>
+      </div>
+      <div class="fr-block">
+        <div class="fr-lbl replace"><span class="lbl-pill">REPLACE WITH THIS</span></div>
+        <pre><span class="hi-add">&lt;span&gt;&copy; 2026 Nova Metrics. All rights reserved.
+  &nbsp;&middot;&nbsp;
+  &lt;a href="privacy.html" style="color:inherit;text-decoration:none;
+     transition:color .2s" onmouseover="this.style.color='#c0ccd8'"
+     onmouseout="this.style.color=''"&gt;Privacy Policy&lt;/a&gt;
+  &nbsp;&middot;&nbsp;
+  &lt;a href="terms.html" style="color:inherit;text-decoration:none;
+     transition:color .2s" onmouseover="this.style.color='#c0ccd8'"
+     onmouseout="this.style.color=''"&gt;Terms of Service&lt;/a&gt;
+&lt;/span&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- PUSH — FILE UPLOAD TABLE -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="push">
+  <div class="sec-eyebrow">Push — GitHub upload</div>
+  <div class="sec-title">Where every file goes in your repository</div>
+  <div class="sec-sub">All files go into the same root folder of your GitHub Pages repository alongside index.html. Here is the exact list.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge push">↑</div>
+      <div class="step-info">
+        <div class="step-title">Upload these files to: github.com/Kharst/novametricsgroup.github.io</div>
+        <div class="step-desc">Go to your repository → Add file → Upload files. Drag all of these in at once, then commit.</div>
+        <div class="step-tags"><span class="tag tag-push">GitHub Pages</span></div>
+      </div>
+    </div>
+    <div class="notice blue">
+      <span class="notice-icon">ℹ️</span>
+      <span><strong>How to upload on GitHub:</strong> Go to the repository page → click <strong>Add file</strong> (top right) → <strong>Upload files</strong> → drag the files in → scroll down → click <strong>Commit changes</strong>. That's it — GitHub Pages deploys automatically within 1–2 minutes.</span>
+    </div>
+    <table class="push-table">
+      <tr>
+        <th>File to upload</th>
+        <th>Where you have it now</th>
+        <th>Where it goes on GitHub</th>
+        <th>Live URL after upload</th>
+      </tr>
+      <tr>
+        <td class="white">privacy.html</td>
+        <td class="dest">Downloaded from this session</td>
+        <td class="dest">Root of repository (same level as index.html)</td>
+        <td class="dest">novametricsgroup.com/privacy.html</td>
+      </tr>
+      <tr>
+        <td class="white">terms.html</td>
+        <td class="dest">Downloaded from this session</td>
+        <td class="dest">Root of repository (same level as index.html)</td>
+        <td class="dest">novametricsgroup.com/terms.html</td>
+      </tr>
+      <tr>
+        <td class="white">index.html</td>
+        <td class="dest">After Code D edits above</td>
+        <td class="dest">Replace the existing index.html in root</td>
+        <td class="dest">novametricsgroup.com</td>
+      </tr>
+      <tr>
+        <td class="white">solar-intelligence.html</td>
+        <td class="dest">After Code A, B, C edits above</td>
+        <td class="dest">Replace existing file in root</td>
+        <td class="dest">novametricsgroup.com/solar-intelligence.html</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- CHECKLIST -->
+<!-- ══════════════════════════════════════ -->
+
+<div class="sec" id="checklist">
+  <div class="sec-eyebrow">Before you publish</div>
+  <div class="sec-title">4 things to confirm first</div>
+  <div class="sec-sub">Both documents have placeholders you must fix before the pages go live. Open each file in a text editor, make these changes, then upload.</div>
+  <hr>
+
+  <div class="step">
+    <div class="step-head">
+      <div class="step-badge warn">!</div>
+      <div class="step-info">
+        <div class="step-title">Find and fix these four things in privacy.html and terms.html</div>
+        <div class="step-desc">Use Ctrl+F to find each one. They are marked with square brackets so they're easy to spot.</div>
+        <div class="step-tags"><span class="tag tag-warn">Do this before uploading</span></div>
+      </div>
+    </div>
+    <div class="notice amber">
+      <span class="notice-icon">⚠️</span>
+      <span>If you don't know your company registration number right now, you can publish with the placeholder and fix it within a few days — it doesn't affect the legal validity of the documents, it just looks unprofessional. Everything else below should be confirmed before you go live.</span>
+    </div>
+    <table class="push-table">
+      <tr><th>File</th><th>Find this</th><th>Replace with</th></tr>
+      <tr>
+        <td class="white">privacy.html<br>terms.html</td>
+        <td class="dest">[CONFIRM REG NUMBER BEFORE PUBLISHING]</td>
+        <td class="dest">Your actual CIPC company registration number, e.g. 2024/123456/07</td>
+      </tr>
+      <tr>
+        <td class="white">terms.html</td>
+        <td class="dest">novametricsgroup.com/pricing</td>
+        <td class="dest">Confirm this URL exists. If your pricing page is at a different path, update it. If it doesn't exist yet, change the text to "published at novametricsgroup.com" for now.</td>
+      </tr>
+      <tr>
+        <td class="white">privacy.html<br>terms.html</td>
+        <td class="dest">⚠️ Before publishing: ... (the yellow flag box)</td>
+        <td class="dest">Delete the entire &lt;div class="flag"&gt;...&lt;/div&gt; block from both files once you've made the fixes above</td>
+      </tr>
+      <tr>
+        <td class="white">Code B — solar-intelligence.html</td>
+        <td class="dest">terms_version: 'v1.0 May 2026'</td>
+        <td class="dest">This is already correct — just confirm the date matches when you actually publish. If you publish in June, change it to 'v1.0 June 2026'.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="step" style="margin-top:18px">
+    <div class="step-head">
+      <div class="step-badge push">✓</div>
+      <div class="step-info">
+        <div class="step-title">After everything is live — two free admin tasks</div>
+        <div class="step-tags"><span class="tag tag-safe">Free &middot; 30–40 minutes total</span></div>
+      </div>
+    </div>
+    <div class="notice green">
+      <span class="notice-icon">✅</span>
+      <span><strong>Register as Information Officer:</strong> Go to <a href="https://www.inforegulator.org.za" target="_blank" style="color:var(--gold)">inforegulator.org.za</a> → Registration of Information Officers → complete the online form. You need your CIPC number and Reuben Siwela's details. Takes 30 minutes. Processing takes a few weeks but submitting is what counts legally.</span>
+    </div>
+    <div class="notice green" style="border-top:none">
+      <span class="notice-icon">✅</span>
+      <span><strong>Sign the Supabase DPA:</strong> Log into supabase.com → your organisation → Settings → Legal → Data Processing Agreement → sign online. Takes 10 minutes. Free on all plans.</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /wrap -->
+
+<footer>
+  <span>Nova Metrics Legal Implementation &middot; 19 May 2026</span>
+  <span>SQL = Supabase Editor &middot; CODE = your files &middot; PUSH = GitHub upload</span>
+</footer>
+
+<script>
+function copyBlock(btn) {
+  const pre = btn.closest('.step').querySelector('pre');
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('done'); }, 2200);
+  });
+}
+const targets = document.querySelectorAll('[id]');
+const links   = document.querySelectorAll('.sb-links a');
+const io = new IntersectionObserver(e => {
+  e.forEach(entry => {
+    if (entry.isIntersecting) {
+      links.forEach(l => l.style.color = '');
+      const a = document.querySelector(`.sb-links a[href="#${entry.target.id}"]`);
+      if (a) a.style.color = 'var(--white)';
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+targets.forEach(t => io.observe(t));
+</script>
+</body>
+</html>
