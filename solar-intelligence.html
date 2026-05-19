@@ -276,6 +276,41 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <input type="password" id="new-password" placeholder="New password (min 8 characters)" />
     <input type="password" id="new-password-confirm" placeholder="Confirm new password" />
     <div id="setpass-error" class="error-msg"></div>
+<!-- ── Legal consent checkboxes ──────────────────────────────── -->
+<div style="margin-bottom:16px;display:flex;flex-direction:column;gap:12px;text-align:left">
+
+  <label style="display:flex;align-items:flex-start;gap:11px;cursor:pointer">
+    <input
+      type="checkbox"
+      id="consent-terms"
+      onchange="checkConsentReady()"
+      style="margin-top:3px;flex-shrink:0;accent-color:#FFD700;width:16px;height:16px"
+    >
+    <span style="font-size:13px;font-weight:300;color:#7a95af;line-height:1.6">
+      I have read and agree to the Nova Metrics
+      <a href="terms.html" target="_blank" style="color:#FFD700;text-decoration:underline">Terms of Service</a>
+      and
+      <a href="privacy.html" target="_blank" style="color:#FFD700;text-decoration:underline">Privacy Policy</a>.
+    </span>
+  </label>
+
+  <label style="display:flex;align-items:flex-start;gap:11px;cursor:pointer">
+    <input
+      type="checkbox"
+      id="consent-data"
+      onchange="checkConsentReady()"
+      style="margin-top:3px;flex-shrink:0;accent-color:#FFD700;width:16px;height:16px"
+    >
+    <span style="font-size:13px;font-weight:300;color:#7a95af;line-height:1.6">
+      I understand that client information I enter into the platform is processed
+      in accordance with the Nova Metrics Privacy Policy, and that I am responsible
+      for having a lawful reason to enter my clients' personal information.
+    </span>
+  </label>
+
+</div>
+<!-- ── End consent checkboxes ────────────────────────────────── -->
+    
     <button class="btn-primary" id="setpass-btn" onclick="doSetPassword()">Set Password &amp; Sign In</button>
   </div>
 </div>
@@ -1033,7 +1068,7 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
 supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}})();
-async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
+async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
 function showLoadingOverlay(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
 function hideLoadingOverlay(){document.getElementById('dataLoading').classList.remove('on');}
 function showDataError(err){document.getElementById('dlMsg').textContent='Failed to load data';document.getElementById('dlErr').textContent=String(err);document.getElementById('dlErr').style.display='block';}
@@ -1092,6 +1127,10 @@ function populateDropdowns(){
 function showApp(){
   document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';
   const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';
+  // ── Terms acceptance check for existing installers ──
+if (installer && !installer.terms_accepted_at) {
+  showTermsAcceptanceModal(installer.installer_id);
+}
   showHwBanner();
   checkBillingStatus();
   showProfileNudges();
@@ -1151,7 +1190,21 @@ async function doSetPassword(){
   btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Setting password\u2026';
   const{data,error}=await supabaseClient.auth.updateUser({password:pass});
   if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';return;}
-  try{showLoadingOverlay('Setting up your workspace\u2026');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}
+  try{
+  showLoadingOverlay('Setting up your workspace\u2026');
+  await loadInstallerProfile(data.user.email);
+  // Record terms acceptance for this new installer
+  if (installer && !installer.terms_accepted_at) {
+    await supabaseClient.from('installers').update({
+      terms_accepted_at: new Date().toISOString(),
+      terms_version:     'v1.0 May 2026'
+    }).eq('installer_id', installer.installer_id);
+    installer.terms_accepted_at = new Date().toISOString();
+  }
+  await loadAllData();
+  hideLoadingOverlay();
+  showApp();
+}catch(e){showDataError(e);}
 }
 function showTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -1693,6 +1746,59 @@ async function findCompliantAlternative(brand){
     console.warn('Billing check error:', e);
   }
 }
+function checkConsentReady() {
+  const termsOk = document.getElementById('consent-terms').checked;
+  const dataOk  = document.getElementById('consent-data').checked;
+  const btn = document.getElementById('setpass-btn');
+  if (btn) {
+    btn.disabled = !(termsOk && dataOk);
+    btn.style.opacity = (termsOk && dataOk) ? '1' : '0.45';
+    btn.style.cursor  = (termsOk && dataOk) ? 'pointer' : 'not-allowed';
+  }
+}
+document.addEventListener('DOMContentLoaded', () => checkConsentReady());
+function showTermsAcceptanceModal(installerId) {
+  const overlay = document.createElement('div');
+  overlay.id = 'terms-modal';
+  overlay.style.cssText = `position:fixed;inset:0;z-index:9999;background:rgba(11,31,58,.97);display:flex;align-items:center;justify-content:center;padding:24px`;
+  overlay.innerHTML = `
+    <div style="max-width:520px;background:#112840;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:36px 32px;text-align:center">
+      <div style="font-family:'DM Serif Display',serif;font-size:26px;color:#f0f4f8;margin-bottom:14px">We've updated our Terms</div>
+      <p style="font-size:14px;font-weight:300;color:#7a95af;line-height:1.7;margin-bottom:24px">
+        Nova Metrics now has formal Terms of Service and a Privacy Policy. Please read and accept them to continue using the platform.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px">
+        <a href="terms.html" target="_blank" style="font-size:13px;color:#FFD700;text-decoration:underline">Read Terms of Service ↗</a>
+        <span style="color:#4a6080">·</span>
+        <a href="privacy.html" target="_blank" style="font-size:13px;color:#FFD700;text-decoration:underline">Read Privacy Policy ↗</a>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:10px;text-align:left;margin-bottom:20px;cursor:pointer">
+        <input type="checkbox" id="modal-consent" style="margin-top:3px;accent-color:#FFD700;flex-shrink:0">
+        <span style="font-size:13px;font-weight:300;color:#7a95af;line-height:1.6">I have read and agree to the Terms of Service and Privacy Policy.</span>
+      </label>
+      <button id="modal-accept-btn" onclick="acceptTermsFromModal(${installerId})" disabled
+        style="width:100%;padding:13px;border-radius:9px;border:none;background:#FFD700;color:#0B1F3A;font-size:14px;font-weight:500;cursor:not-allowed;opacity:0.45;font-family:'DM Sans',sans-serif;transition:all .2s">
+        I accept — continue to platform
+      </button>
+    </div>`;
+  overlay.querySelector('#modal-consent').addEventListener('change', function() {
+    const btn = overlay.querySelector('#modal-accept-btn');
+    btn.disabled = !this.checked;
+    btn.style.opacity = this.checked ? '1' : '0.45';
+    btn.style.cursor  = this.checked ? 'pointer' : 'not-allowed';
+  });
+  document.body.appendChild(overlay);
+}
+
+async function acceptTermsFromModal(installerId) {
+  await supabaseClient.from('installers').update({
+    terms_accepted_at: new Date().toISOString(),
+    terms_version:     'v1.0 May 2026'
+  }).eq('installer_id', installerId);
+  document.getElementById('terms-modal')?.remove();
+}
+  
+  
 </script>
 </body>
 </html>
