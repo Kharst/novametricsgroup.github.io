@@ -447,9 +447,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       <div class="e-icon">☀️</div>
       <div class="e-title">Select a client to view their proposal</div>
       <div class="e-sub">Choose a client from the sidebar, or create a new solar design</div>
+      <a href="solar-intelligence.html" class="e-cta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        New Design
+      </a>
     </div>
 
     <div class="detail" id="detailPanel">
+      <div class="attn-banner" id="attnBanner">
+        <span style="font-size:14px">⚠️</span>
+        <span id="attnMsg">This proposal needs follow-up.</span>
+      </div>
 
       <div class="ch">
         <div class="ch-l">
@@ -491,6 +499,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <span class="mo-label"><strong>Installer override:</strong> mark outcome if client accepted or rejected verbally.</span>
           <button class="mo-btn mo-btn-accept" onclick="markAsWon()">🏆 Mark Won</button>
           <button class="mo-btn mo-btn-reject" onclick="markAsRejected()">✕ Rejected</button>
+        </div>
+      </div>
+
+      <div class="no-prop" id="noPropRow">
+        <div class="np-ic">☀️</div>
+        <div>
+          <div class="np-t">No proposal generated yet</div>
+          <div class="np-s">Design and generate a solar proposal for this client.</div>
+          <a href="solar-intelligence.html" class="np-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            New Design
+          </a>
         </div>
       </div>
 
