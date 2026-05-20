@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Nova Metrics — Solar Intelligence. The end-to-end operations platform for South African solar installers: precision system sizing, professional proposals, full installation management, and customer handover.">
+<meta name="description" content="Nova Metrics — Solar Intelligence. The end-to-end SaaS platform for solar installers: system sizing, AI proposals, installation management, and customer handover. Built for South African installers.">
 <title>Nova Metrics — Solar Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,8 +22,6 @@
 html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--black);color:var(--light);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.022;pointer-events:none;z-index:9999}
-
-/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:200;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(7,9,14,.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
 .nav-logo{display:flex;align-items:center;gap:13px;text-decoration:none}
 .nav-mark{width:32px;height:32px;background:var(--gold);border-radius:8px;display:grid;place-items:center;font-family:var(--serif);font-size:16px;color:var(--black);flex-shrink:0}
@@ -38,19 +36,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:66px;display:flex;ali
 .btn-ghost:hover{color:var(--white);border-color:rgba(255,255,255,.18)}
 .btn-gold{background:var(--gold);color:var(--black)}
 .btn-gold:hover{background:var(--gold-2);transform:translateY(-1px)}
-
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 48px 80px;position:relative;overflow:hidden}
 .hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(200,145,28,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,145,28,.03) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse 90% 80% at 50% 50%,black 0%,transparent 80%);pointer-events:none}
 .hero-glow-a{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(200,145,28,.07) 0%,transparent 65%);top:-250px;right:-200px;pointer-events:none}
 .hero-glow-b{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(45,111,212,.05) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none}
-.hero-content{position:relative;max-width:820px}
+.hero-content{position:relative;max-width:860px}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:30px}
 .hero-eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);opacity:.6}
 .hero-eyebrow-badge{background:var(--gold-dim);border:1px solid rgba(200,145,28,.25);border-radius:20px;padding:3px 10px;font-size:10px;letter-spacing:.1em}
-h1{font-family:var(--serif);font-size:clamp(48px,6.2vw,82px);font-weight:400;line-height:1.06;color:var(--white);margin-bottom:28px;letter-spacing:-.01em}
+h1{font-family:var(--serif);font-size:clamp(50px,6.5vw,84px);font-weight:400;line-height:1.06;color:var(--white);margin-bottom:28px;letter-spacing:-.01em}
 h1 em{font-style:italic;color:var(--gold-3)}
-.hero-sub{font-size:17px;font-weight:300;line-height:1.74;color:var(--subtle);max-width:580px;margin-bottom:44px}
+.hero-sub{font-size:17px;font-weight:300;line-height:1.72;color:var(--subtle);max-width:560px;margin-bottom:44px}
 .hero-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .btn-hero{font-family:var(--sans);font-size:14px;font-weight:500;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;transition:all .22s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;letter-spacing:.01em}
 .btn-hero-primary{background:var(--gold);color:var(--black)}
@@ -73,31 +69,16 @@ h1 em{font-style:italic;color:var(--gold-3)}
 .dc-row{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
 .dc-k{font-size:12px;color:var(--muted)}.dc-v{font-size:12px;font-weight:500;color:var(--light)}
 .dc-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:rgba(26,138,90,.15);border:1px solid rgba(26,138,90,.25);color:var(--green-2)}
-
-/* MARQUEE */
 .marquee-strip{border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);background:var(--dark);overflow:hidden;padding:14px 0}
-.marquee-track{display:flex;width:max-content;animation:marquee 55s linear infinite}
+.marquee-track{display:flex;width:max-content;animation:marquee 50s linear infinite}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .marquee-item{display:flex;align-items:center;gap:44px;padding:0 44px;font-size:11px;font-weight:400;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
 .m-dot{width:3px;height:3px;border-radius:50%;background:var(--gold);opacity:.45;flex-shrink:0}
-
-/* NUMBERS BAR */
-.numbers-bar{background:var(--dark-2);border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.04);padding:36px 48px}
-.numbers-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.num-item{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 20px;border-right:1px solid rgba(255,255,255,.06)}
-.num-item:last-child{border-right:none}
-.num-val{font-family:var(--serif);font-size:38px;font-weight:400;color:var(--gold-3);line-height:1;margin-bottom:6px}
-.num-label{font-size:12px;font-weight:300;color:var(--muted);line-height:1.5}
-
-/* DEMO */
 .demo-section{padding:100px 48px;background:var(--black);position:relative;overflow:hidden}
 .demo-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(200,145,28,.055) 0%,transparent 65%);pointer-events:none}
 .demo-inner{max-width:1100px;margin:0 auto}
 .demo-header{text-align:center;margin-bottom:52px}
-.demo-tabs{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:40px}
-.demo-tab{font-family:var(--sans);font-size:12px;font-weight:500;padding:8px 18px;border-radius:8px;border:1px solid var(--dim);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.04em}
-.demo-tab.active{background:var(--gold-dim);border-color:rgba(200,145,28,.35);color:var(--gold-3)}
-.demo-tab:hover:not(.active){color:var(--light);border-color:rgba(255,255,255,.14)}
+.demo-header .eyebrow{justify-content:center}
 .demo-frame-wrap{position:relative}
 .demo-frame-wrap::before,.demo-frame-wrap::after{content:'';position:absolute;width:48px;height:48px;border-color:var(--gold);border-style:solid;opacity:.45;z-index:2;pointer-events:none}
 .demo-frame-wrap::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-radius:4px 0 0 0}
@@ -116,8 +97,6 @@ h1 em{font-style:italic;color:var(--gold-3)}
 .demo-chrome-lock{width:8px;height:8px;opacity:.3;flex-shrink:0}
 .demo-chrome-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .demo-chrome-badge{margin-left:auto;font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid rgba(200,145,28,.2);border-radius:10px;padding:2px 8px;flex-shrink:0}
-.demo-panel{display:none}
-.demo-panel.active{display:block}
 .demo-video-wrap{position:relative;width:100%;background:#000;aspect-ratio:16/9;cursor:pointer}
 .demo-video-wrap video{width:100%;height:100%;display:block;object-fit:cover}
 .demo-play-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,9,14,.6);backdrop-filter:blur(2px);transition:opacity .35s;z-index:3}
@@ -126,12 +105,6 @@ h1 em{font-style:italic;color:var(--gold-3)}
 .demo-play-btn:hover{background:var(--gold-2);transform:scale(1.08)}
 .demo-play-btn svg{margin-left:4px}
 .demo-play-label{font-size:13px;font-weight:400;letter-spacing:.06em;color:rgba(255,255,255,.65);text-transform:uppercase}
-.demo-iframe-wrap{width:100%;aspect-ratio:16/9;position:relative;background:var(--dark-3)}
-.demo-iframe-wrap iframe{width:100%;height:100%;border:none;display:block}
-.demo-iframe-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--dark-3);gap:14px}
-.demo-iframe-placeholder .launch-btn{font-family:var(--sans);font-size:14px;font-weight:500;padding:12px 24px;border-radius:10px;background:var(--gold);color:var(--black);border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s}
-.demo-iframe-placeholder .launch-btn:hover{background:var(--gold-2);transform:translateY(-2px)}
-.demo-iframe-placeholder p{font-size:14px;color:var(--muted);text-align:center;max-width:360px;line-height:1.6}
 .demo-statusbar{height:38px;background:var(--dark-3);border-top:1px solid rgba(255,255,255,.04);display:flex;align-items:center;padding:0 20px;gap:16px}
 .demo-status-dot{width:6px;height:6px;border-radius:50%;background:var(--green-2);box-shadow:0 0 6px rgba(52,211,153,.4);animation:pulse-dot 2.4s ease-in-out infinite}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
@@ -145,8 +118,6 @@ h1 em{font-style:italic;color:var(--gold-3)}
 .demo-caption-right{display:flex;align-items:center;gap:8px}
 .demo-pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--subtle);border:1px solid var(--dim);border-radius:20px;padding:5px 12px}
 .demo-pill-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
-
-/* SECTIONS */
 .section{padding:100px 48px}
 .inner{max-width:1200px;margin:0 auto}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
@@ -154,8 +125,7 @@ h1 em{font-style:italic;color:var(--gold-3)}
 h2{font-family:var(--serif);font-size:clamp(34px,4vw,52px);font-weight:400;color:var(--white);line-height:1.12;margin-bottom:16px;letter-spacing:-.01em}
 h2 em{font-style:italic;color:var(--gold-3)}
 .section-body{font-size:16px;font-weight:300;line-height:1.78;color:var(--subtle);max-width:540px}
-
-/* PRODUCT GRID */
+/* product grid */
 .product-split{display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:center}
 .product-modules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .mod-card{background:var(--dark-2);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius-lg);padding:24px 20px;transition:all .28s;position:relative;overflow:hidden}
@@ -164,8 +134,7 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .mod-icon{width:34px;height:34px;border-radius:8px;background:var(--gold-dim);border:1px solid rgba(200,145,28,.2);display:grid;place-items:center;font-size:15px;margin-bottom:13px}
 .mod-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:5px;line-height:1.3}
 .mod-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.65}
-
-/* ENGINE GRID */
+/* engine grid */
 .engine-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.04);border-radius:18px;overflow:hidden;margin-top:56px}
 .eng-cell{background:var(--dark);padding:40px 32px;transition:background .25s}
 .eng-cell:hover{background:var(--dark-2)}
@@ -173,8 +142,7 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .eng-title{font-size:15px;font-weight:500;color:var(--white);margin-bottom:10px;line-height:1.3}
 .eng-desc{font-size:13px;font-weight:300;color:var(--muted);line-height:1.7}
 .eng-tag{display:inline-block;margin-top:14px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,145,28,.22);border-radius:20px;padding:3px 9px}
-
-/* PIPELINE STEPS */
+/* pipeline steps (reused for both sections) */
 .workflow-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:56px;position:relative}
 .workflow-steps::before{content:'';position:absolute;top:26px;left:10%;width:80%;height:1px;background:linear-gradient(90deg,transparent,var(--dim),var(--dim),transparent);pointer-events:none}
 .w-step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 10px;position:relative}
@@ -182,11 +150,11 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .w-step:hover .w-num{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-3)}
 .w-title{font-size:13px;font-weight:500;color:var(--white);margin-bottom:6px;line-height:1.3}
 .w-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.6}
+/* job portal pipeline — green accent */
 .job-steps .w-num{border-color:rgba(52,211,153,.2)}
 .job-steps .w-step:hover .w-num{background:rgba(52,211,153,.07);border-color:var(--green-2);color:var(--green-2)}
 .job-steps::before{background:linear-gradient(90deg,transparent,rgba(52,211,153,.18),rgba(52,211,153,.18),transparent)}
-
-/* PROPOSAL / JOB SPLIT */
+/* proposal section */
 .proposal-split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
 .proposal-mock{background:var(--dark-2);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:32px 28px;position:relative;overflow:hidden}
 .proposal-mock::before{content:'';position:absolute;bottom:-80px;right:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(200,145,28,.08) 0%,transparent 70%);pointer-events:none}
@@ -208,8 +176,7 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .pm-comp-k{color:var(--muted)}.pm-comp-v{color:var(--light);font-weight:500}
 .pm-tracking{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
 .pm-track-dot{width:6px;height:6px;border-radius:50%;background:var(--green-2)}
-
-/* JOB MOCK */
+/* job portal mock */
 .job-mock{background:var(--dark-2);border:1px solid rgba(52,211,153,.15);border-radius:18px;overflow:hidden;position:relative}
 .job-mock-topbar{background:var(--dark-3);border-bottom:1px solid rgba(255,255,255,.05);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .job-mock-title{font-size:12px;font-weight:500;color:var(--white);display:flex;align-items:center;gap:8px}
@@ -233,18 +200,9 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .job-check-tick{width:14px;height:14px;border-radius:3px;display:grid;place-items:center;flex-shrink:0;font-size:9px}
 .job-check-tick.done{background:rgba(52,211,153,.15);color:var(--green-2)}
 .job-check-tick.pending{background:rgba(255,255,255,.05);color:transparent;border:1px solid var(--dim)}
-.job-coc-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.job-coc-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);margin-bottom:0}
 .job-coc-k{color:var(--muted)}.job-coc-v{color:var(--light);font-weight:500}
-
-/* ENGINEERING CALLOUT */
-.callout-band{background:var(--dark-2);border:1px solid rgba(200,145,28,.12);border-radius:18px;padding:40px 44px;margin-top:56px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px}
-.callout-item{display:flex;flex-direction:column;gap:8px;padding-right:32px;border-right:1px solid rgba(255,255,255,.05)}
-.callout-item:last-child{border-right:none;padding-right:0}
-.callout-lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);opacity:.7}
-.callout-val{font-family:var(--serif);font-size:32px;font-weight:400;color:var(--gold-3);line-height:1}
-.callout-desc{font-size:13px;font-weight:300;color:var(--muted);line-height:1.6}
-
-/* PLANS */
+/* plans */
 .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
 .plan-card{background:var(--dark-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);padding:32px 28px;position:relative;transition:all .25s}
 .plan-card.featured{border-color:rgba(200,145,28,.3);background:var(--dark-3)}
@@ -261,8 +219,7 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .btn-plan-gold{background:var(--gold);color:var(--black)}.btn-plan-gold:hover{background:var(--gold-2);transform:translateY(-1px)}
 .plan-notify{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted);justify-content:center}
 .plan-notify-dot{width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:.6}
-
-/* CTA */
+/* cta */
 .cta-section{background:var(--dark);padding:100px 48px;text-align:center;position:relative;overflow:hidden}
 .cta-section::before{content:'';position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(200,145,28,.06) 0%,transparent 60%);pointer-events:none}
 .cta-inner{position:relative;max-width:600px;margin:0 auto}
@@ -273,15 +230,13 @@ h2 em{font-style:italic;color:var(--gold-3)}
 .btn-cta{font-family:var(--sans);font-size:14px;font-weight:500;padding:14px 30px;border-radius:10px;border:none;cursor:pointer;transition:all .22s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .btn-cta-primary{background:var(--gold);color:var(--black)}.btn-cta-primary:hover{background:var(--gold-2);transform:translateY(-2px);box-shadow:0 10px 28px rgba(200,145,28,.28)}
 .btn-cta-ghost{background:transparent;color:var(--light);border:1px solid var(--dim)}.btn-cta-ghost:hover{color:var(--white);border-color:rgba(255,255,255,.2)}
-
-/* DISCLAIMER */
+/* disclaimer */
 .disclaimer-section{background:var(--black);border-top:1px solid rgba(255,255,255,.04);padding:52px 48px}
 .disclaimer-inner{max-width:900px;margin:0 auto}
 .disclaimer-title{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
 .disclaimer-text{font-size:12px;font-weight:300;color:var(--dim);line-height:1.85}
 .disclaimer-text p{margin-bottom:10px}.disclaimer-text p:last-child{margin-bottom:0}
-
-/* FOOTER */
+/* footer */
 footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);padding:52px 48px 32px}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:44px}
 .footer-mark{width:28px;height:28px;background:var(--gold);border-radius:6px;display:grid;place-items:center;font-family:var(--serif);font-size:14px;color:var(--black)}
@@ -294,867 +249,529 @@ footer{background:var(--black);border-top:1px solid rgba(255,255,255,.04);paddin
 .footer-links a:hover{color:var(--light)}
 .footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:24px;border-top:1px solid rgba(255,255,255,.04);font-size:12px;color:var(--dim)}
 .footer-bottom a{color:var(--dim);text-decoration:none}.footer-bottom a:hover{color:var(--muted)}
-
-/* ANIMATIONS */
+/* animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .anim{opacity:0;animation:fadeUp .72s ease forwards}
 .d1{animation-delay:.08s}.d2{animation-delay:.18s}.d3{animation-delay:.28s}.d4{animation-delay:.4s}.d5{animation-delay:.54s}
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .72s ease,transform .72s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
-
-/* DESIGN CHANGE */
-.design-change-section{padding:100px 48px;background:var(--dark);position:relative;overflow:hidden}
-.design-change-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;border-radius:50%;background:radial-gradient(ellipse,rgba(45,111,212,.055) 0%,transparent 65%);pointer-events:none}
-.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.dc-timeline{display:flex;flex-direction:column;gap:0;position:relative}
-.dc-timeline::before{content:'';position:absolute;left:19px;top:20px;bottom:20px;width:1px;background:linear-gradient(to bottom,var(--dim),rgba(45,111,212,.3),var(--dim));pointer-events:none}
-.dc-event{display:flex;gap:20px;align-items:flex-start;padding:20px 0;position:relative}
-.dc-event:first-child{padding-top:0}
-.dc-event:last-child{padding-bottom:0}
-.dc-dot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;font-size:13px;position:relative;z-index:1;transition:all .25s}
-.dc-dot.original{background:var(--dark-3);border:1px solid var(--dim);color:var(--muted)}
-.dc-dot.flag{background:rgba(200,145,28,.12);border:1px solid rgba(200,145,28,.3);color:var(--gold)}
-.dc-dot.version{background:rgba(45,111,212,.1);border:1px solid rgba(45,111,212,.3);color:#6aa0e8}
-.dc-dot.notify{background:rgba(45,111,212,.1);border:1px solid rgba(45,111,212,.3);color:#6aa0e8}
-.dc-dot.approved{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.28);color:var(--green-2)}
-.dc-dot.locked{background:rgba(200,145,28,.08);border:1px solid rgba(200,145,28,.2);color:var(--gold-3)}
-.dc-event-body{flex:1;padding-top:7px}
-.dc-event-title{font-size:14px;font-weight:500;color:var(--white);margin-bottom:4px;line-height:1.3}
-.dc-event-desc{font-size:12px;font-weight:300;color:var(--muted);line-height:1.65}
-.dc-event-tag{display:inline-block;margin-top:7px;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:2px 9px}
-.dc-event-tag.gold{color:var(--gold);border:1px solid rgba(200,145,28,.22);background:var(--gold-dim)}
-.dc-event-tag.blue{color:#6aa0e8;border:1px solid rgba(45,111,212,.25);background:rgba(45,111,212,.08)}
-.dc-event-tag.green{color:var(--green-2);border:1px solid rgba(52,211,153,.22);background:rgba(52,211,153,.07)}
-
-.change-mock{background:var(--dark-2);border:1px solid rgba(45,111,212,.18);border-radius:18px;overflow:hidden}
-.change-mock-header{background:var(--dark-3);border-bottom:1px solid rgba(255,255,255,.05);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.change-mock-title{font-size:12px;font-weight:500;color:var(--white);display:flex;align-items:center;gap:8px}
-.change-badge{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:10px;background:rgba(200,145,28,.12);color:var(--gold);border:1px solid rgba(200,145,28,.22)}
-.change-mock-ref{font-size:10px;color:var(--muted)}
-.change-mock-body{padding:20px}
-.change-alert{background:rgba(200,145,28,.07);border:1px solid rgba(200,145,28,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px}
-.change-alert-title{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
-.change-alert-text{font-size:12px;font-weight:300;color:var(--light);line-height:1.6}
-.change-delta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
-.change-delta-cell{background:rgba(0,0,0,.25);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,.05)}
-.change-delta-lbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
-.change-delta-val{font-family:var(--serif);font-size:17px;font-weight:400}
-.change-delta-val.up{color:var(--gold-3)}
-.change-delta-val.dn{color:#6aa0e8}
-.change-delta-sub{font-size:10px;color:var(--muted);margin-top:2px}
-.change-approval{background:rgba(45,111,212,.06);border:1px solid rgba(45,111,212,.18);border-radius:10px;padding:14px 16px;margin-bottom:14px}
-.change-approval-title{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#6aa0e8;margin-bottom:8px}
-.change-approval-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.change-approval-row:last-child{border:none}
-.change-approval-k{color:var(--muted)}.change-approval-v{color:var(--light);font-weight:500}
-.change-lock-bar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);background:rgba(200,145,28,.05);border:1px solid rgba(200,145,28,.12);border-radius:8px;padding:10px 14px}
-.change-lock-icon{font-size:14px;color:var(--gold)}
-@media(max-width:1100px){.dc-split{grid-template-columns:1fr}}
-
-/* RESPONSIVE */
-@media(max-width:1100px){.hero-dashboard{display:none}.product-split{grid-template-columns:1fr}.proposal-split{grid-template-columns:1fr}.plans-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr 1fr}.callout-band{grid-template-columns:1fr}.callout-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.05);padding-right:0;padding-bottom:24px}.callout-item:last-child{border-bottom:none;padding-bottom:0}.numbers-inner{grid-template-columns:1fr 1fr}.num-item:nth-child(2){border-right:none}.num-item:nth-child(3){border-right:1px solid rgba(255,255,255,.06)}}
-@media(max-width:768px){nav{padding:0 20px}.nav-links{display:none}.section{padding:64px 20px}.hero{padding:96px 20px 56px}h1{font-size:40px}.workflow-steps{grid-template-columns:1fr;gap:28px}.workflow-steps::before{display:none}.engine-grid{grid-template-columns:1fr}.product-modules{grid-template-columns:1fr}footer{padding:36px 20px 20px}.footer-grid{grid-template-columns:1fr;gap:28px}.footer-bottom{flex-direction:column;gap:10px;text-align:center}.demo-section{padding:64px 20px}.demo-caption{flex-direction:column;align-items:flex-start}.disclaimer-section{padding:36px 20px}.plans-grid{grid-template-columns:1fr}.numbers-bar{padding:28px 20px}.numbers-inner{grid-template-columns:1fr 1fr;gap:20px}.num-item{border-right:none!important;border-bottom:1px solid rgba(255,255,255,.05);padding-bottom:20px}.demo-tabs{flex-wrap:wrap}}
+/* responsive */
+@media(max-width:1100px){.hero-dashboard{display:none}.product-split{grid-template-columns:1fr}.proposal-split{grid-template-columns:1fr}.plans-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){nav{padding:0 20px}.nav-links{display:none}.section{padding:64px 20px}.hero{padding:96px 20px 56px}h1{font-size:40px}.workflow-steps{grid-template-columns:1fr;gap:28px}.workflow-steps::before{display:none}.engine-grid{grid-template-columns:1fr}.product-modules{grid-template-columns:1fr}footer{padding:36px 20px 20px}.footer-grid{grid-template-columns:1fr;gap:28px}.footer-bottom{flex-direction:column;gap:10px;text-align:center}.demo-section{padding:64px 20px}.demo-caption{flex-direction:column;align-items:flex-start}.disclaimer-section{padding:36px 20px}.plans-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <nav>
-  <a href="#" class="nav-logo">
-    <div class="nav-mark">N</div>
-    <div>
-      <div class="nav-wordmark">Nova Metrics</div>
-      <div class="nav-product">Solar Intelligence</div>
-    </div>
-  </a>
-  <ul class="nav-links">
-    <li><a href="#demo">Demo</a></li>
-    <li><a href="#product">Platform</a></li>
-    <li><a href="#engine">How it works</a></li>
-    <li><a href="#job-portal">Job Portal</a></li>
-    <li><a href="#design-change">Design Changes</a></li>
-    <li><a href="#plans">Pricing</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="solar-intelligence.html" class="btn-nav btn-ghost">Sign in</a>
-    <a href="mailto:info@novametricsgroup.com" class="btn-nav btn-gold">Book a demo &rarr;</a>
-  </div>
+<a href="#" class="nav-logo">
+<div class="nav-mark">N</div>
+<div>
+<div class="nav-wordmark">Nova Metrics</div>
+<div class="nav-product">Solar Intelligence</div>
+</div>
+</a>
+<ul class="nav-links">
+<li><a href="#demo">Demo</a></li>
+<li><a href="#product">Platform</a></li>
+<li><a href="#engine">How it works</a></li>
+<li><a href="#job-portal">Job Portal</a></li>
+<li><a href="#plans">Pricing</a></li>
+</ul>
+<div class="nav-right">
+<a href="solar-intelligence.html" class="btn-nav btn-ghost">Sign in</a>
+<a href="mailto:sales@novametricsgroup.com" class="btn-nav btn-gold">Book a demo &#8594;</a>
+</div>
 </nav>
-
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-grid-bg"></div>
-  <div class="hero-glow-a"></div>
-  <div class="hero-glow-b"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow anim d1">
-      <span class="hero-eyebrow-badge">Now live</span>
-      Built for South African solar installers
-    </div>
-    <h1 class="anim d2">Run your entire<br>solar business from<br><em>one platform</em></h1>
-    <p class="hero-sub anim d3">Nova Metrics handles the work that slows installers down &#8212; designing systems, putting together proposals, tracking installations, and handing over completed projects. One platform, no spreadsheets, no dropped balls.</p>
-    <div class="hero-actions anim d4">
-      <a href="solar-intelligence.html" class="btn-hero btn-hero-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        Open Solar Intelligence
-      </a>
-      <a href="#demo" class="btn-hero btn-hero-outline">See it in action &darr;</a>
-    </div>
-    <div class="hero-proof anim d5">
-      <div class="proof-item"><span class="proof-dot"></span> Proposals in under 5 minutes</div>
-      <div class="proof-item"><span class="proof-dot"></span> Full installation pipeline management</div>
-      <div class="proof-item"><span class="proof-dot"></span> 2,440+ inverter models on record</div>
-      <div class="proof-item"><span class="proof-dot"></span> COC &amp; handover documentation</div>
-    </div>
-  </div>
-  <div class="hero-dashboard anim d4">
-    <div class="dash-card">
-      <div class="dc-label">System Design &#8212; Full House</div>
-      <div class="dc-value">11.25 kW</div>
-      <div class="dc-sub">DC array &middot; 25&times; Longi 450W &middot; DC/AC within range &#10003;</div>
-      <div class="dc-bar"><div class="dc-fill" style="width:84%"></div></div>
-      <div class="dc-row"><span class="dc-k">Battery</span><span class="dc-v">4&times; PowerGem 14.3kWh</span></div>
-      <div class="dc-row"><span class="dc-k">Inverter</span><span class="dc-v">Fronius Symo 10.0</span></div>
-    </div>
-    <div class="dash-card">
-      <div class="dc-label">Financial Model &#8212; 25-year</div>
-      <div class="dc-value">R 8,030</div>
-      <div class="dc-sub">Est. Year 1 savings &middot; NPV positive &middot; Strong IRR</div>
-      <div class="dc-row"><span class="dc-k">Est. real payback</span><span class="dc-v" style="color:var(--gold-3)">&#126;9 years</span></div>
-      <div class="dc-row"><span class="dc-k">Battery DoD</span><span class="dc-v"><span class="dc-badge">Within design range &#10003;</span></span></div>
-    </div>
-    <div class="dash-card">
-      <div class="dc-label">Job Portal &#8212; Active install</div>
-      <div class="dc-row"><span class="dc-k">Client</span><span class="dc-v">Fourscore Holdings</span></div>
-      <div class="dc-row"><span class="dc-k">Stage</span><span class="dc-v"><span class="dc-badge">Installation in progress</span></span></div>
-      <div class="dc-row"><span class="dc-k">COC</span><span class="dc-v">Awaiting &#8212; inspector booked</span></div>
-      <div class="pm-tracking" style="margin-top:12px"><div class="pm-track-dot"></div> Handover doc ready to print</div>
-    </div>
-  </div>
+<div class="hero-grid-bg"></div>
+<div class="hero-glow-a"></div>
+<div class="hero-glow-b"></div>
+<div class="hero-content">
+<div class="hero-eyebrow anim d1">
+<span class="hero-eyebrow-badge">Now live</span>
+End-to-end solar operations platform
+</div>
+<h1 class="anim d2">From first quote<br>to signed <em>handover</em> &#8212;<br>one platform</h1>
+<p class="hero-sub anim d3">Nova Metrics is the complete SaaS platform for South African solar installers. Design systems, generate AI proposals, manage installations, and hand over completed projects &#8212; all in one place.</p>
+<div class="hero-actions anim d4">
+<a href="solar-intelligence.html" class="btn-hero btn-hero-primary">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+Open Solar Intelligence
+</a>
+<a href="#demo" class="btn-hero btn-hero-outline">Watch 1-min demo &#8595;</a>
+</div>
+<div class="hero-proof anim d5">
+<div class="proof-item"><span class="proof-dot"></span> AI proposals in under 5 minutes</div>
+<div class="proof-item"><span class="proof-dot"></span> Full installation pipeline management</div>
+<div class="proof-item"><span class="proof-dot"></span> COC &amp; handover documentation</div>
+<div class="proof-item"><span class="proof-dot"></span> NRS 097-2-1 &amp; NERSA aligned</div>
+</div>
+</div>
+<div class="hero-dashboard anim d4">
+<div class="dash-card">
+<div class="dc-label">System Design &#8212; Full House</div>
+<div class="dc-value">11.25 kW</div>
+<div class="dc-sub">DC array &#183; 25&#215; Longi 450W &#183; DC/AC within range &#10003;</div>
+<div class="dc-bar"><div class="dc-fill" style="width:84%"></div></div>
+<div class="dc-row"><span class="dc-k">Battery</span><span class="dc-v">4&#215; PowerGem 14.3kWh</span></div>
+<div class="dc-row"><span class="dc-k">Inverter</span><span class="dc-v">Fronius Symo 10.0</span></div>
+</div>
+<div class="dash-card">
+<div class="dc-label">Financial Model &#8212; 25-year</div>
+<div class="dc-value">R 8,030</div>
+<div class="dc-sub">Est. Year 1 savings &#183; NPV positive &#183; Strong IRR</div>
+<div class="dc-row"><span class="dc-k">Est. real payback</span><span class="dc-v" style="color:var(--gold-3)">&#126;9 years</span></div>
+<div class="dc-row"><span class="dc-k">Battery DoD</span><span class="dc-v"><span class="dc-badge">Within design range &#10003;</span></span></div>
+</div>
+<div class="dash-card">
+<div class="dc-label">Job Portal &#8212; Active install</div>
+<div class="dc-row"><span class="dc-k">Client</span><span class="dc-v">Fourscore Holdings</span></div>
+<div class="dc-row"><span class="dc-k">Stage</span><span class="dc-v"><span class="dc-badge">Installation in progress</span></span></div>
+<div class="dc-row"><span class="dc-k">COC</span><span class="dc-v">Awaiting &#8212; inspector booked</span></div>
+<div class="pm-tracking" style="margin-top:12px"><div class="pm-track-dot"></div> Handover doc ready to print</div>
+</div>
+</div>
 </section>
-
 <!-- MARQUEE -->
 <div class="marquee-strip">
-  <div class="marquee-track">
-    <div class="marquee-item">System Sizing Engine <span class="m-dot"></span> Battery Validation <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> Branded Proposals <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> 2,440+ Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Dashboard <span class="m-dot"></span> Job Portal <span class="m-dot"></span> Site Visit Assessment <span class="m-dot"></span> Installation Checklist <span class="m-dot"></span> COC Tracking <span class="m-dot"></span> Customer Handover Documents <span class="m-dot"></span> 152 SA Locations <span class="m-dot"></span></div>
-    <div class="marquee-item" aria-hidden="true">System Sizing Engine <span class="m-dot"></span> Battery Validation <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> Branded Proposals <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> 2,440+ Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Dashboard <span class="m-dot"></span> Job Portal <span class="m-dot"></span> Site Visit Assessment <span class="m-dot"></span> Installation Checklist <span class="m-dot"></span> COC Tracking <span class="m-dot"></span> Customer Handover Documents <span class="m-dot"></span> 152 SA Locations <span class="m-dot"></span></div>
-  </div>
+<div class="marquee-track">
+<div class="marquee-item">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span> Job Portal <span class="m-dot"></span> Site Visit Assessment <span class="m-dot"></span> Installation Checklist <span class="m-dot"></span> COC Tracking <span class="m-dot"></span> Customer Handover Documents <span class="m-dot"></span></div>
+<div class="marquee-item" aria-hidden="true">System Sizing Engine <span class="m-dot"></span> Battery Intelligence <span class="m-dot"></span> NRS 097-2-1 Alignment <span class="m-dot"></span> NERSA SSEG Guidance <span class="m-dot"></span> AI Proposal Generation <span class="m-dot"></span> NPV &amp; IRR Modelling <span class="m-dot"></span> 25-Year Financial Model <span class="m-dot"></span> Tariff Escalation Scenarios <span class="m-dot"></span> Master Inverter Compliance Register <span class="m-dot"></span> Proposal Tracking <span class="m-dot"></span> Pipeline Analytics <span class="m-dot"></span> Job Portal <span class="m-dot"></span> Site Visit Assessment <span class="m-dot"></span> Installation Checklist <span class="m-dot"></span> COC Tracking <span class="m-dot"></span> Customer Handover Documents <span class="m-dot"></span></div>
 </div>
-
-<!-- NUMBERS BAR -->
-<div class="numbers-bar">
-  <div class="numbers-inner">
-    <div class="num-item reveal">
-      <div class="num-val">2,440<span style="font-size:22px;color:var(--gold)">+</span></div>
-      <div class="num-label">Inverter models in the SA<br>Master Compliance Register</div>
-    </div>
-    <div class="num-item reveal">
-      <div class="num-val">152</div>
-      <div class="num-label">South African locations with<br>irradiance data built in</div>
-    </div>
-    <div class="num-item reveal">
-      <div class="num-val">25<span style="font-size:22px;color:var(--gold)">yr</span></div>
-      <div class="num-label">Financial projection horizon<br>with NERSA-aligned escalation</div>
-    </div>
-    <div class="num-item reveal">
-      <div class="num-val">5<span style="font-size:22px;color:var(--gold)">min</span></div>
-      <div class="num-label">From first input to<br>a proposal ready to send</div>
-    </div>
-  </div>
 </div>
-
-<!-- DEMO -->
+<!-- DEMO VIDEO -->
 <section class="demo-section" id="demo">
-  <div class="demo-inner">
-    <div class="demo-header">
-      <div class="eyebrow reveal" style="justify-content:center">See it yourself</div>
-      <h2 class="reveal">The platform,<br><em>in practice</em></h2>
-      <p class="section-body reveal" style="max-width:500px;margin:0 auto 0">Watch the overview or open the interactive demo below and click through the platform yourself &#8212; no login required.</p>
-    </div>
-
-    <div class="demo-tabs reveal">
-      <button class="demo-tab active" onclick="switchTab('video',this)">&#9654;&ensp;Platform overview</button>
-      <button class="demo-tab" onclick="switchTab('interactive',this)">&#9654;&ensp;Interactive demo</button>
-    </div>
-
-    <div class="demo-frame-wrap reveal">
-      <div class="demo-corner-tr"></div>
-      <div class="demo-corner-bl"></div>
-      <div class="demo-shell">
-        <div class="demo-chrome">
-          <div class="demo-chrome-dots"><div class="demo-chrome-dot"></div><div class="demo-chrome-dot"></div><div class="demo-chrome-dot"></div></div>
-          <div class="demo-chrome-bar">
-            <svg class="demo-chrome-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span class="demo-chrome-url" id="chromeUrl">app.novametricsgroup.com &middot; Solar Intelligence</span>
-            <span class="demo-chrome-badge">Live Platform</span>
-          </div>
-        </div>
-
-        <!-- VIDEO PANEL -->
-        <div class="demo-panel active" id="panel-video">
-          <div class="demo-video-wrap" id="demoVideoWrap">
-            <video id="demoVideo" src="https://zloxcqrhkcohheeixfns.supabase.co/storage/v1/object/public/pdf_proposals/Solar%20Intelligence%20Overview.mp4" preload="metadata" playsinline muted></video>
-            <div class="demo-play-overlay" id="demoPlayOverlay">
-              <div class="demo-play-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="var(--black)" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></div>
-              <span class="demo-play-label">Play overview demo</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- INTERACTIVE PANEL -->
-        <div class="demo-panel" id="panel-interactive">
-          <div class="demo-iframe-wrap" id="iframeWrap">
-            <div class="demo-iframe-placeholder" id="iframePlaceholder">
-              <p>The interactive demo runs the full Solar Intelligence platform in your browser. Click below to open it &#8212; no account needed.</p>
-              <a href="demo.html" target="_blank" class="launch-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                Open interactive demo
-              </a>
-              <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
-                <span style="font-size:12px;color:var(--muted)">or load inline&ensp;&darr;</span>
-                <button onclick="loadIframe()" style="font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 14px;border-radius:7px;background:var(--gold-dim);border:1px solid rgba(200,145,28,.25);color:var(--gold-3);cursor:pointer;">Load in page</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="demo-statusbar">
-          <div class="demo-status-dot"></div>
-          <span class="demo-status-text" id="demoStatusText">Ready to play &middot; Solar Intelligence Overview</span>
-          <span class="demo-status-tag">Nova Metrics</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="demo-caption reveal">
-      <div class="demo-caption-left">
-        <div class="demo-caption-icon">&#9654;</div>
-        <div class="demo-caption-text"><strong>Full platform walkthrough</strong> &#8212; from client intake and load entry through system sizing, financial modelling, and proposal generation. Switch to the interactive tab to click through the platform yourself.</div>
-      </div>
-      <div class="demo-caption-right">
-        <div class="demo-pill"><span class="demo-pill-dot"></span> No login needed</div>
-        <div class="demo-pill"><span class="demo-pill-dot"></span> Full platform</div>
-      </div>
-    </div>
-  </div>
+<div class="demo-inner">
+<div class="demo-header">
+<div class="eyebrow reveal">Platform Overview</div>
+<h2 class="reveal">See <em>Solar Intelligence</em><br>in action</h2>
+<p class="section-body reveal" style="max-width:500px;margin:0 auto">Watch how Nova Metrics transforms a client load profile into a precision-engineered system design and a ready-to-send proposal &#8212; in under five minutes.</p>
+</div>
+<div class="demo-frame-wrap reveal">
+<div class="demo-corner-tr"></div>
+<div class="demo-corner-bl"></div>
+<div class="demo-shell">
+<div class="demo-chrome">
+<div class="demo-chrome-dots"><div class="demo-chrome-dot"></div><div class="demo-chrome-dot"></div><div class="demo-chrome-dot"></div></div>
+<div class="demo-chrome-bar">
+<svg class="demo-chrome-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+<span class="demo-chrome-url">app.novametricsgroup.com &#183; Solar Intelligence</span>
+<span class="demo-chrome-badge">Live Platform</span>
+</div>
+</div>
+<div class="demo-video-wrap" id="demoVideoWrap">
+<video id="demoVideo" src="https://zloxcqrhkcohheeixfns.supabase.co/storage/v1/object/public/pdf_proposals/Solar%20Intelligence%20Overview.mp4" preload="metadata" playsinline muted></video>
+<div class="demo-play-overlay" id="demoPlayOverlay">
+<div class="demo-play-btn"><svg width="26" height="26" viewBox="0 0 24 24" fill="var(--black)" stroke="none"><polygon points="5,3 19,12 5,21"/></svg></div>
+<span class="demo-play-label">Play overview demo</span>
+</div>
+</div>
+<div class="demo-statusbar">
+<div class="demo-status-dot"></div>
+<span class="demo-status-text" id="demoStatusText">Ready to play &#183; Solar Intelligence Overview</span>
+<span class="demo-status-tag">Nova Metrics</span>
+</div>
+</div>
+</div>
+<div class="demo-caption reveal">
+<div class="demo-caption-left">
+<div class="demo-caption-icon">&#9654;</div>
+<div class="demo-caption-text"><strong>Full platform walkthrough</strong> &#8212; from client intake and load entry through system sizing, financial modelling, and AI proposal generation. No sound required.</div>
+</div>
+<div class="demo-caption-right">
+<div class="demo-pill"><span class="demo-pill-dot"></span> No sound</div>
+<div class="demo-pill"><span class="demo-pill-dot"></span> 1+ min overview</div>
+</div>
+</div>
+</div>
 </section>
-
 <!-- PRODUCT OVERVIEW -->
 <section class="section" id="product" style="background:var(--dark)">
-  <div class="inner">
-    <div class="product-split">
-      <div>
-        <div class="eyebrow reveal">The Platform</div>
-        <h2 class="reveal">Everything an installer<br>needs, <em>nothing they don't.</em></h2>
-        <p class="section-body reveal" style="margin-bottom:20px">Nova Metrics covers the entire lifecycle of a solar project &#8212; from designing a system and winning the client, through managing the installation on-site and producing a proper handover. The whole business, in one place.</p>
-        <p class="section-body reveal">The platform does the heavy lifting: structured engineering calculations, your hardware catalogue, 152 SA locations, a 25-year financial model, and a branded proposal &#8212; all connected. You bring the expertise; Nova Metrics makes sure it shows in every deliverable you produce.</p>
-        <div style="margin-top:36px" class="reveal"><a href="solar-intelligence.html" class="btn-hero btn-hero-primary" style="display:inline-flex">Open the platform &rarr;</a></div>
-      </div>
-      <div class="product-modules">
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#9889;</div>
-          <div class="mod-title">System Sizing Engine</div>
-          <div class="mod-desc">Solar arrays, batteries, and inverters sized from actual load profiles &#8212; from Essential Only (1.5 kW) to Large Commercial (15 kW). Multi-gate engineering validation. DC/AC ratios, autonomy, battery DoD all checked before a design is accepted.</div>
-        </div>
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#128267;</div>
-          <div class="mod-title">Battery Intelligence</div>
-          <div class="mod-desc">Selects the right LiFePO4 configuration based on capacity headroom, depth-of-discharge, and autonomy runtime. Designed to maximise cycle life, not just hit a kWh number. Industry-standard 92% round-trip efficiency applied by default.</div>
-        </div>
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#128200;</div>
-          <div class="mod-title">Financial Modelling</div>
-          <div class="mod-desc">25-year indicative projections: NERSA-aligned tariff escalation, NPV, IRR, O&amp;M provisions, insurance estimates, and battery lifecycle costs. Engineering-grade outputs that clients can actually understand and act on.</div>
-        </div>
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#128196;</div>
-          <div class="mod-title">Branded Proposals</div>
-          <div class="mod-desc">Every calculated figure feeds into a professional, branded PDF proposal with your logo and company colours. System specs, financials, environmental impact, NERSA SSEG status &#8212; one click, client-ready. The narrative is written for you.</div>
-        </div>
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#128203;</div>
-          <div class="mod-title">Proposal Portal &amp; Tracking</div>
-          <div class="mod-desc">Send, track, and manage proposals from a dedicated dashboard. See when a client opens the email, views the proposal, or downloads the PDF. Pipeline view with Hot, Warm, Cold priority signals so you know who to follow up with.</div>
-        </div>
-        <div class="mod-card reveal">
-          <div class="mod-icon">&#128295;</div>
-          <div class="mod-title">Job Portal</div>
-          <div class="mod-desc">Won the deal? It moves straight into the Job Portal. Site visit assessment, installation checklists, COC tracking, and a digital handover certificate &#8212; all structured, all connected, nothing falling through the gaps.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="inner">
+<div class="product-split">
+<div>
+<div class="eyebrow reveal">The Platform</div>
+<h2 class="reveal">One platform.<br><em>The entire pipeline.</em></h2>
+<p class="section-body reveal" style="margin-bottom:20px">Nova Metrics covers every stage of a solar installer&#8217;s business &#8212; from designing a system and winning the client, through to managing the installation on-site and handing over a completed project with the right documentation.</p>
+<p class="section-body reveal">Designed in alignment with South African engineering standards: NRS 097-2-1 inverter compliance, NERSA SSEG registration, LiFePO4 battery parameters, 25-year financial modelling &#8212; and now a complete post-sale installation and handover workflow.</p>
+<div style="margin-top:36px" class="reveal"><a href="solar-intelligence.html" class="btn-hero btn-hero-primary" style="display:inline-flex">Open the platform &#8594;</a></div>
+</div>
+<div class="product-modules">
+<div class="mod-card reveal">
+<div class="mod-icon">&#9889;</div>
+<div class="mod-title">System Sizing Engine</div>
+<div class="mod-desc">Sizes solar arrays, batteries, and inverters from actual load profiles. Multi-gate engineering validation against South African performance benchmarks. DC/AC ratios aligned with NRS 097-2-1 parameters.</div>
+</div>
+<div class="mod-card reveal">
+<div class="mod-icon">&#128267;</div>
+<div class="mod-title">Battery Intelligence</div>
+<div class="mod-desc">Selects the optimal LiFePO4 configuration through capacity headroom, depth-of-discharge, and autonomy runtime gates. Prefers designs that maximise cycle life. Industry-standard round-trip efficiency applied.</div>
+</div>
+<div class="mod-card reveal">
+<div class="mod-icon">&#128200;</div>
+<div class="mod-title">Financial Modelling</div>
+<div class="mod-desc">Engineering-grade 25-year indicative projections: NERSA-aligned tariff escalation, NPV, IRR, O&amp;M provisions, insurance estimates, and full battery lifecycle cost modelling &#8212; all as indicative outputs.</div>
+</div>
+<div class="mod-card reveal">
+<div class="mod-icon">&#128196;</div>
+<div class="mod-title">AI Proposal Engine</div>
+<div class="mod-desc">Every calculation feeds an AI-generated, branded PDF proposal. System specs, financial projections, NERSA SSEG alignment, environmental impact &#8212; one click, client-ready.</div>
+</div>
+<div class="mod-card reveal">
+<div class="mod-icon">&#128203;</div>
+<div class="mod-title">Proposal Portal &amp; Analytics</div>
+<div class="mod-desc">Send, track, and manage proposals from a dedicated dashboard. Pipeline view, engagement tracking (views, downloads, read time), and follow-up priority signals &#8212; Hot, Warm, Cold.</div>
+</div>
+<div class="mod-card reveal">
+<div class="mod-icon">&#128295;</div>
+<div class="mod-title">Job Portal</div>
+<div class="mod-desc">Once a proposal is won, the job moves into the Job Portal. Site visit assessment, installation preparation, structured installation checklist, final sign-off, COC tracking, and digital customer handover document &#8212; all in one place.</div>
+</div>
+</div>
+</div>
+</div>
 </section>
-
-<!-- HOW THE ENGINE WORKS -->
+<!-- HOW IT WORKS: PROPOSAL PIPELINE -->
 <section class="section" id="engine">
-  <div class="inner">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
-      <div>
-        <div class="eyebrow reveal">Engineering Methodology</div>
-        <h2 class="reveal">Built on structured<br><em>engineering logic</em></h2>
-      </div>
-      <p class="section-body reveal" style="max-width:360px">Every number in a Nova Metrics design is derived from structured calculations &#8212; not rules of thumb. The platform meets NRS 097-2-1 and NERSA SSEG standards because it was built that way, not because it was added as a compliance layer afterwards.</p>
-    </div>
-    <div class="engine-grid">
-      <div class="eng-cell reveal">
-        <div class="eng-num">01</div>
-        <div class="eng-title">Load-based solar sizing</div>
-        <div class="eng-desc">Solar is sized to cover daytime consumption plus overnight battery recharge, using industry-standard performance ratios and system availability benchmarks. Matched to the most suitable panel configuration from your live catalogue &#8212; not a generic estimate.</div>
-        <span class="eng-tag">Solar Array</span>
-      </div>
-      <div class="eng-cell reveal">
-        <div class="eng-num">02</div>
-        <div class="eng-title">Multi-gate battery validation</div>
-        <div class="eng-desc">Three checks before accepting any battery configuration: capacity headroom above required storage, depth-of-discharge within design targets, and guaranteed autonomy runtime. Configured to protect LiFePO4 cycle life with real per-battery DoD and efficiency values.</div>
-        <span class="eng-tag">Battery</span>
-      </div>
-      <div class="eng-cell reveal">
-        <div class="eng-num">03</div>
-        <div class="eng-title">Inverter sizing &amp; compliance check</div>
-        <div class="eng-desc">Inverter sized with an engineering safety margin over peak load. DC/AC ratio validated in alignment with NRS 097-2-1 parameters. Every inverter in your catalogue is cross-referenced against the South African Master Inverter Compliance Register &#8212; 2,440+ certified models on record.</div>
-        <span class="eng-tag">Inverter &middot; NRS 097-2-1</span>
-      </div>
-      <div class="eng-cell reveal">
-        <div class="eng-num">04</div>
-        <div class="eng-title">365-day net yield modelling</div>
-        <div class="eng-desc">Annual production estimates apply performance ratios, system availability factors, and panel degradation assumptions aligned with South African norms. Location-specific irradiance pulled from 152 SA locations. Specific yield benchmarked against national reference values.</div>
-        <span class="eng-tag">Yield</span>
-      </div>
-      <div class="eng-cell reveal">
-        <div class="eng-num">05</div>
-        <div class="eng-title">Engineering-grade financials</div>
-        <div class="eng-desc">25-year indicative projections using NERSA-aligned tariff escalation, NPV and IRR modelling with industry-standard discount rates, maintenance provisions, insurance estimates, and battery replacement lifecycle costs. All figures clearly marked as indicative estimates.</div>
-        <span class="eng-tag">NPV &middot; IRR &middot; Financials</span>
-      </div>
-      <div class="eng-cell reveal">
-        <div class="eng-num">06</div>
-        <div class="eng-title">Engagement pipeline intelligence</div>
-        <div class="eng-desc">Once a proposal is sent, the platform tracks email opens, proposal views, PDF downloads, and read time. A follow-up priority signal &#8212; Hot, Warm, Cold &#8212; tells you exactly who to call and when, without manually tracking every lead in a spreadsheet.</div>
-        <span class="eng-tag">Analytics</span>
-      </div>
-    </div>
-
-    <div class="callout-band reveal">
-      <div class="callout-item">
-        <div class="callout-lbl">On NRS 097-2-1</div>
-        <div class="callout-val" style="font-size:22px;font-family:var(--sans);font-weight:300;color:var(--light)">Built in,<br>not bolted on</div>
-        <div class="callout-desc">The platform meets NRS 097-2-1 because the sizing logic was designed around it. Inverter DC/AC ratios, battery DoD limits, and grid connection guidance are part of the calculation model &#8212; not a checkbox you tick afterwards.</div>
-      </div>
-      <div class="callout-item">
-        <div class="callout-lbl">On proposals</div>
-        <div class="callout-val" style="font-size:22px;font-family:var(--sans);font-weight:300;color:var(--light)">The numbers<br>come first</div>
-        <div class="callout-desc">The engineering calculations run first. The proposal narrative is then written around those verified numbers. Clients read a professional document &#8212; but everything in it is grounded in a structured engineering model, not a language model guessing.</div>
-      </div>
-      <div class="callout-item">
-        <div class="callout-lbl">On installers</div>
-        <div class="callout-val" style="font-size:22px;font-family:var(--sans);font-weight:300;color:var(--light)">You stay<br>in control</div>
-        <div class="callout-desc">Your hardware catalogue, your branding, your margins. The platform works from what you upload &#8212; your panels, inverters, and batteries drive every design. Nova Metrics handles the calculation and the paperwork; you handle the relationship and the installation.</div>
-      </div>
-    </div>
-  </div>
+<div class="inner">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:40px;flex-wrap:wrap">
+<div>
+<div class="eyebrow reveal">Decision Engineering</div>
+<h2 class="reveal">Designed to produce the<br><em>right answer</em> every time</h2>
+</div>
+<p class="section-body reveal" style="max-width:340px">Every number in a Nova Metrics proposal is derived from structured engineering models &#8212; not rules of thumb. Defensible, repeatable, and aligned with South African standards by design.</p>
+</div>
+<div class="engine-grid">
+<div class="eng-cell reveal">
+<div class="eng-num">01</div>
+<div class="eng-title">Load-based solar sizing</div>
+<div class="eng-desc">Solar is sized to cover daytime consumption plus overnight battery recharge &#8212; not a rough multiple of peak load. Calculated using industry-standard performance ratios and system availability benchmarks, then matched to the most suitable panel configuration from your live catalogue.</div>
+<span class="eng-tag">Solar Array</span>
+</div>
+<div class="eng-cell reveal">
+<div class="eng-num">02</div>
+<div class="eng-title">LiFePO4 battery design validation</div>
+<div class="eng-desc">Multi-gate engineering checks before accepting any battery configuration: capacity headroom, depth-of-discharge within design targets, and guaranteed autonomy runtime. Optimised to maximise LiFePO4 cycle life with industry-standard round-trip efficiency applied.</div>
+<span class="eng-tag">Battery</span>
+</div>
+<div class="eng-cell reveal">
+<div class="eng-num">03</div>
+<div class="eng-title">NRS 097-2-1 alignment check</div>
+<div class="eng-desc">Inverter sized with engineering safety margin applied to peak load. DC/AC ratio validated in alignment with NRS 097-2-1 parameters. Every uploaded inverter is automatically cross-referenced against the South African Master Inverter Compliance Register (2,440+ certified models).</div>
+<span class="eng-tag">Inverter &#183; NRS 097-2-1</span>
+</div>
+<div class="eng-cell reveal">
+<div class="eng-num">04</div>
+<div class="eng-title">365-day net yield modelling</div>
+<div class="eng-desc">Annual production estimates apply performance ratios, system availability factors, and panel degradation assumptions aligned with South African industry norms. Location-specific irradiance from a 150+ location South African database. Specific yield benchmarked against national references.</div>
+<span class="eng-tag">Yield</span>
+</div>
+<div class="eng-cell reveal">
+<div class="eng-num">05</div>
+<div class="eng-title">Engineering-grade financial projections</div>
+<div class="eng-desc">25-year indicative projections using NERSA-aligned tariff escalation, industry-standard discount rates for NPV, IRR modelling, maintenance provisions, insurance estimates, and battery replacement lifecycle costs. All outputs are indicative estimates subject to site conditions and tariff changes.</div>
+<span class="eng-tag">NPV &#183; IRR &#183; Financials</span>
+</div>
+<div class="eng-cell reveal">
+<div class="eng-num">06</div>
+<div class="eng-title">Engagement pipeline intelligence</div>
+<div class="eng-desc">After a proposal is sent, the platform tracks email opens, proposal views, PDF downloads, and read time &#8212; subject to applicable privacy policies. Follow-up priority signal (Hot, Warm, Cold) so installers know exactly who to contact and when.</div>
+<span class="eng-tag">Analytics</span>
+</div>
+</div>
+</div>
 </section>
-
 <!-- PROPOSAL WORKFLOW -->
 <section class="section" style="background:var(--dark)">
-  <div class="inner">
-    <div class="eyebrow reveal">Proposal Workflow</div>
-    <h2 class="reveal">From client intake to<br><em>proposal in the inbox</em></h2>
-    <p class="section-body reveal">A guided workflow that takes less than five minutes per client &#8212; from entering a load profile to an engineering-grade, branded PDF ready to send.</p>
-    <div class="workflow-steps">
-      <div class="w-step reveal"><div class="w-num">1</div><div class="w-title">Add the client</div><div class="w-desc">Name, email, address, segment. Saved instantly to your pipeline.</div></div>
-      <div class="w-step reveal"><div class="w-num">2</div><div class="w-title">Enter project inputs</div><div class="w-desc">Location (152 SA locations), load profile, autonomy hours, tariff &#8212; driven by your hardware catalogue.</div></div>
-      <div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Platform designs the system</div><div class="w-desc">Panels, inverter, battery selected and validated automatically. NRS 097-2-1 and NERSA SSEG alignment checked at every gate.</div></div>
-      <div class="w-step reveal"><div class="w-num">4</div><div class="w-title">Review &amp; generate</div><div class="w-desc">Inspect the Solar, Battery, Inverter, Financials, and Proposal tabs. Adjust if needed, then generate the branded PDF in one click.</div></div>
-      <div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Send &amp; track</div><div class="w-desc">Email the proposal directly. Track views, downloads, and read time from the Proposal Portal in real time.</div></div>
-    </div>
-  </div>
+<div class="inner">
+<div class="eyebrow reveal">Proposal Workflow</div>
+<h2 class="reveal">From client intake to<br><em>signed proposal</em></h2>
+<p class="section-body reveal">A guided workflow that takes less than five minutes per client &#8212; from entering a load profile to an engineering-grade, AI-enhanced PDF in the client&#8217;s inbox.</p>
+<div class="workflow-steps">
+<div class="w-step reveal"><div class="w-num">1</div><div class="w-title">Add the client</div><div class="w-desc">Enter name, email, address. Saved instantly to your pipeline.</div></div>
+<div class="w-step reveal"><div class="w-num">2</div><div class="w-title">Enter project inputs</div><div class="w-desc">Location, load profile, autonomy hours, tariff &#8212; all driven by your live catalogue.</div></div>
+<div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Platform designs the system</div><div class="w-desc">Panels, inverter, battery selected and validated in alignment with NRS 097-2-1 and NERSA SSEG guidelines automatically.</div></div>
+<div class="w-step reveal"><div class="w-num">4</div><div class="w-title">Review &amp; generate</div><div class="w-desc">Inspect Solar, Battery, Inverter, Financials, Environment, and Proposal tabs. Then generate the branded PDF.</div></div>
+<div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Send &amp; track</div><div class="w-desc">Email the proposal in one click. Track views and downloads from the Proposal Portal in real time.</div></div>
+</div>
+</div>
 </section>
-
-<!-- PROPOSAL ENGINE DETAIL -->
+<!-- PROPOSAL ENGINE SECTION -->
 <section class="section" id="proposal">
-  <div class="inner">
-    <div class="proposal-split">
-      <div>
-        <div class="eyebrow reveal">Proposals</div>
-        <h2 class="reveal">A proposal that<br><em>looks the part</em></h2>
-        <p class="section-body reveal" style="margin-bottom:24px">The engineering output &#8212; system size, financials, components, yield &#8212; is all calculated first. The proposal narrative is then written around those verified numbers, structured into sections any client can follow.</p>
-        <p class="section-body reveal">Clients receive a document that reads like it came from a professional engineering firm. Because it was built on exactly that standard of data. Your branding on the cover, your hardware in the BOM, your identity on every page.</p>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> Your logo, colours, and contact details on every page</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> System specs, NPV/IRR financials, environmental estimates</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> Professional narrative written around your calculated numbers</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> NERSA SSEG alignment status shown automatically</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> Delivered in seconds, engagement tracked automatically</li>
-        </ul>
-      </div>
-      <div class="proposal-mock reveal">
-        <div class="pm-header">
-          <div class="pm-logo"><div class="pm-mark">N</div><div class="pm-name">Nova Metrics</div></div>
-          <span class="pm-status">Proposal Ready</span>
-        </div>
-        <div class="pm-client">Solar Proposal &#8212; Fourscore</div>
-        <div class="pm-stats">
-          <div class="pm-stat"><div class="pm-stat-lbl">System size</div><div class="pm-stat-val">11.25 kW</div><div class="pm-stat-sub">DC &middot; ratio within range &#10003;</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">Est. Year 1 savings</div><div class="pm-stat-val">R8,030</div><div class="pm-stat-sub">vs. current Eskom bill</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">NPV analysis</div><div class="pm-stat-val">Positive</div><div class="pm-stat-sub">25-year projection</div></div>
-          <div class="pm-stat"><div class="pm-stat-lbl">Est. real payback</div><div class="pm-stat-val">&#126;9 yrs</div><div class="pm-stat-sub">Escalating tariff scenario</div></div>
-        </div>
-        <div class="pm-components">
-          <div class="pm-comp-title">Components</div>
-          <div class="pm-comp-row"><span class="pm-comp-k">Solar</span><span class="pm-comp-v">25&times; Longi 450W</span></div>
-          <div class="pm-comp-row"><span class="pm-comp-k">Inverter</span><span class="pm-comp-v">Fronius Symo 10.0 &#8212; NRS 097 aligned &#10003;</span></div>
-          <div class="pm-comp-row"><span class="pm-comp-k">Battery</span><span class="pm-comp-v">4&times; PowerGem 14.3kWh &middot; DoD: within range &#10003;</span></div>
-        </div>
-        <div class="pm-tracking"><div class="pm-track-dot"></div> Proposal delivered &middot; viewed 3&times; &middot; PDF downloaded</div>
-      </div>
-    </div>
-  </div>
+<div class="inner">
+<div class="proposal-split">
+<div>
+<div class="eyebrow reveal">Proposal Engine</div>
+<h2 class="reveal">A proposal that<br><em>closes</em> the deal</h2>
+<p class="section-body reveal" style="margin-bottom:24px">Every calculated figure feeds our AI pipeline, which writes the technical narrative, financial commentary, and call-to-action &#8212; then renders it into a branded PDF with your company identity.</p>
+<p class="section-body reveal">Clients receive a document that reads like it was prepared by a professional engineering firm &#8212; because it was built on exactly that standard of structured, repeatable data.</p>
+<ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> Branded with your logo and company colours</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> System specs, NPV/IRR indicative financials, environmental estimates</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> AI-written commentary in every section</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> NERSA SSEG alignment status shown automatically</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--gold);font-size:11px;font-weight:600">&#10003;</span> Delivered in seconds, engagement tracked automatically</li>
+</ul>
+</div>
+<div class="proposal-mock reveal">
+<div class="pm-header">
+<div class="pm-logo"><div class="pm-mark">N</div><div class="pm-name">Nova Metrics</div></div>
+<span class="pm-status">Proposal Ready</span>
+</div>
+<div class="pm-client">Solar Proposal &#8212; Fourscore</div>
+<div class="pm-stats">
+<div class="pm-stat"><div class="pm-stat-lbl">System size</div><div class="pm-stat-val">11.25 kW</div><div class="pm-stat-sub">DC &#183; ratio within range &#10003;</div></div>
+<div class="pm-stat"><div class="pm-stat-lbl">Est. Year 1 savings</div><div class="pm-stat-val">R8,030</div><div class="pm-stat-sub">vs. current Eskom bill</div></div>
+<div class="pm-stat"><div class="pm-stat-lbl">NPV analysis</div><div class="pm-stat-val">Positive</div><div class="pm-stat-sub">25-year projection</div></div>
+<div class="pm-stat"><div class="pm-stat-lbl">Est. real payback</div><div class="pm-stat-val">&#126;9 yrs</div><div class="pm-stat-sub">Escalating tariff scenario</div></div>
+</div>
+<div class="pm-components">
+<div class="pm-comp-title">Components</div>
+<div class="pm-comp-row"><span class="pm-comp-k">Solar</span><span class="pm-comp-v">25&#215; Longi 450W</span></div>
+<div class="pm-comp-row"><span class="pm-comp-k">Inverter</span><span class="pm-comp-v">Fronius Symo 10.0 &#8212; NRS 097 aligned &#10003;</span></div>
+<div class="pm-comp-row"><span class="pm-comp-k">Battery</span><span class="pm-comp-v">4&#215; PowerGem 14.3kWh &#183; DoD: within range &#10003;</span></div>
+</div>
+<div class="pm-tracking"><div class="pm-track-dot"></div> Proposal delivered &#183; viewed 3&#215; &#183; PDF downloaded</div>
+</div>
+</div>
+</div>
 </section>
-
-<!-- JOB PORTAL -->
+<!-- JOB PORTAL SECTION -->
 <section class="section" id="job-portal" style="background:var(--dark)">
-  <div class="inner">
-    <div class="proposal-split">
-      <div>
-        <div class="eyebrow reveal" style="color:var(--green-2)">Job Portal</div>
-        <h2 class="reveal">From won deal to<br><em>signed handover</em></h2>
-        <p class="section-body reveal" style="margin-bottom:24px">Once a proposal is accepted, the job moves automatically into the Job Portal &#8212; a structured installation workspace that tracks every step from site visit through to the customer signing off on their completed system.</p>
-        <p class="section-body reveal">No more chasing jobs on WhatsApp or tracking installations in spreadsheets. Every active job has a pipeline view, structured checklists, site visit records, and a handover certificate ready to print when you're done.</p>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Structured site visit form &#8212; roof, electrical, shading, DB board, cable run</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Team assignment, install date, and exact equipment spec</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Design change management &#8212; flag, version, delta, client approval loop</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Full installation checklist (pre-install, structural, electrical, commissioning)</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> COC number, issuing electrician, and grid approval tracking</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Printable customer handover certificate with warranty details</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Full activity log for every job from first contact to handover</li>
-        </ul>
-        <div style="margin-top:32px" class="reveal">
-          <a href="job-portal.html" class="btn-hero" style="background:rgba(52,211,153,.12);color:var(--green-2);border:1px solid rgba(52,211,153,.25);display:inline-flex">
-            &#9661; Open Job Portal
-          </a>
-        </div>
-      </div>
-      <div class="job-mock reveal">
-        <div class="job-mock-topbar">
-          <div class="job-mock-title">
-            <span>&#9672; JOB PORTAL</span>
-            <span class="job-mock-badge">Active</span>
-          </div>
-          <div class="job-mock-stage">Fourscore Holdings &middot; REF 000042</div>
-        </div>
-        <div class="job-pipeline-bar">
-          <div class="jp-node"><div class="jp-dot done">&#10003;</div><div class="jp-label" style="color:var(--green-2)">Site Visit</div></div>
-          <div class="jp-line done"></div>
-          <div class="jp-node"><div class="jp-dot done">&#10003;</div><div class="jp-label" style="color:var(--green-2)">Prep</div></div>
-          <div class="jp-line done"></div>
-          <div class="jp-node"><div class="jp-dot active">3</div><div class="jp-label" style="color:var(--gold)">Install</div></div>
-          <div class="jp-line"></div>
-          <div class="jp-node"><div class="jp-dot pending">4</div><div class="jp-label">Sign-off</div></div>
-          <div class="jp-line"></div>
-          <div class="jp-node"><div class="jp-dot pending">5</div><div class="jp-label">Handover</div></div>
-        </div>
-        <div class="job-mock-body">
-          <div class="job-check-section">
-            <div class="job-check-title">Electrical Checklist</div>
-            <div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>DC cabling routed and secured</div>
-            <div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>MC4 connectors crimped and tested</div>
-            <div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>Inverter mounted and secured</div>
-            <div class="job-check-item"><span class="job-check-tick pending"></span>AC wiring complete to DB board</div>
-            <div class="job-check-item"><span class="job-check-tick pending"></span>Earth bonding complete</div>
-          </div>
-          <div style="border-top:1px solid rgba(255,255,255,.05);padding-top:14px;margin-top:4px">
-            <div class="job-check-title">COC &amp; Compliance</div>
-            <div class="job-coc-row" style="margin-bottom:5px"><span class="job-coc-k">COC Number</span><span class="job-coc-v">Pending inspector</span></div>
-            <div class="job-coc-row" style="margin-bottom:5px"><span class="job-coc-k">Grid Application</span><span class="job-coc-v">Submitted &#8212; awaiting approval</span></div>
-            <div class="job-coc-row" style="border:none"><span class="job-coc-k">Handover Doc</span><span class="job-coc-v" style="color:var(--gold)">Ready to generate</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="inner">
+<div class="proposal-split">
+<div>
+<div class="eyebrow reveal" style="color:var(--green-2)">Job Portal</div>
+<h2 class="reveal">From won deal to<br><em>completed handover</em></h2>
+<p class="section-body reveal" style="margin-bottom:24px">Once a proposal is accepted, the job moves automatically into the Job Portal &#8212; a structured installation management workspace that tracks every step from site visit to signed handover certificate.</p>
+<p class="section-body reveal">No more tracking installations on spreadsheets or losing track of where a job is. Every active installation has a live pipeline view, structured checklists, and a digital handover document ready to print.</p>
+<ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Structured site visit assessment form</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Team assignment and equipment specification</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Full installation checklist (pre-install, structural, electrical, commissioning)</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> COC number, issuer, and grid approval tracking</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Printable customer handover certificate</li>
+<li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:var(--green-2);font-size:11px;font-weight:600">&#10003;</span> Full activity log for every job</li>
+</ul>
+<div style="margin-top:32px" class="reveal">
+<a href="job-portal.html" class="btn-hero" style="background:rgba(52,211,153,.12);color:var(--green-2);border:1px solid rgba(52,211,153,.25);display:inline-flex">
+&#9661; Open Job Portal
+</a>
+</div>
+</div>
+<div class="job-mock reveal">
+<div class="job-mock-topbar">
+<div class="job-mock-title">
+<span>&#9672; JOB PORTAL</span>
+<span class="job-mock-badge">Active</span>
+</div>
+<div class="job-mock-stage">Fourscore Holdings &#183; REF 000042</div>
+</div>
+<!-- pipeline steps -->
+<div class="job-pipeline-bar">
+<div class="jp-node"><div class="jp-dot done">&#10003;</div><div class="jp-label" style="color:var(--green-2)">Site Visit</div></div>
+<div class="jp-line done"></div>
+<div class="jp-node"><div class="jp-dot done">&#10003;</div><div class="jp-label" style="color:var(--green-2)">Prep</div></div>
+<div class="jp-line done"></div>
+<div class="jp-node"><div class="jp-dot active">3</div><div class="jp-label" style="color:var(--gold)">Install</div></div>
+<div class="jp-line"></div>
+<div class="jp-node"><div class="jp-dot pending">4</div><div class="jp-label">Sign-off</div></div>
+<div class="jp-line"></div>
+<div class="jp-node"><div class="jp-dot pending">5</div><div class="jp-label">Handover</div></div>
+</div>
+<div class="job-mock-body">
+<div class="job-check-section">
+<div class="job-check-title">Electrical Checklist</div>
+<div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>DC cabling routed and secured</div>
+<div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>MC4 connectors crimped and tested</div>
+<div class="job-check-item done"><span class="job-check-tick done">&#10003;</span>Inverter mounted and secured</div>
+<div class="job-check-item"><span class="job-check-tick pending"></span>AC wiring complete to DB board</div>
+<div class="job-check-item"><span class="job-check-tick pending"></span>Earth bonding complete</div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.05);padding-top:14px;margin-top:4px">
+<div class="job-check-title">COC &amp; Compliance</div>
+<div class="job-coc-row" style="margin-bottom:5px"><span class="job-coc-k">COC Number</span><span class="job-coc-v">Pending inspector</span></div>
+<div class="job-coc-row" style="margin-bottom:5px"><span class="job-coc-k">Grid Application</span><span class="job-coc-v">Submitted &#8212; awaiting approval</span></div>
+<div class="job-coc-row" style="border:none"><span class="job-coc-k">Handover Doc</span><span class="job-coc-v" style="color:var(--gold)">Ready to generate</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
-
-<!-- JOB PIPELINE STEPS -->
+<!-- JOB PORTAL WORKFLOW -->
 <section class="section">
-  <div class="inner">
-    <div class="eyebrow reveal" style="color:var(--green-2)">Installation Pipeline</div>
-    <h2 class="reveal">Five steps, every job,<br>every time &#8212; <em>no exceptions</em></h2>
-    <p class="section-body reveal">Every won job moves through a defined pipeline. Each stage unlocks when the previous one is complete, creating a clean audit trail from site assessment to customer sign-off.</p>
-    <div class="workflow-steps job-steps">
-      <div class="w-step reveal"><div class="w-num">1</div><div class="w-title">Site Visit Assessment</div><div class="w-desc">Roof condition, electrical infrastructure, shading analysis, cable run, meter type, DB board, and recommended system. If specs differ from the proposal, a design change is flagged &#8212; triggering the client approval workflow.</div></div>
-      <div class="w-step reveal"><div class="w-num">2</div><div class="w-title">Installation Preparation</div><div class="w-desc">Team lead, team members, scheduled date, and full equipment spec &#8212; panel brand and watts, inverter, battery. Locks in exactly what goes to site.</div></div>
-      <div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Installation Checklist</div><div class="w-desc">Pre-installation, structural and mounting, electrical wiring, and commissioning checklists. Tick off with notes as the team works through each item.</div></div>
-      <div class="w-step reveal"><div class="w-num">4</div><div class="w-title">Final Sign-off</div><div class="w-desc">As-installed system specs, any outstanding punch list items, inspector name and date. Marks the installation complete before handover proceeds.</div></div>
-      <div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Customer Handover</div><div class="w-desc">COC number, issuing electrician, grid approval status, customer training confirmation, warranty details, and a printable Handover Certificate signed by both parties.</div></div>
-    </div>
-  </div>
+<div class="inner">
+<div class="eyebrow reveal" style="color:var(--green-2)">Installation Pipeline</div>
+<h2 class="reveal">Five structured steps<br>from site visit to <em>handover</em></h2>
+<p class="section-body reveal">Every won job moves through a defined pipeline. Each step unlocks when the previous one is complete, creating an automatic audit trail from site assessment to customer sign-off.</p>
+<div class="workflow-steps job-steps">
+<div class="w-step reveal"><div class="w-num">1</div><div class="w-title">Site Visit Assessment</div><div class="w-desc">Roof condition, electrical infrastructure, shading analysis, cable run, meter type, DB board, and recommended system. All captured on-site, saved instantly.</div></div>
+<div class="w-step reveal"><div class="w-num">2</div><div class="w-title">Installation Preparation</div><div class="w-desc">Team lead, team members, installation date, and full equipment spec &#8212; panel brand, inverter size, battery brand and capacity. Locks in what goes to site.</div></div>
+<div class="w-step reveal"><div class="w-num">3</div><div class="w-title">Installation Checklist</div><div class="w-desc">Structured checklists for pre-installation, structural and mounting, electrical wiring, and full commissioning. Tick-off with notes as the team works.</div></div>
+<div class="w-step reveal"><div class="w-num">4</div><div class="w-title">Final Sign-off</div><div class="w-desc">As-installed system specs, punch list of outstanding items, inspector name, and date inspected. Marks the installation as complete before handover.</div></div>
+<div class="w-step reveal"><div class="w-num">5</div><div class="w-title">Customer Handover</div><div class="w-desc">COC number, issuing electrician, grid approval status, customer training confirmation, and a printable Handover Certificate &#8212; signed by both parties.</div></div>
+</div>
+</div>
 </section>
-
-<!-- DESIGN CHANGE MANAGEMENT -->
-<section class="design-change-section" id="design-change">
-  <div class="inner">
-    <div class="dc-split">
-      <div>
-        <div class="eyebrow reveal" style="color:#6aa0e8">Design Change Management</div>
-        <h2 class="reveal">When the site doesn&rsquo;t match<br>the <em>original proposal</em></h2>
-        <p class="section-body reveal" style="margin-bottom:24px">It happens. The assessor gets on-site and the roof orientation is wrong, the DB board needs upgrading, or the cable run is twice what was assumed. The original proposal specs no longer fit &#8212; and the client needs to know.</p>
-        <p class="section-body reveal">Nova Metrics handles this properly. When a site visit flags a design change, the platform generates a revised proposal version, calculates the exact delta against the original accepted specs, notifies the client with a secure approval link, and holds the job until a decision is made. Nothing moves forward on an unapproved change.</p>
-        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:28px" class="reveal">
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> Installer flags the change with a reason and category at site visit</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> Original proposal specs stored and compared to revised design</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> Delta calculated: system kW, battery kWh, cost, and percentage change</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> New proposal version created with full revision history</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> Client notified with a unique secure approval link &#8212; they accept or decline</li>
-          <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:300;color:var(--light)"><span style="color:#6aa0e8;font-size:11px;font-weight:600">&#10003;</span> Job locked until client decision is recorded &#8212; full audit trail throughout</li>
-        </ul>
-        <div style="margin-top:32px;background:rgba(45,111,212,.07);border:1px solid rgba(45,111,212,.18);border-radius:12px;padding:18px 20px;" class="reveal">
-          <div style="font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#6aa0e8;margin-bottom:8px">Why this matters</div>
-          <p style="font-size:13px;font-weight:300;color:var(--muted);line-height:1.7">Most solar businesses handle design changes over WhatsApp, with no record of what the client agreed to or when. Nova Metrics turns an awkward conversation into a documented, timestamped approval process &#8212; protecting both the installer and the client.</p>
-        </div>
-      </div>
-
-      <div class="reveal">
-        <!-- Change flag card -->
-        <div class="change-mock" style="margin-bottom:14px">
-          <div class="change-mock-header">
-            <div class="change-mock-title">
-              <span>&#9888; DESIGN CHANGE DETECTED</span>
-              <span class="change-badge">Pending Client Approval</span>
-            </div>
-            <div class="change-mock-ref">REF 000042 &middot; Fourscore Holdings</div>
-          </div>
-          <div class="change-mock-body">
-            <div class="change-alert">
-              <div class="change-alert-title">&#9888;&ensp;Change flagged at site visit</div>
-              <div class="change-alert-text">Roof pitch and shading analysis require a larger array than originally specified. Cable run to DB board significantly longer than estimated. System upsized to maintain proposed autonomy hours.</div>
-            </div>
-            <div style="font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Delta vs. accepted proposal</div>
-            <div class="change-delta-grid">
-              <div class="change-delta-cell">
-                <div class="change-delta-lbl">System</div>
-                <div class="change-delta-val up">+1.8 kW</div>
-                <div class="change-delta-sub">11.25 &rarr; 13.05 kW</div>
-              </div>
-              <div class="change-delta-cell">
-                <div class="change-delta-lbl">Battery</div>
-                <div class="change-delta-val up">+14.3 kWh</div>
-                <div class="change-delta-sub">57.2 &rarr; 71.5 kWh</div>
-              </div>
-              <div class="change-delta-cell">
-                <div class="change-delta-lbl">Cost impact</div>
-                <div class="change-delta-val up">+12.4%</div>
-                <div class="change-delta-sub">R342k &rarr; R384k</div>
-              </div>
-            </div>
-            <div class="change-approval">
-              <div class="change-approval-title">Client approval status</div>
-              <div class="change-approval-row"><span class="change-approval-k">Notification sent</span><span class="change-approval-v">15 May 2026 &middot; 09:14</span></div>
-              <div class="change-approval-row"><span class="change-approval-k">Proposal version</span><span class="change-approval-v">v2 &#8212; revision sent to client</span></div>
-              <div class="change-approval-row"><span class="change-approval-k">Client seen at</span><span class="change-approval-v">15 May 2026 &middot; 11:32</span></div>
-              <div class="change-approval-row"><span class="change-approval-k">Decision</span><span class="change-approval-v" style="color:var(--gold)">Awaiting response</span></div>
-            </div>
-            <div class="change-lock-bar">
-              <span class="change-lock-icon">&#128274;</span>
-              <span>Job locked &#8212; installation cannot proceed until client approves revised design</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Approved state card -->
-        <div class="change-mock">
-          <div class="change-mock-header">
-            <div class="change-mock-title">
-              <span style="color:var(--green-2)">&#10003; DESIGN CHANGE APPROVED</span>
-            </div>
-            <div class="change-mock-ref" style="color:var(--green-2);opacity:.7">Client responded &middot; 16 May 2026 &middot; 08:51</div>
-          </div>
-          <div class="change-mock-body" style="padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--light);background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:9px;padding:12px 14px;margin-bottom:12px">
-              <span style="font-size:16px;color:var(--green-2)">&#10003;</span>
-              <span>Client accepted revised design and updated cost. Job unlocked &#8212; installation can proceed.</span>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <span class="dc-event-tag green">Revision accepted</span>
-              <span class="dc-event-tag green">v2 locked in</span>
-              <span class="dc-event-tag green">Audit trail complete</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Design change timeline -->
-    <div style="margin-top:72px" class="reveal">
-      <div class="eyebrow" style="color:#6aa0e8;justify-content:center;margin-bottom:32px">How a design change flows through the platform</div>
-      <div class="dc-timeline" style="max-width:740px;margin:0 auto">
-        <div class="dc-event">
-          <div class="dc-dot original">&#9675;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Proposal accepted by client</div>
-            <div class="dc-event-desc">Original system specs locked in. Solar kW, battery kWh, inverter, and total cost recorded as the baseline. Job moves into the portal.</div>
-            <span class="dc-event-tag gold">Baseline stored</span>
-          </div>
-        </div>
-        <div class="dc-event">
-          <div class="dc-dot flag">&#9888;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Site visit flags a design change</div>
-            <div class="dc-event-desc">Assessor marks <em>design_changed = true</em> at site, records the reason and change category (roof, shading, electrical, or cable run). The original specs are preserved for comparison &#8212; nothing is overwritten.</div>
-            <span class="dc-event-tag gold">Reason &amp; category recorded</span>
-          </div>
-        </div>
-        <div class="dc-event">
-          <div class="dc-dot version">&#8681;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Revised proposal version created</div>
-            <div class="dc-event-desc">A new version is generated with the updated system specs. The platform calculates the exact delta: system size change in kW, battery kWh change, cost delta in rand, and percentage change. All stored against the original.</div>
-            <span class="dc-event-tag blue">Delta calculated automatically</span>
-          </div>
-        </div>
-        <div class="dc-event">
-          <div class="dc-dot notify">&#9993;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Client notified with a secure approval link</div>
-            <div class="dc-event-desc">The client receives the revised proposal and a unique link to review and respond. The platform records when the notification was sent, when the client opened it, and when they responded &#8212; automatically.</div>
-            <span class="dc-event-tag blue">Timestamped &middot; no chasing needed</span>
-          </div>
-        </div>
-        <div class="dc-event">
-          <div class="dc-dot locked">&#128274;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Job locked until a decision is made</div>
-            <div class="dc-event-desc">Installation preparation cannot proceed while a change is pending client approval. The job status reflects this &#8212; the team can see exactly what&rsquo;s holding it up and why.</div>
-            <span class="dc-event-tag gold">No one accidentally proceeds</span>
-          </div>
-        </div>
-        <div class="dc-event">
-          <div class="dc-dot approved">&#10003;</div>
-          <div class="dc-event-body">
-            <div class="dc-event-title">Client approves (or declines) &#8212; job continues</div>
-            <div class="dc-event-desc">If approved, the revised version is locked in and the job unlocks. If declined, the reason is recorded and the installer is notified. Either way, the full decision history is in the audit trail.</div>
-            <span class="dc-event-tag green">Full audit trail &middot; both outcomes handled</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- PLANS -->
 <section class="section" id="plans" style="background:var(--dark)">
-  <div class="inner">
-    <div style="text-align:center;max-width:560px;margin:0 auto 8px">
-      <div class="eyebrow reveal" style="justify-content:center">Pricing</div>
-      <h2 class="reveal">Precision-built for<br><em>serious installers</em></h2>
-      <p class="section-body reveal" style="margin:0 auto">Straightforward monthly pricing in Rands. No hidden fees, no per-proposal charges. Cancel anytime.</p>
-    </div>
-    <div class="plans-grid">
-
-      <!-- Starter -->
-      <div class="plan-card reveal">
-        <div class="plan-tier">Starter</div>
-        <div class="plan-price">R1,500 <span style="font-size:16px;font-weight:300;color:var(--muted)">/&thinsp;mo</span></div>
-        <div class="plan-price-sub">Up to 15 proposals per month</div>
-        <div class="plan-desc">For installers doing 5&ndash;10 jobs a month who want a professional proposal workflow without the admin overhead.</div>
-        <ul class="plan-features">
-          <li>15 proposals per month</li>
-          <li>Full system sizing engine</li>
-          <li>Custom-branded PDF proposals</li>
-          <li>Proposal Portal &amp; open tracking</li>
-          <li>Job Portal &mdash; installation pipeline</li>
-          <li>COC &amp; handover documentation</li>
-          <li>NRS 097-2-1 compliance check</li>
-        </ul>
-        <a href="solar-intelligence.html" class="btn-plan btn-plan-outline">Start free trial &rarr;</a>
-        <div class="plan-notify"><span class="plan-notify-dot"></span> 60-day free trial &mdash; no card required</div>
-      </div>
-
-      <!-- Professional -->
-      <div class="plan-card featured reveal">
-        <div class="plan-badge">Most popular</div>
-        <div class="plan-tier">Professional</div>
-        <div class="plan-price">R2,499 <span style="font-size:16px;font-weight:300;color:var(--muted)">/&thinsp;mo</span></div>
-        <div class="plan-price-sub">Unlimited proposals &mdash; no caps</div>
-        <div class="plan-desc">For active installers running proposals every day. Less than 0.3% of monthly turnover for a team doing 5 installs. Everything, unlimited.</div>
-        <ul class="plan-features">
-          <li><strong>Unlimited proposals</strong></li>
-          <li>Everything in Starter</li>
-          <li>Pipeline analytics dashboard</li>
-          <li>152-location irradiance database</li>
-          <li>Custom hardware catalogue</li>
-          <li>Priority support</li>
-          <li>Early access to new features</li>
-        </ul>
-        <a href="solar-intelligence.html" class="btn-plan btn-plan-gold">Start free trial &rarr;</a>
-        <div class="plan-notify"><span class="plan-notify-dot"></span> 60-day free trial &mdash; no card required</div>
-      </div>
-
-      <!-- Enterprise -->
-      <div class="plan-card reveal">
-        <div class="plan-tier">Enterprise</div>
-        <div class="plan-price">R5,999 <span style="font-size:16px;font-weight:300;color:var(--muted)">/&thinsp;mo</span></div>
-        <div class="plan-price-sub">Up to 5 installer seats</div>
-        <div class="plan-desc">For multi-branch operations and franchise networks. One account, multiple teams, one billing line. Custom branding, API access, and a dedicated account manager.</div>
-        <ul class="plan-features">
-          <li>Everything in Professional</li>
-          <li><strong>5 installer seats</strong></li>
-          <li>White-label portal &amp; branding</li>
-          <li>API access for integrations</li>
-          <li>Dedicated account manager</li>
-          <li>Monthly performance review call</li>
-          <li>Custom SLA &amp; onboarding</li>
-        </ul>
-        <a href="mailto:info@novametricsgroup.com" class="btn-plan btn-plan-outline">Talk to us &rarr;</a>
-        <div class="plan-notify"><span class="plan-notify-dot"></span> Custom scoping &amp; commercial terms</div>
-      </div>
-
-    </div>
-    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:28px">Payments processed by <strong style="color:var(--light)">PayFast</strong> &middot; ZAR &middot; No cross-border fees &middot; Cancel anytime</p>
-  </div>
+<div class="inner">
+<div style="text-align:center;max-width:560px;margin:0 auto 8px">
+<div class="eyebrow reveal" style="justify-content:center">Pricing</div>
+<h2 class="reveal">Precision-built for<br><em>serious installers</em></h2>
+<p class="section-body reveal" style="margin:0 auto">We&#8217;re finalising pricing tiers for the South African market. Register your interest to be first to know when plans go live.</p>
+</div>
+<div class="plans-grid">
+<div class="plan-card reveal">
+<div class="plan-tier">Starter</div>
+<div class="plan-price">Coming Soon</div>
+<div class="plan-price-sub">Pricing to be announced</div>
+<div class="plan-desc">Everything you need to design systems, send professional proposals, and manage your first installations.</div>
+<ul class="plan-features">
+<li>Full system sizing engine</li>
+<li>AI-generated branded proposals</li>
+<li>Proposal Portal &amp; tracking</li>
+<li>Job Portal &#8212; installation pipeline</li>
+<li>COC &amp; handover documentation</li>
+</ul>
+<a href="mailto:sales@novametricsgroup.com" class="btn-plan btn-plan-outline">Register interest &#8594;</a>
+<div class="plan-notify"><span class="plan-notify-dot"></span> Be notified when pricing goes live</div>
+</div>
+<div class="plan-card featured reveal">
+<div class="plan-badge">Most popular</div>
+<div class="plan-tier">Professional</div>
+<div class="plan-price">Coming Soon</div>
+<div class="plan-price-sub">Pricing to be announced</div>
+<div class="plan-desc">The full platform for growing installers who need speed, depth, and pipeline intelligence across a high volume of clients and jobs.</div>
+<ul class="plan-features">
+<li>Unlimited proposals</li>
+<li>Everything in Starter</li>
+<li>Pipeline analytics dashboard</li>
+<li>Custom hardware catalogue</li>
+<li>Multi-location irradiance database</li>
+<li>Priority support</li>
+</ul>
+<a href="mailto:sales@novametricsgroup.com" class="btn-plan btn-plan-gold">Register interest &#8594;</a>
+<div class="plan-notify"><span class="plan-notify-dot"></span> Be notified when pricing goes live</div>
+</div>
+<div class="plan-card reveal">
+<div class="plan-tier">Enterprise</div>
+<div class="plan-price">Let&#8217;s talk</div>
+<div class="plan-price-sub">Custom commercial terms</div>
+<div class="plan-desc">For larger installer networks that need white-label branding, API access, multi-account management, and dedicated support.</div>
+<ul class="plan-features">
+<li>Everything in Professional</li>
+<li>White-label branding</li>
+<li>API access</li>
+<li>Multiple installer accounts</li>
+<li>Dedicated onboarding &amp; SLA</li>
+<li>Custom integrations</li>
+</ul>
+<a href="mailto:sales@novametricsgroup.com" class="btn-plan btn-plan-outline">Talk to us &#8594;</a>
+<div class="plan-notify"><span class="plan-notify-dot"></span> Custom scoping &amp; commercial terms</div>
+</div>
+</div>
+</div>
 </section>
-
 <!-- CTA -->
 <section class="cta-section">
-  <div class="cta-inner">
-    <div class="eyebrow reveal" style="justify-content:center">Get access</div>
-    <h2 class="cta-h2 reveal">The whole pipeline.<br><em>One platform.</em></h2>
-    <p class="cta-body reveal">Nova Metrics is live and being used by solar installers today. Sign in and design your first system, open a job in the portal, or book a 20-minute demo and we&rsquo;ll walk you through the platform end-to-end.</p>
-    <div class="cta-actions reveal">
-      <a href="solar-intelligence.html" class="btn-cta btn-cta-primary">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        Open Solar Intelligence
-      </a>
-      <a href="job-portal.html" class="btn-cta" style="background:rgba(52,211,153,.1);color:var(--green-2);border:1px solid rgba(52,211,153,.22);">&#9661; Open Job Portal</a>
-      <a href="mailto:info@novametricsgroup.com" class="btn-cta btn-cta-ghost">Book a demo</a>
-    </div>
-  </div>
+<div class="cta-inner">
+<div class="eyebrow reveal" style="justify-content:center">Get access</div>
+<h2 class="cta-h2 reveal">The whole pipeline.<br><em>One platform.</em></h2>
+<p class="cta-body reveal">Nova Metrics is live and being used by solar installers today. Sign in and design your first system, manage an active installation, or book a 20-minute demo and we&#8217;ll walk you through the platform end-to-end.</p>
+<div class="cta-actions reveal">
+<a href="solar-intelligence.html" class="btn-cta btn-cta-primary">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+Open Solar Intelligence
+</a>
+<a href="job-portal.html" class="btn-cta" style="background:rgba(52,211,153,.1);color:var(--green-2);border:1px solid rgba(52,211,153,.22);">&#9661; Open Job Portal</a>
+<a href="mailto:sales@novametricsgroup.com" class="btn-cta btn-cta-ghost">Book a demo</a>
+</div>
+</div>
 </section>
-
 <!-- DISCLAIMER -->
 <div class="disclaimer-section">
-  <div class="disclaimer-inner">
-    <div class="disclaimer-title">Important Information &amp; Disclaimers</div>
-    <div class="disclaimer-text">
-      <p><strong style="color:var(--muted)">Financial projections.</strong> All financial outputs produced by Nova Metrics &#8212; including estimated savings, payback periods, NPV, and IRR figures &#8212; are indicative projections only, based on user-provided inputs, modelled tariff escalation scenarios, and industry-standard assumptions. Actual results will vary based on real-world site conditions, actual electricity consumption, utility tariff changes, system performance, financing structure, and other factors outside Nova Metrics&rsquo; control. These outputs do not constitute financial advice. Users should seek independent financial and technical advice before making any investment decision.</p>
-      <p><strong style="color:var(--muted)">Standards alignment.</strong> Nova Metrics designs systems in alignment with NRS 097-2-1 and NERSA SSEG guidelines as understood at the time of platform development. The platform references the South African Master Inverter Compliance Register for informational purposes. Nova Metrics does not certify regulatory compliance on behalf of any installer, client, or installation. It remains the sole responsibility of the installer to confirm compliance with all applicable standards, municipal requirements, and utility connection conditions before any installation proceeds.</p>
-      <p><strong style="color:var(--muted)">Installation documentation.</strong> Handover certificates, COC records, and activity logs generated by the Job Portal are operational tools for installers. They do not replace legally required documentation, licensed electrician sign-off, or any municipal or utility approval process. The installer remains solely responsible for all compliance, safety, and legal obligations associated with any installation.</p>
-      <p><strong style="color:var(--muted)">Data &amp; privacy.</strong> Proposal engagement tracking is subject to applicable privacy legislation including POPIA (Act No. 4 of 2013) and requires appropriate user consent. Installers are responsible for ensuring their use of the platform complies with all applicable data privacy obligations.</p>
-      <p><strong style="color:var(--muted)">No liability.</strong> Nova Metrics shall not be liable for any loss, damage, or claim arising from reliance on platform outputs, financial projections, standards-related information, or installation documentation without independent professional verification.</p>
-    </div>
-  </div>
+<div class="disclaimer-inner">
+<div class="disclaimer-title">Important Information &amp; Disclaimers</div>
+<div class="disclaimer-text">
+<p><strong style="color:var(--muted)">Financial projections.</strong> All financial outputs produced by Nova Metrics &#8212; including estimated savings, payback periods, NPV, and IRR figures &#8212; are indicative projections only, based on user-provided inputs, modelled tariff escalation scenarios, and industry-standard assumptions. Actual results will vary based on real-world site conditions, actual electricity consumption, utility tariff changes, system performance, financing structure, and other factors outside Nova Metrics&#8217; control. These outputs do not constitute financial advice. Users should seek independent financial and technical advice before making any investment decision.</p>
+<p><strong style="color:var(--muted)">Regulatory alignment.</strong> Nova Metrics designs systems in alignment with NRS 097-2-1 and NERSA SSEG guidelines as understood at the time of platform development. The platform references the South African Master Inverter Compliance Register for informational purposes. Nova Metrics does not certify regulatory compliance on behalf of any installer, client, or installation. It remains the sole responsibility of the installer to confirm compliance with all applicable standards, municipal requirements, and utility connection conditions before any installation proceeds.</p>
+<p><strong style="color:var(--muted)">Installation documentation.</strong> Handover certificates, COC records, and activity logs generated by the Job Portal are operational tools for installers. They do not replace legally required documentation, licensed electrician sign-off, or any municipal or utility approval process. The installer remains solely responsible for all compliance, safety, and legal obligations associated with any installation.</p>
+<p><strong style="color:var(--muted)">Data &amp; privacy.</strong> Proposal engagement tracking is subject to applicable privacy legislation including POPIA (Act No. 4 of 2013) and requires appropriate user consent. Installers are responsible for ensuring their use of the platform complies with all applicable data privacy obligations.</p>
+<p><strong style="color:var(--muted)">No liability.</strong> Nova Metrics shall not be liable for any loss, damage, or claim arising from reliance on platform outputs, financial projections, compliance-related information, or installation documentation without independent professional verification.</p>
 </div>
-
+</div>
+</div>
 <!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div>
-      <div class="footer-brand-row"><div class="footer-mark">N</div><div class="footer-brand-name">Nova Metrics</div></div>
-      <p class="footer-desc">Solar Intelligence &#8212; the end-to-end operations platform for South African solar installers. Precision system sizing, professional proposals, installation management, and customer handover. Built to meet NRS 097-2-1 &amp; NERSA SSEG standards by design.</p>
-      <span style="display:inline-block;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,145,28,.28);border-radius:20px;padding:4px 10px">Solar Intelligence Platform</span>
-    </div>
-    <div>
-      <div class="footer-col-title">Platform</div>
-      <ul class="footer-links">
-        <li><a href="solar-intelligence.html">Solar Intelligence</a></li>
-        <li><a href="prposal_portal.html">Proposal Portal</a></li>
-        <li><a href="job-portal.html">Job Portal</a></li>
-        <li><a href="#product">System sizing</a></li>
-        <li><a href="#product">Financial modelling</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Installers</div>
-      <ul class="footer-links">
-        <li><a href="solar-intelligence.html">Sign in</a></li>
-        <li><a href="demo.html">Interactive demo</a></li>
-        <li><a href="job-portal.html">Job Portal</a></li>
-        <li><a href="mailto:info@novametricsgroup.com">Book a demo</a></li>
-        <li><a href="#plans">Pricing</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Company</div>
-      <ul class="footer-links">
-        <li><a href="mailto:info@novametricsgroup.com">info@novametricsgroup.com</a></li>
-        <li><a href="#">South Africa</a></li>
-        <li><a href="privacy.html">Privacy Policy</a></li>
-<li><a href="terms.html">Terms of Service</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>&copy; 2026 Nova Metrics. All rights reserved.
-  &nbsp;&middot;&nbsp;
-  <a href="privacy.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#c0ccd8'" onmouseout="this.style.color=''">Privacy Policy</a>
-  &nbsp;&middot;&nbsp;
-  <a href="terms.html" style="color:inherit;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#c0ccd8'" onmouseout="this.style.color=''">Terms of Service</a>
-</span>
-    <span>Built for solar professionals &middot; Financial outputs are indicative estimates only</span>
-  </div>
+<div class="footer-grid">
+<div>
+<div class="footer-brand-row"><div class="footer-mark">N</div><div class="footer-brand-name">Nova Metrics</div></div>
+<p class="footer-desc">Solar Intelligence &#8212; the end-to-end SaaS platform for solar installers. System sizing, AI proposals, installation management, and customer handover. Designed in alignment with NRS 097-2-1 &amp; NERSA SSEG guidelines.</p>
+<span style="display:inline-block;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,145,28,.28);border-radius:20px;padding:4px 10px">Solar Intelligence Platform</span>
+</div>
+<div>
+<div class="footer-col-title">Platform</div>
+<ul class="footer-links">
+<li><a href="solar-intelligence.html">Solar Intelligence</a></li>
+<li><a href="prposal_portal.html">Proposal Portal</a></li>
+<li><a href="job-portal.html">Job Portal</a></li>
+<li><a href="#product">System sizing</a></li>
+<li><a href="#product">Financial modelling</a></li>
+</ul>
+</div>
+<div>
+<div class="footer-col-title">Installers</div>
+<ul class="footer-links">
+<li><a href="solar-intelligence.html">Sign in</a></li>
+<li><a href="job-portal.html">Job Portal</a></li>
+<li><a href="mailto:sales@novametricsgroup.com">Book a demo</a></li>
+<li><a href="mailto:support@novametricsgroup.com">Support</a></li>
+<li><a href="#plans">Pricing</a></li>
+</ul>
+</div>
+<div>
+<div class="footer-col-title">Contact Us</div>
+<ul class="footer-links">
+<li><a href="mailto:sales@novametricsgroup.com">sales@novametricsgroup.com</a></li>
+<li><a href="mailto:support@novametricsgroup.com">support@novametricsgroup.com</a></li>
+<li><a href="mailto:billing@novametricsgroup.com">billing@novametricsgroup.com</a></li>
+<li><a href="mailto:proposals@novametricsgroup.com">proposals@novametricsgroup.com</a></li>
+<li><a href="mailto:compliance@novametricsgroup.com">compliance@novametricsgroup.com</a></li>
+<li><a href="#">South Africa</a></li>
+<li><a href="#">Privacy policy</a></li>
+</ul>
+</div>
+</div>
+<div class="footer-bottom">
+<span>&copy; 2026 Nova Metrics. All rights reserved.</span>
+<span>Built for solar professionals &#183; Financial outputs are indicative estimates only</span>
+</div>
 </footer>
-
 <script>
-// Reveal on scroll
 const io = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
 },{threshold:0.08,rootMargin:'0px 0px -32px 0px'});
 document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 document.querySelectorAll('.product-modules .mod-card,.engine-grid .eng-cell,.plans-grid .plan-card').forEach(function(el,i){
-  el.style.transitionDelay=(i*0.06)+'s';
+el.style.transitionDelay=(i*0.06)+'s';
 });
-
-// Video player
 (function(){
-  var video=document.getElementById('demoVideo');
-  var wrap=document.getElementById('demoVideoWrap');
-  var overlay=document.getElementById('demoPlayOverlay');
-  var statusText=document.getElementById('demoStatusText');
-  function fmt(s){var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
-  if(wrap) wrap.addEventListener('click',function(){
-    if(video.paused){video.play();overlay.classList.add('hidden');statusText.textContent='Playing \u00b7 Solar Intelligence Overview';}
-    else{video.pause();overlay.classList.remove('hidden');statusText.textContent='Paused \u00b7 click to resume';}
-  });
-  if(video){
-    video.addEventListener('timeupdate',function(){
-      if(!video.paused&&video.duration) statusText.textContent=fmt(video.currentTime)+' / '+fmt(video.duration)+' \u00b7 Solar Intelligence Overview';
-    });
-    video.addEventListener('ended',function(){overlay.classList.remove('hidden');statusText.textContent='Ready to play \u00b7 Solar Intelligence Overview';});
-  }
+var video=document.getElementById('demoVideo');
+var wrap=document.getElementById('demoVideoWrap');
+var overlay=document.getElementById('demoPlayOverlay');
+var statusText=document.getElementById('demoStatusText');
+function fmt(s){var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+wrap.addEventListener('click',function(){
+if(video.paused){video.play();overlay.classList.add('hidden');statusText.textContent='Playing \u00b7 Solar Intelligence Overview';}
+else{video.pause();overlay.classList.remove('hidden');statusText.textContent='Paused \u00b7 click to resume';}
+});
+video.addEventListener('timeupdate',function(){
+if(!video.paused&&video.duration) statusText.textContent=fmt(video.currentTime)+' / '+fmt(video.duration)+' \u00b7 Solar Intelligence Overview';
+});
+video.addEventListener('ended',function(){overlay.classList.remove('hidden');statusText.textContent='Ready to play \u00b7 Solar Intelligence Overview';});
 })();
-
-// Demo tab switching
-function switchTab(tab, btn){
-  document.querySelectorAll('.demo-tab').forEach(function(t){t.classList.remove('active');});
-  btn.classList.add('active');
-  document.querySelectorAll('.demo-panel').forEach(function(p){p.classList.remove('active');});
-  document.getElementById('panel-'+tab).classList.add('active');
-  var urlEl = document.getElementById('chromeUrl');
-  var statusEl = document.getElementById('demoStatusText');
-  if(tab==='interactive'){
-    urlEl.textContent='app.novametricsgroup.com \u00b7 Interactive Demo';
-    statusEl.textContent='Interactive demo \u00b7 no login required';
-  } else {
-    urlEl.textContent='app.novametricsgroup.com \u00b7 Solar Intelligence';
-    statusEl.textContent='Ready to play \u00b7 Solar Intelligence Overview';
-  }
-}
-
-// Load iframe inline
-function loadIframe(){
-  var wrap = document.getElementById('iframeWrap');
-  var placeholder = document.getElementById('iframePlaceholder');
-  var iframe = document.createElement('iframe');
-  iframe.src = 'demo.html';
-  iframe.style.cssText = 'width:100%;height:100%;border:none;display:block;';
-  iframe.allow = 'fullscreen';
-  placeholder.style.display = 'none';
-  wrap.appendChild(iframe);
-  document.getElementById('demoStatusText').textContent = 'Interactive demo loading\u2026';
-  iframe.onload = function(){
-    document.getElementById('demoStatusText').textContent = 'Interactive demo \u00b7 click anywhere to explore';
-  };
-}
 </script>
 </body>
 </html>
