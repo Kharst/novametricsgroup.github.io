@@ -242,7 +242,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="plan-card featured" id="card-professional">
       <div class="plan-badge recommended" id="badge-professional">Recommended</div>
       <div class="plan-name">Professional</div>
-      <div class="plan-price"><span class="amount">R2,000</span> <span class="cycle">/ month</span></div>
+      <div class="plan-price"><span class="amount">R2,499</span> <span class="cycle">/ month</span></div>
       <div class="plan-desc">For active installers running proposals every day. Unlimited, no caps, no surprises. Less than 0.3% of monthly turnover for a team doing 5 installs.</div>
       <ul class="plan-features">
         <li class="yes"><i class="ic">&#10003;</i> <strong>Unlimited proposals</strong></li>
@@ -341,7 +341,7 @@ function renderStatus() {
       eyebrow.textContent = '\u26A0 Trial Expired';
       planEl.textContent = 'Trial Ended';
       metaEl.innerHTML = 'Your 60-day trial has ended. <strong>Subscribe to continue generating proposals</strong> for your clients.';
-      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,000/mo');
+      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,499/mo');
       return;
     }
     if (!s.allowed && s.reason === 'trial_limit_reached') {
@@ -349,7 +349,7 @@ function renderStatus() {
       eyebrow.textContent = '\u26A0 Proposal Limit Reached';
       planEl.textContent = 'Trial Limit';
       metaEl.innerHTML = 'You\u2019ve used all 5 trial proposals. <strong>Subscribe to generate unlimited proposals.</strong>';
-      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,000/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
+      actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,499/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
       return;
     }
 
@@ -375,7 +375,7 @@ function renderStatus() {
     fillEl.style.width = pct + '%';
     fillEl.style.background = pct >= 80 ? 'var(--red)' : pct >= 60 ? 'var(--amber)' : 'var(--green)';
 
-    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#9650; Upgrade to Professional &mdash; R2,000/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#9650; Upgrade to Professional &mdash; R2,499/mo') + actionBtn('outline', 'startUpgrade(\'starter\')', 'Starter &mdash; R1,500/mo');
 
     document.getElementById('badge-trial').className = 'plan-badge current-b';
     document.getElementById('badge-trial').style.display = 'block';
@@ -397,7 +397,7 @@ function renderStatus() {
     eyebrow.textContent = '\u26A0 Payment Overdue';
     planEl.textContent = 'Grace Period';
     metaEl.innerHTML = 'Your last payment failed. Please renew before your access is suspended.';
-    actions.innerHTML = actionBtn('gold', 'startUpgrade(\''+s.plan+'\' )', 'Update Payment &mdash; '+(s.plan==='starter'?'R1,500':'R2,000')+'/mo');
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\''+s.plan+'\' )', 'Update Payment &mdash; '+(s.plan==='starter'?'R1,500':'R2,499')+'/mo');
     markCurrentPlan(s.plan);
 
   } else {
@@ -405,7 +405,7 @@ function renderStatus() {
     eyebrow.textContent = '\u2715 Inactive';
     planEl.textContent = 'Subscription Required';
     metaEl.textContent = 'Your account is inactive. Subscribe to continue using Solar Intelligence.';
-    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Subscribe Now &mdash; R2,000/mo');
+    actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Subscribe Now &mdash; R2,499/mo');
   }
 }
 
