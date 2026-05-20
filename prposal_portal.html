@@ -112,9 +112,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .nav-ghost{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;background:transparent;color:rgba(255,255,255,.38);font-size:10.5px;font-weight:500;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .18s;white-space:nowrap;}
 .nav-ghost:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2);}
 .tab-content{display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden;}
-.tab-content.on{display:flex;}
+.tab-content.on{display:flex;flex:1;min-height:0;}
 /* Empty state */
-.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:14px;background:radial-gradient(ellipse at 50% 40%,rgba(11,31,58,.06) 0%,transparent 70%);}
+.empty{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:14px;background:radial-gradient(ellipse at 50% 40%,rgba(11,31,58,.06) 0%,transparent 70%);}
 .e-icon{width:60px;height:60px;background:linear-gradient(135deg,#0B1F3A 0%,#1a3455 100%);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(11,31,58,.18);}
 .e-title{font-size:15px;font-weight:600;color:#1e293b;}.e-sub{font-size:12px;color:#94a3b8;}
 .e-cta{display:flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;background:var(--navy);color:var(--gold);font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:4px;border:1px solid rgba(255,215,0,.25);letter-spacing:.01em;}
@@ -859,11 +859,6 @@ function pick(idx,rowEl){
   var isAttn=needsAttention(c);
   document.getElementById('attnBanner').classList.toggle('on',isAttn);
   if(isAttn) document.getElementById('attnMsg').textContent=attnMessage(c);
-  s('chAv',init(name));s('chNm',name);s('chEm',email);
-  s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
-  s('chSeg',has?(ai.client_segment||'—'):'—');
-  s('chDt',ai?fmtDate(ai.created_at):'—');
-  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}else{document.getElementById('chPhoneRow').style.display='none';}
   var ps=has?getProposalStatus(ai):null;
   var pill=document.getElementById('chPill');pill.textContent=getPillLabel(ps,has);pill.className='pill '+getPillClass(ps);
   var ts=document.getElementById('trackingStrip');ts.style.display=has?'flex':'none';
