@@ -448,11 +448,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <div class="tab-content on" id="proposalsTab">
     <div class="empty" id="emptyState">
       <div class="e-icon">☀️</div>
-      <div class="e-title">Select a client to view their proposal</div>
-      <div class="e-sub">Choose a client from the sidebar, or create a new solar design</div>
-      <a href="solar-intelligence.html" class="e-cta">
+      <div class="e-title" id="emptyStateTitle">Select a client to view their proposal</div>
+      <div class="e-sub" id="emptyStateSub">Choose a client from the sidebar, or create a new solar design</div>
+      <a href="solar-intelligence.html" class="e-cta" id="emptyStateCta" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        New Design
+        Create First Design
       </a>
     </div>
 
@@ -867,7 +867,20 @@ async function loadClients(){
       if(idx<0) idx=allClients.findIndex(function(c){return c.ai&&c.ai.pdf_url;});
       if(idx>=0){var matchRow=Array.from(document.querySelectorAll('.c-row')).find(function(r){return parseInt(r.dataset.idx)===idx;});pick(idx,matchRow||null);var cname=(allClients[idx].ai&&allClients[idx].ai.client_name)||(allClients[idx].lead&&allClients[idx].lead.client_name)||'your client';document.getElementById('arrivalClientName').textContent=cname;return;}
     }
-    document.getElementById('emptyState').style.display='flex';
+    var es=document.getElementById('emptyState');
+    es.style.display='flex';
+    var emptyTitle=document.getElementById('emptyStateTitle');
+    var emptySub=document.getElementById('emptyStateSub');
+    var emptyCta=document.getElementById('emptyStateCta');
+    if(allClients.length===0){
+      if(emptyTitle) emptyTitle.textContent='Welcome to Nova Metrics 👋';
+      if(emptySub) emptySub.textContent='You have no clients yet. Create your first solar design and send it — your client list will build from there.';
+      if(emptyCta) emptyCta.style.display='inline-flex';
+    } else {
+      if(emptyTitle) emptyTitle.textContent='Select a client to view their proposal';
+      if(emptySub) emptySub.textContent='Choose a client from the sidebar, or create a new solar design';
+      if(emptyCta) emptyCta.style.display='none';
+    }
   }catch(err){
     document.getElementById('clientList').innerHTML='<div class="loading-row" style="color:#eb7070">Failed to load clients</div>';
     document.getElementById('clientCount').textContent='Error';
