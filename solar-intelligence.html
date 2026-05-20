@@ -331,6 +331,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <span id="trial-banner-text" style="color:var(--amber)"></span>
   <a href="billing.html" style="color:var(--gold);font-weight:600;text-decoration:none;font-size:12px;flex-shrink:0">Upgrade →</a>
 </div>
+  <div id="greeting-bar" style="display:none;padding:0 0 10px 0"></div>
   <div id="hw-source-banner" class="hw-banner"></div>
   <div class="no-system-alert" id="no-system-alert">
     <div class="nsa-title">&#9888; No Compliant System Found</div>
@@ -1133,7 +1134,9 @@ if (installer && !installer.terms_accepted_at) {
 }
   showHwBanner();
   checkBillingStatus();
-  showProfileNudges();
+ showProfileNudges();
+  showGreeting();
+  checkFirstTimeUser();
 }
 function showProfileNudges() {
   const tips = [];
@@ -1790,6 +1793,86 @@ function showTermsAcceptanceModal(installerId) {
   document.body.appendChild(overlay);
 }
 
+  // ── GREETING ──────────────────────────────────────────────────────────────────
+function showGreeting() {
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  const firstName = (installer.installer_name || 'there').split(' ')[0];
+  const el = document.getElementById('greeting-bar');
+  if (!el) return;
+  const today = new Date().toLocaleDateString('en-ZA', {weekday:'long', day:'numeric', month:'long'});
+  el.innerHTML =
+    '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;'
+    + 'border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:12px;margin-bottom:4px">'
+    + '<span style="font-family:\'DM Serif Display\',serif;font-size:22px;color:#f0f4f8;line-height:1.2">'
+    + greet + ', <em style="font-style:italic;color:var(--gold)">' + firstName + '</em></span>'
+    + '<span style="font-size:12px;color:var(--muted);font-weight:300"> — ' + today + '</span>'
+    + '</div>';
+  el.style.display = 'block';
+}
+
+// ── FIRST-TIME GUIDE ──────────────────────────────────────────────────────────
+async function checkFirstTimeUser() {
+  if (!installer) return;
+  try {
+    const rows = await sbFetch(
+      '/rest/v1/ai_results?installer_id=eq.' + installer.installer_id + '&select=ai_id&limit=1'
+    );
+    if (!rows || rows.length === 0) setTimeout(() => showFirstTimeGuide(), 1000);
+  } catch(e) { console.warn('First-time check:', e); }
+}
+
+function showFirstTimeGuide() {
+  if (document.getElementById('terms-modal')) return;
+  const firstName = (installer.installer_name || 'there').split(' ')[0];
+  const steps = [
+    { icon:'📍', n:1, title:'Pick a location',
+      desc:'Click the Location box at the top and type your client\'s city. 152 SA locations with irradiance data built in.' },
+    { icon:'⚡', n:2, title:'Add their appliances',
+      desc:'Click "Add Appliances…" and choose what the client runs at home. Or tap a Quick Template like "Full Household" to start instantly.' },
+    { icon:'🔆', n:3, title:'Click "Design System"',
+      desc:'The platform picks the right solar array, battery, and inverter — NRS 097-2-1 compliant, every check shown on screen.' },
+    { icon:'📄', n:4, title:'Generate the proposal',
+      desc:'Go to the Generate Proposal tab, enter the client\'s name and email, click Generate. A branded PDF is ready in seconds.' }
+  ];
+  const stepsHtml = steps.map(s =>
+    '<div style="display:flex;gap:13px;margin-bottom:10px;padding:12px 14px;'
+    + 'background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;align-items:flex-start">'
+    + '<div style="width:32px;height:32px;border-radius:50%;background:rgba(255,215,0,.12);'
+    + 'border:1px solid rgba(255,215,0,.3);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">' + s.icon + '</div>'
+    + '<div><div style="font-size:13px;font-weight:600;color:#f0f4f8;margin-bottom:2px">' + s.n + '. ' + s.title + '</div>'
+    + '<div style="font-size:12px;font-weight:300;color:#7a95af;line-height:1.6">' + s.desc + '</div></div></div>'
+  ).join('');
+  const overlay = document.createElement('div');
+  overlay.id = 'first-time-guide';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(11,31,58,.93);'
+    + 'display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px)';
+  overlay.innerHTML =
+    '<div style="max-width:520px;width:100%;background:#112840;border:1px solid rgba(255,215,0,.22);'
+    + 'border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)">'
+    + '<div style="background:linear-gradient(135deg,#0B1F3A,#1a3a5c);padding:24px 28px 18px;'
+    + 'text-align:center;border-bottom:2px solid var(--gold)">'
+    + '<div style="width:48px;height:48px;background:var(--gold);border-radius:12px;'
+    + 'display:flex;align-items:center;justify-content:center;'
+    + 'font-family:\'DM Serif Display\',serif;font-size:20px;color:#0B1F3A;margin:0 auto 12px">N</div>'
+    + '<div style="font-family:\'DM Serif Display\',serif;font-size:22px;color:#f0f4f8;margin-bottom:6px">'
+    + 'Welcome, <em style="color:var(--gold)">' + firstName + '</em></div>'
+    + '<div style="font-size:13px;font-weight:300;color:#7a95af;line-height:1.6">'
+    + 'Let\'s design your first solar system.<br>It takes less than 5 minutes.</div></div>'
+    + '<div style="padding:18px 24px">'
+    + '<div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Your first design — 4 steps</div>'
+    + stepsHtml
+    + '<button onclick="document.getElementById(\'first-time-guide\').remove()" '
+    + 'style="width:100%;padding:13px;border-radius:10px;border:none;background:var(--gold);'
+    + 'color:#0B1F3A;font-size:14px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;margin-top:4px;transition:all .2s" '
+    + 'onmouseover="this.style.background=\'#fff\'" onmouseout="this.style.background=\'var(--gold)\'">Got it — let\'s start designing ⚡</button>'
+    + '<div style="text-align:center;margin-top:8px">'
+    + '<button onclick="document.getElementById(\'first-time-guide\').remove()" '
+    + 'style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif;padding:4px">'
+    + 'Skip — I know what I\'m doing</button></div>'
+    + '</div></div>';
+  document.body.appendChild(overlay);
+}
 async function acceptTermsFromModal(installerId) {
   await supabaseClient.from('installers').update({
     terms_accepted_at: new Date().toISOString(),
