@@ -112,18 +112,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .nav-ghost{display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;background:transparent;color:rgba(255,255,255,.38);font-size:10.5px;font-weight:500;border:1px solid rgba(255,255,255,.1);cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .18s;white-space:nowrap;}
 .nav-ghost:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.2);}
 .tab-content{display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden;}
-.tab-content.on{display:flex;flex:1;min-height:0;}
-.empty{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:14px;}
+.tab-content.on{display:flex;}
 /* Empty state */
-.empty{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:14px;background:radial-gradient(ellipse at 50% 40%,rgba(11,31,58,.06) 0%,transparent 70%);}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;gap:14px;background:radial-gradient(ellipse at 50% 40%,rgba(11,31,58,.06) 0%,transparent 70%);}
 .e-icon{width:60px;height:60px;background:linear-gradient(135deg,#0B1F3A 0%,#1a3455 100%);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 24px rgba(11,31,58,.18);}
 .e-title{font-size:15px;font-weight:600;color:#1e293b;}.e-sub{font-size:12px;color:#94a3b8;}
 .e-cta{display:flex;align-items:center;gap:7px;padding:9px 20px;border-radius:9px;background:var(--navy);color:var(--gold);font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;text-decoration:none;transition:all .2s;margin-top:4px;border:1px solid rgba(255,215,0,.25);letter-spacing:.01em;}
 .e-cta:hover{background:#1e3a5f;box-shadow:0 4px 18px rgba(11,31,58,.25);transform:translateY(-1px);}
 
-  .detail{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 12px;display:none;flex-direction:column;gap:6px;}
+.detail{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 12px;display:none;flex-direction:column;gap:6px;}
 .detail.on{display:flex;animation:up .22s ease;}
-  
+.detail>*{flex-shrink:0;}
 @keyframes up{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
 .arrival-banner{background:linear-gradient(135deg,rgba(11,31,58,.06),rgba(255,215,0,.04));border-bottom:1px solid rgba(255,215,0,.18);padding:7px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;}
@@ -317,11 +316,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .fp-cold{color:#2563eb;font-weight:600;}.fp-wait{color:#6b7280;}
 .fp-closed{color:#16a34a;font-weight:600;}
 
-::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
-.main ::-webkit-scrollbar-thumb{background:#94a3b8;border-radius:4px;}
-.main ::-webkit-scrollbar-thumb:hover{background:#64748b;}
-.main ::-webkit-scrollbar-track{background:#e8ecf2;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
+.main ::-webkit-scrollbar-thumb{background:#d1d5db;}
 
 @media(max-width:1280px){
   :root{--sidebar-w:200px;}
@@ -430,6 +427,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       <div style="width:1px;height:16px;background:rgba(255,255,255,.1);margin:0 2px;"></div>
       <a href="#" class="nav-a hi" id="navInstallerName">Nova Metrics</a>
       <button class="sign-out-btn" id="signOutBtn">Sign out</button>
+      <a href="solar-intelligence.html" class="new-calc-topbtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        New Design
+      </a>
     </div>
   </div>
 
@@ -458,6 +459,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <span id="attnMsg">This proposal needs follow-up.</span>
       </div>
 
+      <div class="ch">
+        <div class="ch-l">
+          <div class="ch-av" id="chAv">?</div>
+          <div style="min-width:0">
+            <div class="ch-nm" id="chNm">—</div>
+            <div class="ch-sub" id="chEm">—</div>
+            <div class="ch-meta">
+              <div class="ch-mi">📍 <strong id="chLoc">—</strong></div>
+              <div class="ch-mi">⚡ <strong id="chSeg">—</strong></div>
+              <div class="ch-mi">📅 <strong id="chDt">—</strong></div>
+              <div class="ch-mi" id="chPhoneRow" style="display:none">📱 <strong id="chPhone">—</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="pill p" id="chPill">No Proposal</div>
+      </div>
+
       <div class="tracking-strip" id="trackingStrip" style="display:none">
         <div class="tev"><div class="tev-dot" id="tev-dot-generated"></div><div class="tev-lbl" id="tev-lbl-generated">Generated</div><div class="tev-time" id="tev-time-generated"></div></div>
         <div class="tev"><div class="tev-dot" id="tev-dot-sent"></div><div class="tev-lbl" id="tev-lbl-sent">Sent</div><div class="tev-time" id="tev-time-sent"></div></div>
@@ -481,6 +499,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           <span class="mo-label"><strong>Installer override:</strong> mark outcome if client accepted or rejected verbally.</span>
           <button class="mo-btn mo-btn-accept" onclick="markAsWon()">🏆 Mark Won</button>
           <button class="mo-btn mo-btn-reject" onclick="markAsRejected()">✕ Rejected</button>
+        </div>
+      </div>
+
+      <div class="no-prop" id="noPropRow">
+        <div class="np-ic">☀️</div>
+        <div>
+          <div class="np-t">No proposal generated yet</div>
+          <div class="np-s">Design and generate a solar proposal for this client.</div>
+          <a href="solar-intelligence.html" class="np-cta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            New Design
+          </a>
         </div>
       </div>
 
@@ -860,11 +890,16 @@ function pick(idx,rowEl){
   var isAttn=needsAttention(c);
   document.getElementById('attnBanner').classList.toggle('on',isAttn);
   if(isAttn) document.getElementById('attnMsg').textContent=attnMessage(c);
+  s('chAv',init(name));s('chNm',name);s('chEm',email);
+  s('chLoc',has?(ai.location||(c.lead&&c.lead.address)||'—'):((c.lead&&c.lead.address)||'—'));
+  s('chSeg',has?(ai.client_segment||'—'):'—');
+  s('chDt',ai?fmtDate(ai.created_at):'—');
+  if(phone){s('chPhone',phone);document.getElementById('chPhoneRow').style.display='flex';}else{document.getElementById('chPhoneRow').style.display='none';}
   var ps=has?getProposalStatus(ai):null;
   var pill=document.getElementById('chPill');pill.textContent=getPillLabel(ps,has);pill.className='pill '+getPillClass(ps);
   var ts=document.getElementById('trackingStrip');ts.style.display=has?'flex':'none';
   if(has){tevSet('generated',ai.created_at,'Generated');tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');tevSet('opened',ai.email_opened_at,'Opened');tevSet('viewed',ai.proposal_viewed_at,'Viewed');tevSet('won',ai.won_at||null,'Won');}
-  vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
+  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
   var isAccepted=(ps==='accepted');var isTerminal=(ps==='accepted'||ps==='rejected');
   document.getElementById('wonBadgeRow').style.display=(has&&isAccepted)?'block':'none';
   document.getElementById('manualOverrideRow').style.display=(has&&!isTerminal)?'block':'none';
