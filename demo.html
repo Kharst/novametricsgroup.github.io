@@ -1173,5 +1173,44 @@ window.addEventListener('resize',()=>{
   if(step>=0){const s=STEPS[step];if(s&&document.getElementById(s.id))spotlight(s.id,s.placement);}
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // ── Skip if tour is already running ──────────────────────────
+  // Only auto-run when page loads fresh (not mid-tour)
+  if (typeof step !== 'undefined' && step > 0) return;
+
+  // ── Pre-fill the proposal form (Generate Proposal tab) ───────
+  var nameEl  = document.getElementById('p-name');
+  var emailEl = document.getElementById('p-email');
+  if (nameEl)  nameEl.value  = 'Sarah Dlamini';
+  if (emailEl) emailEl.value = 'sarah@example.co.za';
+
+  // Location is already pre-filled as "Johannesburg, Gauteng" ✓
+  // Load profile is already pre-filled as 3.15 kW / 4 appliances ✓
+  // Backup is already set via sel-auto ✓
+
+  // ── Auto-run the design so output tabs are populated ─────────
+  setTimeout(function () {
+    runDesignAnimate();
+
+    // After animation completes, show Solar tab so user lands on results
+    setTimeout(function () {
+      showTab('solar');
+
+      // Update button text to show it ran
+      var btn = document.getElementById('btn-design');
+      if (btn) {
+        btn.textContent = '✓ System Designed';
+        btn.style.background = 'var(--green)';
+        btn.style.color = '#064e3b';
+      }
+    }, 1300);
+
+  }, 400); // small delay so page fully renders first
+
+});
+</script>
+  
 </body>
 </html>
