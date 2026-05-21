@@ -130,6 +130,43 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <p class="hero-sub">Start your 60-day free trial. No credit card required. Get access to AI-powered solar proposals in minutes.</p>
     </div>
 
+    <!-- DATA TRUST STRIP -->
+    <div class="trust-strip" style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.18);border-radius:12px;padding:14px 18px;margin-bottom:20px">
+      <div onclick="this.parentElement.querySelector('.trust-body').style.display=this.parentElement.querySelector('.trust-body').style.display==='none'?'block':'none'"
+           style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none">
+        <span style="font-size:11px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.08em">🔒 How we handle your data</span>
+        <span style="font-size:11px;color:#7a95af">tap to expand ▾</span>
+      </div>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399">✓ POPIA Compliant</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399">✓ Data never sold</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399">✓ Delete anytime</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34d399">✓ Supabase DPA signed</span>
+      </div>
+      <div class="trust-body" style="display:none;margin-top:14px">
+        <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:#7a95af;line-height:1.6">
+          <span style="font-size:14px;flex-shrink:0">📋</span>
+          <div><strong style="color:#f0f4f8;display:block;font-size:11px;font-weight:600;margin-bottom:2px">What we collect</strong>Your company name, email address, and optionally a contact name and number. Nothing more.</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:#7a95af;line-height:1.6">
+          <span style="font-size:14px;flex-shrink:0">🗄️</span>
+          <div><strong style="color:#f0f4f8;display:block;font-size:11px;font-weight:600;margin-bottom:2px">Where it's stored</strong>Securely in Supabase (AES-256 encryption at rest, TLS in transit). Nova Metrics has a signed Data Processing Addendum with Supabase — Ref TSTVZ-BKVYE-BJ8JZ-YJGZ6.</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:#7a95af;line-height:1.6">
+          <span style="font-size:14px;flex-shrink:0">⏳</span>
+          <div><strong style="color:#f0f4f8;display:block;font-size:11px;font-weight:600;margin-bottom:2px">How long we keep it</strong>For the duration of your account. If you close your account, your data is deleted within 30 days. You can request deletion at any time by emailing <a href="mailto:privacy@novametricsgroup.com" style="color:#FFD700">privacy@novametricsgroup.com</a>.</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:#7a95af;line-height:1.6">
+          <span style="font-size:14px;flex-shrink:0">🚫</span>
+          <div><strong style="color:#f0f4f8;display:block;font-size:11px;font-weight:600;margin-bottom:2px">What we never do</strong>We never sell your data, share it for advertising, or use it outside of running Solar Intelligence for you.</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:7px 0;font-size:12px;color:#7a95af;line-height:1.6">
+          <span style="font-size:14px;flex-shrink:0">🇿🇦</span>
+          <div><strong style="color:#f0f4f8;display:block;font-size:11px;font-weight:600;margin-bottom:2px">POPIA Registration</strong>Nova Metrics is registered with the Information Regulator of South Africa. Information Officer: Reuben Siwela. Reg No: 2026-016677. <a href="/faq.html#data" style="color:#FFD700">See full data FAQ →</a></div>
+        </div>
+      </div>
+    </div>
+    <!-- END DATA TRUST STRIP -->
     <div class="card">
 
       <!-- STEP INDICATOR -->
