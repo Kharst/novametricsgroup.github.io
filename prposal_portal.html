@@ -849,12 +849,14 @@ document.getElementById('signOutBtn').addEventListener('click',async function(){
 
 async function loadClients(){
   var instId=installer.installer_id;
+  var sessResult=await sb.auth.getSession();
+  var token=(sessResult.data&&sessResult.data.session)?sessResult.data.session.access_token:ANON;
   try{
-    var leadsRes=await fetch(SUPA+'/rest/v1/leads?installer_id=eq.'+instId+'&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var leadsRes=await fetch(SUPA+'/rest/v1/leads?installer_id=eq.'+instId+'&select=lead_id,client_name,client_email,client_phone,address,created_at&order=created_at.asc',{headers:{apikey:ANON,Authorization:'Bearer '+token}});
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,proposal_status,sent_at,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,whatsapp_sent_at,client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,won_at,rejected_at,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
+    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,proposal_status,sent_at,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,whatsapp_sent_at,client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,won_at,rejected_at,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+token}});
     var aiRows=await aiRes.json();
     if(!Array.isArray(aiRows)){console.warn('ai_results fetch failed:',aiRows);aiRows=[];}
     var aiByEmail={};
