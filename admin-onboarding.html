@@ -327,6 +327,31 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="btn btn-ghost" onclick="assignLocationsOnly()" id="assign-btn">Assign Selected Locations</button>
           <div class="msg" id="assign-msg"></div>
         </div>
+
+        <div style="border-top:1px solid var(--border);margin:16px 0"></div>
+
+        <!-- ── DELETE INSTALLER ── -->
+        <div class="field">
+          <label style="color:var(--red)">⚠ Delete Installer Permanently</label>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+            Removes the installer <strong style="color:var(--text)">and all their linked data</strong> — proposals, clients, site visits, installations, activity logs, and their login account. <strong style="color:var(--red)">Cannot be undone.</strong>
+          </p>
+          <select id="delete-installer-sel" style="margin-bottom:10px">
+            <option value="">— select installer to delete —</option>
+          </select>
+          <div id="delete-confirm-area" style="display:none;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:12px 14px;margin-bottom:10px">
+            <p style="font-size:12px;color:var(--red);margin-bottom:10px;line-height:1.6">
+              You are about to permanently delete <strong id="delete-confirm-name"></strong> and everything linked to them. Are you sure?
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" style="background:var(--red);color:#fff;border:none;font-weight:600" onclick="confirmDeleteInstaller()" id="delete-confirm-btn">Yes, delete permanently</button>
+              <button class="btn btn-ghost btn-sm" onclick="cancelDelete()">Cancel</button>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="border-color:rgba(248,113,113,.3);color:var(--red)" onclick="promptDeleteInstaller()" id="delete-btn">🗑 Delete Selected Installer</button>
+          <div class="msg" id="delete-msg"></div>
+        </div>
+
       </div>
     </div>
 
@@ -688,6 +713,9 @@ async function loadInstallers() {
     allInstallers.map(i => `<option value="${i.installer_id}">${i.installer_name || i.contact_email}</option>`).join('');
   assignSel.innerHTML = optionsHtml;
   complianceSel.innerHTML = optionsHtml;
+  document.getElementById('delete-installer-sel').innerHTML =
+    '<option value="">— select installer to delete —</option>' +
+    allInstallers.map(i => `<option value="${i.installer_id}">${i.installer_name || i.contact_email} (#${i.installer_id})</option>`).join('');
 
   if (!allInstallers.length) {
     tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">No installers yet</td></tr>';
@@ -711,6 +739,7 @@ async function loadInstallers() {
         <div class="action-cell">
           <button class="btn btn-ghost btn-sm" onclick="prefillCompliance(${i.installer_id})">Edit</button>
           <button class="btn btn-ghost btn-sm" onclick="prefillReset('${i.contact_email||''}')">Resend</button>
+          <button class="btn btn-ghost btn-sm" style="border-color:rgba(248,113,113,.3);color:var(--red)" onclick="prefillDelete(${i.installer_id})">Delete</button>
         </div>
       </td>
     </tr>`;
@@ -732,6 +761,62 @@ function prefillReset(email) {
 function showMsg(el, type, text) {
   el.textContent = text;
   el.className = `msg ${type} show`;
+}
+
+function prefillDelete(installerId) {
+  const sel = document.getElementById('delete-installer-sel');
+  sel.value = installerId;
+  promptDeleteInstaller();
+  sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function promptDeleteInstaller() {
+  const sel = document.getElementById('delete-installer-sel');
+  const confirmArea = document.getElementById('delete-confirm-area');
+  const msgEl = document.getElementById('delete-msg');
+  msgEl.className = 'msg'; msgEl.textContent = '';
+  if (!sel.value) {
+    confirmArea.style.display = 'none';
+    return showMsg(msgEl, 'err', 'Please select an installer first.');
+  }
+  const name = sel.options[sel.selectedIndex].text;
+  document.getElementById('delete-confirm-name').textContent = name;
+  confirmArea.style.display = 'block';
+}
+
+function cancelDelete() {
+  document.getElementById('delete-confirm-area').style.display = 'none';
+  document.getElementById('delete-installer-sel').value = '';
+}
+
+async function confirmDeleteInstaller() {
+  const sel = document.getElementById('delete-installer-sel');
+  const installerId = parseInt(sel.value);
+  const msgEl = document.getElementById('delete-msg');
+  const btn   = document.getElementById('delete-confirm-btn');
+  if (!installerId) return;
+  btn.disabled = true; btn.textContent = 'Deleting…';
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/rpc/delete_installer_cascade`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPA_ANON,
+        'Authorization': 'Bearer ' + SUPA_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ p_installer_id: installerId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.error || 'Delete failed');
+    document.getElementById('delete-confirm-area').style.display = 'none';
+    sel.value = '';
+    showMsg(msgEl, 'ok', `✓ Installer #${installerId} and all linked data deleted successfully.`);
+    toast('✓ Installer deleted');
+    loadInstallers();
+  } catch(e) {
+    showMsg(msgEl, 'err', '✗ ' + e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Yes, delete permanently';
 }
 
 function toast(msg, isErr = false) {
