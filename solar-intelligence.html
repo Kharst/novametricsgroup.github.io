@@ -142,7 +142,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .ct-hint{margin-top:10px;font-size:11px;color:var(--muted);padding:8px 12px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);}
 .ct-hint.residential{border-color:rgba(122,200,248,.2);background:rgba(122,200,248,.05);color:var(--blue);}
 .ct-hint.commercial{border-color:var(--gold-border);background:rgba(255,215,0,.05);color:var(--muted);}
-/* ── NRS 097 Compliance Badge ──────────────────────────────────── */
+/* ── NRS 097 Alignment Indicator ───────────────────────────────── */
 .comp-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em;}
 .comp-badge.green{background:rgba(52,211,153,.12);color:var(--green);border:1px solid rgba(52,211,153,.28);}
 .comp-badge.amber{background:rgba(251,191,36,.10);color:var(--amber);border:1px solid rgba(251,191,36,.25);}
@@ -364,7 +364,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div id="greeting-bar" style="display:none;padding:0 0 10px 0"></div>
   <div id="hw-source-banner" class="hw-banner"></div>
   <div class="no-system-alert" id="no-system-alert">
-    <div class="nsa-title">&#9888; No Compliant System Found</div>
+    <div class="nsa-title">&#9888; No Suitable System Configuration Found</div>
     <div class="nsa-body" id="no-system-body">With the selected inputs and available hardware, no system meets all design requirements.</div>
   </div>
 
@@ -485,7 +485,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   <div id="tab-battery" class="tab-panel">
     <div class="kpi-grid" style="margin-bottom:8px">
       <div class="kpi green" id="sys-rec-kpi" style="grid-column:1/-1;border-width:2px">
-        <div class="label">&#9889; System Compliance &#8212; Solar &#183; Battery &#183; Inverter &#183; DC/AC &#8212; All must pass</div>
+        <div class="label">&#9889; Regulation Alignment Check &#8212; Solar &#183; Battery &#183; Inverter &#183; DC/AC &#8212; Reviewed Against Referenced Standards</div>
         <div class="value" id="sys-rec-value" style="font-size:1rem">&#8212;</div>
         <div class="sub" id="sys-rec-sub"></div>
       </div>
@@ -503,7 +503,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="kpi white"><div class="label">Battery Units</div><div class="value" id="b-units">&#8212;</div></div>
       <div class="kpi white"><div class="label">Runtime at Average Draw</div><div class="value" id="b-runtime">&#8212;</div></div>
     </div>
-    <div class="section-title">Cross-System Compliance Check</div>
+    <div class="section-title">Cross-System Design Validation</div>
     <div class="status-row"><span class="lbl">&#9728;&#65039; Solar covers daytime load + battery recharge</span><span class="val" id="b-solar-compat">&#8212;</span></div>
     <div class="status-row"><span class="lbl">&#128267; Battery power output &#8805; peak load</span><span class="val" id="b-load-compat">&#8212;</span></div>
     <div class="status-row"><span class="lbl">&#9889; Inverter AC rating &#8805; peak load &#215; 1.3 safety margin</span><span class="val" id="b-inv-compat">&#8212;</span></div>
@@ -541,15 +541,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="status-row"><span class="lbl">Max DC Input (kW)</span><span class="val" id="i-dc-max">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Headroom over Backup Peak</span><span class="val" id="i-headroom">&#8212;</span></div>
     <div class="status-row"><span class="lbl">Efficiency</span><span class="val" id="i-eff">&#8212;</span></div>
-    <div class="section-title">Regulatory Compliance</div>
+    <div class="section-title">Regulatory Alignment Overview</div>
     <div class="status-row">
       <span class="lbl">NRS 097-2-1 Grid Connection Standard</span>
       <span class="val" id="i-nrs097-status"><span style="color:var(--muted);font-size:11px">Run a design first &#9889;</span></span>
     </div>
-    <div class="comp-detail" id="i-nrs097-detail"></div>
+    <div class="comp-detail" id="i-nrs097-detail">
+Assessment based on published NRS 097 design parameters and common utility requirements. Final approval, engineering verification, and municipal acceptance remain the responsibility of the installer and relevant authorities.
+</div>
     <div class="comp-alt" id="i-nrs097-alt"></div>
     <div class="status-row"><span class="lbl">DC/AC Ratio vs NRS 097 (target 1.3:1, max 1.5:1)</span><span class="val" id="i-dcac-nrs">&#8212;</span></div>
-    <div class="status-row"><span class="lbl">NERSA SSEG Registration Required</span><span class="val" id="i-nersa">&#8212;</span></div>
+    <div class="status-row"><span class="lbl">Municipal / Utility SSEG Registration May Apply</span><span class="val" id="i-nersa">&#8212;</span></div>
     <div class="section-title">DC / AC Ratio Visual</div>
     <div class="chart-wrap">
       <div class="chart-row"><div class="chart-label">DC kW</div><div class="chart-bar-outer"><div class="chart-bar-inner" id="bar-dc" style="width:0%;background:var(--gold)"></div></div><div class="chart-val" id="bar-dc-val">&#8212;</div></div>
@@ -641,6 +643,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
       <div class="info">AI-powered proposal via Nova Metrics pipeline.<br><b id="pdf-type-hint">&#127968; Homeowner PDF &#8212; clear, simple, deal-closing</b></div>
       <button class="btn-generate" id="btn-gen" onclick="generateProposal()" disabled>Generate Proposal</button>
     </div>
+    <div style="margin-top:14px;font-size:11px;line-height:1.6;color:var(--muted)">
+Nova Metrics provides standards-aligned solar design guidance based on user inputs and referenced industry specifications. Outputs are advisory only and do not constitute municipal approval, engineering sign-off, or regulatory certification.
+</div>
+    
     <div class="success-card" id="success-card">
       <div class="success-header">
         <div class="success-icon">&#10003;</div>
