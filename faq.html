@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — Nova Metrics Solar Intelligence</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0B1F3A;--gold:#FFD700;--text:#f0f4f8;--muted:#7a95af;
+  --border:rgba(255,255,255,.08);--surface:#112840;--surface2:#0e2035;
+  --green:#34d399;--red:#f87171;--amber:#fbbf24;--blue:#7ac8f8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--gold);text-decoration:none}.a:hover{text-decoration:underline}
+
+.nav{background:var(--surface2);border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.nav-icon{width:32px;height:32px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--navy);font-family:'DM Serif Display',serif}
+.nav-title{font-size:14px;font-weight:600}.nav-sub{font-size:10px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.nav-right{display:flex;gap:10px}
+.nav-link{font-size:12px;color:var(--muted);text-decoration:none;padding:7px 14px;border:1px solid var(--border);border-radius:7px;transition:.15s}
+.nav-link:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.nav-link.primary{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600}
+.nav-link.primary:hover{background:#fff}
+
+.main{flex:1;padding:48px 20px 80px;max-width:760px;margin:0 auto;width:100%}
+
+.page-title{font-family:'DM Serif Display',serif;font-size:2.2rem;margin-bottom:8px;line-height:1.2}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:40px;line-height:1.6}
+
+.section{margin-bottom:48px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:rgba(255,215,0,.15)}
+
+.faq-item{border:1px solid var(--border);border-radius:11px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text);user-select:none;gap:12px;transition:background .15s}
+.faq-q:hover{background:rgba(255,255,255,.03)}
+.faq-q .arrow{font-size:11px;color:var(--muted);flex-shrink:0;transition:transform .2s}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 20px 18px;font-size:13px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border)}
+.faq-a p{margin-top:12px}
+.faq-a p:first-child{margin-top:12px}
+.faq-item.open .faq-a{display:block}
+.faq-a a{color:var(--gold)}
+.faq-a ul{margin:10px 0 0 18px;list-style:disc}
+.faq-a li{margin-bottom:6px;line-height:1.7}
+.faq-a .highlight{background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.18);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:var(--text);line-height:1.7}
+.faq-a .highlight strong{color:var(--gold)}
+
+/* compliance badges */
+.comp-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.comp-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px}
+.comp-badge.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25);color:var(--green)}
+.comp-badge.blue{background:rgba(122,200,248,.1);border:1px solid rgba(122,200,248,.25);color:var(--blue)}
+.comp-badge.amber{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+
+.footer{text-align:center;font-size:11px;color:var(--muted);padding:20px;flex-shrink:0;border-top:1px solid var(--border)}
+.footer a{color:var(--muted)}.footer a:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="/">
+    <div class="nav-icon">N</div>
+    <div><div class="nav-title">Nova Metrics</div><div class="nav-sub">Solar Intelligence</div></div>
+  </a>
+  <div class="nav-right">
+    <a href="/register.html" class="nav-link">Register Free</a>
+    <a href="/solar-intelligence.html" class="nav-link primary">Log In →</a>
+  </div>
+</nav>
+
+<div class="main">
+
+  <h1 class="page-title">Frequently Asked <em style="font-style:italic;color:var(--gold)">Questions</em></h1>
+  <p class="page-sub">Everything you need to know about Solar Intelligence — the platform, your trial, billing, and how we handle your data.</p>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION: GETTING STARTED
+  ═══════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">☀ Getting Started</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What is Solar Intelligence?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Solar Intelligence is an AI-powered solar proposal and system sizing platform built for South African solar installers. It lets you design NRS 097-2-1 compliant PV systems — selecting the right panels, inverters, and batteries for a client's load — and generate a branded PDF proposal in seconds.</p>
+        <p>It's built and operated by Nova Metrics Group (Pty) Ltd, based in Rivonia, Johannesburg.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        How do I get started?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Click <a href="/register.html">Register Free</a>. Enter your company name and email — no credit card required. You'll receive a login link by email. Click it, set your password, and you're in. The whole process takes under two minutes.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What's included in the free trial?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Your 60-day free trial includes full access to all Solar Intelligence features:</p>
+        <ul>
+          <li>Unlimited system designs (solar array, battery, inverter sizing)</li>
+          <li>NRS 097-2-1 compliance checks on every design</li>
+          <li>Up to 5 AI-generated client proposals (residential and commercial)</li>
+          <li>Access to the shared hardware database (panels, inverters, batteries)</li>
+          <li>Load Builder with appliance catalog and quick templates</li>
+          <li>25-year financial model with NERSA tariff escalation rates</li>
+        </ul>
+        <p>No credit card is required to start. After 60 days, a subscription is required to continue generating proposals.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Can I use my own hardware pricing?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Once logged in, go to <strong>My Hardware</strong> to upload your own panel, inverter, and battery pricelist. The system will use your prices for all calculations and proposals. Until you upload your own list, the shared Nova Metrics hardware database is used as a fallback.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION: BILLING
+  ═══════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-label">💳 Billing &amp; Subscriptions</div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What happens after my 60-day trial?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>After 60 days, your system design tools remain accessible, but generating new AI proposals requires an active subscription. Your data and all previously generated proposals are never deleted. You can subscribe at any time from the Billing page inside the platform.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Can I cancel at any time?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Yes. You can cancel your subscription at any time from your account settings. There are no cancellation fees. Your access continues until the end of your current billing period.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       SECTION: DATA & PRIVACY  (anchor: #data)
+  ═══════════════════════════════════════════════ -->
+  <div class="section" id="data">
+    <div class="section-label">🔒 Data, Privacy &amp; Compliance</div>
+
+    <div class="faq-item open">
+      <div class="faq-q" onclick="toggle(this)">
+        Is Nova Metrics POPIA compliant?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Nova Metrics Group (Pty) Ltd is registered with the Information Regulator of South Africa under the Protection of Personal Information Act (POPIA).</p>
+        <div class="comp-badges">
+          <span class="comp-badge green">✓ POPIA Registered</span>
+          <span class="comp-badge green">✓ Information Regulator Reg No: 2026-016677</span>
+          <span class="comp-badge green">✓ Registration Date: 19 May 2026</span>
+        </div>
+        <p style="margin-top:14px">Our Information Officer is <strong style="color:var(--text)">Reuben Siwela</strong> (appointed 17 April 2025). For any privacy or data access requests, email <a href="mailto:privacy@novametricsgroup.com">privacy@novametricsgroup.com</a>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Who processes my data and under what agreement?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Your data is stored and processed on <strong style="color:var(--text)">Supabase</strong>, a globally recognised database infrastructure provider. Nova Metrics has a fully executed Data Processing Addendum (DPA) with Supabase that legally governs how your data is handled.</p>
+        <div class="highlight">
+          <strong>DPA Reference:</strong> TSTVZ-BKVYE-BJ8JZ-YJGZ6<br>
+          <strong>Signed:</strong> 19 May 2026 by Reuben Siwela, Director, Nova Metrics<br>
+          <strong>Governing law:</strong> Irish law (EU SCCs, Standard Contractual Clauses)<br>
+          <strong>Supabase role:</strong> Data Processor / Sub-processor<br>
+          <strong>Nova Metrics role:</strong> Data Controller / Business
+        </div>
+        <p>Under this DPA, Supabase is contractually prohibited from selling your data, using it for advertising, or processing it outside the scope of running Solar Intelligence for you.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What data does Nova Metrics collect about me?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>When you register, we collect:</p>
+        <ul>
+          <li>Company / business name</li>
+          <li>Business email address</li>
+          <li>Contact person name (optional)</li>
+          <li>Contact number (optional)</li>
+          <li>Accreditation details (optional, added later in your profile)</li>
+        </ul>
+        <p>When you use the platform, we also store:</p>
+        <ul>
+          <li>System designs and proposal records you generate</li>
+          <li>Hardware pricelists you upload</li>
+          <li>Usage data (pages visited, features used) — used only to improve the platform</li>
+        </ul>
+        <p>We do not collect client personal information directly. Any client details you enter when generating a proposal (client name, email, address) are stored under your account and subject to your own POPIA obligations as data controller for your clients.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        How long is my data kept?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Your data is retained for the duration of your account. If you close your account:</p>
+        <ul>
+          <li>You have <strong style="color:var(--text)">30 days</strong> to request a copy of your data in a standard format.</li>
+          <li>After 30 days from account closure, all your data is permanently deleted from Nova Metrics and Supabase systems.</li>
+        </ul>
+        <p>You can request early deletion at any time by emailing <a href="mailto:privacy@novametricsgroup.com">privacy@novametricsgroup.com</a>. Deletion requests are processed within 10 business days.</p>
+        <div class="highlight">
+          <strong>Retention period (as per DPA):</strong> Duration of the Agreement, unless earlier deletion is requested by the Customer in accordance with the functionality of the Services.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Is my data encrypted?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Yes. Supabase applies industry-standard encryption to all data stored and transmitted on Nova Metrics' behalf:</p>
+        <ul>
+          <li><strong style="color:var(--text)">At rest:</strong> AES-256 encryption on all disks and backups. Encryption keys are generated per-project and protected by FIPS 140-2 compliant Hardware Security Modules (HSMs).</li>
+          <li><strong style="color:var(--text)">In transit:</strong> TLS 1.2 with modern cipher suites on all connections, including credential transmission.</li>
+          <li><strong style="color:var(--text)">Backups:</strong> Daily encrypted backups, stored on infrastructure independent of live project resources, with 99.99% availability target.</li>
+        </ul>
+        <p>Passwords are never stored in plain text — only hashed, salted values are retained.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Will Nova Metrics sell or share my data?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>No. Under our DPA with Supabase and our own Privacy Policy, Nova Metrics is explicitly prohibited from:</p>
+        <ul>
+          <li>Selling your data or making it available to third parties for payment</li>
+          <li>Sharing your data for cross-context behavioural advertising</li>
+          <li>Using your data outside the direct business relationship (running Solar Intelligence for you)</li>
+          <li>Combining your data with data from other customers without legal basis</li>
+        </ul>
+        <p>The only sub-processors that ever touch your data are listed in the Supabase DPA Schedule 3 — infrastructure providers like Amazon Web Services, Cloudflare, and Google (all for hosting only).</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What are my rights under POPIA?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>As a South African data subject, you have the following rights under POPIA, which Nova Metrics is obligated to honour:</p>
+        <ul>
+          <li><strong style="color:var(--text)">Right to access</strong> — Request a copy of the personal data we hold about you</li>
+          <li><strong style="color:var(--text)">Right to correction</strong> — Request correction of inaccurate or incomplete data</li>
+          <li><strong style="color:var(--text)">Right to deletion</strong> — Request deletion of your personal data</li>
+          <li><strong style="color:var(--text)">Right to object</strong> — Object to certain types of processing</li>
+          <li><strong style="color:var(--text)">Right to complain</strong> — Lodge a complaint with the Information Regulator of South Africa at <a href="https://www.justice.gov.za/inforeg/" target="_blank">www.justice.gov.za/inforeg</a></li>
+        </ul>
+        <p>To exercise any of these rights, email <a href="mailto:privacy@novametricsgroup.com">privacy@novametricsgroup.com</a>. We will respond within 10 business days.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        What are my responsibilities as an installer using the platform?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>When you enter client information (name, email, address) into Solar Intelligence to generate proposals, <strong style="color:var(--text)">you are the data controller</strong> for that client's personal data. This means you are responsible for:</p>
+        <ul>
+          <li>Having a lawful basis to collect and process your client's personal information</li>
+          <li>Informing your clients that their details are being processed to generate a solar proposal</li>
+          <li>Obtaining consent where required under POPIA</li>
+          <li>Handling any access or deletion requests your clients make to you</li>
+        </ul>
+        <p>Nova Metrics acts as your data processor for client data — we store and process it only to generate the proposal you requested, and never for any other purpose.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggle(this)">
+        Where is my data physically stored?
+        <span class="arrow">▾</span>
+      </div>
+      <div class="faq-a">
+        <p>Your data is stored on Supabase infrastructure hosted on Amazon Web Services (AWS). Nova Metrics' Sup
