@@ -216,7 +216,33 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .rw-actions-hd{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px;}
 .rw-action{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);font-size:11.5px;color:var(--text);line-height:1.5;margin-bottom:5px;}
 .rw-action-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
-  
+
+ /* ── Setup Wizard ──────────────────────────────────────── */
+#setup-wizard{position:fixed;inset:0;z-index:9999;background:rgba(11,31,58,.96);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px)}
+.wiz-box{max-width:520px;width:100%;background:#112840;border:1px solid rgba(255,215,0,.25);border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.wiz-header{background:linear-gradient(135deg,#0B1F3A,#1a3a5c);padding:22px 28px 16px;border-bottom:2px solid var(--gold);text-align:center}
+.wiz-steps{display:flex;justify-content:center;gap:6px;margin-bottom:14px}
+.wiz-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,215,0,.25);transition:.3s}
+.wiz-dot.active{background:var(--gold);width:22px;border-radius:4px}
+.wiz-dot.done{background:rgba(52,211,153,.6)}
+.wiz-body{padding:22px 26px}
+.wiz-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;display:block}
+.wiz-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text);padding:11px 14px;border-radius:9px;font-size:13px;font-family:'DM Sans',sans-serif;transition:border-color .2s;margin-bottom:14px}
+.wiz-input:focus{outline:none;border-color:var(--gold)}
+.wiz-color-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.wiz-color-item label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);display:block;margin-bottom:5px}
+.wiz-color-pair{display:flex;gap:7px;align-items:center}
+.wiz-color-pair input[type=color]{width:40px;height:36px;padding:2px;border-radius:7px;border:1px solid rgba(255,255,255,.1);background:none;cursor:pointer}
+.wiz-color-pair input[type=text]{width:76px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--text);padding:9px 10px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif}
+.wiz-btn-row{display:flex;gap:10px;margin-top:6px}
+.wiz-btn-primary{flex:1;padding:12px;border-radius:9px;border:none;background:var(--gold);color:#0B1F3A;font-size:14px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.wiz-btn-primary:hover{background:#fff}
+.wiz-btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.wiz-btn-skip{padding:12px 18px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:none;color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s}
+.wiz-btn-skip:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+.wiz-level{display:flex;align-items:center;gap:10px;padding:12px 15px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);margin-bottom:14px}
+.wiz-level-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.wiz-tip{font-size:11px;color:var(--muted);line-height:1.6;padding:10px 14px;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.12);border-radius:8px;margin-bottom:14px} 
 </style>
 </head>
 <body>
@@ -1141,6 +1167,7 @@ if (installer && !installer.terms_accepted_at) {
  showProfileNudges();
   showGreeting();
   checkFirstTimeUser();
+  showSetupWizard();
 }
 function showProfileNudges() {
   const tips = [];
@@ -1876,6 +1903,158 @@ function showFirstTimeGuide() {
     + 'Skip — I know what I\'m doing</button></div>'
     + '</div></div>';
   document.body.appendChild(overlay);
+}
+  // ── SETUP WIZARD ─────────────────────────────────────────────────────────
+let wizStep = 1;
+
+function showSetupWizard() {
+  if (localStorage.getItem('setup_wizard_done_' + installer.installer_id)) return;
+  const missing = !installer.logo_url || !installer.primary_color;
+  if (!missing) { localStorage.setItem('setup_wizard_done_' + installer.installer_id, '1'); return; }
+  const el = document.createElement('div');
+  el.id = 'setup-wizard';
+  el.innerHTML = wizHTML(1);
+  document.body.appendChild(el);
+}
+
+function wizHTML(step) {
+  const dots = [1,2,3].map(i =>
+    `<div class="wiz-dot ${i < step ? 'done' : i === step ? 'active' : ''}"></div>`
+  ).join('');
+  const titles = ['','Brand your proposals','Compliance details (optional)','You\'re ready!'];
+  const subs   = ['','Upload your logo and set your brand colours — these appear on every proposal.','Your registration number unlocks Verified status on your handover certificates.','Your profile is set up. Here\'s what you\'ve unlocked.'];
+
+  let body = '';
+
+  if (step === 1) {
+    const p = installer.primary_color   || '#0A2540';
+    const s = installer.secondary_color || '#FFFFFF';
+    const a = installer.accent_color    || '#B8962E';
+    body = `
+      <span class="wiz-label">Logo URL</span>
+      <input class="wiz-input" id="wiz-logo" placeholder="https://yourcompany.com/logo.png" value="${installer.logo_url||''}">
+      <div class="wiz-tip">💡 Paste a direct link to your logo image. Use a transparent PNG for best results on proposals.</div>
+      <div class="wiz-color-row">
+        <div class="wiz-color-item">
+          <label>Primary</label>
+          <div class="wiz-color-pair">
+            <input type="color" id="wiz-pc" value="${p}" oninput="document.getElementById('wiz-ph').value=this.value">
+            <input type="text"  id="wiz-ph" value="${p}" maxlength="7" oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value))document.getElementById('wiz-pc').value=this.value">
+          </div>
+        </div>
+        <div class="wiz-color-item">
+          <label>Secondary</label>
+          <div class="wiz-color-pair">
+            <input type="color" id="wiz-sc" value="${s}" oninput="document.getElementById('wiz-sh').value=this.value">
+            <input type="text"  id="wiz-sh" value="${s}" maxlength="7" oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value))document.getElementById('wiz-sc').value=this.value">
+          </div>
+        </div>
+        <div class="wiz-color-item">
+          <label>Accent</label>
+          <div class="wiz-color-pair">
+            <input type="color" id="wiz-ac" value="${a}" oninput="document.getElementById('wiz-ah').value=this.value">
+            <input type="text"  id="wiz-ah" value="${a}" maxlength="7" oninput="if(/^#[0-9A-Fa-f]{6}$/.test(this.value))document.getElementById('wiz-ac').value=this.value">
+          </div>
+        </div>
+      </div>
+      <div class="wiz-btn-row">
+        <button class="wiz-btn-primary" id="wiz-next-btn" onclick="wizSave1()">Save & continue →</button>
+        <button class="wiz-btn-skip" onclick="wizGoTo(2)">Skip for now</button>
+      </div>`;
+  }
+
+  if (step === 2) {
+    body = `
+      <span class="wiz-label">Registration Number</span>
+      <input class="wiz-input" id="wiz-reg" placeholder="e.g. 2012/123456/07" value="${installer.registration_number||''}">
+      <span class="wiz-label">Accreditation</span>
+      <input class="wiz-input" id="wiz-acc" placeholder="e.g. SAPVIA, SESSA" value="${installer.accreditation||''}">
+      <div class="wiz-tip">📋 These appear on your handover certificate and lift your profile to <strong style="color:var(--green)">Verified</strong> status.</div>
+      <div class="wiz-btn-row">
+        <button class="wiz-btn-primary" onclick="wizSave2()">Save & continue →</button>
+        <button class="wiz-btn-skip" onclick="wizGoTo(3)">Skip for now</button>
+      </div>`;
+  }
+
+  if (step === 3) {
+    const hasLogo   = !!installer.logo_url;
+    const hasColour = !!installer.primary_color;
+    const hasReg    = !!installer.registration_number;
+    const hasAcc    = !!installer.accreditation;
+    const isVerified = hasReg && hasAcc;
+    const level = isVerified ? '🟢 Verified' : (hasLogo ? '🔵 Documented' : '⚪ Basic Profile');
+    const dot   = isVerified ? '#34d399'      : (hasLogo ? '#7ac8f8'      : '#7a95af');
+    const items = [
+      { label:'Logo on proposals', done: hasLogo },
+      { label:'Brand colours', done: hasColour },
+      { label:'Registration number', done: hasReg },
+      { label:'Accreditation', done: hasAcc },
+    ];
+    body = `
+      <div class="wiz-level">
+        <div class="wiz-level-dot" style="background:${dot}"></div>
+        <div><div style="font-size:13px;font-weight:600">${level}</div><div style="font-size:11px;color:var(--muted)">Your current profile level</div></div>
+      </div>
+      ${items.map(it=>`<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:13px">
+        <span style="color:${it.done?'var(--green)':'var(--muted)'}">${it.done?'✓':'○'}</span>
+        <span style="color:${it.done?'var(--text)':'var(--muted)'}">${it.label}</span>
+        ${!it.done?'<a href="hardware-pricelist.html" style="font-size:11px;color:var(--gold);margin-left:auto">Add later →</a>':''}
+      </div>`).join('')}
+      <div style="margin-top:16px">
+        <button class="wiz-btn-primary" onclick="wizDone()" style="width:100%">Enter Solar Intelligence ⚡</button>
+      </div>`;
+  }
+
+  return `<div class="wiz-box">
+    <div class="wiz-header">
+      <div class="wiz-steps">${dots}</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:4px">${titles[step]}</div>
+      <div style="font-size:12px;color:var(--muted)">${subs[step]}</div>
+    </div>
+    <div class="wiz-body">${body}</div>
+  </div>`;
+}
+
+function wizGoTo(step) {
+  wizStep = step;
+  document.getElementById('setup-wizard').innerHTML = wizHTML(step);
+}
+
+async function wizSave1() {
+  const btn = document.getElementById('wiz-next-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const logo = document.getElementById('wiz-logo').value.trim();
+  const pc   = document.getElementById('wiz-ph').value.trim();
+  const sc   = document.getElementById('wiz-sh').value.trim();
+  const ac   = document.getElementById('wiz-ah').value.trim();
+  await supabaseClient.from('installers').update({
+    logo_url:        logo || null,
+    primary_color:   pc   || null,
+    secondary_color: sc   || null,
+    accent_color:    ac   || null,
+  }).eq('installer_id', installer.installer_id);
+  installer.logo_url        = logo;
+  installer.primary_color   = pc;
+  installer.secondary_color = sc;
+  installer.accent_color    = ac;
+  wizGoTo(2);
+}
+
+async function wizSave2() {
+  const reg = document.getElementById('wiz-reg').value.trim();
+  const acc = document.getElementById('wiz-acc').value.trim();
+  await supabaseClient.from('installers').update({
+    registration_number: reg || null,
+    accreditation:       acc || null,
+  }).eq('installer_id', installer.installer_id);
+  installer.registration_number = reg;
+  installer.accreditation       = acc;
+  wizGoTo(3);
+}
+
+function wizDone() {
+  localStorage.setItem('setup_wizard_done_' + installer.installer_id, '1');
+  document.getElementById('setup-wizard').remove();
 }
 async function acceptTermsFromModal(installerId) {
   await supabaseClient.from('installers').update({
