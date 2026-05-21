@@ -208,7 +208,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="plan-card" id="card-trial">
       <div class="plan-badge" id="badge-trial" style="display:none">Current</div>
       <div class="plan-name">Trial</div>
-      <div class="plan-price"><span class="amount">R0</span> <span class="cycle">/ 60 days</span></div>
+      <div class="plan-price"><span class="amount">R0</span> <span class="cycle">/ 14 days</span></div>
       <div class="plan-desc">Evaluate Solar Intelligence with your first clients &#8212; no card required.</div>
       <ul class="plan-features">
         <li class="partial"><i class="ic">&#9632;</i> 5 proposals total</li>
@@ -358,7 +358,7 @@ function renderStatus() {
       banner.className = 'status-banner expired';
       eyebrow.textContent = '\u26A0 Trial Expired';
       planEl.textContent = 'Trial Ended';
-      metaEl.innerHTML = 'Your 60-day trial has ended. <strong>Subscribe to continue generating proposals</strong> for your clients.';
+      metaEl.innerHTML = 'Your 14-day trial has ended. <strong>Subscribe to continue generating proposals</strong> for your clients.';
       actions.innerHTML = actionBtn('gold', 'startUpgrade(\'professional\')', '&#128640; Upgrade to Professional &mdash; R2,499/mo');
       return;
     }
