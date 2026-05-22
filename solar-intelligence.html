@@ -811,6 +811,8 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let installer = null, calcResult = null, selectedLoc = null, selectedClientType = 'residential';
 
+let currentJob = null; // set when portal opens a job and passes ai_id  
+
 const SYSTEM_PR           = 0.80;
 const BATT_ROUND_TRIP_EFF = 0.92;
 const SYSTEM_AVAILABILITY = 0.97;
@@ -1801,6 +1803,7 @@ async function saveRevisionVersion() {
 
   const payload = {
     installer_id:      installer.installer_id,
+    ai_id:             currentJob?.ai_id || null,
     revision_type:     'locked_design',
     // ── Audit trail (new) ────────────────────────────────────────
     revision_reason:   revReason,
