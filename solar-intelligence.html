@@ -1020,6 +1020,30 @@ function buildSystemResult({ inv, invUnits, panel, panelCount, batt, battUnits,
   };
 }
 
+function deepFreeze(obj){
+  if(!obj||typeof obj!=='object'||Object.isFrozen(obj)) return obj;
+  Object.freeze(obj);
+  Object.keys(obj).forEach(k=>deepFreeze(obj[k]));
+  return obj;
+}
+function makeCalculationSnapshot(result,timingAnalysis){
+  return deepFreeze({...result,timingAnalysis});
+}
+function cloneCalculationSnapshot(result){
+  return deepFreeze(JSON.parse(JSON.stringify(result)));
+}
+function validationContextFromResult(r){
+  return {
+    dcAc:r.dcAc, invAC:r.invAC, invDC:r.invDC, invMPPT:r.mpptAv,
+    sysDC:r.sysDC, battKW:r.battTotalKW, battKWh:r.iKWh,
+    effPeak:r.peakLoadBackup||r.peakLoad, dod:r.battDod, headroom:r.battCR,
+    clipRatio:r.clipRatio, stringsNeeded:r.stringsNeeded,
+    panelsPerString:r.panelsPerString, mpptNeeded:r.mpptReq,
+    strVOC:r.strVOC, maxPVV:r.maxPVV, osP:r.osP,
+    invUnits:r.invUnits, panelCount:r.pc
+  };
+}
+
 function selectBestBattery(reqKWh, peakLoad, autonomy){
   const cands=[], avg=Math.max(reqKWh/autonomy,0.01);
   DB.batteries.forEach(b=>{
@@ -1218,8 +1242,8 @@ function calculate(){
     isRevision: false
   });
   const tw = analyseLoadTiming(lbItems, result.iKWh, autonomy, dailyUsage, result.battRuntime);
-  // Fresh assignment — no stale state inherited from any prior calculation
-  calcResult = { ...result, timingAnalysis: tw };
+  // Fresh frozen assignment — no stale state inherited from any prior calculation
+  calcResult = makeCalculationSnapshot(result, tw);
   renderAll(calcResult);
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
   toast('&#10003; Compliant system designed — All automated design checks passed');
@@ -1331,7 +1355,7 @@ let revisionBaseResult = null; // frozen snapshot of the original auto calculati
 // ── Open / Close ─────────────────────────────────────────────────
 function openRevisionPanel() {
   if (!calcResult) { toast('⚠ Run a design first', true); return; }
-  revisionBaseResult = JSON.parse(JSON.stringify(calcResult)); // immutable freeze of original
+  revisionBaseResult = cloneCalculationSnapshot(calcResult);
   document.getElementById('rev-validation-msg').innerHTML = '';
   document.getElementById('rev-comparison').style.display = 'none';
   const advPanel = document.getElementById('rev-advisory-panel');
@@ -1641,32 +1665,17 @@ function calculateLockedSystem() {
   const effPeak  = peakLoadBackup  || peakLoad;
   const effDaily = dailyUsageBackup|| dailyUsage;
 
-  // ── Build validation context from locked hardware ─────────────────
-  const invAC       = inv.ac    * invUnits;
-  const invDC       = inv.dc    * invUnits;
-  const invMPPT     = inv.mppt  * invUnits;
-  const sysDC       = panelCount * panel.watts / 1000;
-  const dcAc        = sysDC / invAC;
-  const battKWh     = batt.usable * battUnits;
-  const battKW      = batt.kw    * battUnits;
-  const reqKWh      = effDaily   * (autonomy / 24);
-  const dod         = battKWh > 0 ? reqKWh / battKWh : 999;
-  const headroom    = battKWh > 0 ? battKWh / Math.max(reqKWh, 0.001) : 0;
-  const clipRatio   = sysDC > invDC ? (sysDC - invDC) / sysDC : 0;
-  const reqSolarKW  = ((dailyUsage - reqKWh) + reqKWh / BATT_ROUND_TRIP_EFF) / (psh * SYSTEM_PR * SYSTEM_AVAILABILITY);
-  const osP         = (sysDC - reqSolarKW) / Math.max(reqSolarKW, 0.001);
-  const strCfg      = computeStringConfig(panelCount, panel.watts, invDC);
-  const { stringsNeeded, panelsPerString, strVOC, maxPVV } = strCfg;
-  const mpptNeeded  = Math.ceil(stringsNeeded / 2);
+  // Build one draft calculation; validation and UI use the same numbers.
+  const draftResult = buildSystemResult({
+    inv, invUnits, panel, panelCount, batt, battUnits,
+    peakLoad, dailyUsage,
+    peakLoadBackup: effPeak, dailyUsageBackup: effDaily,
+    psh, autonomy, tariff, markup,
+    locName: selectedLoc.label, isRevision: true
+  });
 
-  const valCtx = {
-    dcAc, invAC, invDC, invMPPT, sysDC, battKW, battKWh,
-    effPeak, dod, headroom, clipRatio, stringsNeeded, panelsPerString,
-    mpptNeeded, strVOC, maxPVV, osP, invUnits, panelCount
-  };
-
-  // ── Run modular validation engine — no UI coupling ─────────────────
-  const val = runValidationEngine(valCtx);
+  // Run modular validation with no duplicated sizing formulas.
+  const val = runValidationEngine(validationContextFromResult(draftResult));
   renderValidationResults(val, msgEl);
   if (val.blockers.length > 0) {
     document.getElementById('rev-comparison').style.display = 'none';
@@ -1675,24 +1684,16 @@ function calculateLockedSystem() {
     return;
   }
 
-  // ── ONE call to shared calculation core — zero duplicated formulas ──
-  const revResult = buildSystemResult({
-    inv, invUnits, panel, panelCount, batt, battUnits,
-    peakLoad, dailyUsage,
-    peakLoadBackup: effPeak, dailyUsageBackup: effDaily,
-    psh, autonomy, tariff, markup,
-    locName: selectedLoc.label, isRevision: true
-  });
-  const tw = analyseLoadTiming(lbItems, revResult.iKWh, autonomy, dailyUsage, revResult.battRuntime);
-  // Fresh assignment — no stale state inherited from previous calculation
-  calcResult = { ...revResult, timingAnalysis: tw };
+  const tw = analyseLoadTiming(lbItems, draftResult.iKWh, autonomy, dailyUsage, draftResult.battRuntime);
+  // Fresh frozen assignment — no stale state inherited from previous calculation
+  calcResult = makeCalculationSnapshot(draftResult, tw);
 
   renderAll(calcResult);
   renderComplianceBadge(calcResult.invBrand, calcResult.invModelRaw);
-  renderRevisionComparison(revisionBaseResult, revResult, val);
+  renderRevisionComparison(revisionBaseResult, calcResult, val);
 
   // Advisory intelligence — engineering guidance even in locked mode
-  const advisory = generateAdvisoryInsights(revResult, revisionBaseResult);
+  const advisory = generateAdvisoryInsights(calcResult, revisionBaseResult);
   renderAdvisoryInsights(advisory);
 
   toast('✓ Revision calculated — all tabs updated with locked design');
@@ -1857,6 +1858,59 @@ async function saveRevisionVersion() {
   } catch(e) {
     toast('✗ Save failed: ' + e.message, true);
     btn.disabled=false; btn.textContent='Save Revision Version';
+  }
+}
+
+async function saveOriginalProposalVersion(aiId,r){
+  if(!aiId||!r||!installer) return;
+  try{
+    const {data:{session}}=await supabaseClient.auth.getSession();
+    const payload={
+      installer_id:      installer.installer_id,
+      ai_id:             aiId,
+      revision_type:     'original',
+      revision_reason:   'Initial generated proposal',
+      revised_by:        installer.installer_name||installer.contact_email||'System',
+      revised_at:        new Date().toISOString(),
+      installer_notes:   null,
+      system_kw:         parseFloat(r.sysDC.toFixed(3)),
+      battery_kwh:       parseFloat(r.iKWh.toFixed(2)),
+      panels_qty:        r.pc,
+      panel_brand:       r.panelModel,
+      panel_watt:        r.panelWatts,
+      inverter_brand:    r.invBrand,
+      inverter_kw:       parseFloat(r.invAC.toFixed(2)),
+      battery_brand:     r.battModel,
+      battery_unit_kwh:  r.battUsable,
+      battery_qty:       r.battUnits,
+      system_cost:       Math.round(r.totCost),
+      total_cost:        Math.round(r.sellP),
+      annual_savings:    Math.round(r.annSavY1),
+      npv:               Math.round(r.npv),
+      irr:               parseFloat(r.irr.toFixed(2)),
+      payback_years:     r.realPb,
+      dc_ac_ratio:       parseFloat(r.dcAc.toFixed(3)),
+      delta_system_kw:   0,
+      delta_battery_kwh: 0,
+      delta_cost:        0,
+      delta_pct:         0,
+      delta_category:    'Original Proposal',
+      delta_summary:     'Original generated proposal',
+      created_at:        new Date().toISOString()
+    };
+    const res=await fetch(SUPA_URL+'/rest/v1/proposal_versions',{
+      method:'POST',
+      headers:{
+        'apikey':SUPA_ANON,
+        'Authorization':'Bearer '+(session?session.access_token:SUPA_ANON),
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok) console.warn('Original proposal version not saved:',await res.text());
+  }catch(e){
+    console.warn('Original proposal version not saved:',e);
   }
 }
 
@@ -2042,6 +2096,7 @@ if (__bs && !__bs.allowed) {
     const res=await fetch(SUPA_URL+'/functions/v1/generate-solar-proposal',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON,'Authorization':'Bearer '+token},body:JSON.stringify(payload)});
     const data=await res.json();
     if(data.success){
+      await saveOriginalProposalVersion(data.ai_id,r);
       // Billing counter — increment proposals used this month
       try { await supabaseClient.rpc('increment_proposal_count', { p_installer_id: installer.installer_id }); }
       catch(e) { console.warn('Billing count update failed:', e); }

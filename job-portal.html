@@ -801,11 +801,11 @@ function renderProposalVersions(){
   }).join('');
   container.innerHTML = `
     <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">
-      📋 Proposal Versions — ${currentProposalVersions.length} revision${currentProposalVersions.length>1?'s':''}
+      📋 Proposal Versions — ${currentProposalVersions.length} version${currentProposalVersions.length>1?'s':''}
     </div>
     ${rows}
     <div style="padding:8px 14px;font-size:11px;color:var(--text3)">
-      Latest revision hardware pre-filled in Install Prep below.
+      Latest version hardware pre-filled in Install Prep below.
     </div>`;
 }
 function prefillForms(){
