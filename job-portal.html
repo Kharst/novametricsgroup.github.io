@@ -247,6 +247,7 @@
         <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(3)"><div class="pipe-dot" id="pdot-3">4</div><div class="pipe-label" id="plbl-3">Completion</div></div><div class="pipe-arrow" id="parr-3"></div></div>
         <div class="pipe-step"><div class="pipe-node" onclick="jumpToPanel(4)"><div class="pipe-dot" id="pdot-4">5</div><div class="pipe-label" id="plbl-4">Handover</div></div></div>
       </div>
+      <div id="proposal-versions-section" style="display:none;margin:16px 28px 0;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden"></div>
       <div class="approval-alert-banner" id="approval-alert-banner" style="margin-top:16px"><span id="approval-alert-icon"></span><span id="approval-alert-msg"></span></div>
       <div class="design-change-alert" id="design-change-alert" style="margin:16px 28px 0">
         <div class="dca-header"><div class="dca-icon">⚠</div><div><div class="dca-title">Design Change Detected — Action Required</div><div class="dca-sub">The site assessment recommends a different system to the original accepted proposal.</div></div></div>
@@ -418,7 +419,7 @@
 const SUPA_URL='https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
 const sbClient=supabase.createClient(SUPA_URL,SUPA_ANON);
-let jobs=[],currentJob=null,currentInstall=null,currentHandover=null,currentVisit=null,currentInstallerProfile=null;
+let jobs=[],currentJob=null,currentInstall=null,currentHandover=null,let currentProposalVersions = [];currentVisit=null,currentInstallerProfile=null;
 let activeFilter='all',_jobLoading=false,_pendingJobId=null;
 const MINOR=0.05,MAJOR=0.20;
 function getCat(kw,batt){const m=Math.max(kw||0,batt||0);return m>=MAJOR?'major':m>=MINOR?'minor':'none';}
@@ -533,15 +534,18 @@ async function openJob(id){
     if(!data||!data[0]){toast('Job not found','error');return;}
     currentJob=data[0];currentInstallerProfile=null;
     if(currentJob.installer_id){try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}}
-    const[visits,installs,handovers,logs]=await Promise.all([
-      sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('installations',`job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('handovers',`job_id=eq.${id}&order=created_at.desc&limit=1`),
-      sbGet('job_activity_log',`job_id=eq.${id}&order=created_at.desc&limit=20`),
-    ]);
-    currentVisit=visits?.[0]||null;currentInstall=installs?.[0]||null;currentHandover=handovers?.[0]||null;
+    const[visits,installs,handovers,logs,versions]=await Promise.all([
+  sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+  sbGet('installations',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+  sbGet('handovers',`job_id=eq.${id}&order=created_at.desc&limit=1`),
+  sbGet('job_activity_log',`job_id=eq.${id}&order=created_at.desc&limit=20`),
+  sbGet('proposal_versions',`ai_id=eq.${id}&order=created_at.desc&limit=10`),
+]);
+currentVisit=visits?.[0]||null;currentInstall=installs?.[0]||null;currentHandover=handovers?.[0]||null;
+currentProposalVersions=versions||[];
     renderJobHeader();renderPipeline();renderPanels();renderActivityLog(logs||[]);prefillForms();
-    renderNotificationStatus();renderDesignChangeAlert();renderPanel1DesignNote();renderApprovalBanner();
+renderNotificationStatus();renderDesignChangeAlert();renderPanel1DesignNote();renderApprovalBanner();
+renderProposalVersions();
     const ph=document.getElementById('placeholder');const ws=document.getElementById('job-workspace');
     if(ph)ph.style.display='none';if(ws)ws.style.display='flex';
     renderSidebar();
@@ -769,10 +773,55 @@ async function sendDesignChangeNotification(job,visit,category){
     toast('Failed to send notification: '+e.message,'error');
   }
 }
-
+function renderProposalVersions(){
+  const container = document.getElementById('proposal-versions-section');
+  if(!container) return;
+  if(!currentProposalVersions.length){ container.style.display='none'; return; }
+  container.style.display='block';
+  const rows = currentProposalVersions.map((v,i)=>{
+    const date = v.created_at ? new Date(v.created_at).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const cat   = v.delta_category||'Revision';
+    const catColor = cat.includes('Major')?'var(--red)':cat.includes('Moderate')?'var(--amber)':'var(--green)';
+    const costSign = v.delta_cost>0?'+':'';
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);${i===0?'background:rgba(245,166,35,.04)':''}">
+      <div style="font-family:var(--mono);font-size:9px;color:${i===0?'var(--amber)':'var(--text3)'};padding-top:2px;white-space:nowrap">
+        ${i===0?'LATEST':'V'+(currentProposalVersions.length-i)}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">${v.delta_summary||'Design revision'}</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span style="font-family:var(--mono);font-size:10px;color:${catColor}">${cat}</span>
+          ${v.delta_cost?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${costSign}R${Math.abs(Math.round(v.delta_cost)).toLocaleString('en-ZA')} cost</span>`:''}
+          ${v.system_kw?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${v.system_kw} kWp · ${v.battery_kwh} kWh</span>`:''}
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap">${date}</div>
+    </div>`;
+  }).join('');
+  container.innerHTML = `
+    <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">
+      📋 Proposal Versions — ${currentProposalVersions.length} revision${currentProposalVersions.length>1?'s':''}
+    </div>
+    ${rows}
+    <div style="padding:8px 14px;font-size:11px;color:var(--text3)">
+      Latest revision hardware pre-filled in Install Prep below.
+    </div>`;
+}
 function prefillForms(){
   const v=currentVisit;
   if(v){setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);checkDesignChangeLive();}
+  // Pre-fill installation hardware from latest proposal version if no install record yet
+const latestVersion = currentProposalVersions[0];
+if(latestVersion && !currentInstall) {
+  setVal('inst-panelbrand', latestVersion.panel_brand);
+  setVal('inst-panelwatt',  latestVersion.panel_watt);
+  setVal('inst-panelqty',   latestVersion.panels_qty);
+  setVal('inst-inverterbrand', latestVersion.inverter_brand);
+  setVal('inst-inverterkw',    latestVersion.inverter_kw);
+  setVal('inst-batterybrand',  latestVersion.battery_brand);
+  setVal('inst-batterykwh',    latestVersion.battery_unit_kwh);
+  setVal('inst-batteryqty',    latestVersion.battery_qty);
+}
   const inst=currentInstall;
   if(inst){setVal('inst-teamlead',inst.team_lead);setVal('inst-team',inst.team_members);setVal('inst-date',inst.scheduled_date);setVal('inst-panelbrand',inst.panels_brand);setVal('inst-panelwatt',inst.panels_watt);setVal('inst-panelqty',inst.panels_qty);setVal('inst-inverterbrand',inst.inverter_brand);setVal('inst-inverterkw',inst.inverter_kw);setVal('inst-batterybrand',inst.battery_brand);setVal('inst-batterykwh',inst.battery_kwh);setVal('inst-batteryqty',inst.battery_qty);setVal('comp-kw',inst.final_system_kw);setVal('comp-battery',inst.final_battery_kwh);setVal('comp-punchlist',inst.punch_list);setVal('comp-inspector',inst.inspector_name);setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');if(inst.install_checklist?.length)reloadChecklist(inst.install_checklist);}
   const ho=currentHandover;
