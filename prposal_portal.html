@@ -570,7 +570,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
           </button>
         </div>
       </div>
-
+      <!-- Engineering disclaimer — visible whenever a proposal exists -->
+      <div id="engDisclaimer" style="display:none;background:#f0f4f8;border:1px solid #cbd5e1;border-radius:8px;padding:10px 14px;font-size:10.5px;color:#475569;line-height:1.6;margin-bottom:2px">
+        <strong style="color:#1e293b;display:block;margin-bottom:3px">&#9432; Design Tool Output — Not an Engineering Certificate</strong>
+        This proposal is produced by Nova Metrics Solar Intelligence to help qualified solar installers present system specifications to clients. It does not constitute an engineering certificate, compliance certificate (COC), or sign-off under NRS&nbsp;097-2-1, NERSA regulations, or any applicable municipal grid code. Final design verification, compliance documentation, and installation sign-off remain the sole responsibility of the registered installer and qualified electrician.
+      </div>
       <div class="booking-card" id="bookingCard" style="display:none">
         <div class="booking-header">
           <div class="booking-icon">🗓️</div>
@@ -917,7 +921,7 @@ function pick(idx,rowEl){
   var pill=document.getElementById('chPill');pill.textContent=getPillLabel(ps,has);pill.className='pill '+getPillClass(ps);
   var ts=document.getElementById('trackingStrip');ts.style.display=has?'flex':'none';
   if(has){tevSet('generated',ai.created_at,'Generated');tevSet('sent',ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at,'Sent');tevSet('opened',ai.email_opened_at,'Opened');tevSet('viewed',ai.proposal_viewed_at,'Viewed');tevSet('won',ai.won_at||null,'Won');}
-  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');
+  vis('noPropRow',!has,'flex');vis('statsRow',has,'grid');vis('specsRow',has,'grid');vis('dlRow',has,'flex');vis('engDisclaimer',has,'block');
   var isAccepted=(ps==='accepted');var isTerminal=(ps==='accepted'||ps==='rejected');
   document.getElementById('wonBadgeRow').style.display=(has&&isAccepted)?'block':'none';
   document.getElementById('manualOverrideRow').style.display=(has&&!isTerminal)?'block':'none';
