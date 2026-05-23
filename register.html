@@ -413,6 +413,17 @@ async function submitRegistration() {
     document.getElementById('success-email').textContent = email;
     document.getElementById('success-screen').style.display = 'block';
 
+    // Fire welcome email — non-blocking, fire and forget
+    fetch(`${SUPA_URL}/functions/v1/welcome-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+      body: JSON.stringify({
+        installer_id: data.installer_id,
+        email:        email,
+        company_name: company,
+      }),
+    }).catch(() => {}); // don't block on this
+
   } catch (e) {
     showMsg(msgEl, 'err', '✗ ' + e.message);
     btn.disabled = !termsAccepted;
