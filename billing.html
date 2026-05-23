@@ -161,7 +161,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </nav>
 
-<!-- Minimal login for direct access -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">N</div>
@@ -174,16 +173,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
   </div>
 </div>
 
-<!-- Main billing content -->
 <div id="billing-screen">
 
-  <!-- PayFast return success -->
   <div class="success-alert" id="success-alert">
     <div class="sa-title">&#127881; Subscription activated!</div>
     <div class="sa-body">Welcome to Solar Intelligence Professional. Your account is now active and you have unlimited proposal generation. Head back to the Design System tool to keep working.</div>
   </div>
 
-  <!-- Current plan status card -->
   <div class="status-banner trial" id="status-banner">
     <div class="sb-eyebrow" id="sb-eyebrow">Loading&#8230;</div>
     <div class="sb-plan" id="sb-plan">&#8212;</div>
@@ -199,7 +195,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="sb-actions" id="sb-actions"></div>
   </div>
 
-  <!-- Plan comparison -->
   <div class="section-hd">Choose your <em>plan</em></div>
 
   <div class="plan-grid">
@@ -215,7 +210,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
         <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
         <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
-        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 aligned sizing</li>
         <li class="no"><i class="ic">&#10007;</i> Unlimited proposals</li>
       </ul>
       <button class="plan-cta disabled" disabled>Free Trial</button>
@@ -233,7 +228,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
         <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
         <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
-        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 aligned sizing</li>
       </ul>
       <button class="plan-cta gold" id="cta-starter" onclick="startUpgrade('starter')">Upgrade to Starter</button>
     </div>
@@ -250,7 +245,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
         <li class="yes"><i class="ic">&#10003;</i> Full system sizing engine</li>
         <li class="yes"><i class="ic">&#10003;</i> AI proposal generation</li>
         <li class="yes"><i class="ic">&#10003;</i> Job portal &amp; design changes</li>
-        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 compliance check</li>
+        <li class="yes"><i class="ic">&#10003;</i> NRS 097-2-1 aligned sizing</li>
         <li class="yes"><i class="ic">&#10003;</i> Priority support</li>
       </ul>
       <button class="plan-cta gold" id="cta-professional" onclick="startUpgrade('professional')">Upgrade to Professional</button>
@@ -295,7 +290,6 @@ const usp = new URLSearchParams(window.location.search);
 const returnStatus = usp.get('status');
 const returnPlan   = usp.get('plan');
 
-// ── Boot ────────────────────────────────────────────────────────────────────
 (async function boot(){
   const { data:{ session } } = await supabaseClient.auth.getSession();
   if (session) {
@@ -434,7 +428,6 @@ function markCurrentPlan(plan) {
   if (badge) { badge.className = 'plan-badge current-b'; badge.textContent = 'Current'; badge.style.display = 'block'; }
   const cta = document.getElementById('cta-'+plan);
   if (cta) { cta.textContent = 'Current Plan'; cta.className = 'plan-cta disabled'; cta.disabled = true; }
-  // Remove recommended badge from professional if it's already on that plan
   const proBadge = document.getElementById('badge-professional');
   if (plan === 'professional' && proBadge && proBadge.textContent === 'Current') {
     proBadge.className = 'plan-badge current-b';
@@ -458,7 +451,6 @@ async function startUpgrade(plan) {
     });
     const data = await res.json();
     if (!data.payfast_url) throw new Error(data.error || 'Checkout failed');
-    // Build and auto-submit PayFast form
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = data.payfast_url;
