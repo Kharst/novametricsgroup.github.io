@@ -594,17 +594,17 @@ async function inviteInstaller() {
 }
 
 async function assignLocations(installerId, locIds) {
-  await fetch(`${SUPA_URL}/rest/v1/installer_locations?installer_id=eq.${installerId}`, {
-    method: 'DELETE',
-    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Prefer': 'return=minimal' }
-  });
-  if (locIds.length === 0) return;
-  const rows = locIds.map(lid => ({ installer_id: installerId, location_id: lid }));
-  await fetch(`${SUPA_URL}/rest/v1/installer_locations`, {
+  const res = await fetch(`${SUPA_URL}/functions/v1/assign-locations`, {
     method: 'POST',
-    headers: { 'apikey': SUPA_ANON, 'Authorization': 'Bearer ' + SUPA_ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-    body: JSON.stringify(rows)
+    headers: { 'Content-Type': 'application/json', 'apikey': SUPA_ANON },
+    body: JSON.stringify({
+      admin_secret: adminSecret,
+      installer_id: installerId,
+      location_ids: locIds
+    })
   });
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || 'Location assignment failed');
 }
 
 async function assignLocationsOnly() {
