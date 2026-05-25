@@ -1346,21 +1346,265 @@ async function saveBooking(){
   }catch(err){alert('Network error: '+err.message);btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
 }
 
-async function loadAnalytics(forceRefresh){
-  if(dashLoaded&&!forceRefresh)return;dashLoaded=true;
-  document.getElementById('dashLoading').style.display='flex';document.getElementById('dashBody').style.display='none';
-  try{
-    var res=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+installer.installer_id+'&select=ai_id,client_name,client_email,location,client_segment,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,annual_consumption_kwh,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,client_engaged,created_at,pdf_url,status&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+ANON}});
-    var rows=await res.json();if(!Array.isArray(rows))rows=[];
-    renderAllDashTabs(rows);
-    document.getElementById('dashUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('dashLoading').style.display='none';document.getElementById('dashBody').style.display='block';
-    if(forceRefresh)dashLoaded=false;
-  }catch(err){document.getElementById('dashLoading').innerHTML='<div style="color:#eb7070;font-size:11px">Failed to load analytics</div>';}
-  refreshWonCount();
+async function loadAnalytics(force){
+  if(dashLoaded&&!force) return;
+  dashLoaded=false;
+  var loading=document.getElementById('dashLoading');
+  var body=document.getElementById('dashBody');
+  if(loading) loading.style.display='flex';
+  if(body) body.style.display='none';
+
+  /* Wait up to 6 s for loadClients to finish if user opened Analytics immediately */
+  var waited=0;
+  while(allClients.length===0&&waited<6000){
+    await new Promise(function(r){setTimeout(r,250);});
+    waited+=250;
+  }
+
+  /* Only proposals that have a generated PDF */
+  var rows=allClients.filter(function(c){return c.ai&&c.ai.pdf_url;}).map(function(c){return c.ai;});
+  var n=rows.length;
+
+  /* ── Helpers ── */
+  function av(fn){
+    var v=rows.map(fn).filter(function(x){return typeof x==='number'&&!isNaN(x)&&x>0;});
+    return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:null;
+  }
+  function sm(fn){
+    return rows.map(fn).filter(function(x){return typeof x==='number'&&!isNaN(x);}).reduce(function(a,b){return a+b;},0);
+  }
+  function topVal(fn){
+    var counts={};
+    rows.forEach(function(r){var v=fn(r);if(v){counts[v]=(counts[v]||0)+1;}});
+    var keys=Object.keys(counts);
+    return keys.length?keys.sort(function(a,b){return counts[b]-counts[a];})[0]:'—';
+  }
+  function fmt(v,dec,unit){
+    if(v===null||v===undefined||isNaN(v)) return '—';
+    var rounded=dec!=null?parseFloat(v).toFixed(dec):Math.round(parseFloat(v)).toString();
+    return rounded+(unit?' '+unit:'');
+  }
+  function fmtRand(v){
+    if(!v||isNaN(v)) return '—';
+    if(v>=1000000) return 'R'+(v/1000000).toFixed(1)+'M';
+    if(v>=1000) return 'R'+Math.round(v/1000)+'k';
+    return 'R'+Math.round(v);
+  }
+  function pct(a,b){return b&&b>0?Math.round(a/b*100)+'%':'—';}
+  function set(id,val){var el=document.getElementById(id);if(el)el.textContent=(val===null||val===undefined)?'—':String(val);}
+
+  /* ── Pipeline counts ── */
+  var total=allClients.length;
+  var won=allClients.filter(function(c){
+    return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');
+  }).length;
+  var sent=allClients.filter(function(c){
+    return c.ai&&(c.ai.email_sent_at||c.ai.whatsapp_sent_at||c.ai.sent_at);
+  }).length;
+  var viewed=allClients.filter(function(c){
+    return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at);
+  }).length;
+
+  /* ── Financial aggregates ── */
+  var totalPipeline=sm(function(r){return parseFloat(r.total_cost)||0;});
+  var avgCost=av(function(r){return parseFloat(r.total_cost);});
+  var avgAnnual=av(function(r){return parseFloat(r.annual_savings);});
+  var avgMonthly=av(function(r){return parseFloat(r.monthly_savings);});
+  var avgLifetime=av(function(r){return parseFloat(r.lifetime_savings);});
+  var avgPayback=av(function(r){return parseFloat(r.payback_years);});
+
+  /* ══ OVERVIEW / INSTALLER PERFORMANCE section (newer live layout) ══ */
+  set('dashPipelineVal', fmtRand(totalPipeline));
+  set('dashWonRate',     pct(won, sent));
+  set('dashHotLeads',   viewed);
+  set('dashAvgDeal',    fmtRand(avgCost));
+  set('dashTracked',    total);
+  set('dashCompleted',  n);
+  set('dashWon',        won);
+  /* Also try alternate IDs the live version might use */
+  ['overviewPipeline','kpiPipeline','perf-pipeline'].forEach(function(id){set(id,fmtRand(totalPipeline));});
+  ['overviewWonRate','kpiWonRate','perf-won-rate'].forEach(function(id){set(id,pct(won,sent));});
+  ['overviewHot','kpiHot','perf-hot'].forEach(function(id){set(id,viewed);});
+  ['overviewDeal','kpiDeal','perf-deal'].forEach(function(id){set(id,fmtRand(avgCost));});
+
+  /* Conversion funnel single-value span (the "— won" in live page) */
+  ['funnelWon','conversionWon','wonCount'].forEach(function(id){set(id,won);});
+
+  /* ══ SYSTEM tab ══ */
+  var avgKw=av(function(r){return parseFloat(r.system_size_kw);});
+  var avgPanels=av(function(r){return parseFloat(r.panel_number);});
+  var avgSolar=av(function(r){return parseFloat(r.annual_solar_kwh)/365;});
+  var avgYield=av(function(r){return parseFloat(r.annual_solar_kwh);});
+  set('sAvgKw',     fmt(avgKw,1));
+  set('sAvgPanels', fmt(avgPanels,0));
+  set('sAvgSolar',  fmt(avgSolar,1));
+  set('sAvgYield',  fmt(avgYield,0));
+  set('sKwDC',      fmt(avgKw,1,' kW'));
+  set('sPanelModel',topVal(function(r){return r.panel_model;}));
+  set('sPanelCount',fmt(avgPanels,0));
+  set('sPeakLoad',  fmt(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
+  set('sAutonomy',  fmt(av(function(r){return parseFloat(r.required_autonomy_hrs);}),1,' hrs'));
+
+  /* System sizing distribution */
+  var dist={'<5kW':0,'5-10kW':0,'10-15kW':0,'>15kW':0};
+  rows.forEach(function(r){
+    var kw=parseFloat(r.system_size_kw)||0;
+    if(kw<5)       dist['<5kW']++;
+    else if(kw<10) dist['5-10kW']++;
+    else if(kw<15) dist['10-15kW']++;
+    else           dist['>15kW']++;
+  });
+  var distEl=document.getElementById('sDistBody');
+  if(distEl){
+    distEl.innerHTML=Object.keys(dist).map(function(k){
+      var barW=n?Math.round(dist[k]/n*100):0;
+      return '<div class="pipe-row">'+
+        '<span class="pipe-lbl">'+k+'</span>'+
+        '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+barW+'%;background:#FFD700"></div></div>'+
+        '<span class="pipe-num">'+dist[k]+'</span>'+
+        '<span class="pipe-pct">'+(n?barW+'%':'')+'</span></div>';
+    }).join('');
+  }
+
+  /* ══ BATTERY tab ══ */
+  var avgBkwh=av(function(r){return parseFloat(r.battery_capacity_kwh);});
+  var avgHours=av(function(r){return parseFloat(r.required_autonomy_hrs);});
+  var topBatt=topVal(function(r){return r.battery_model;});
+  set('bAvgKwh',   fmt(avgBkwh,1));
+  set('bAvgHours', fmt(avgHours,1));
+  set('bTopModel', topBatt);
+  set('bAvgCost',  '—');
+  set('bModel',    topBatt);
+  set('bInstKwh',  fmt(avgBkwh,1,' kWh'));
+  set('bHours',    fmt(avgHours,1,' hrs'));
+  set('bPeakLoad', fmt(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
+  set('bSegment',  topVal(function(r){return r.client_segment;}));
+  set('bTotalKwh', fmt(sm(function(r){return parseFloat(r.battery_capacity_kwh)||0;}),1));
+  set('bTotalUnits',n);
+  set('bTotalCost','—');
+
+  /* ══ FINANCIALS tab ══ */
+  set('fPipelineVal', fmtRand(totalPipeline));
+  set('fAvgAnnual',   fmtRand(avgAnnual));
+  set('fAvgCost',     fmtRand(avgCost));
+  set('fAvgPayback',  fmt(avgPayback,1,' yrs'));
+  set('fAvgMonthly',  fmtRand(avgMonthly));
+  set('fAvgAnnual2',  fmtRand(avgAnnual));
+  set('fAvgLifetime', fmtRand(avgLifetime));
+  set('fAvgPayback2', fmt(avgPayback,1,' yrs'));
+  set('fAvgCost2',    fmtRand(avgCost));
+  set('fTotalPipeline',fmtRand(totalPipeline));
+  set('fTotalSavings', fmtRand(sm(function(r){return parseFloat(r.annual_savings)||0;})));
+  set('fProposalCount',n);
+
+  /* ══ ENVIRONMENTAL tab ══ */
+  var tCo2=sm(function(r){return parseFloat(r.annual_co2_saved)||0;});
+  var tCoal=sm(function(r){return parseFloat(r.coal_avoided_tons)||0;});
+  var tTrees=sm(function(r){return parseFloat(r.trees_equivalent)||0;});
+  var tYield=sm(function(r){return parseFloat(r.annual_solar_kwh)||0;});
+  set('eTotalCo2',   fmt(tCo2,1));
+  set('eTotalCoal',  fmt(tCoal,1));
+  set('eTotalTrees', Math.round(tTrees));
+  set('eTotalYield', Math.round(tYield));
+  set('eAvgCo2',     fmt(av(function(r){return parseFloat(r.annual_co2_saved);}),1,' t'));
+  set('eAvgCoal',    fmt(av(function(r){return parseFloat(r.coal_avoided_tons);}),1,' t'));
+  set('eAvgTrees',   fmt(av(function(r){return parseFloat(r.trees_equivalent);}),0));
+  set('eAvgYield',   fmt(av(function(r){return parseFloat(r.annual_solar_kwh);}),0,' kWh'));
+  set('eAvgConsumption','—');
+  set('eTotalCo2b',  fmt(tCo2,1));
+  set('eTotalTreesb',Math.round(tTrees));
+  set('eTotalYieldb',fmt(tYield/1000,1));
+
+  /* ══ INVERTER tab ══ */
+  var topInv=topVal(function(r){return r.inverter_model;});
+  var avgDC=av(function(r){return parseFloat(r.system_size_kw);});
+  var avgPeak=av(function(r){return parseFloat(r.required_load_kw);});
+  set('iTopModel', topInv);
+  set('iAvgRatio', '—');
+  set('iAvgDC',    fmt(avgDC,1));
+  set('iAvgPeak',  fmt(avgPeak,1));
+  set('iModel',    topInv);
+  set('iRatio',    '—');
+  set('iReqAC',    '—');
+  set('iDC',       fmt(avgDC,1,' kW'));
+  set('iPeak',     fmt(avgPeak,1,' kW'));
+  var ratioEl=document.getElementById('iRatioStatus');
+  if(ratioEl) ratioEl.innerHTML='<span style="color:#6b7280;font-size:11.5px">DC/AC ratio requires inverter AC rating — not stored in current proposals.</span>';
+
+  /* ══ PIPELINE tab ══ */
+  set('pTotal',    total);
+  set('pGenerated',n);
+  set('pSent',     sent);
+  set('pEngaged',  won);   /* ← THE KEY FIX: was showing 0 */
+
+  /* Funnel bars */
+  var funnelEl=document.getElementById('pFunnel');
+  if(funnelEl){
+    var steps=[
+      {label:'Proposals Generated', count:n,      color:'#FFD700'},
+      {label:'Sent to Client',       count:sent,   color:'#9ca3af'},
+      {label:'Opened / Viewed',      count:viewed, color:'#7ac8f8'},
+      {label:'Won',                  count:won,    color:'#22c55e'}
+    ];
+    funnelEl.innerHTML=steps.map(function(st){
+      var barW=n?Math.round(st.count/n*100):0;
+      return '<div class="pipe-row">'+
+        '<span class="pipe-lbl">'+st.label+'</span>'+
+        '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+barW+'%;background:'+st.color+'"></div></div>'+
+        '<span class="pipe-num">'+st.count+'</span>'+
+        '<span class="pipe-pct">'+(n?barW+'%':'')+'</span></div>';
+    }).join('');
+  }
+
+  /* Rate pills */
+  var rateEl=document.getElementById('pRateRow');
+  if(rateEl){
+    rateEl.innerHTML=
+      '<div class="rate-pill"><div class="rp-lbl">Open Rate</div><div class="rp-val">'+pct(viewed,sent)+'</div></div>'+
+      '<div class="rate-pill"><div class="rp-lbl">Win Rate</div><div class="rp-val">'+pct(won,sent)+'</div></div>'+
+      '<div class="rate-pill"><div class="rp-lbl">Conversion</div><div class="rp-val">'+pct(won,n)+'</div></div>';
+  }
+
+  /* Follow-up table */
+  var tbody=document.getElementById('pFollowTable');
+  if(tbody){
+    set('pTableCount', total+' clients');
+    var tableHtml=allClients.slice(0,50).map(function(c){
+      var ai=c.ai;
+      var name=(ai&&ai.client_name)||(c.lead&&c.lead.client_name)||'—';
+      var loc=(ai&&ai.location)||(c.lead&&c.lead.address)||'—';
+      var ps=ai?getProposalStatus(ai):null;
+      var labels={generated:'Generated',sent:'Sent',viewed:'Viewed',accepted:'Won',rejected:'Rejected'};
+      var classes={accepted:'fp-closed',rejected:'fp-cold',viewed:'fp-warm',sent:'fp-wait',generated:'fp-wait'};
+      var cost=ai?parseFloat(ai.total_cost)||0:0;
+      var sentAt=ai&&(ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at);
+      var daysSent=sentAt?Math.round((Date.now()-new Date(sentAt).getTime())/86400000)+'d':'—';
+      var action=!ai||!ps?'Generate proposal':
+        ps==='accepted'?'📅 Book site visit':
+        ps==='rejected'?'Closed':
+        ps==='viewed'?'🔥 Follow up now':
+        ps==='sent'?'Check in':'Send proposal';
+      return '<tr>'+
+        '<td>'+esc(name)+'</td>'+
+        '<td>'+esc(loc.length>16?loc.slice(0,14)+'…':loc)+'</td>'+
+        '<td class="'+(classes[ps]||'fp-wait')+'">'+((ps&&labels[ps])||'None')+'</td>'+
+        '<td>'+action+'</td>'+
+        '<td>'+daysSent+'</td>'+
+        '<td>'+(cost?'R '+fmtK(cost):'—')+'</td></tr>';
+    }).join('');
+    tbody.innerHTML=tableHtml||'<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No clients yet</td></tr>';
+  }
+
+  /* Timestamp */
+  var now2=new Date();
+  set('dashUpdated','Updated '+now2.getHours().toString().padStart(2,'0')+':'+now2.getMinutes().toString().padStart(2,'0'));
+
+  /* Show content */
+  if(loading) loading.style.display='none';
+  if(body){body.style.display='block';}
   dashLoaded=true;
-}
-function renderExecutiveOverview(rows,completed){
+  switchDashTab(activeDashTab||'system');
+}function renderExecutiveOverview(rows,completed){
 
   var total=rows.length;
 
