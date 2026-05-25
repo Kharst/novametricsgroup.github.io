@@ -1532,69 +1532,103 @@ async function loadAnalytics(force){
   if(ratioEl) ratioEl.innerHTML='<span style="color:#6b7280;font-size:11.5px">DC/AC ratio requires inverter AC rating — not stored in current proposals.</span>';
 
   /* ══ PIPELINE tab ══ */
-  set('pTotal',    total);
-  set('pGenerated',n);
-  set('pSent',     sent);
-  set('pEngaged',  won);   /* ← THE KEY FIX: was showing 0 */
+/* ── Pipeline pane — reads from allClients (already loaded & correct) ── */
+var withPdf = allClients.filter(function(c){ return c.ai && c.ai.pdf_url; });
+var pTotal  = allClients.length;
+var pGen    = withPdf.length;
+var pSent   = allClients.filter(function(c){
+                return c.ai && (c.ai.email_sent_at || c.ai.whatsapp_sent_at || c.ai.sent_at);
+              }).length;
+var pViewed = allClients.filter(function(c){
+                return c.ai && (c.ai.proposal_viewed_at || c.ai.email_opened_at);
+              }).length;
+/* ✅ THE FIX: checks BOTH client_engaged AND proposal_status — same as getProposalStatus() */
+var pWon    = allClients.filter(function(c){
+                return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
+              }).length;
 
-  /* Funnel bars */
-  var funnelEl=document.getElementById('pFunnel');
-  if(funnelEl){
-    var steps=[
-      {label:'Proposals Generated', count:n,      color:'#FFD700'},
-      {label:'Sent to Client',       count:sent,   color:'#9ca3af'},
-      {label:'Opened / Viewed',      count:viewed, color:'#7ac8f8'},
-      {label:'Won',                  count:won,    color:'#22c55e'}
-    ];
-    funnelEl.innerHTML=steps.map(function(st){
-      var barW=n?Math.round(st.count/n*100):0;
-      return '<div class="pipe-row">'+
-        '<span class="pipe-lbl">'+st.label+'</span>'+
-        '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+barW+'%;background:'+st.color+'"></div></div>'+
-        '<span class="pipe-num">'+st.count+'</span>'+
-        '<span class="pipe-pct">'+(n?barW+'%':'')+'</span></div>';
-    }).join('');
-  }
+/* Pipeline Value = sum of all total_cost in allClients */
+var pipeVal = allClients.reduce(function(s,c){
+  return s + (c.ai ? parseFloat(c.ai.total_cost)||0 : 0);
+},0);
 
-  /* Rate pills */
-  var rateEl=document.getElementById('pRateRow');
-  if(rateEl){
-    rateEl.innerHTML=
-      '<div class="rate-pill"><div class="rp-lbl">Open Rate</div><div class="rp-val">'+pct(viewed,sent)+'</div></div>'+
-      '<div class="rate-pill"><div class="rp-lbl">Win Rate</div><div class="rp-val">'+pct(won,sent)+'</div></div>'+
-      '<div class="rate-pill"><div class="rp-lbl">Conversion</div><div class="rp-val">'+pct(won,n)+'</div></div>';
-  }
+/* Won-only value for Avg Deal */
+var wonVal  = allClients.filter(function(c){
+  return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
+}).reduce(function(s,c){ return s + (parseFloat(c.ai.total_cost)||0); }, 0);
 
-  /* Follow-up table */
-  var tbody=document.getElementById('pFollowTable');
-  if(tbody){
-    set('pTableCount', total+' clients');
-    var tableHtml=allClients.slice(0,50).map(function(c){
-      var ai=c.ai;
-      var name=(ai&&ai.client_name)||(c.lead&&c.lead.client_name)||'—';
-      var loc=(ai&&ai.location)||(c.lead&&c.lead.address)||'—';
-      var ps=ai?getProposalStatus(ai):null;
-      var labels={generated:'Generated',sent:'Sent',viewed:'Viewed',accepted:'Won',rejected:'Rejected'};
-      var classes={accepted:'fp-closed',rejected:'fp-cold',viewed:'fp-warm',sent:'fp-wait',generated:'fp-wait'};
-      var cost=ai?parseFloat(ai.total_cost)||0:0;
-      var sentAt=ai&&(ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at);
-      var daysSent=sentAt?Math.round((Date.now()-new Date(sentAt).getTime())/86400000)+'d':'—';
-      var action=!ai||!ps?'Generate proposal':
-        ps==='accepted'?'📅 Book site visit':
-        ps==='rejected'?'Closed':
-        ps==='viewed'?'🔥 Follow up now':
-        ps==='sent'?'Check in':'Send proposal';
-      return '<tr>'+
-        '<td>'+esc(name)+'</td>'+
-        '<td>'+esc(loc.length>16?loc.slice(0,14)+'…':loc)+'</td>'+
-        '<td class="'+(classes[ps]||'fp-wait')+'">'+((ps&&labels[ps])||'None')+'</td>'+
-        '<td>'+action+'</td>'+
-        '<td>'+daysSent+'</td>'+
-        '<td>'+(cost?'R '+fmtK(cost):'—')+'</td></tr>';
-    }).join('');
-    tbody.innerHTML=tableHtml||'<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No clients yet</td></tr>';
-  }
+var wonRate = pSent > 0 ? Math.round((pWon / pSent) * 100) : 0;
+var hotLeads = allClients.filter(function(c){
+  return c.ai && (c.ai.proposal_viewed_at || c.ai.email_opened_at)
+      && !(c.ai.client_engaged || c.ai.proposal_status === 'accepted')
+      && c.ai.proposal_status !== 'rejected';
+}).length;
+var avgDeal = pWon > 0 ? wonVal / pWon : 0;
 
+/* Fill the 4 KPI cards */
+document.getElementById('pTotal').textContent    = pTotal;
+document.getElementById('pGenerated').textContent= pGen;
+document.getElementById('pSent').textContent     = pSent;
+document.getElementById('pEngaged').textContent  = pWon;   /* ← was always wrong before */
+
+/* Rate pills row */
+document.getElementById('pRateRow').innerHTML =
+  pill('Pipeline Value',    'R ' + fmtK(pipeVal), 'quoted opportunity') +
+  pill('Won Rate',          wonRate + '%',          'accepted / sent') +
+  pill('Hot Leads',         hotLeads,               'viewed or downloaded') +
+  pill('Avg Deal',          'R ' + fmtK(avgDeal),  'per completed proposal');
+
+function pill(lbl,val,sub){
+  return '<div class="rate-pill"><div class="rp-lbl">'+lbl+'</div>'+
+         '<div class="rp-val">'+val+'</div>'+
+         '<div style="font-size:10px;color:#9ca3af;margin-top:2px">'+sub+'</div></div>';
+}
+
+/* Conversion Funnel */
+var maxN = pTotal || 1;
+document.getElementById('pFunnel').innerHTML = [
+  {lbl:'Total Clients', n:pTotal,  color:'#FFD700'},
+  {lbl:'Proposals Sent',n:pSent,   color:'#7ac8f8'},
+  {lbl:'Viewed',        n:pViewed, color:'#fbbf24'},
+  {lbl:'Won',           n:pWon,    color:'#34d399'},
+].map(function(s){
+  var w = Math.round((s.n / maxN) * 100);
+  var pct = pTotal > 0 ? Math.round(s.n/pTotal*100) : 0;
+  return '<div class="pipe-row">'+
+    '<div class="pipe-lbl">'+s.lbl+'</div>'+
+    '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+w+'%;background:'+s.color+'"></div></div>'+
+    '<div class="pipe-num">'+s.n+'</div>'+
+    '<div class="pipe-pct">'+pct+'%</div>'+
+  '</div>';
+}).join('');
+
+/* Client Temperature table */
+var now2 = Date.now();
+var rows = allClients.filter(function(c){ return c.ai && c.ai.pdf_url; })
+  .map(function(c){
+    var ai = c.ai;
+    var ps = getProposalStatus(ai);
+    var name  = ai.client_name || (c.lead && c.lead.client_name) || '—';
+    var loc   = ai.location || (c.lead && c.lead.address) || '—';
+    var cost  = ai.total_cost ? 'R '+fmtK(parseFloat(ai.total_cost)) : '—';
+    var days  = ai.created_at ? Math.round((now2 - new Date(ai.created_at).getTime())/86400000) : '—';
+    var fu='', cls='';
+    if(ps==='accepted'){fu='✓ Won';cls='fp-closed';}
+    else if(ps==='rejected'){fu='Rejected';cls='fp-wait';}
+    else if(ps==='viewed'){fu='Viewed — follow up now';cls='fp-hot';}
+    else if(ps==='sent'){fu=days>3?'Overdue follow-up':'Sent — awaiting view';cls=days>3?'fp-warm':'fp-cold';}
+    else{fu='Not sent yet';cls='fp-wait';}
+    return '<tr><td>'+esc(name)+'</td><td>'+esc(loc)+'</td>'+
+      '<td><span class="badge '+(ps==='accepted'?'sb-accepted':ps==='viewed'?'sb-viewed':ps==='sent'?'sb-sent':ps==='rejected'?'sb-rejected':'sb-generated')+'">'+
+      (ps||'none')+'</span></td>'+
+      '<td class="'+cls+'">'+fu+'</td>'+
+      '<td>'+days+'</td><td>'+cost+'</td></tr>';
+  });
+document.getElementById('pTableCount').textContent = rows.length + ' clients';
+document.getElementById('pFollowTable').innerHTML = rows.length
+  ? rows.join('')
+  : '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No proposals yet.</td></tr>';
+}
   /* Timestamp */
   var now2=new Date();
   set('dashUpdated','Updated '+now2.getHours().toString().padStart(2,'0')+':'+now2.getMinutes().toString().padStart(2,'0'));
