@@ -1628,7 +1628,7 @@ document.getElementById('pTableCount').textContent = rows.length + ' clients';
 document.getElementById('pFollowTable').innerHTML = rows.length
   ? rows.join('')
   : '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No proposals yet.</td></tr>';
-}
+
   /* Timestamp */
   var now2=new Date();
   set('dashUpdated','Updated '+now2.getHours().toString().padStart(2,'0')+':'+now2.getMinutes().toString().padStart(2,'0'));
