@@ -269,6 +269,195 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .dash-body{flex:1;overflow-y:auto;padding:12px 14px;}
 .dash-loading{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 .dash-spin{width:24px;height:24px;border:2px solid rgba(11,31,58,.1);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+  .analytics-overview{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.dash-hero{
+  display:grid;
+  grid-template-columns:minmax(250px,1.05fr) minmax(320px,1.45fr);
+  gap:10px;
+  background:linear-gradient(135deg,#081a30 0%,#12395c 58%,#0f766e 100%);
+  border-radius:12px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 18px 38px rgba(8,26,48,.18);
+  color:#fff;
+  overflow:hidden;
+  position:relative;
+}
+
+.dash-hero::after{
+  content:'';
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:3px;
+  background:linear-gradient(90deg,#FFD700,#22c55e,#38bdf8);
+}
+
+.hero-copy{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:12px;
+  min-width:0;
+}
+
+.hero-eyebrow{
+  font-size:9.5px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#FFD700;
+}
+
+.hero-title{
+  font-family:'DM Serif Display',serif;
+  font-size:28px;
+  line-height:1.03;
+  font-weight:600;
+  margin-top:3px;
+  color:#fff;
+}
+
+.hero-sub{
+  font-size:11.5px;
+  line-height:1.55;
+  color:rgba(255,255,255,.72);
+  max-width:430px;
+}
+
+.hero-meta{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.hero-chip{
+  font-size:9.5px;
+  font-weight:700;
+  color:#dbeafe;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;
+  padding:5px 9px;
+  white-space:nowrap;
+}
+
+.hero-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  position:relative;
+  z-index:1;
+}
+
+.hero-metric{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;
+  padding:11px 10px;
+  min-width:0;
+  backdrop-filter:blur(8px);
+}
+
+.hm-lbl{
+  font-size:8.5px;
+  color:rgba(255,255,255,.58);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.hm-val{
+  font-family:'DM Serif Display',serif;
+  font-size:22px;
+  line-height:1;
+  color:#fff;
+}
+
+.hm-sub{
+  font-size:9px;
+  color:rgba(255,255,255,.55);
+  margin-top:5px;
+}
+
+.premium-grid{
+  display:grid;
+  grid-template-columns:1.1fr .9fr .9fr;
+  gap:10px;
+}
+
+.premium-grid.two{
+  grid-template-columns:1fr 1fr;
+}
+
+.premium-card{
+  background:#fff;
+  border:1px solid #e6ebf2;
+  border-radius:12px;
+  padding:12px 13px;
+  min-width:0;
+  box-shadow:0 10px 26px rgba(11,31,58,.05);
+}
+
+.premium-hd{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.premium-title{
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--navy);
+}
+
+.premium-sub{
+  font-size:10px;
+  color:#94a3b8;
+  margin-top:2px;
+  line-height:1.4;
+}
+
+.premium-badge{
+  font-size:9px;
+  font-weight:800;
+  border-radius:999px;
+  padding:4px 8px;
+  background:#ecfdf5;
+  color:#047857;
+  white-space:nowrap;
+}
+
+.funnel-viz,
+.heat-list,
+.insight-list,
+.action-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.bar-viz{
+  height:148px;
+  display:flex;
+  align-items:flex-end;
+  gap:7px;
+  padding-top:8px;
+}
 .stab-pane{display:none;flex-direction:column;gap:10px;}
 .stab-pane.on{display:flex;}
 .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:7px;}
@@ -616,6 +805,136 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
       </div>
       <div class="dash-loading" id="dashLoading"><div class="dash-spin"></div><div style="font-size:11px;color:#6b7280">Loading analytics…</div></div>
       <div class="dash-body" id="dashBody" style="display:none">
+        <div class="analytics-overview">
+
+  <div class="dash-hero">
+
+    <div class="hero-copy">
+      <div>
+        <div class="hero-eyebrow">Installer Performance</div>
+
+        <div class="hero-title">
+          Business command centre
+        </div>
+
+        <div class="hero-sub">
+          A live read on pipeline value, conversion quality,
+          client heat and portfolio impact across every proposal
+          you have generated.
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <span class="hero-chip" id="ovMomentum">Momentum —</span>
+        <span class="hero-chip" id="ovPortfolio">Portfolio —</span>
+      </div>
+    </div>
+
+    <div class="hero-metrics">
+
+      <div class="hero-metric">
+        <div class="hm-lbl">Pipeline Value</div>
+        <div class="hm-val" id="ovPipelineValue">—</div>
+        <div class="hm-sub">quoted opportunity</div>
+      </div>
+
+      <div class="hero-metric">
+        <div class="hm-lbl">Won Rate</div>
+        <div class="hm-val" id="ovWonRate">—</div>
+        <div class="hm-sub">accepted / sent</div>
+      </div>
+
+      <div class="hero-metric">
+        <div class="hm-lbl">Hot Leads</div>
+        <div class="hm-val" id="ovHotLeads">—</div>
+        <div class="hm-sub">viewed or downloaded</div>
+      </div>
+
+      <div class="hero-metric">
+        <div class="hm-lbl">Avg Deal</div>
+        <div class="hm-val" id="ovAvgDeal">—</div>
+        <div class="hm-sub">per completed proposal</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="premium-grid">
+
+    <div class="premium-card">
+      <div class="premium-hd">
+        <div>
+          <div class="premium-title">Conversion Funnel</div>
+          <div class="premium-sub">
+            Where prospects move from quote to accepted job.
+          </div>
+        </div>
+
+        <div class="premium-badge" id="ovFunnelBadge">—</div>
+      </div>
+
+      <div class="funnel-viz" id="ovFunnel"></div>
+    </div>
+
+    <div class="premium-card">
+      <div class="premium-hd">
+        <div>
+          <div class="premium-title">Monthly Pipeline</div>
+          <div class="premium-sub">
+            Quoted value by proposal month.
+          </div>
+        </div>
+      </div>
+
+      <div class="bar-viz" id="ovTrendBars"></div>
+    </div>
+
+    <div class="premium-card">
+      <div class="premium-hd">
+        <div>
+          <div class="premium-title">Client Temperature</div>
+          <div class="premium-sub">
+            Prioritise the leads most likely to close.
+          </div>
+        </div>
+      </div>
+
+      <div class="heat-list" id="ovClientHeat"></div>
+    </div>
+
+  </div>
+
+  <div class="premium-grid two">
+
+    <div class="premium-card">
+      <div class="premium-hd">
+        <div>
+          <div class="premium-title">Performance Brief</div>
+          <div class="premium-sub">
+            High-signal readout for the installer owner.
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-list" id="ovInsights"></div>
+    </div>
+
+    <div class="premium-card">
+      <div class="premium-hd">
+        <div>
+          <div class="premium-title">Next Best Actions</div>
+          <div class="premium-sub">
+            Follow-up moves that protect revenue.
+          </div>
+        </div>
+      </div>
+
+      <div class="action-list" id="ovActions"></div>
+    </div>
+
+  </div>
+
+</div>
         <div class="stab-pane on" id="pane-system"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg System Size</div><div class="kpi-val" id="sAvgKw">—</div><div class="kpi-sub">kW DC average</div></div><div class="kpi green"><div class="kpi-lbl">Avg Panel Count</div><div class="kpi-val" id="sAvgPanels">—</div><div class="kpi-sub">panels per system</div></div><div class="kpi blue"><div class="kpi-lbl">Avg Daily Solar</div><div class="kpi-val" id="sAvgSolar">—</div><div class="kpi-sub">kWh / day est.</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Annual Yield</div><div class="kpi-val" id="sAvgYield">—</div><div class="kpi-sub">kWh / year</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Panel Summary (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">System Size DC</span><span class="wc-v" id="sKwDC">—</span></div><div class="wc-row"><span class="wc-k">Panel Model (Most Common)</span><span class="wc-v" id="sPanelModel">—</span></div><div class="wc-row"><span class="wc-k">Panel Count</span><span class="wc-v" id="sPanelCount">—</span></div><div class="wc-row"><span class="wc-k">Peak Load</span><span class="wc-v" id="sPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Backup Autonomy Target</span><span class="wc-v" id="sAutonomy">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>System Sizing Distribution</div><div id="sDistBody" style="font-size:11px;color:#374151"></div></div></div></div>
         <div class="stab-pane" id="pane-battery"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Avg Battery Capacity</div><div class="kpi-val" id="bAvgKwh">—</div><div class="kpi-sub">kWh installed avg</div></div><div class="kpi green"><div class="kpi-lbl">Avg Backup Target</div><div class="kpi-val" id="bAvgHours">—</div><div class="kpi-sub">hrs autonomy avg</div></div><div class="kpi blue"><div class="kpi-lbl">Battery Model (Top)</div><div class="kpi-val" id="bTopModel" style="font-size:12px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Battery Cost</div><div class="kpi-val" id="bAvgCost">—</div><div class="kpi-sub">per system</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Battery Design (Avg per Proposal)</div><div class="wc-row"><span class="wc-k">Battery Model</span><span class="wc-v" id="bModel">—</span></div><div class="wc-row"><span class="wc-k">Installed Capacity</span><span class="wc-v" id="bInstKwh">—</span></div><div class="wc-row"><span class="wc-k">Backup Target</span><span class="wc-v" id="bHours">—</span></div><div class="wc-row"><span class="wc-k">Peak Load Covered</span><span class="wc-v" id="bPeakLoad">—</span></div><div class="wc-row"><span class="wc-k">Client Segment</span><span class="wc-v" id="bSegment">—</span></div></div><div class="dark-card"><div class="dc-title">🔋 Battery Portfolio Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="bTotalKwh">—</div><div class="dc-lbl">Total kWh Installed</div></div><div class="dc-item"><div class="dc-val" id="bTotalUnits">—</div><div class="dc-lbl">Total Units</div></div><div class="dc-item"><div class="dc-val" id="bTotalCost">—</div><div class="dc-lbl">Total Battery Cost</div></div></div></div></div></div>
         <div class="stab-pane" id="pane-financials"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Pipeline Value</div><div class="kpi-val" id="fPipelineVal">—</div><div class="kpi-sub">All proposals</div></div><div class="kpi green"><div class="kpi-lbl">Avg Annual Saving</div><div class="kpi-val" id="fAvgAnnual">—</div><div class="kpi-sub">vs. Eskom bill</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System Cost</div><div class="kpi-val" id="fAvgCost">—</div><div class="kpi-sub">per proposal</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Payback</div><div class="kpi-val" id="fAvgPayback">—</div><div class="kpi-sub">escalating tariff</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Financial Averages</div><div class="wc-row"><span class="wc-k">Avg Monthly Saving</span><span class="wc-v" id="fAvgMonthly">—</span></div><div class="wc-row"><span class="wc-k">Avg Annual Saving</span><span class="wc-v" id="fAvgAnnual2">—</span></div><div class="wc-row"><span class="wc-k">Avg 25-yr Lifetime Saving</span><span class="wc-v" id="fAvgLifetime">—</span></div><div class="wc-row"><span class="wc-k">Avg Payback Period</span><span class="wc-v" id="fAvgPayback2">—</span></div><div class="wc-row"><span class="wc-k">Avg System Cost</span><span class="wc-v" id="fAvgCost2">—</span></div></div><div class="dark-card"><div class="dc-title">💰 Revenue Summary</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="fTotalPipeline">—</div><div class="dc-lbl">Total Pipeline (R)</div></div><div class="dc-item"><div class="dc-val" id="fTotalSavings">—</div><div class="dc-lbl">Total Annual Savings</div></div><div class="dc-item"><div class="dc-val" id="fProposalCount">—</div><div class="dc-lbl">Proposals Generated</div></div></div></div></div></div>
@@ -860,7 +1179,7 @@ async function loadClients(){
     var leads=await leadsRes.json();
     var seen={},unique=[];
     (leads||[]).forEach(function(l){var k=(l.client_email||'').toLowerCase().trim();if(k&&!seen[k]){seen[k]=true;unique.push(l);}});
-    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,proposal_status,sent_at,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,email_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,whatsapp_sent_at,client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,won_at,rejected_at,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+token}});
+    var aiRes=await fetch(SUPA+'/rest/v1/ai_results?installer_id=eq.'+instId+'&select=ai_id,client_email,client_name,client_phone,location,client_segment,client_type,status,proposal_status,sent_at,system_size_kw,panel_model,panel_number,inverter_model,battery_model,battery_capacity_kwh,annual_savings,monthly_savings,total_cost,payback_years,lifetime_savings,annual_solar_kwh,annual_co2_saved,coal_avoided_tons,trees_equivalent,required_load_kw,required_autonomy_hrs,pdf_url,proposal_generated,proposal_status,email_sent_at,sent_at,whatsapp_sent_at,email_opened_at,proposal_viewed_at,pdf_downloaded_at,client_engaged,won_at,rejected_at,whatsapp_sent_at,client_engaged,site_visit_date,site_visit_time,site_visit_notes,site_visit_confirmed,won_at,rejected_at,created_at&order=created_at.desc',{headers:{apikey:ANON,Authorization:'Bearer '+token}});
     var aiRows=await aiRes.json();
     if(!Array.isArray(aiRows)){console.warn('ai_results fetch failed:',aiRows);aiRows=[];}
     var aiByEmail={};
@@ -1009,8 +1328,78 @@ async function loadAnalytics(forceRefresh){
     if(forceRefresh)dashLoaded=false;
   }catch(err){document.getElementById('dashLoading').innerHTML='<div style="color:#eb7070;font-size:11px">Failed to load analytics</div>';}
 }
+function renderExecutiveOverview(rows,completed){
+
+  var total=rows.length;
+
+  var sentRows=rows.filter(function(r){
+    return r.email_sent_at||r.sent_at||r.whatsapp_sent_at;
+  });
+
+  var opened=rows.filter(function(r){
+    return r.email_opened_at;
+  }).length;
+
+  var viewedRows=rows.filter(function(r){
+    return r.proposal_viewed_at;
+  });
+
+  var downloadedRows=rows.filter(function(r){
+    return r.pdf_downloaded_at;
+  });
+
+  var wonRows=rows.filter(function(r){
+    return r.client_engaged||
+           r.proposal_status==='accepted'||
+           r.won_at;
+  });
+
+  var rejectedRows=rows.filter(function(r){
+    return r.proposal_status==='rejected'||
+           r.rejected_at;
+  });
+
+  var pipeline=sum(completed,'total_cost');
+
+  var avgDeal=completed.length
+    ? pipeline/completed.length
+    : 0;
+
+  var wonRate=pct(
+    wonRows.length,
+    sentRows.length||completed.length
+  );
+
+  var hotRows=rows.filter(function(r){
+
+    if(
+      r.client_engaged||
+      r.proposal_status==='accepted'||
+      r.proposal_status==='rejected'
+    ) return false;
+
+    return !!(
+      r.pdf_downloaded_at||
+      r.proposal_viewed_at
+    );
+
+  });
+
+  d('ovPipelineValue','R '+fmtK(pipeline));
+  d('ovWonRate',wonRate);
+  d('ovHotLeads',hotRows.length);
+  d('ovAvgDeal',avgDeal?'R '+fmtK(avgDeal):'—');
+
+  d('ovMomentum',rows.length+' tracked');
+  d('ovPortfolio',completed.length+' completed proposals');
+
+  d('ovFunnelBadge',wonRows.length+' won');
+
+}
+  
 function renderAllDashTabs(rows){
   var completed=rows.filter(function(r){return r.status==='completed'||r.pdf_url;});
+  renderExecutiveOverview(rows,completed);
   var avgKw=avg(completed,'system_size_kw'),avgPanels=avg(completed,'panel_number'),avgYield=avg(completed,'annual_solar_kwh'),avgDailySolar=avgYield/365;
   d('sAvgKw',completed.length?avgKw.toFixed(2)+' kW':'—');d('sAvgPanels',completed.length?Math.round(avgPanels)+' panels':'—');d('sAvgSolar',completed.length?avgDailySolar.toFixed(1)+' kWh':'—');d('sAvgYield',completed.length?Math.round(avgYield).toLocaleString('en-ZA')+' kWh':'—');
   d('sKwDC',completed.length?avgKw.toFixed(2)+' kW DC':'—');d('sPanelModel',mode(completed,'panel_model')||'—');d('sPanelCount',completed.length?Math.round(avgPanels)+' units':'—');d('sPeakLoad',completed.length?avg(completed,'required_load_kw').toFixed(1)+' kW':'—');d('sAutonomy',completed.length?avg(completed,'required_autonomy_hrs').toFixed(0)+' hours':'—');
@@ -1034,14 +1423,27 @@ function renderAllDashTabs(rows){
   d('iTopModel',topInv||'—');d('iAvgRatio',completed.length?avgRatio.toFixed(2):'—');d('iAvgDC',completed.length?avgDCkW.toFixed(2)+' kW':'—');d('iAvgPeak',completed.length?avgPeakLoad.toFixed(1)+' kW':'—');
   d('iModel',topInv||'—');d('iRatio',completed.length?avgRatio.toFixed(2):'—');d('iReqAC',completed.length?(avgPeakLoad*1.3).toFixed(1)+' kW':'—');d('iDC',completed.length?avgDCkW.toFixed(2)+' kW':'—');d('iPeak',completed.length?avgPeakLoad.toFixed(1)+' kW':'—');
   document.getElementById('iRatioStatus').innerHTML=completed.length?'<div class="wc-row"><span class="wc-k">Avg Ratio</span><span class="wc-v"><strong style="color:'+ratioColor+'">'+avgRatio.toFixed(2)+'</strong></span></div><div class="wc-row"><span class="wc-k">Status</span><span class="wc-v"><span style="color:'+ratioColor+';font-weight:600">'+ratioStatus+'</span></span></div><div class="wc-row"><span class="wc-k">NRS 097 Margin</span><span class="wc-v">30% applied</span></div><div class="wc-row"><span class="wc-k">SANS 10142-1</span><span class="wc-v">0.95–1.35 balanced</span></div>':'<div style="color:#9ca3af;font-size:11px;padding:4px 0">No data yet</div>';
-  var total=rows.length,generated=rows.filter(function(r){return r.status==='completed'||r.pdf_url;}).length,sent=rows.filter(function(r){return r.email_sent_at;}).length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){return r.proposal_status==='accepted';}).length;
+  var total=rows.length,generated=rows.filter(function(r){return r.status==='completed'||r.pdf_url;}).length,sent=rows.filter(function(r){
+  return r.email_sent_at||
+         r.sent_at||
+         r.whatsapp_sent_at;
+})
+    .length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){
+  return r.client_engaged||
+         r.proposal_status==='accepted'||
+         r.won_at;
+}).length
   d('pTotal',total);d('pGenerated',generated);d('pSent',sent);d('pEngaged',engaged);
   var rates=[{lbl:'Lead→Proposal',val:pct(generated,total)},{lbl:'Email Open',val:pct(opened,sent)},{lbl:'View Rate',val:pct(viewed,sent)},{lbl:'Download',val:pct(downloaded,sent)},{lbl:'Won Rate',val:pct(engaged,sent)}];
   document.getElementById('pRateRow').innerHTML=rates.map(function(r){return'<div class="rate-pill"><div class="rp-lbl">'+r.lbl+'</div><div class="rp-val">'+r.val+'</div></div>';}).join('');
   var funnelSteps=[{lbl:'In Pipeline',n:total,color:'#FFD700'},{lbl:'Generated',n:generated,color:'#22c55e'},{lbl:'Sent',n:sent,color:'#3b82f6'},{lbl:'Opened',n:opened,color:'#14b8a6'},{lbl:'Viewed',n:viewed,color:'#8b5cf6'},{lbl:'Downloaded',n:downloaded,color:'#f97316'},{lbl:'Won',n:engaged,color:'#ef4444'}];
   var base=Math.max(total,1);
   document.getElementById('pFunnel').innerHTML=funnelSteps.map(function(sv){var p=Math.round((sv.n/base)*100);return'<div class="pipe-row"><span class="pipe-lbl">'+sv.lbl+'</span><div class="pipe-bar-wrap"><div class="pipe-bar" style="background:'+sv.color+';width:'+p+'%"></div></div><span class="pipe-num">'+sv.n+'</span><span class="pipe-pct">'+p+'%</span></div>';}).join('');
-  var sentRows=rows.filter(function(r){return r.email_sent_at;}).slice(0,20);
+  var sentRows=rows.filter(function(r){
+  return r.email_sent_at||
+         r.sent_at||
+         r.whatsapp_sent_at;
+}).slice(0,20);
   d('pTableCount',sentRows.length+' sent');
   if(!sentRows.length){document.getElementById('pFollowTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:14px">No proposals sent yet</td></tr>';}
   else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var ds=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var st,fu,fc;if(r.proposal_status==='accepted'){st='Won';fu='Closed';fc='fp-closed';}else if(r.pdf_downloaded_at){st='DL';fu='Hot — call now';fc='fp-hot';}else if(r.proposal_viewed_at&&ds>=2){st='Viewed';fu='Hot — call now';fc='fp-hot';}else if(r.email_opened_at&&ds>=3){st='Opened';fu='Warm — follow up';fc='fp-warm';}else if(ds>=7){st='Sent';fu='Cold — resend';fc='fp-cold';}else{st='Sent';fu='Waiting';fc='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong></td><td>'+esc(r.location||'—')+'</td><td>'+st+'</td><td class="'+fc+'">'+fu+'</td><td>'+(ds!==null?ds+'d':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
