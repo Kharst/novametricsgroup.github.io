@@ -1346,6 +1346,13 @@ async function saveBooking(){
   }catch(err){alert('Network error: '+err.message);btn.textContent='📅 Confirm Site Visit';btn.disabled=false;}
 }
 
+// =====================================================================
+// NOVA METRICS — ANALYTICS FIX
+// Replace the entire loadAnalytics() function in prposal_portal.html
+// Find: "async function loadAnalytics(force){"
+// Replace with everything below up to and including the closing "}"
+// =====================================================================
+
 async function loadAnalytics(force){
   if(dashLoaded&&!force) return;
   dashLoaded=false;
@@ -1354,18 +1361,15 @@ async function loadAnalytics(force){
   if(loading) loading.style.display='flex';
   if(body) body.style.display='none';
 
-  /* Wait up to 6 s for loadClients to finish if user opened Analytics immediately */
   var waited=0;
   while(allClients.length===0&&waited<6000){
     await new Promise(function(r){setTimeout(r,250);});
     waited+=250;
   }
 
-  /* Only proposals that have a generated PDF */
   var rows=allClients.filter(function(c){return c.ai&&c.ai.pdf_url;}).map(function(c){return c.ai;});
   var n=rows.length;
 
-  /* ── Helpers ── */
   function av(fn){
     var v=rows.map(fn).filter(function(x){return typeof x==='number'&&!isNaN(x)&&x>0;});
     return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:null;
@@ -1379,11 +1383,6 @@ async function loadAnalytics(force){
     var keys=Object.keys(counts);
     return keys.length?keys.sort(function(a,b){return counts[b]-counts[a];})[0]:'—';
   }
-  function fmt(v,dec,unit){
-    if(v===null||v===undefined||isNaN(v)) return '—';
-    var rounded=dec!=null?parseFloat(v).toFixed(dec):Math.round(parseFloat(v)).toString();
-    return rounded+(unit?' '+unit:'');
-  }
   function fmtRand(v){
     if(!v||isNaN(v)) return '—';
     if(v>=1000000) return 'R'+(v/1000000).toFixed(1)+'M';
@@ -1392,6 +1391,13 @@ async function loadAnalytics(force){
   }
   function pct(a,b){return b&&b>0?Math.round(a/b*100)+'%':'—';}
   function set(id,val){var el=document.getElementById(id);if(el)el.textContent=(val===null||val===undefined)?'—':String(val);}
+  function fmtAnal(v,dec,unit){
+    if(v===null||v===undefined) return '—';
+    var num=parseFloat(v);
+    if(isNaN(num)) return '—';
+    var rounded=dec!=null?num.toFixed(dec):Math.round(num).toString();
+    return rounded+(unit?' '+unit:'');
+  }
 
   /* ── Pipeline counts ── */
   var total=allClients.length;
@@ -1413,46 +1419,162 @@ async function loadAnalytics(force){
   var avgLifetime=av(function(r){return parseFloat(r.lifetime_savings);});
   var avgPayback=av(function(r){return parseFloat(r.payback_years);});
 
-  /* ══ OVERVIEW / INSTALLER PERFORMANCE section (newer live layout) ══ */
-  set('dashPipelineVal', fmtRand(totalPipeline));
-  set('dashWonRate',     pct(won, sent));
-  set('dashHotLeads',   viewed);
-  set('dashAvgDeal',    fmtRand(avgCost));
-  set('dashTracked',    total);
-  set('dashCompleted',  n);
-  set('dashWon',        won);
-  /* Also try alternate IDs the live version might use */
-  ['overviewPipeline','kpiPipeline','perf-pipeline'].forEach(function(id){set(id,fmtRand(totalPipeline));});
-  ['overviewWonRate','kpiWonRate','perf-won-rate'].forEach(function(id){set(id,pct(won,sent));});
-  ['overviewHot','kpiHot','perf-hot'].forEach(function(id){set(id,viewed);});
-  ['overviewDeal','kpiDeal','perf-deal'].forEach(function(id){set(id,fmtRand(avgCost));});
+  /* ── Won-only value & hot leads ── */
+  var wonVal=allClients.filter(function(c){
+    return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');
+  }).reduce(function(s,c){return s+(parseFloat(c.ai.total_cost)||0);},0);
+  var avgDeal=won>0?wonVal/won:0;
+  var hotLeads=allClients.filter(function(c){
+    return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at)
+        &&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')
+        &&c.ai.proposal_status!=='rejected';
+  }).length;
 
-  /* Conversion funnel single-value span (the "— won" in live page) */
-  ['funnelWon','conversionWon','wonCount'].forEach(function(id){set(id,won);});
+  /* ══ FIX 1: HERO METRICS — use correct element IDs (ovPipelineValue etc) ══ */
+  set('ovPipelineValue', fmtRand(totalPipeline));
+  set('ovWonRate',       sent>0?Math.round(won/sent*100)+'%':'—');
+  set('ovHotLeads',      hotLeads);
+  set('ovAvgDeal',       avgDeal?fmtRand(avgDeal):'—');
+  set('ovMomentum',      total+' tracked');
+  set('ovPortfolio',     n+' completed proposals');
+  set('ovFunnelBadge',   won+' won');
+
+  /* ══ FIX 2: CONVERSION FUNNEL — populate ovFunnel ══ */
+  var ovFunnelEl=document.getElementById('ovFunnel');
+  if(ovFunnelEl){
+    var fSteps=[
+      {lbl:'Proposals Sent',n:sent,    color:'#7ac8f8'},
+      {lbl:'Viewed',        n:viewed,  color:'#fbbf24'},
+      {lbl:'Hot Leads',     n:hotLeads,color:'#f97316'},
+      {lbl:'Won',           n:won,     color:'#34d399'},
+    ];
+    var fMax=sent||1;
+    ovFunnelEl.innerHTML=fSteps.map(function(step){
+      var w=Math.round(step.n/fMax*100);
+      var p=total>0?Math.round(step.n/total*100):0;
+      return '<div class="pipe-row">'+
+        '<div class="pipe-lbl">'+step.lbl+'</div>'+
+        '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+w+'%;background:'+step.color+'"></div></div>'+
+        '<div class="pipe-num">'+step.n+'</div>'+
+        '<div class="pipe-pct">'+p+'%</div></div>';
+    }).join('');
+  }
+
+  /* ══ FIX 3: MONTHLY PIPELINE BARS — populate ovTrendBars ══ */
+  var trendBarsEl=document.getElementById('ovTrendBars');
+  if(trendBarsEl){
+    var monthBuckets={};
+    allClients.forEach(function(c){
+      if(!c.ai||!c.ai.created_at) return;
+      var dt=new Date(c.ai.created_at);
+      var key=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+      if(!monthBuckets[key]) monthBuckets[key]={label:dt.toLocaleDateString('en-ZA',{month:'short',year:'2-digit'}),value:0};
+      monthBuckets[key].value+=parseFloat(c.ai&&c.ai.total_cost||0);
+    });
+    var monthKeys=Object.keys(monthBuckets).sort().slice(-6);
+    var maxMV=Math.max.apply(null,monthKeys.map(function(k){return monthBuckets[k].value||0;}))||1;
+    trendBarsEl.innerHTML=monthKeys.length?monthKeys.map(function(k){
+      var m=monthBuckets[k];
+      var h=Math.max(8,Math.round((m.value/maxMV)*130));
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">'+
+        '<div style="font-size:8.5px;color:#9ca3af;text-align:center">'+fmtRand(m.value)+'</div>'+
+        '<div style="width:80%;max-width:32px;background:#0B1F3A;border-radius:3px 3px 0 0;height:'+h+'px;"></div>'+
+        '<div style="font-size:8px;color:#6b7280;white-space:nowrap">'+m.label+'</div></div>';
+    }).join(''):'<div style="color:#9ca3af;font-size:11px;padding:16px 0;width:100%;text-align:center">No proposals yet</div>';
+  }
+
+  /* ══ FIX 4: CLIENT TEMPERATURE — populate ovClientHeat ══ */
+  var heatEl=document.getElementById('ovClientHeat');
+  if(heatEl){
+    var heatClients=allClients.filter(function(c){
+      return c.ai&&c.ai.pdf_url&&c.ai.proposal_status!=='accepted'&&c.ai.proposal_status!=='rejected';
+    }).sort(function(a,b){
+      function sc(x){return(x.ai.proposal_viewed_at?3:0)+(x.ai.email_opened_at?2:0)+((x.ai.email_sent_at||x.ai.sent_at)?1:0);}
+      return sc(b)-sc(a);
+    }).slice(0,6);
+    heatEl.innerHTML=heatClients.length?heatClients.map(function(c){
+      var ps=getProposalStatus(c.ai);
+      var name=c.ai.client_name||(c.lead&&c.lead.client_name)||'—';
+      var tempLabel=ps==='viewed'?'🔴 Hot':ps==='sent'?'🟡 Warm':'⚪ Cold';
+      var tempColor=ps==='viewed'?'#dc2626':ps==='sent'?'#d97706':'#6b7280';
+      var cost=c.ai.total_cost?'R'+fmtK(parseFloat(c.ai.total_cost)):'';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f3f4f6;gap:8px">'+
+        '<span style="color:#1e293b;font-size:11px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(name)+'</span>'+
+        '<span style="font-size:10px;color:#94a3b8;flex-shrink:0">'+cost+'</span>'+
+        '<span style="font-size:10px;color:'+tempColor+';font-weight:600;flex-shrink:0">'+tempLabel+'</span></div>';
+    }).join(''):'<div style="color:#9ca3af;font-size:11px;padding:8px 0">No active leads to show.</div>';
+  }
+
+  /* ══ FIX 5: PERFORMANCE BRIEF — populate ovInsights ══ */
+  var insightsEl=document.getElementById('ovInsights');
+  if(insightsEl){
+    var insights=[];
+    if(won>0) insights.push('🏆 '+won+' deal'+(won>1?'s':'')+' won · '+fmtRand(wonVal)+' confirmed revenue');
+    if(hotLeads>0) insights.push('🔥 '+hotLeads+' lead'+(hotLeads>1?'s':'')+' viewed — prime follow-up window');
+    if(n>0) insights.push('📄 '+n+' proposal'+(n>1?'s':'')+' generated · '+fmtRand(totalPipeline)+' pipeline value');
+    if(sent>0&&won===0) insights.push('📤 '+sent+' sent, none won yet — tighten follow-up cadence');
+    if(avgCost) insights.push('💰 Avg deal size '+fmtRand(avgCost)+' per proposal');
+    if(avgPayback) insights.push('📈 Avg payback '+avgPayback.toFixed(1)+' yrs · clients see strong ROI');
+    if(!insights.length) insights.push('Generate and send proposals to see your performance brief.');
+    insightsEl.innerHTML=insights.map(function(i){
+      return '<div style="font-size:11px;color:#374151;padding:5px 0;border-bottom:1px solid #f3f4f6;line-height:1.4">'+i+'</div>';
+    }).join('');
+  }
+
+  /* ══ FIX 6: NEXT BEST ACTIONS — populate ovActions ══ */
+  var actionsEl=document.getElementById('ovActions');
+  if(actionsEl){
+    var actions=[];
+    var nowT=Date.now();
+    allClients.filter(function(c){
+      return c.ai&&c.ai.proposal_viewed_at
+        &&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')
+        &&c.ai.proposal_status!=='rejected';
+    }).slice(0,3).forEach(function(c){
+      actions.push('📞 Call '+esc(c.ai.client_name||'client')+' — viewed proposal, follow up now');
+    });
+    allClients.filter(function(c){
+      var ai=c.ai;if(!ai) return false;
+      var sentT=ai.email_sent_at||ai.sent_at||ai.whatsapp_sent_at;
+      return sentT&&!ai.proposal_viewed_at&&!ai.email_opened_at
+        &&(nowT-new Date(sentT).getTime())>3*86400000
+        &&!(ai.client_engaged||ai.proposal_status==='accepted');
+    }).slice(0,3).forEach(function(c){
+      actions.push('📩 Resend to '+esc(c.ai.client_name||'client')+' — sent 3+ days ago, not opened');
+    });
+    allClients.filter(function(c){
+      return c.ai&&c.ai.pdf_url&&!c.ai.email_sent_at&&!c.ai.sent_at&&!c.ai.whatsapp_sent_at;
+    }).slice(0,2).forEach(function(c){
+      actions.push('📤 Send proposal to '+esc(c.ai.client_name||'client')+' — generated but not sent');
+    });
+    if(!actions.length) actions.push('✅ All leads actioned — generate new proposals to grow pipeline');
+    actionsEl.innerHTML=actions.map(function(a){
+      return '<div style="font-size:11px;color:#374151;padding:5px 0;border-bottom:1px solid #f3f4f6;line-height:1.4">'+a+'</div>';
+    }).join('');
+  }
 
   /* ══ SYSTEM tab ══ */
   var avgKw=av(function(r){return parseFloat(r.system_size_kw);});
   var avgPanels=av(function(r){return parseFloat(r.panel_number);});
   var avgSolar=av(function(r){return parseFloat(r.annual_solar_kwh)/365;});
   var avgYield=av(function(r){return parseFloat(r.annual_solar_kwh);});
-  set('sAvgKw',     fmt(avgKw,1));
-  set('sAvgPanels', fmt(avgPanels,0));
-  set('sAvgSolar',  fmt(avgSolar,1));
-  set('sAvgYield',  fmt(avgYield,0));
-  set('sKwDC',      fmt(avgKw,1,' kW'));
+  set('sAvgKw',     fmtAnal(avgKw,1));
+  set('sAvgPanels', fmtAnal(avgPanels,0));
+  set('sAvgSolar',  fmtAnal(avgSolar,1));
+  set('sAvgYield',  fmtAnal(avgYield,0));
+  set('sKwDC',      fmtAnal(avgKw,1,' kW'));
   set('sPanelModel',topVal(function(r){return r.panel_model;}));
-  set('sPanelCount',fmt(avgPanels,0));
-  set('sPeakLoad',  fmt(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
-  set('sAutonomy',  fmt(av(function(r){return parseFloat(r.required_autonomy_hrs);}),1,' hrs'));
+  set('sPanelCount',fmtAnal(avgPanels,0));
+  set('sPeakLoad',  fmtAnal(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
+  set('sAutonomy',  fmtAnal(av(function(r){return parseFloat(r.required_autonomy_hrs);}),1,' hrs'));
 
-  /* System sizing distribution */
   var dist={'<5kW':0,'5-10kW':0,'10-15kW':0,'>15kW':0};
   rows.forEach(function(r){
     var kw=parseFloat(r.system_size_kw)||0;
-    if(kw<5)       dist['<5kW']++;
+    if(kw<5) dist['<5kW']++;
     else if(kw<10) dist['5-10kW']++;
     else if(kw<15) dist['10-15kW']++;
-    else           dist['>15kW']++;
+    else dist['>15kW']++;
   });
   var distEl=document.getElementById('sDistBody');
   if(distEl){
@@ -1470,16 +1592,16 @@ async function loadAnalytics(force){
   var avgBkwh=av(function(r){return parseFloat(r.battery_capacity_kwh);});
   var avgHours=av(function(r){return parseFloat(r.required_autonomy_hrs);});
   var topBatt=topVal(function(r){return r.battery_model;});
-  set('bAvgKwh',   fmt(avgBkwh,1));
-  set('bAvgHours', fmt(avgHours,1));
+  set('bAvgKwh',   fmtAnal(avgBkwh,1));
+  set('bAvgHours', fmtAnal(avgHours,1));
   set('bTopModel', topBatt);
   set('bAvgCost',  '—');
   set('bModel',    topBatt);
-  set('bInstKwh',  fmt(avgBkwh,1,' kWh'));
-  set('bHours',    fmt(avgHours,1,' hrs'));
-  set('bPeakLoad', fmt(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
+  set('bInstKwh',  fmtAnal(avgBkwh,1,' kWh'));
+  set('bHours',    fmtAnal(avgHours,1,' hrs'));
+  set('bPeakLoad', fmtAnal(av(function(r){return parseFloat(r.required_load_kw);}),1,' kW'));
   set('bSegment',  topVal(function(r){return r.client_segment;}));
-  set('bTotalKwh', fmt(sm(function(r){return parseFloat(r.battery_capacity_kwh)||0;}),1));
+  set('bTotalKwh', fmtAnal(sm(function(r){return parseFloat(r.battery_capacity_kwh)||0;}),1));
   set('bTotalUnits',n);
   set('bTotalCost','—');
 
@@ -1487,11 +1609,11 @@ async function loadAnalytics(force){
   set('fPipelineVal', fmtRand(totalPipeline));
   set('fAvgAnnual',   fmtRand(avgAnnual));
   set('fAvgCost',     fmtRand(avgCost));
-  set('fAvgPayback',  fmt(avgPayback,1,' yrs'));
+  set('fAvgPayback',  fmtAnal(avgPayback,1,' yrs'));
   set('fAvgMonthly',  fmtRand(avgMonthly));
   set('fAvgAnnual2',  fmtRand(avgAnnual));
   set('fAvgLifetime', fmtRand(avgLifetime));
-  set('fAvgPayback2', fmt(avgPayback,1,' yrs'));
+  set('fAvgPayback2', fmtAnal(avgPayback,1,' yrs'));
   set('fAvgCost2',    fmtRand(avgCost));
   set('fTotalPipeline',fmtRand(totalPipeline));
   set('fTotalSavings', fmtRand(sm(function(r){return parseFloat(r.annual_savings)||0;})));
@@ -1502,18 +1624,18 @@ async function loadAnalytics(force){
   var tCoal=sm(function(r){return parseFloat(r.coal_avoided_tons)||0;});
   var tTrees=sm(function(r){return parseFloat(r.trees_equivalent)||0;});
   var tYield=sm(function(r){return parseFloat(r.annual_solar_kwh)||0;});
-  set('eTotalCo2',   fmt(tCo2,1));
-  set('eTotalCoal',  fmt(tCoal,1));
+  set('eTotalCo2',   fmtAnal(tCo2,1));
+  set('eTotalCoal',  fmtAnal(tCoal,1));
   set('eTotalTrees', Math.round(tTrees));
   set('eTotalYield', Math.round(tYield));
-  set('eAvgCo2',     fmt(av(function(r){return parseFloat(r.annual_co2_saved);}),1,' t'));
-  set('eAvgCoal',    fmt(av(function(r){return parseFloat(r.coal_avoided_tons);}),1,' t'));
-  set('eAvgTrees',   fmt(av(function(r){return parseFloat(r.trees_equivalent);}),0));
-  set('eAvgYield',   fmt(av(function(r){return parseFloat(r.annual_solar_kwh);}),0,' kWh'));
+  set('eAvgCo2',     fmtAnal(av(function(r){return parseFloat(r.annual_co2_saved);}),1,' t'));
+  set('eAvgCoal',    fmtAnal(av(function(r){return parseFloat(r.coal_avoided_tons);}),1,' t'));
+  set('eAvgTrees',   fmtAnal(av(function(r){return parseFloat(r.trees_equivalent);}),0));
+  set('eAvgYield',   fmtAnal(av(function(r){return parseFloat(r.annual_solar_kwh);}),0,' kWh'));
   set('eAvgConsumption','—');
-  set('eTotalCo2b',  fmt(tCo2,1));
+  set('eTotalCo2b',  fmtAnal(tCo2,1));
   set('eTotalTreesb',Math.round(tTrees));
-  set('eTotalYieldb',fmt(tYield/1000,1));
+  set('eTotalYieldb',fmtAnal(tYield/1000,1));
 
   /* ══ INVERTER tab ══ */
   var topInv=topVal(function(r){return r.inverter_model;});
@@ -1521,124 +1643,95 @@ async function loadAnalytics(force){
   var avgPeak=av(function(r){return parseFloat(r.required_load_kw);});
   set('iTopModel', topInv);
   set('iAvgRatio', '—');
-  set('iAvgDC',    fmt(avgDC,1));
-  set('iAvgPeak',  fmt(avgPeak,1));
+  set('iAvgDC',    fmtAnal(avgDC,1));
+  set('iAvgPeak',  fmtAnal(avgPeak,1));
   set('iModel',    topInv);
   set('iRatio',    '—');
   set('iReqAC',    '—');
-  set('iDC',       fmt(avgDC,1,' kW'));
-  set('iPeak',     fmt(avgPeak,1,' kW'));
+  set('iDC',       fmtAnal(avgDC,1,' kW'));
+  set('iPeak',     fmtAnal(avgPeak,1,' kW'));
   var ratioEl=document.getElementById('iRatioStatus');
   if(ratioEl) ratioEl.innerHTML='<span style="color:#6b7280;font-size:11.5px">DC/AC ratio requires inverter AC rating — not stored in current proposals.</span>';
 
   /* ══ PIPELINE tab ══ */
-/* ── Pipeline pane — reads from allClients (already loaded & correct) ── */
-var withPdf = allClients.filter(function(c){ return c.ai && c.ai.pdf_url; });
-var pTotal  = allClients.length;
-var pGen    = withPdf.length;
-var pSent   = allClients.filter(function(c){
-                return c.ai && (c.ai.email_sent_at || c.ai.whatsapp_sent_at || c.ai.sent_at);
-              }).length;
-var pViewed = allClients.filter(function(c){
-                return c.ai && (c.ai.proposal_viewed_at || c.ai.email_opened_at);
-              }).length;
-/* ✅ THE FIX: checks BOTH client_engaged AND proposal_status — same as getProposalStatus() */
-var pWon    = allClients.filter(function(c){
-                return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
-              }).length;
+  var withPdf=allClients.filter(function(c){return c.ai&&c.ai.pdf_url;});
+  var pTotal=allClients.length;
+  var pGen=withPdf.length;
+  var pSent=allClients.filter(function(c){return c.ai&&(c.ai.email_sent_at||c.ai.whatsapp_sent_at||c.ai.sent_at);}).length;
+  var pViewed=allClients.filter(function(c){return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at);}).length;
+  var pWon=allClients.filter(function(c){return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');}).length;
+  var pipeVal=allClients.reduce(function(s,c){return s+(c.ai?parseFloat(c.ai.total_cost)||0:0);},0);
+  var wonVal2=allClients.filter(function(c){return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');}).reduce(function(s,c){return s+(parseFloat(c.ai.total_cost)||0);},0);
+  var wonRate2=pSent>0?Math.round((pWon/pSent)*100):0;
+  var hotLeads2=allClients.filter(function(c){return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at)&&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')&&c.ai.proposal_status!=='rejected';}).length;
+  var avgDeal2=pWon>0?wonVal2/pWon:0;
 
-/* Pipeline Value = sum of all total_cost in allClients */
-var pipeVal = allClients.reduce(function(s,c){
-  return s + (c.ai ? parseFloat(c.ai.total_cost)||0 : 0);
-},0);
+  document.getElementById('pTotal').textContent=pTotal;
+  document.getElementById('pGenerated').textContent=pGen;
+  document.getElementById('pSent').textContent=pSent;
+  document.getElementById('pEngaged').textContent=pWon;
 
-/* Won-only value for Avg Deal */
-var wonVal  = allClients.filter(function(c){
-  return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
-}).reduce(function(s,c){ return s + (parseFloat(c.ai.total_cost)||0); }, 0);
+  document.getElementById('pRateRow').innerHTML=
+    pill2('Pipeline Value','R '+fmtK(pipeVal),'quoted opportunity')+
+    pill2('Won Rate',wonRate2+'%','accepted / sent')+
+    pill2('Hot Leads',hotLeads2,'viewed or downloaded')+
+    pill2('Avg Deal','R '+fmtK(avgDeal2),'per completed proposal');
 
-var wonRate = pSent > 0 ? Math.round((pWon / pSent) * 100) : 0;
-var hotLeads = allClients.filter(function(c){
-  return c.ai && (c.ai.proposal_viewed_at || c.ai.email_opened_at)
-      && !(c.ai.client_engaged || c.ai.proposal_status === 'accepted')
-      && c.ai.proposal_status !== 'rejected';
-}).length;
-var avgDeal = pWon > 0 ? wonVal / pWon : 0;
+  function pill2(lbl,val,sub){
+    return '<div class="rate-pill"><div class="rp-lbl">'+lbl+'</div>'+
+           '<div class="rp-val">'+val+'</div>'+
+           '<div style="font-size:10px;color:#9ca3af;margin-top:2px">'+sub+'</div></div>';
+  }
 
-/* Fill the 4 KPI cards */
-document.getElementById('pTotal').textContent    = pTotal;
-document.getElementById('pGenerated').textContent= pGen;
-document.getElementById('pSent').textContent     = pSent;
-document.getElementById('pEngaged').textContent  = pWon;   /* ← was always wrong before */
+  var maxN=pTotal||1;
+  document.getElementById('pFunnel').innerHTML=[
+    {lbl:'Total Clients',n:pTotal,color:'#FFD700'},
+    {lbl:'Proposals Sent',n:pSent,color:'#7ac8f8'},
+    {lbl:'Viewed',n:pViewed,color:'#fbbf24'},
+    {lbl:'Won',n:pWon,color:'#34d399'},
+  ].map(function(st){
+    var w=Math.round((st.n/maxN)*100);
+    var pct2=pTotal>0?Math.round(st.n/pTotal*100):0;
+    return '<div class="pipe-row">'+
+      '<div class="pipe-lbl">'+st.lbl+'</div>'+
+      '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+w+'%;background:'+st.color+'"></div></div>'+
+      '<div class="pipe-num">'+st.n+'</div>'+
+      '<div class="pipe-pct">'+pct2+'%</div></div>';
+  }).join('');
 
-/* Rate pills row */
-document.getElementById('pRateRow').innerHTML =
-  pill('Pipeline Value',    'R ' + fmtK(pipeVal), 'quoted opportunity') +
-  pill('Won Rate',          wonRate + '%',          'accepted / sent') +
-  pill('Hot Leads',         hotLeads,               'viewed or downloaded') +
-  pill('Avg Deal',          'R ' + fmtK(avgDeal),  'per completed proposal');
-
-function pill(lbl,val,sub){
-  return '<div class="rate-pill"><div class="rp-lbl">'+lbl+'</div>'+
-         '<div class="rp-val">'+val+'</div>'+
-         '<div style="font-size:10px;color:#9ca3af;margin-top:2px">'+sub+'</div></div>';
-}
-
-/* Conversion Funnel */
-var maxN = pTotal || 1;
-document.getElementById('pFunnel').innerHTML = [
-  {lbl:'Total Clients', n:pTotal,  color:'#FFD700'},
-  {lbl:'Proposals Sent',n:pSent,   color:'#7ac8f8'},
-  {lbl:'Viewed',        n:pViewed, color:'#fbbf24'},
-  {lbl:'Won',           n:pWon,    color:'#34d399'},
-].map(function(s){
-  var w = Math.round((s.n / maxN) * 100);
-  var pct = pTotal > 0 ? Math.round(s.n/pTotal*100) : 0;
-  return '<div class="pipe-row">'+
-    '<div class="pipe-lbl">'+s.lbl+'</div>'+
-    '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:'+w+'%;background:'+s.color+'"></div></div>'+
-    '<div class="pipe-num">'+s.n+'</div>'+
-    '<div class="pipe-pct">'+pct+'%</div>'+
-  '</div>';
-}).join('');
-
-/* Client Temperature table */
-var now2 = Date.now();
-var rows = allClients.filter(function(c){ return c.ai && c.ai.pdf_url; })
-  .map(function(c){
-    var ai = c.ai;
-    var ps = getProposalStatus(ai);
-    var name  = ai.client_name || (c.lead && c.lead.client_name) || '—';
-    var loc   = ai.location || (c.lead && c.lead.address) || '—';
-    var cost  = ai.total_cost ? 'R '+fmtK(parseFloat(ai.total_cost)) : '—';
-    var days  = ai.created_at ? Math.round((now2 - new Date(ai.created_at).getTime())/86400000) : '—';
-    var fu='', cls='';
+  var nowT2=Date.now();
+  var tableRows=allClients.filter(function(c){return c.ai&&c.ai.pdf_url;}).map(function(c){
+    var ai=c.ai;
+    var ps=getProposalStatus(ai);
+    var name=ai.client_name||(c.lead&&c.lead.client_name)||'—';
+    var loc=ai.location||(c.lead&&c.lead.address)||'—';
+    var cost=ai.total_cost?'R '+fmtK(parseFloat(ai.total_cost)):'—';
+    var days=ai.created_at?Math.round((nowT2-new Date(ai.created_at).getTime())/86400000):'—';
+    var fu='',cls='';
     if(ps==='accepted'){fu='✓ Won';cls='fp-closed';}
     else if(ps==='rejected'){fu='Rejected';cls='fp-wait';}
     else if(ps==='viewed'){fu='Viewed — follow up now';cls='fp-hot';}
     else if(ps==='sent'){fu=days>3?'Overdue follow-up':'Sent — awaiting view';cls=days>3?'fp-warm':'fp-cold';}
     else{fu='Not sent yet';cls='fp-wait';}
     return '<tr><td>'+esc(name)+'</td><td>'+esc(loc)+'</td>'+
-      '<td><span class="badge '+(ps==='accepted'?'sb-accepted':ps==='viewed'?'sb-viewed':ps==='sent'?'sb-sent':ps==='rejected'?'sb-rejected':'sb-generated')+'">'+
-      (ps||'none')+'</span></td>'+
-      '<td class="'+cls+'">'+fu+'</td>'+
-      '<td>'+days+'</td><td>'+cost+'</td></tr>';
+      '<td><span class="badge '+(ps==='accepted'?'sb-accepted':ps==='viewed'?'sb-viewed':ps==='sent'?'sb-sent':ps==='rejected'?'sb-rejected':'sb-generated')+'">'+(ps||'none')+'</span></td>'+
+      '<td class="'+cls+'">'+fu+'</td><td>'+days+'</td><td>'+cost+'</td></tr>';
   });
-document.getElementById('pTableCount').textContent = rows.length + ' clients';
-document.getElementById('pFollowTable').innerHTML = rows.length
-  ? rows.join('')
-  : '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No proposals yet.</td></tr>';
+  document.getElementById('pTableCount').textContent=tableRows.length+' clients';
+  document.getElementById('pFollowTable').innerHTML=tableRows.length
+    ?tableRows.join('')
+    :'<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No proposals yet.</td></tr>';
 
   /* Timestamp */
-  var now2=new Date();
-  set('dashUpdated','Updated '+now2.getHours().toString().padStart(2,'0')+':'+now2.getMinutes().toString().padStart(2,'0'));
+  var nowDt=new Date();
+  set('dashUpdated','Updated '+nowDt.getHours().toString().padStart(2,'0')+':'+nowDt.getMinutes().toString().padStart(2,'0'));
 
-  /* Show content */
   if(loading) loading.style.display='none';
-  if(body){body.style.display='block';}
+  if(body) body.style.display='block';
   dashLoaded=true;
   switchDashTab(activeDashTab||'system');
-}function renderExecutiveOverview(rows,completed){
+}
+  function renderExecutiveOverview(rows,completed){
 
   var total=rows.length;
 
