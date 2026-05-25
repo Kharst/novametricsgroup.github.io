@@ -790,14 +790,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <div class="tab-content" id="analyticsTab">
     <div class="dash-shell">
       <div class="dash-topbar">
-        <div class="dash-stabs">
-          <button class="dash-stab on" onclick="switchDashTab('system')">☀️ System Size</button>
-          <button class="dash-stab" onclick="switchDashTab('battery')">🔋 Battery</button>
-          <button class="dash-stab" onclick="switchDashTab('financials')">💰 Financials</button>
-          <button class="dash-stab" onclick="switchDashTab('environmental')">🌱 Environmental</button>
-          <button class="dash-stab" onclick="switchDashTab('inverter')">⚡ Inverter</button>
-          <button class="dash-stab" onclick="switchDashTab('pipeline')">📊 Pipeline</button>
-        </div>
+        <div class="dash-stabs" id="dashStabs">
+  <button class="dash-stab on" data-tab="system">☀️ System</button>
+  <button class="dash-stab" data-tab="battery">🔋 Battery</button>
+  <button class="dash-stab" data-tab="financials">💰 Financials</button>
+  <button class="dash-stab" data-tab="environmental">🌱 Environment</button>
+  <button class="dash-stab" data-tab="inverter">⚡ Inverter</button>
+  <button class="dash-stab" data-tab="pipeline">📊 Pipeline</button>
+</div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           <button class="dash-refresh" onclick="loadAnalytics(true)">↻ Refresh</button>
           <span class="dash-updated" id="dashUpdated"></span>
@@ -974,14 +974,35 @@ function switchTab(tab){
 }
 function switchDashTab(name){
   activeDashTab=name;
-  document.querySelectorAll('.dash-stab').forEach(function(b,i){
-    var tabs=['system','battery','financials','environmental','inverter','pipeline'];
-    b.classList.toggle('on',tabs[i]===name);
+  // Use data-tab attribute — immune to DOM order changes
+  document.querySelectorAll('.dash-stab').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-tab')===name);
   });
   document.querySelectorAll('.stab-pane').forEach(function(p){p.classList.remove('on');});
   var pane=document.getElementById('pane-'+name);
   if(pane)pane.classList.add('on');
+  // Ensure dashBody is visible (in case called before load completes)
+  var db=document.getElementById('dashBody');
+  if(db&&db.style.display==='none'){
+    var dl=document.getElementById('dashLoading');
+    if(dl) dl.style.display='none';
+    db.style.display='block';
+  }
 }
+
+// Wire up tab buttons via event delegation (runs after DOM ready)
+document.addEventListener('DOMContentLoaded', function(){
+  var stabs=document.getElementById('dashStabs');
+  if(stabs){
+    stabs.addEventListener('click',function(e){
+      var btn=e.target.closest('.dash-stab');
+      if(btn){
+        var tab=btn.getAttribute('data-tab');
+        if(tab) switchDashTab(tab);
+      }
+    });
+  }
+});
 
 function getProposalStatus(ai){
   if(!ai||!ai.pdf_url) return null;
@@ -1021,6 +1042,15 @@ function attnMessage(c){
   if(ps==='sent'){var sentAt=ai.sent_at||ai.email_sent_at||ai.whatsapp_sent_at;var days=Math.round((now-new Date(sentAt).getTime())/86400000);return'⚠️ Sent '+days+' days ago — not viewed yet. Consider a follow-up call.';}
   return '';
 }
+
+// Recomputes "Won" KPI from allClients — handles both client_engaged and proposal_status='accepted'
+function refreshWonCount(){
+  var won=allClients.filter(function(c){
+    return c.ai&&(c.ai.client_engaged||c.ai.proposal_status==='accepted');
+  }).length;
+  var el=document.getElementById('pEngaged');
+  if(el) el.textContent=won;
+}  
 function clientMatchesTab(c,tab){
   var ai=c.ai;
   switch(tab){
@@ -1327,6 +1357,8 @@ async function loadAnalytics(forceRefresh){
     document.getElementById('dashLoading').style.display='none';document.getElementById('dashBody').style.display='block';
     if(forceRefresh)dashLoaded=false;
   }catch(err){document.getElementById('dashLoading').innerHTML='<div style="color:#eb7070;font-size:11px">Failed to load analytics</div>';}
+  refreshWonCount();
+  dashLoaded=true;
 }
 function renderExecutiveOverview(rows,completed){
 
