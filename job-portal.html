@@ -14,26 +14,21 @@
   .topbar-logo span{color:var(--text2);font-weight:400}
   .topbar-right{display:flex;align-items:center;gap:12px}
   .layout{display:flex;height:calc(100vh - 56px);overflow:hidden}
-  /* ── Premium sidebar ── */
   .sidebar{width:280px;background:linear-gradient(180deg,#0f1520 0%,#111827 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
   .sidebar-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
   .sidebar-title{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.14em;text-transform:uppercase}
   .badge-count{font-family:var(--mono);font-size:9px;background:rgba(245,166,35,.15);color:var(--amber);padding:2px 8px;border-radius:20px;font-weight:700;border:1px solid rgba(245,166,35,.25)}
-  /* search */
   .search-box{padding:10px 12px 8px;position:relative}
   .search-box::before{content:'⌕';position:absolute;left:20px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none;line-height:1}
   .search-box input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:12px;padding:7px 10px 7px 28px;border-radius:6px;outline:none;transition:border-color .15s,background .15s}
   .search-box input:focus{border-color:rgba(245,166,35,.4);background:rgba(255,255,255,.06)}
   .search-box input::placeholder{color:var(--text3)}
-  /* filter dropdown */
   .filter-dropdown-wrap{padding:0 12px 10px;border-bottom:1px solid var(--border)}
   .filter-select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.06em;padding:6px 10px;border-radius:6px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a6a85' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .15s}
   .filter-select:focus{border-color:rgba(245,166,35,.4)}
-  /* job list */
   .job-list{flex:1;overflow-y:auto;padding:4px 0}
   .job-list::-webkit-scrollbar{width:3px}
   .job-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-  /* job cards — premium */
   .job-card{margin:3px 8px;border-radius:8px;padding:11px 13px;cursor:pointer;transition:all .15s;border:1px solid transparent;position:relative}
   .job-card:hover{background:rgba(255,255,255,.04);border-color:var(--border)}
   .job-card.active{background:rgba(245,166,35,.06);border-color:rgba(245,166,35,.2)}
@@ -46,11 +41,11 @@
   .job-list-empty span{display:block;font-size:22px;margin-bottom:8px;opacity:.4}
   .stage-pill{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em}
   .stage--site_visit_scheduled{background:rgba(74,158,255,.15);color:var(--blue)}
-  .stage--site_visit_complete{background:rgba(74,158,255,.25);color:var(--blue)}
+  .stage--site_visit_completed{background:rgba(74,158,255,.25);color:var(--blue)}
   .stage--installation_scheduled{background:rgba(245,166,35,.15);color:var(--amber)}
   .stage--installation_in_progress{background:rgba(245,166,35,.25);color:var(--amber2)}
-  .stage--installation_complete{background:rgba(46,204,138,.15);color:var(--green)}
-  .stage--handed_over{background:rgba(46,204,138,.3);color:var(--green)}
+  .stage--installation_completed{background:rgba(46,204,138,.15);color:var(--green)}
+  .stage--handover_completed{background:rgba(46,204,138,.3);color:var(--green)}
   .stage--accepted,.stage--lead,.stage--quoted{background:rgba(90,106,133,.15);color:var(--text3)}
   .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
   .main::-webkit-scrollbar{width:6px}
@@ -205,11 +200,11 @@
         <option value="all">ALL STAGES</option>
         <option value="accepted">● Won — Awaiting Visit</option>
         <option value="site_visit_scheduled">● Site Visit Scheduled</option>
-        <option value="site_visit_complete">● Visit Complete</option>
+        <option value="site_visit_completed">● Visit Complete</option>
         <option value="installation_scheduled">● Install Scheduled</option>
         <option value="installation_in_progress">● Installing Now</option>
-        <option value="installation_complete">● Install Complete</option>
-        <option value="handed_over">● Handed Over</option>
+        <option value="installation_completed">● Install Complete</option>
+        <option value="handover_completed">● Handed Over</option>
       </select>
     </div>
     <div class="job-list" id="job-list"></div>
@@ -478,21 +473,40 @@ function setSyncStatus(s){
   else{el.textContent='● loading';el.style.color='var(--text3)';}
 }
 
-const STAGE_LABELS={lead:'Won — Awaiting Visit',accepted:'Won — Awaiting Visit',site_visit_scheduled:'Visit Scheduled',site_visit_complete:'Visit Complete',installation_scheduled:'Install Scheduled',installation_in_progress:'Installing',installation_complete:'Install Complete',handed_over:'Handed Over'};
+/* ── UPDATED: stage names now match the DB constraint ── */
+const STAGE_LABELS={
+  lead:'Won — Awaiting Visit',
+  accepted:'Won — Awaiting Visit',
+  site_visit_scheduled:'Visit Scheduled',
+  site_visit_completed:'Visit Complete',
+  deposit_received:'Deposit Received',
+  materials_ordered:'Materials Ordered',
+  installation_scheduled:'Install Scheduled',
+  installation_in_progress:'Installing',
+  installation_completed:'Install Complete',
+  coc_issued:'COC Issued',
+  sseg_submitted:'SSEG Submitted',
+  handover_completed:'Handed Over'
+};
+
 const PANEL_UNLOCK=[
-  ['lead','accepted','site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-  ['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-  ['installation_scheduled','installation_in_progress','installation_complete','handed_over'],
-  ['installation_in_progress','installation_complete','handed_over'],
-  ['installation_complete','handed_over'],
+  ['lead','accepted','site_visit_scheduled','site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+  ['site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+  ['installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+  ['installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+  ['installation_completed','coc_issued','sseg_submitted','handover_completed'],
 ];
+
 const PB={0:{done:'Visit Complete',current:'Pending',locked:'Locked'},1:{done:'Scheduled',current:'Pending',locked:'Locked'},2:{done:'Complete',current:'In Progress',locked:'Locked'},3:{done:'Signed Off',current:'Pending',locked:'Locked'},4:{done:'✓ Handed Over',current:'Pending',locked:'Locked'}};
-const SO=['site_visit_scheduled','site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'];
+
+/* Stage order for pipeline dots */
+const SO=['site_visit_scheduled','site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'];
 function si(s){return SO.indexOf(s);}
 
 async function loadJobs(){
   setSyncStatus('loading');
-  const won='accepted,site_visit_scheduled,site_visit_complete,installation_scheduled,installation_in_progress,installation_complete,handed_over';
+  /* ── UPDATED: query uses new stage names ── */
+  const won='accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
   try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
@@ -506,9 +520,9 @@ function filterJobs(){renderSidebar();}
 function renderSidebar(){
   const q=document.getElementById('search-input').value.toLowerCase();
   const list=document.getElementById('job-list');
-  const ins=['installation_scheduled','installation_in_progress','installation_complete'];
+  const ins=['installation_scheduled','installation_in_progress','installation_completed'];
   const f=jobs.filter(j=>{
-    const mf=activeFilter==='all'?true:activeFilter==='installation'?ins.includes(j.job_status):activeFilter==='handed_over'?j.job_status==='handed_over':j.job_status===activeFilter;
+    const mf=activeFilter==='all'?true:activeFilter==='installation'?ins.includes(j.job_status):activeFilter==='handover_completed'?j.job_status==='handover_completed':j.job_status===activeFilter;
     return mf&&(!q||`${j.client_name||''} ${j.client_address||''} ${j.ai_id||''}`.toLowerCase().includes(q));
   });
   document.getElementById('job-count').textContent=f.length;list.innerHTML='';
@@ -564,7 +578,7 @@ function renderJobHeader(){
 
 function renderPipeline(){
   const idx=si(currentJob.job_status);
-  [{stage:'site_visit_complete'},{stage:'installation_scheduled'},{stage:'installation_in_progress'},{stage:'installation_complete'},{stage:'handed_over'}].forEach((ps,i)=>{
+  [{stage:'site_visit_completed'},{stage:'installation_scheduled'},{stage:'installation_in_progress'},{stage:'installation_completed'},{stage:'handover_completed'}].forEach((ps,i)=>{
     const dot=document.getElementById(`pdot-${i}`),lbl=document.getElementById(`plbl-${i}`),arr=document.getElementById(`parr-${i}`);
     if(!dot||!lbl)return;const psi=si(ps.stage);
     if(idx>=psi){dot.className='pipe-dot done';lbl.className='pipe-label done';if(arr)arr.className='pipe-arrow done';}
@@ -580,9 +594,15 @@ function renderPanels(){
     const panel=document.getElementById(`panel-${i}`),badge=document.getElementById(`panel-${i}-badge`);
     if(!panel||!badge)return;
     const unlocked=unlock.includes(status);panel.classList.toggle('locked',!unlocked);
-    const done={0:['site_visit_complete','installation_scheduled','installation_in_progress','installation_complete','handed_over'],1:['installation_scheduled','installation_in_progress','installation_complete','handed_over'],2:['installation_complete','handed_over'],3:['installation_complete','handed_over'],4:['handed_over']};
+    const done={
+      0:['site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+      1:['installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+      2:['installation_completed','coc_issued','sseg_submitted','handover_completed'],
+      3:['installation_completed','coc_issued','sseg_submitted','handover_completed'],
+      4:['handover_completed']
+    };
     let bs='locked';if(unlocked)bs=(done[i]||[]).includes(status)?'done':'current';
-    badge.textContent=PB[i][bs];badge.className=`stage-pill ${bs==='done'?'stage--installation_complete':bs==='current'?'stage--installation_in_progress':'stage--lead'}`;
+    badge.textContent=PB[i][bs];badge.className=`stage-pill ${bs==='done'?'stage--installation_completed':bs==='current'?'stage--installation_in_progress':'stage--lead'}`;
     if(bs==='current')panel.classList.add('open');
   });
   const pre=document.getElementById('checklist-pre');if(pre&&pre.childElementCount===0)buildChecklist();
@@ -687,18 +707,9 @@ function renderPanel1DesignNote(){
   const ok=v.original_proposal_kw||currentJob?.system_size_kw||'—';
   const nk=v.recommended_system_kw||'—';
   note.style.display='block';
-  if(declined){
-    note.className='info-card error';
-    note.textContent='🔴 Client declined the revised design ('+ok+' kWp → '+nk+' kWp) — contact them before proceeding.';
-  } else if(v.design_change_category==='major'&&!approved){
-    note.className='info-card error';
-    note.textContent='🔴 Major design change — awaiting client approval. Original: '+ok+' kWp → Revised: '+nk+' kWp. Approval link sent.';
-  } else {
-    note.className='info-card warning';
-    note.textContent=approved
-      ? '✓ Client approved the revised design: '+ok+' → '+nk+' kWp.'
-      : '⚠ Design change on record: '+ok+' → '+nk+' kWp. Reason: "'+( v.design_change_reason||'not yet documented')+'"';
-  }
+  if(declined){note.className='info-card error';note.textContent='🔴 Client declined the revised design ('+ok+' kWp → '+nk+' kWp) — contact them before proceeding.';}
+  else if(v.design_change_category==='major'&&!approved){note.className='info-card error';note.textContent='🔴 Major design change — awaiting client approval. Original: '+ok+' kWp → Revised: '+nk+' kWp. Approval link sent.';}
+  else{note.className='info-card warning';note.textContent=approved?'✓ Client approved the revised design: '+ok+' → '+nk+' kWp.':'⚠ Design change on record: '+ok+' → '+nk+' kWp. Reason: \"'+(v.design_change_reason||'not yet documented')+'\""';}
 }
 
 async function acknowledgeDesignChange(){
@@ -733,36 +744,20 @@ async function sendDesignChangeNotification(job,visit,category){
   if(ackEl){ackEl.style.display='block';ackEl.textContent='⏳ Generating revised proposal PDF and notifying client...';}
   try{
     if(category==='major'){
-      // MAJOR change: run the full engine — recalculates all financials,
-      // generates a complete new proposal PDF, emails the client with
-      // PDF link, full comparison table, and Accept / Decline buttons.
-      const res=await fetch(`${SUPA_URL}/functions/v1/generate-revised-proposal`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
-        body:JSON.stringify({ai_id:job.ai_id,site_visit_id:visit.id})
-      });
-      const data=await res.json();
-      if(!data.success)throw new Error(data.error||'generate-revised-proposal failed');
+      const res=await fetch(`${SUPA_URL}/functions/v1/generate-revised-proposal`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({ai_id:job.ai_id,site_visit_id:visit.id})});
+      const data=await res.json();if(!data.success)throw new Error(data.error||'generate-revised-proposal failed');
       const patch={client_notified_of_change_at:new Date().toISOString(),design_change_category:category};
       if(data.approval_token)patch.client_approval_token=data.approval_token;
-      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);
-      currentVisit={...currentVisit,...patch};
+      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);currentVisit={...currentVisit,...patch};
       await logActivity('DESIGN NOTIFICATION',`Revised proposal PDF (ref ${data.new_ai_id||'—'}) generated and sent to client for approval`,visit.assessor_name);
       toast('⏳ Revised proposal sent — awaiting client approval','info');
       if(ackEl){ackEl.textContent='✓ Revised proposal PDF sent to client — awaiting their approval.';}
     }else{
-      // MINOR change: informational email only, no PDF needed.
-      const res=await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','apikey':SUPA_ANON},
-        body:JSON.stringify({client_name:job.client_name,client_email:job.client_email,client_address:job.client_address||'',original_kw:visit.original_proposal_kw||job.system_size_kw,original_batt:visit.original_proposal_batt_kwh||job.battery_capacity_kwh,new_kw:visit.recommended_system_kw,new_batt:visit.recommended_battery_kwh,change_category:category,change_reason:visit.design_change_reason||'',installer_name:job.installer_name||'Your Solar Installer',ai_id:job.ai_id,visit_id:visit.id})
-      });
-      const data=await res.json();
-      if(!data.success)throw new Error(data.error||'send-design-change-notification failed');
+      const res=await fetch(`${SUPA_URL}/functions/v1/send-design-change-notification`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({client_name:job.client_name,client_email:job.client_email,client_address:job.client_address||'',original_kw:visit.original_proposal_kw||job.system_size_kw,original_batt:visit.original_proposal_batt_kwh||job.battery_capacity_kwh,new_kw:visit.recommended_system_kw,new_batt:visit.recommended_battery_kwh,change_category:category,change_reason:visit.design_change_reason||'',installer_name:job.installer_name||'Your Solar Installer',ai_id:job.ai_id,visit_id:visit.id})});
+      const data=await res.json();if(!data.success)throw new Error(data.error||'send-design-change-notification failed');
       const patch={client_notified_of_change_at:new Date().toISOString(),design_change_category:category};
       if(data.approval_token)patch.client_approval_token=data.approval_token;
-      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);
-      currentVisit={...currentVisit,...patch};
+      await sbPatch('site_visits',`id=eq.${visit.id}`,patch);currentVisit={...currentVisit,...patch};
       await logActivity('DESIGN NOTIFICATION','Client notified of minor design adjustment',visit.assessor_name);
       toast('✓ Client notified of adjustment','success');
       if(ackEl){ackEl.textContent='✓ Client notified of design adjustment.';}
@@ -774,55 +769,33 @@ async function sendDesignChangeNotification(job,visit,category){
     toast('Failed to send notification: '+e.message,'error');
   }
 }
+
 function renderProposalVersions(){
-  const container = document.getElementById('proposal-versions-section');
-  if(!container) return;
-  if(!currentProposalVersions.length){ container.style.display='none'; return; }
+  const container=document.getElementById('proposal-versions-section');
+  if(!container)return;
+  if(!currentProposalVersions.length){container.style.display='none';return;}
   container.style.display='block';
-  const rows = currentProposalVersions.map((v,i)=>{
-    const date = v.created_at ? new Date(v.created_at).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    const cat   = v.delta_category||'Revision';
-    const catColor = cat.includes('Major')?'var(--red)':cat.includes('Moderate')?'var(--amber)':'var(--green)';
-    const costSign = v.delta_cost>0?'+':'';
+  const rows=currentProposalVersions.map((v,i)=>{
+    const date=v.created_at?new Date(v.created_at).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    const cat=v.delta_category||'Revision';
+    const catColor=cat.includes('Major')?'var(--red)':cat.includes('Moderate')?'var(--amber)':'var(--green)';
+    const costSign=v.delta_cost>0?'+':'';
     return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);${i===0?'background:rgba(245,166,35,.04)':''}">
-      <div style="font-family:var(--mono);font-size:9px;color:${i===0?'var(--amber)':'var(--text3)'};padding-top:2px;white-space:nowrap">
-        ${i===0?'LATEST':'V'+(currentProposalVersions.length-i)}
-      </div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:3px">${v.delta_summary||'Design revision'}</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <span style="font-family:var(--mono);font-size:10px;color:${catColor}">${cat}</span>
-          ${v.delta_cost?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${costSign}R${Math.abs(Math.round(v.delta_cost)).toLocaleString('en-ZA')} cost</span>`:''}
-          ${v.system_kw?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${v.system_kw} kWp · ${v.battery_kwh} kWh</span>`:''}
-        </div>
-      </div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap">${date}</div>
-    </div>`;
+      <div style="font-family:var(--mono);font-size:9px;color:${i===0?'var(--amber)':'var(--text3)'};padding-top:2px;white-space:nowrap">${i===0?'LATEST':'V'+(currentProposalVersions.length-i)}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text2);margin-bottom:3px">${v.delta_summary||'Design revision'}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><span style="font-family:var(--mono);font-size:10px;color:${catColor}">${cat}</span>
+      ${v.delta_cost?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${costSign}R${Math.abs(Math.round(v.delta_cost)).toLocaleString('en-ZA')} cost</span>`:''}
+      ${v.system_kw?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${v.system_kw} kWp · ${v.battery_kwh} kWh</span>`:''}</div></div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap">${date}</div></div>`;
   }).join('');
-  container.innerHTML = `
-    <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">
-      📋 Proposal Versions — ${currentProposalVersions.length} version${currentProposalVersions.length>1?'s':''}
-    </div>
-    ${rows}
-    <div style="padding:8px 14px;font-size:11px;color:var(--text3)">
-      Latest version hardware pre-filled in Install Prep below.
-    </div>`;
+  container.innerHTML=`<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">📋 Proposal Versions — ${currentProposalVersions.length} version${currentProposalVersions.length>1?'s':''}</div>${rows}<div style="padding:8px 14px;font-size:11px;color:var(--text3)">Latest version hardware pre-filled in Install Prep below.</div>`;
 }
+
 function prefillForms(){
   const v=currentVisit;
   if(v){setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);checkDesignChangeLive();}
-  // Pre-fill installation hardware from latest proposal version if no install record yet
-const latestVersion = currentProposalVersions[0];
-if(latestVersion && !currentInstall) {
-  setVal('inst-panelbrand', latestVersion.panel_brand);
-  setVal('inst-panelwatt',  latestVersion.panel_watt);
-  setVal('inst-panelqty',   latestVersion.panels_qty);
-  setVal('inst-inverterbrand', latestVersion.inverter_brand);
-  setVal('inst-inverterkw',    latestVersion.inverter_kw);
-  setVal('inst-batterybrand',  latestVersion.battery_brand);
-  setVal('inst-batterykwh',    latestVersion.battery_unit_kwh);
-  setVal('inst-batteryqty',    latestVersion.battery_qty);
-}
+  const latestVersion=currentProposalVersions[0];
+  if(latestVersion&&!currentInstall){setVal('inst-panelbrand',latestVersion.panel_brand);setVal('inst-panelwatt',latestVersion.panel_watt);setVal('inst-panelqty',latestVersion.panels_qty);setVal('inst-inverterbrand',latestVersion.inverter_brand);setVal('inst-inverterkw',latestVersion.inverter_kw);setVal('inst-batterybrand',latestVersion.battery_brand);setVal('inst-batterykwh',latestVersion.battery_unit_kwh);setVal('inst-batteryqty',latestVersion.battery_qty);}
   const inst=currentInstall;
   if(inst){setVal('inst-teamlead',inst.team_lead);setVal('inst-team',inst.team_members);setVal('inst-date',inst.scheduled_date);setVal('inst-panelbrand',inst.panels_brand);setVal('inst-panelwatt',inst.panels_watt);setVal('inst-panelqty',inst.panels_qty);setVal('inst-inverterbrand',inst.inverter_brand);setVal('inst-inverterkw',inst.inverter_kw);setVal('inst-batterybrand',inst.battery_brand);setVal('inst-batterykwh',inst.battery_kwh);setVal('inst-batteryqty',inst.battery_qty);setVal('comp-kw',inst.final_system_kw);setVal('comp-battery',inst.final_battery_kwh);setVal('comp-punchlist',inst.punch_list);setVal('comp-inspector',inst.inspector_name);setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');if(inst.install_checklist?.length)reloadChecklist(inst.install_checklist);}
   const ho=currentHandover;
@@ -861,15 +834,13 @@ async function _saveSiteVisit(complete){
   const ok=parseFloat(currentJob.system_size_kw)||0,ob=parseFloat(currentJob.battery_capacity_kwh)||0;
   const kd=nk&&ok?Math.abs((nk-ok)/ok):0,bd=nb&&ob?Math.abs((nb-ob)/ob):0;
   const changed=kd>MINOR||bd>MINOR,cat=getCat(kd,bd);
-  const vd={job_id:String(currentJob.ai_id),assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',shading_notes:getVal('sv-shadingnotes'),recommended_system_kw:nk,recommended_battery_kwh:nb,additional_notes:getVal('sv-notes'),completed_at:complete?new Date().toISOString():null,design_changed:changed,
-original_proposal_kw:ok||null,
-original_proposal_batt_kwh:ob||null,
-client_approval_status:changed?'pending':'not_applicable'};
+  const vd={job_id:String(currentJob.ai_id),assessor_name:getVal('sv-assessor'),visited_at:getVal('sv-datetime')||new Date().toISOString(),municipality:getVal('sv-municipality'),grid_ref_number:getVal('sv-gridref'),roof_type:getVal('sv-rooftype'),roof_condition:getVal('sv-roofcondition')||null,cable_run_meters:parseInt(getVal('sv-cablerun'))||null,meter_type:getVal('sv-metertype'),phase:getVal('sv-phase')||null,db_board_adequate:getVal('sv-db')==='true',db_notes:getVal('sv-dbnotes'),earthing_ok:getVal('sv-earthing')==='true',earthing_notes:getVal('sv-earthingnotes'),shading_issues:getVal('sv-shading')==='true',shading_notes:getVal('sv-shadingnotes'),recommended_system_kw:nk,recommended_battery_kwh:nb,additional_notes:getVal('sv-notes'),completed_at:complete?new Date().toISOString():null,design_changed:changed,original_proposal_kw:ok||null,original_proposal_batt_kwh:ob||null,client_approval_status:changed?'pending':'not_applicable'};
   try{
     if(currentVisit){delete vd.client_notified_at;delete vd.client_notified_by;await sbPatch('site_visits','id=eq.'+currentVisit.id,vd);currentVisit={...currentVisit,...vd};}
     else{const r=await sbPost('site_visits',vd);currentVisit=r?.[0]||null;}
     if(complete){
-      await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'site_visit_complete'});
+      /* ── UPDATED: use new stage name site_visit_completed ── */
+      await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'site_visit_completed',site_visit_completed_at:new Date().toISOString()});
       await logActivity('SITE VISIT',cat==='major'?'Site visit complete — MAJOR change. Client approval required.':cat==='minor'?'Site visit complete — minor adjustment.':'Site visit complete.',vd.assessor_name);
       toast(cat==='major'?'Site visit complete — client approval required':cat==='minor'?'Site visit complete — minor adjustment noted':'Site visit completed!',cat==='major'?'info':'success');
       if(currentVisit&&cat!=='none')await sendDesignChangeNotification(currentJob,currentVisit,cat);
@@ -901,7 +872,8 @@ async function completeInstallation(){
   try{
     const cd={final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),install_checklist:collectChecklist()};
     if(currentInstall)await sbPatch('installations','id=eq.'+currentInstall.id,cd);
-    await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'installation_complete'});
+    /* ── UPDATED: use new stage name installation_completed ── */
+    await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'installation_completed',installation_completed_at:new Date().toISOString()});
     await logActivity('COMPLETION','Final sign-off by '+getVal('comp-inspector'),getVal('comp-inspector'));
     toast('Installation complete! Proceed to handover.','success');await openJob(currentJob.ai_id);
   }catch(e){toast('Error: '+e.message,'error');}finally{endAction('btn-complete-install');}
@@ -912,7 +884,8 @@ async function completeHandover(){
   try{
     const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString()};
     if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',hd);currentHandover=r?.[0]||null;}
-    await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'handed_over'});
+    /* ── UPDATED: use new stage name handover_completed, also write handover_completed_at ── */
+    await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'handover_completed',handover_completed_at:new Date().toISOString()});
     await logActivity('HANDOVER','Handed over by '+getVal('ho-by'),getVal('ho-by'));
     toast('🎉 Job handed over!','success');renderHandoverDoc();
     const prev=document.getElementById('handover-doc-preview');if(prev)prev.style.display='block';
