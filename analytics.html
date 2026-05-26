@@ -491,9 +491,9 @@ async function loadAll(){
     /* Parallel fetch */
     const [allProposals, jobs, visits, installs, handovers] = await Promise.all([
       /* All proposals in period — for funnel top */
-      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_system_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,proposal_sent_at,proposal_viewed_at${pf}&order=created_at.desc`),
+      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at${pf}&order=created_at.desc`),
       /* Active jobs */
-      sb('ai_results', `select=ai_id,job_status,system_size_kw,total_system_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,client_name&job_status=in.(${ACTIVE_STAGES})${pf}&order=created_at.desc`),
+      sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,client_name&job_status=in.(${ACTIVE_STAGES})${pf}&order=created_at.desc`),
       /* Site visits */
       sb('site_visits', `select=id,job_id,design_changed,design_change_category,client_approval_status,created_at${pf}&order=created_at.desc`),
       /* Installations */
@@ -526,13 +526,13 @@ async function loadAll(){
    KPIs
 ══════════════════════════════════════════ */
 function renderKPIs(proposals, jobs, visits){
-  /* Pipeline value = all active jobs total_system_cost */
+  /* Pipeline value = all active jobs total_cost */
   const pipelineJobs = jobs.filter(j=>j.job_status!=='handover_completed');
-  const pipeline = pipelineJobs.reduce((s,j)=>s+(parseFloat(j.total_system_cost)||0),0);
+  const pipeline = pipelineJobs.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
 
-  /* Revenue realised = handover_completed total_system_cost */
+  /* Revenue realised = handover_completed total_cost */
   const realised = jobs.filter(j=>j.job_status==='handover_completed')
-    .reduce((s,j)=>s+(parseFloat(j.total_system_cost)||0),0);
+    .reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
 
   /* Full-funnel won rate = handover_completed / all proposals */
   const totalProp = proposals.length;
@@ -567,7 +567,7 @@ function renderFunnel(proposals, jobs){
   /* Count each funnel stage */
   const counts = {
     generated: proposals.length,
-    sent:       proposals.filter(p=>p.proposal_sent_at||p.job_status&&p.job_status!=='lead').length,
+    sent:       proposals.filter(p=>p.sent_at||p.job_status&&p.job_status!=='lead').length,
     viewed:     proposals.filter(p=>p.proposal_viewed_at).length,
     accepted:   jobs.filter(j=>JOB_STAGE_ORDER.includes(j.job_status)).length,
     site_visit_completed: jobs.filter(j=>['site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(j.job_status)).length,
@@ -615,7 +615,7 @@ function renderRevenueChart(proposals){
   const months = getMonths();
   const data = months.map(m=>
     proposals.filter(p=>inMonth(p.created_at,m))
-      .reduce((s,p)=>s+(parseFloat(p.total_system_cost)||0),0)
+      .reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0)
   );
   destroyChart('chart-revenue');
   const ctx=document.getElementById('chart-revenue').getContext('2d');
