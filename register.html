@@ -425,7 +425,8 @@ async function submitRegistration() {
     }).catch(() => {}); // don't block on this
 
   } catch (e) {
-    showMsg(msgEl, 'err', '✗ ' + e.message);
+    console.error('Registration error:', e);
+    showMsg(msgEl, 'err', '✗ Error: ' + e.message + ' — Check the browser console (F12) for details.');
     btn.disabled = !termsAccepted;
     btn.innerHTML = '🚀 Create My Account';
   }
