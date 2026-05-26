@@ -253,6 +253,102 @@ body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(
     </div>
   </div>
 
+  <!-- ══ SALES PIPELINE ══ -->
+  <div class="section-hd">
+    <div class="section-title">Sales Pipeline</div>
+    <div class="section-sub">Proposal funnel — lead to accepted</div>
+  </div>
+  <div class="kpi-strip" style="margin-bottom:16px">
+    <div class="kpi c-amber">
+      <div class="kpi-label">Total Leads</div>
+      <div class="kpi-val" id="sp-total">—</div>
+      <div class="kpi-sub">in system</div>
+    </div>
+    <div class="kpi c-blue">
+      <div class="kpi-label">Proposals Sent</div>
+      <div class="kpi-val" id="sp-sent">—</div>
+      <div class="kpi-sub">emailed or WhatsApp</div>
+    </div>
+    <div class="kpi c-purple">
+      <div class="kpi-label">Hot Leads</div>
+      <div class="kpi-val" id="sp-hot">—</div>
+      <div class="kpi-sub">viewed, not yet won</div>
+    </div>
+    <div class="kpi c-green">
+      <div class="kpi-label">Proposals Won</div>
+      <div class="kpi-val" id="sp-won">—</div>
+      <div class="kpi-sub">client accepted</div>
+    </div>
+    <div class="kpi c-orange">
+      <div class="kpi-label">Won Rate</div>
+      <div class="kpi-val" id="sp-wonrate">—</div>
+      <div class="kpi-sub">accepted / sent</div>
+    </div>
+    <div class="kpi c-teal">
+      <div class="kpi-label">Avg Deal Size</div>
+      <div class="kpi-val" id="sp-avgdeal">—</div>
+      <div class="kpi-sub">per won proposal</div>
+    </div>
+  </div>
+
+  <div class="charts-2" style="margin-bottom:16px">
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">Proposal Conversion Funnel</div><div class="cc-sub">Lead → Generated → Sent → Viewed → Won</div></div>
+        <span class="cc-badge amber">Proposals</span>
+      </div>
+      <div class="cc-body" id="sp-funnel" style="padding:14px 18px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">Proposal Financials</div><div class="cc-sub">Average metrics across all generated proposals</div></div>
+        <span class="cc-badge green">Averages</span>
+      </div>
+      <div class="cc-body" id="sp-financials" style="padding:14px 18px"></div>
+    </div>
+  </div>
+
+  <!-- Next Best Actions + Insights row -->
+  <div class="charts-2" style="margin-bottom:16px">
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">Next Best Actions</div><div class="cc-sub">Follow-up moves that protect revenue right now</div></div>
+        <span class="cc-badge amber">🎯 Actions</span>
+      </div>
+      <div id="sp-actions" style="padding:14px 18px;min-height:80px"></div>
+    </div>
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">Pipeline Insights</div><div class="cc-sub">What your numbers are telling you</div></div>
+        <span class="cc-badge blue">💡 Insights</span>
+      </div>
+      <div id="sp-insights" style="padding:14px 18px;min-height:80px"></div>
+    </div>
+  </div>
+
+  <!-- Client Follow-Up Table -->
+  <div class="chart-card" style="margin-bottom:28px;padding:0;overflow:hidden">
+    <div class="cc-header">
+      <div><div class="cc-title">Client Follow-Up Status</div><div class="cc-sub">Every proposal — where it stands and what action to take</div></div>
+      <span class="cc-badge blue" id="sp-table-count">—</span>
+    </div>
+    <table class="vel-table" id="sp-followup-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Follow-Up Action</th>
+          <th>Days Since Sent</th>
+          <th>System Cost</th>
+        </tr>
+      </thead>
+      <tbody id="sp-followup-tbody">
+        <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:11px;font-family:var(--mono)">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
   <!-- ══ FULL FUNNEL ══ -->
   <div class="section-hd"><div class="section-title">Full Customer Journey</div><div class="section-sub">Proposal generated through to handover completed</div></div>
   <div class="funnel-card">
@@ -491,7 +587,7 @@ async function loadAll(){
     /* Parallel fetch */
     const [allProposals, jobs, visits, installs, handovers] = await Promise.all([
       /* All proposals in period — for funnel top */
-      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at${pf}&order=created_at.desc`),
+      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at,client_name,email_sent_at,whatsapp_sent_at,email_opened_at,client_engaged,proposal_status,location,pdf_url,annual_savings,monthly_savings,payback_years,panel_number${pf}&order=created_at.desc`),
       /* Active jobs */
       sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,client_name&job_status=in.(${ACTIVE_STAGES})${pf}&order=created_at.desc`),
       /* Site visits */
@@ -502,6 +598,7 @@ async function loadAll(){
       sb('handovers', `select=id,job_id,handed_over_at${pfHo}&order=handed_over_at.desc`),
     ]);
 
+    renderSalesPipeline(allProposals);
     renderKPIs(allProposals, jobs, visits);
     renderFunnel(allProposals, jobs);
     renderRevenueChart(allProposals);
@@ -520,6 +617,142 @@ async function loadAll(){
     setSyncStatus('error');
     console.error('loadAll error:',e);
   }
+
+  /* ══════════════════════════════════════════
+   SALES PIPELINE (migrated from proposal portal)
+══════════════════════════════════════════ */
+function renderSalesPipeline(proposals){
+  const fmtR = v => v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+  const setText2 = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+
+  const withPdf   = proposals.filter(p=>p.pdf_url);
+  const sent      = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
+  const viewed    = proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at);
+  const won       = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
+  const hot       = viewed.filter(p=>!(p.client_engaged||p.proposal_status==='accepted')&&p.proposal_status!=='rejected');
+  const wonVal    = won.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+  const wonRate   = sent.length ? Math.round(won.length/sent.length*100) : 0;
+  const avgDeal   = won.length ? wonVal/won.length : 0;
+
+  setText2('sp-total',   proposals.length);
+  setText2('sp-sent',    sent.length);
+  setText2('sp-hot',     hot.length);
+  setText2('sp-won',     won.length);
+  setText2('sp-wonrate', wonRate+'%');
+  setText2('sp-avgdeal', fmtR(avgDeal));
+
+  // Funnel bars
+  const funnelEl = document.getElementById('sp-funnel');
+  if(funnelEl){
+    const steps = [
+      {lbl:'Total Leads', n:proposals.length, color:'#FFD700'},
+      {lbl:'Proposals Generated', n:withPdf.length, color:'#fbbf24'},
+      {lbl:'Sent to Client', n:sent.length, color:'#7ac8f8'},
+      {lbl:'Viewed / Opened', n:viewed.length, color:'#f97316'},
+      {lbl:'Won', n:won.length, color:'#34d399'},
+    ];
+    const maxN = proposals.length || 1;
+    funnelEl.innerHTML = steps.map(st=>{
+      const w = Math.round((st.n/maxN)*100);
+      const pct = proposals.length>0?Math.round(st.n/proposals.length*100):0;
+      return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:140px;font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${st.lbl}</div>
+        <div style="flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden">
+          <div style="height:100%;width:${w}%;background:${st.color};border-radius:5px;transition:width .4s"></div>
+        </div>
+        <div style="width:28px;text-align:right;font-size:12px;font-weight:600;color:var(--text1)">${st.n}</div>
+        <div style="width:32px;font-size:10px;color:var(--text3)">${pct}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Financial averages
+  const finEl = document.getElementById('sp-financials');
+  if(finEl){
+    const withCost = proposals.filter(p=>parseFloat(p.total_cost)>0);
+    const n = withCost.length || 1;
+    const avgCost     = withCost.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0)/n;
+    const avgAnnual   = withCost.reduce((s,p)=>s+(parseFloat(p.annual_savings)||0),0)/n;
+    const avgMonthly  = withCost.reduce((s,p)=>s+(parseFloat(p.monthly_savings)||0),0)/n;
+    const avgPayback  = withCost.filter(p=>parseFloat(p.payback_years)>0).reduce((s,p)=>s+(parseFloat(p.payback_years)||0),0) / (withCost.filter(p=>parseFloat(p.payback_years)>0).length||1);
+    const totalPipe   = proposals.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+    const rows = [
+      ['Total Pipeline Value', fmtR(totalPipe)],
+      ['Avg System Cost', fmtR(avgCost)],
+      ['Avg Monthly Saving', fmtR(avgMonthly)],
+      ['Avg Annual Saving', fmtR(avgAnnual)],
+      ['Avg Payback Period', avgPayback>0?avgPayback.toFixed(1)+' yrs':'—'],
+      ['Proposals Generated', withCost.length],
+    ];
+    finEl.innerHTML = rows.map(([k,v])=>
+      `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px">
+        <span style="color:var(--text3)">${k}</span>
+        <span style="font-weight:600;color:var(--text1)">${v}</span>
+      </div>`
+    ).join('');
+  }
+
+  // Next Best Actions
+  const actionsEl = document.getElementById('sp-actions');
+  if(actionsEl){
+    const actions = [];
+    const nowT = Date.now();
+    viewed.filter(p=>!(p.client_engaged||p.proposal_status==='accepted')&&p.proposal_status!=='rejected')
+      .slice(0,3).forEach(p=>actions.push('📞 Call '+esc2(p.client_name||'client')+' — viewed proposal, follow up now'));
+    sent.filter(p=>!p.proposal_viewed_at&&!p.email_opened_at&&!(p.client_engaged||p.proposal_status==='accepted'))
+      .filter(p=>{ const t=p.email_sent_at||p.sent_at||p.whatsapp_sent_at; return t&&(nowT-new Date(t).getTime())>3*86400000; })
+      .slice(0,3).forEach(p=>actions.push('📩 Resend to '+esc2(p.client_name||'client')+' — sent 3+ days ago, not opened'));
+    withPdf.filter(p=>!p.email_sent_at&&!p.sent_at&&!p.whatsapp_sent_at)
+      .slice(0,2).forEach(p=>actions.push('📤 Send proposal to '+esc2(p.client_name||'client')+' — generated but not sent'));
+    if(!actions.length) actions.push('✅ All leads actioned — generate new proposals to grow pipeline');
+    actionsEl.innerHTML = actions.map(a=>
+      `<div style="font-size:11.5px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);line-height:1.5">${a}</div>`
+    ).join('');
+  }
+
+  // Pipeline Insights
+  const insightsEl = document.getElementById('sp-insights');
+  if(insightsEl){
+    const insights = [];
+    const totalPipeVal = proposals.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+    if(withPdf.length>0) insights.push(`📄 ${withPdf.length} proposal${withPdf.length>1?'s':''} generated · ${fmtR(totalPipeVal)} pipeline value`);
+    if(hot.length>0) insights.push(`🔥 ${hot.length} hot lead${hot.length>1?'s':''} — viewed but not yet accepted`);
+    if(wonRate>0) insights.push(`✅ ${wonRate}% win rate from sent proposals`);
+    const overdue = sent.filter(p=>{ const t=p.email_sent_at||p.sent_at||p.whatsapp_sent_at; return t&&!p.proposal_viewed_at&&(Date.now()-new Date(t).getTime())>3*86400000&&!(p.client_engaged||p.proposal_status==='accepted'); });
+    if(overdue.length>0) insights.push(`⚠️ ${overdue.length} proposal${overdue.length>1?'s':''} sent 3+ days ago with no view — follow up`);
+    if(!insights.length) insights.push('Generate and send proposals to see your performance brief.');
+    insightsEl.innerHTML = insights.map(i=>
+      `<div style="font-size:11.5px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);line-height:1.5">${i}</div>`
+    ).join('');
+  }
+
+  // Client Follow-Up Table
+  const tbody = document.getElementById('sp-followup-tbody');
+  const countEl = document.getElementById('sp-table-count');
+  if(tbody){
+    const nowT2 = Date.now();
+    const tableRows = withPdf.map(p=>{
+      const ps = p.proposal_status==='accepted'?'accepted':p.proposal_status==='rejected'?'rejected':(p.proposal_viewed_at||p.email_opened_at)?'viewed':(p.email_sent_at||p.whatsapp_sent_at||p.sent_at)?'sent':'generated';
+      const days = p.sent_at||p.email_sent_at||p.whatsapp_sent_at ? Math.round((nowT2-new Date(p.email_sent_at||p.whatsapp_sent_at||p.sent_at).getTime())/86400000) : '—';
+      const fu = ps==='accepted'?'✓ Won':ps==='rejected'?'Rejected':ps==='viewed'?'Viewed — follow up now':ps==='sent'&&days>3?'Overdue follow-up':ps==='sent'?'Sent — awaiting view':'Not sent yet';
+      const fuColor = ps==='accepted'?'#34d399':ps==='rejected'?'#f87171':ps==='viewed'?'#fbbf24':days>3?'#f97316':'var(--text3)';
+      const badgeClass = ps==='accepted'?'#34d399':ps==='viewed'?'#7ac8f8':ps==='sent'?'#9ca3af':ps==='rejected'?'#f87171':'#FFD700';
+      const cost = p.total_cost?fmtR(parseFloat(p.total_cost)):'—';
+      return `<tr>
+        <td style="font-weight:500">${esc2(p.client_name||'—')}</td>
+        <td style="color:var(--text3)">${esc2(p.location||'—')}</td>
+        <td><span style="background:${badgeClass}22;color:${badgeClass};border:1px solid ${badgeClass}44;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em">${ps}</span></td>
+        <td style="color:${fuColor};font-size:11px">${fu}</td>
+        <td style="color:var(--text3)">${days}</td>
+        <td style="font-weight:600">${cost}</td>
+      </tr>`;
+    });
+    if(countEl) countEl.textContent = tableRows.length+' clients';
+    tbody.innerHTML = tableRows.length ? tableRows.join('') : '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text3);font-size:11px">No proposals generated yet.</td></tr>';
+  }
+}
+
+function esc2(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 }
 
 /* ══════════════════════════════════════════
