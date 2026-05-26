@@ -797,6 +797,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
   <button class="dash-stab" data-tab="environmental">🌱 Environment</button>
   <button class="dash-stab" data-tab="inverter">⚡ Inverter</button>
   <button class="dash-stab" data-tab="pipeline">📊 Pipeline</button>
+  <button class="dash-stab" data-tab="jobs">🔧 Jobs</button>        
 </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           <button class="dash-refresh" onclick="loadAnalytics(true)">↻ Refresh</button>
@@ -941,6 +942,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
         <div class="stab-pane" id="pane-environmental"><div class="g4"><div class="kpi green"><div class="kpi-lbl">Total CO₂ Avoided</div><div class="kpi-val" id="eTotalCo2">—</div><div class="kpi-sub">tons / year (all proposals)</div></div><div class="kpi teal"><div class="kpi-lbl">Coal Avoided</div><div class="kpi-val" id="eTotalCoal">—</div><div class="kpi-sub">tons / year</div></div><div class="kpi blue"><div class="kpi-lbl">Trees Equivalent</div><div class="kpi-val" id="eTotalTrees">—</div><div class="kpi-sub">trees planted equiv.</div></div><div class="kpi purple"><div class="kpi-lbl">Total Solar Yield</div><div class="kpi-val" id="eTotalYield">—</div><div class="kpi-sub">kWh / year (all)</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Per-Proposal Environmental Impact (Avg)</div><div class="wc-row"><span class="wc-k">CO₂ Avoided</span><span class="wc-v" id="eAvgCo2">—</span></div><div class="wc-row"><span class="wc-k">Coal Avoided</span><span class="wc-v" id="eAvgCoal">—</span></div><div class="wc-row"><span class="wc-k">Trees Equivalent</span><span class="wc-v" id="eAvgTrees">—</span></div><div class="wc-row"><span class="wc-k">Annual Solar Yield</span><span class="wc-v" id="eAvgYield">—</span></div><div class="wc-row"><span class="wc-k">Annual Consumption Offset</span><span class="wc-v" id="eAvgConsumption">—</span></div></div><div class="dark-card"><div class="dc-title">🌍 Total Portfolio Impact</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="eTotalCo2b">—</div><div class="dc-lbl">Tons CO₂ Avoided</div></div><div class="dc-item"><div class="dc-val" id="eTotalTreesb">—</div><div class="dc-lbl">Trees Equivalent</div></div><div class="dc-item"><div class="dc-val" id="eTotalYieldb">—</div><div class="dc-lbl">MWh / Year</div></div></div></div></div></div>
         <div class="stab-pane" id="pane-inverter"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Top Inverter Model</div><div class="kpi-val" id="iTopModel" style="font-size:12px">—</div><div class="kpi-sub">most recommended</div></div><div class="kpi green"><div class="kpi-lbl">Avg DC/AC Ratio</div><div class="kpi-val" id="iAvgRatio">—</div><div class="kpi-sub">ideal 0.95-1.35</div></div><div class="kpi blue"><div class="kpi-lbl">Avg System DC Size</div><div class="kpi-val" id="iAvgDC">—</div><div class="kpi-sub">kW DC</div></div><div class="kpi teal"><div class="kpi-lbl">Avg Peak Load</div><div class="kpi-val" id="iAvgPeak">—</div><div class="kpi-sub">kW peak</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot g"></div>Inverter Selection Summary</div><div class="wc-row"><span class="wc-k">Most Recommended Inverter</span><span class="wc-v" id="iModel">—</span></div><div class="wc-row"><span class="wc-k">Avg DC/AC Ratio</span><span class="wc-v" id="iRatio">—</span></div><div class="wc-row"><span class="wc-k">Avg Inverter Required AC</span><span class="wc-v" id="iReqAC">—</span></div><div class="wc-row"><span class="wc-k">Avg System DC Size</span><span class="wc-v" id="iDC">—</span></div><div class="wc-row"><span class="wc-k">Avg Peak Load</span><span class="wc-v" id="iPeak">—</span></div></div><div class="white-card"><div class="wc-title"><div class="dot gn"></div>DC/AC Ratio Status (SANS 10142-1)</div><div id="iRatioStatus" style="font-size:11px;color:#374151"></div></div></div></div>
         <div class="stab-pane" id="pane-pipeline"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Total Clients</div><div class="kpi-val" id="pTotal">—</div><div class="kpi-sub">in pipeline</div></div><div class="kpi green"><div class="kpi-lbl">Proposals Generated</div><div class="kpi-val" id="pGenerated">—</div><div class="kpi-sub">completed</div></div><div class="kpi blue"><div class="kpi-lbl">Emails Sent</div><div class="kpi-val" id="pSent">—</div><div class="kpi-sub">to clients</div></div><div class="kpi teal"><div class="kpi-lbl">Won</div><div class="kpi-val" id="pEngaged">—</div><div class="kpi-sub">client accepted</div></div></div><div class="rate-row" id="pRateRow"></div><div class="white-card"><div class="wc-title"><div class="dot g"></div>Proposal Pipeline Funnel</div><div id="pFunnel"></div></div><div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:9px 13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Client Follow-Up Status</div><div style="font-size:9.5px;color:#9ca3af" id="pTableCount">—</div></div><table class="ft"><thead><tr><th style="width:22%">Client</th><th style="width:15%">Location</th><th style="width:10%">Status</th><th style="width:22%">Follow-Up</th><th style="width:10%">Days Sent</th><th style="width:21%">System Cost</th></tr></thead><tbody id="pFollowTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:16px">Loading…</td></tr></tbody></table></div></div>
+        <div class="stab-pane" id="pane-jobs"><div class="g4"><div class="kpi gold"><div class="kpi-lbl">Jobs Won</div><div class="kpi-val" id="jWon">—</div><div class="kpi-sub">accepted proposals</div></div><div class="kpi teal"><div class="kpi-lbl">In Progress</div><div class="kpi-val" id="jInProgress">—</div><div class="kpi-sub">site visit → install</div></div><div class="kpi green"><div class="kpi-lbl">Completed</div><div class="kpi-val" id="jCompleted">—</div><div class="kpi-sub">handover done</div></div><div class="kpi blue"><div class="kpi-lbl">Revenue Completed</div><div class="kpi-val" id="jRevenue">—</div><div class="kpi-sub">handover_completed jobs</div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Job Stage Funnel</div><div id="jStageFunnel"></div></div><div class="white-card"><div class="wc-title"><div class="dot g"></div>Avg Days Per Stage</div><div id="jCycleTimes"></div></div></div><div class="g2"><div class="white-card"><div class="wc-title"><div class="dot gn"></div>Bottleneck Alert</div><div id="jBottlenecks" style="font-size:11px;color:#374151"></div></div><div class="dark-card"><div class="dc-title">💰 Revenue by Stage</div><div class="dc-grid"><div class="dc-item"><div class="dc-val" id="jRevWon">—</div><div class="dc-lbl">Won</div></div><div class="dc-item"><div class="dc-val" id="jRevDeposit">—</div><div class="dc-lbl">Deposit Paid</div></div><div class="dc-item"><div class="dc-val" id="jRevDone">—</div><div class="dc-lbl">Completed</div></div></div></div></div><div class="white-card" style="padding:0;overflow:hidden;"><div style="padding:9px 13px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:9.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)">Active Jobs — Stage Tracker</div><div style="font-size:9.5px;color:#9ca3af" id="jTableCount">—</div></div><table class="ft"><thead><tr><th style="width:20%">Client</th><th style="width:15%">Location</th><th style="width:18%">Current Stage</th><th style="width:14%">Days in Stage</th><th style="width:18%">Next Action</th><th style="width:15%">System Cost</th></tr></thead><tbody id="jJobsTable"><tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:16px">Loading…</td></tr></tbody></table></div></div>
+      </div>
       </div>
     </div>
   </div>
@@ -1725,7 +1728,258 @@ async function loadAnalytics(force){
   /* Timestamp */
   var nowDt=new Date();
   set('dashUpdated','Updated '+nowDt.getHours().toString().padStart(2,'0')+':'+nowDt.getMinutes().toString().padStart(2,'0'));
+  
+  /* ══ JOBS TAB ══ */
 
+// Stage order — defines the funnel sequence
+var JOB_STAGES = [
+  { key: 'accepted',               label: 'Won',                  color: '#FFD700', next: 'Book site visit' },
+  { key: 'site_visit_scheduled',   label: 'Site visit scheduled', color: '#fbbf24', next: 'Complete site visit' },
+  { key: 'site_visit_completed',   label: 'Site visit done',      color: '#f97316', next: 'Collect deposit' },
+  { key: 'deposit_received',       label: 'Deposit received',     color: '#14b8a6', next: 'Order materials' },
+  { key: 'materials_ordered',      label: 'Materials ordered',    color: '#22c55e', next: 'Schedule installation' },
+  { key: 'installation_scheduled', label: 'Install scheduled',    color: '#3b82f6', next: 'Start installation' },
+  { key: 'installation_in_progress',label: 'Install in progress', color: '#8b5cf6', next: 'Complete installation' },
+  { key: 'installation_completed', label: 'Install complete',     color: '#6366f1', next: 'Issue COC' },
+  { key: 'coc_issued',             label: 'COC issued',           color: '#0ea5e9', next: 'Complete handover' },
+  { key: 'sseg_submitted',         label: 'SSEG submitted',       color: '#06b6d4', next: 'Complete handover' },
+  { key: 'handover_completed',     label: 'Handover done',        color: '#34d399', next: '✓ Complete' },
+];
+
+// Timestamp that marks when a job entered its current stage
+var STAGE_TIMESTAMPS = {
+  'accepted':                'won_at',
+  'site_visit_scheduled':    'site_visit_date',
+  'site_visit_completed':    'site_visit_completed_at',
+  'deposit_received':        'deposit_paid_at',
+  'materials_ordered':       'materials_ordered_at',
+  'installation_scheduled':  'installation_date',
+  'installation_in_progress':'installation_start_at',
+  'installation_completed':  'installation_completed_at',
+  'coc_issued':              'coc_issued_at',
+  'sseg_submitted':          'sseg_application_at',
+  'handover_completed':      'handover_completed_at',
+};
+
+// Pull only won jobs (proposal_status = accepted) from allClients
+var wonJobs = allClients.filter(function(c) {
+  return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
+});
+
+var jWonCount = wonJobs.length;
+
+// Count by stage
+var stageCounts = {};
+JOB_STAGES.forEach(function(s) { stageCounts[s.key] = 0; });
+
+wonJobs.forEach(function(c) {
+  var stage = c.ai.job_status || 'accepted';
+  if (stageCounts[stage] !== undefined) {
+    stageCounts[stage]++;
+  } else {
+    stageCounts['accepted']++;  // fallback for unset job_status on won records
+  }
+});
+
+// In progress = everything between accepted and handover_completed (exclusive)
+var inProgressKeys = JOB_STAGES
+  .filter(function(s) { return s.key !== 'handover_completed'; })
+  .map(function(s) { return s.key; });
+
+var jInProgressCount = wonJobs.filter(function(c) {
+  var stage = c.ai.job_status || 'accepted';
+  return inProgressKeys.includes(stage);
+}).length;
+
+var jCompletedCount = stageCounts['handover_completed'] || 0;
+
+// Revenue aggregates
+var totalWonRevenue = wonJobs.reduce(function(s, c) {
+  return s + (parseFloat(c.ai.total_cost) || 0);
+}, 0);
+
+var depositRevenue = wonJobs.filter(function(c) {
+  return c.ai.deposit_paid || c.ai.job_status === 'deposit_received'
+      || JOB_STAGES.findIndex(function(s){return s.key===c.ai.job_status;}) >=
+         JOB_STAGES.findIndex(function(s){return s.key==='deposit_received';});
+}).reduce(function(s, c) {
+  return s + (parseFloat(c.ai.deposit_amount) || parseFloat(c.ai.total_cost) * 0.3 || 0);
+}, 0);
+
+var completedRevenue = wonJobs.filter(function(c) {
+  return c.ai.job_status === 'handover_completed';
+}).reduce(function(s, c) {
+  return s + (parseFloat(c.ai.total_cost) || 0);
+}, 0);
+
+// Set KPI cards
+set('jWon', jWonCount);
+set('jInProgress', jInProgressCount);
+set('jCompleted', jCompletedCount);
+set('jRevenue', fmtRand(completedRevenue) || '—');
+set('jRevWon', fmtRand(totalWonRevenue));
+set('jRevDeposit', fmtRand(depositRevenue));
+set('jRevDone', fmtRand(completedRevenue));
+
+// Stage funnel
+var funnelEl = document.getElementById('jStageFunnel');
+if (funnelEl) {
+  var maxStage = jWonCount || 1;
+  funnelEl.innerHTML = JOB_STAGES.map(function(stage) {
+    var count = stageCounts[stage.key] || 0;
+    if (count === 0 && stage.key !== 'accepted') return '';  // hide empty non-first stages
+    var w = Math.round((count / maxStage) * 100);
+    return '<div class="pipe-row">' +
+      '<div class="pipe-lbl">' + stage.label + '</div>' +
+      '<div class="pipe-bar-wrap"><div class="pipe-bar" style="width:' + w + '%;background:' + stage.color + '"></div></div>' +
+      '<div class="pipe-num">' + count + '</div>' +
+      '<div class="pipe-pct">' + (jWonCount > 0 ? Math.round(count / jWonCount * 100) : 0) + '%</div>' +
+      '</div>';
+  }).filter(Boolean).join('');
+  if (!funnelEl.innerHTML) {
+    funnelEl.innerHTML = '<div style="color:#9ca3af;font-size:11px;padding:8px 0">No won jobs yet — mark proposals as Won to see the funnel.</div>';
+  }
+}
+
+// Average cycle times between stages
+var cycleTimes = document.getElementById('jCycleTimes');
+if (cycleTimes) {
+  // Pairs: [from_stage, to_stage, label]
+  var pairs = [
+    ['won_at',                    'site_visit_date',           'Won → Site visit'],
+    ['site_visit_date',           'deposit_paid_at',           'Site visit → Deposit'],
+    ['deposit_paid_at',           'materials_ordered_at',      'Deposit → Materials'],
+    ['materials_ordered_at',      'installation_date',         'Materials → Install'],
+    ['installation_date',         'installation_completed_at', 'Install → Complete'],
+    ['installation_completed_at', 'coc_issued_at',             'Complete → COC'],
+    ['coc_issued_at',             'handover_completed_at',     'COC → Handover'],
+  ];
+
+  var cycleRows = pairs.map(function(pair) {
+    var fromKey = pair[0], toKey = pair[1], label = pair[2];
+    var durations = [];
+    wonJobs.forEach(function(c) {
+      var ai = c.ai;
+      if (ai[fromKey] && ai[toKey]) {
+        var diff = (new Date(ai[toKey]) - new Date(ai[fromKey])) / 86400000;
+        if (diff > 0 && diff < 365) durations.push(diff);
+      }
+    });
+    if (!durations.length) return null;
+    var avg = Math.round(durations.reduce(function(a, b) { return a + b; }, 0) / durations.length);
+    return '<div class="wc-row">' +
+      '<span class="wc-k">' + label + '</span>' +
+      '<span class="wc-v">' + avg + ' days avg</span>' +
+      '</div>';
+  }).filter(Boolean);
+
+  cycleTimes.innerHTML = cycleRows.length
+    ? cycleRows.join('')
+    : '<div style="color:#9ca3af;font-size:11px;padding:6px 0">Not enough timestamp data yet — update job stages to build cycle time history.</div>';
+}
+
+// Bottleneck alerts (jobs stuck in a stage > threshold)
+var bottlenecksEl = document.getElementById('jBottlenecks');
+if (bottlenecksEl) {
+  var THRESHOLDS = {
+    'accepted': 3,
+    'site_visit_scheduled': 7,
+    'site_visit_completed': 3,
+    'deposit_received': 5,
+    'materials_ordered': 14,
+    'installation_scheduled': 14,
+    'installation_in_progress': 7,
+    'installation_completed': 3,
+    'coc_issued': 5,
+  };
+
+  var nowMs = Date.now();
+  var bottlenecks = [];
+
+  wonJobs.forEach(function(c) {
+    var ai = c.ai;
+    var stage = ai.job_status || 'accepted';
+    if (stage === 'handover_completed') return;
+
+    var tsKey = STAGE_TIMESTAMPS[stage];
+    var ts = ai[tsKey] || ai.won_at;
+    if (!ts) return;
+
+    var daysStuck = Math.round((nowMs - new Date(ts).getTime()) / 86400000);
+    var threshold = THRESHOLDS[stage] || 7;
+
+    if (daysStuck > threshold) {
+      var stageLabel = JOB_STAGES.find(function(s) { return s.key === stage; });
+      var nextAction = stageLabel ? stageLabel.next : 'Follow up';
+      bottlenecks.push({
+        name: ai.client_name || '—',
+        stage: stageLabel ? stageLabel.label : stage,
+        days: daysStuck,
+        next: nextAction,
+      });
+    }
+  });
+
+  bottlenecks.sort(function(a, b) { return b.days - a.days; });
+
+  if (bottlenecks.length) {
+    bottlenecksEl.innerHTML = bottlenecks.slice(0, 6).map(function(b) {
+      var urgency = b.days > 14 ? '#dc2626' : '#d97706';
+      return '<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid #f3f4f6;gap:8px">' +
+        '<span style="color:#1e293b;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(b.name) + '</span>' +
+        '<span style="color:#94a3b8;font-size:10px;flex-shrink:0">' + esc(b.stage) + '</span>' +
+        '<span style="color:' + urgency + ';font-weight:600;font-size:10px;flex-shrink:0">' + b.days + 'd stuck</span>' +
+        '</div>';
+    }).join('') +
+    '<div style="font-size:10px;color:#94a3b8;margin-top:6px">' + bottlenecks.length + ' job' + (bottlenecks.length > 1 ? 's' : '') + ' need attention</div>';
+  } else {
+    bottlenecksEl.innerHTML = '<div style="color:#16a34a;font-size:11px;padding:8px 0">✓ No bottlenecks detected — all jobs moving within expected timelines.</div>';
+  }
+}
+
+// Active jobs table
+var jobsTableBody = document.getElementById('jJobsTable');
+if (jobsTableBody) {
+  var activeJobs = wonJobs.filter(function(c) {
+    return c.ai.job_status !== 'handover_completed';
+  }).sort(function(a, b) {
+    var stageOrder = function(c) {
+      return JOB_STAGES.findIndex(function(s) { return s.key === (c.ai.job_status || 'accepted'); });
+    };
+    return stageOrder(a) - stageOrder(b);
+  });
+
+  document.getElementById('jTableCount').textContent = activeJobs.length + ' active job' + (activeJobs.length !== 1 ? 's' : '');
+
+  if (!activeJobs.length) {
+    jobsTableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:18px">No active jobs yet.</td></tr>';
+  } else {
+    jobsTableBody.innerHTML = activeJobs.map(function(c) {
+      var ai = c.ai;
+      var stage = ai.job_status || 'accepted';
+      var stageInfo = JOB_STAGES.find(function(s) { return s.key === stage; }) || { label: stage, next: '—', color: '#9ca3af' };
+      var tsKey = STAGE_TIMESTAMPS[stage];
+      var ts = ai[tsKey] || ai.won_at;
+      var daysInStage = ts ? Math.round((Date.now() - new Date(ts).getTime()) / 86400000) : '—';
+      var daysClass = typeof daysInStage === 'number' && daysInStage > 7 ? 'fp-warm' : typeof daysInStage === 'number' && daysInStage > 14 ? 'fp-hot' : '';
+      var name = ai.client_name || (c.lead && c.lead.client_name) || '—';
+      var loc = ai.location || (c.lead && c.lead.address) || '—';
+      var cost = ai.total_cost ? 'R ' + fmtK(parseFloat(ai.total_cost)) : '—';
+
+      return '<tr>' +
+        '<td><strong>' + esc(name) + '</strong></td>' +
+        '<td>' + esc(loc) + '</td>' +
+        '<td><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:' + stageInfo.color + '22;color:' + stageInfo.color + ';border:1px solid ' + stageInfo.color + '44">' + esc(stageInfo.label) + '</span></td>' +
+        '<td class="' + daysClass + '">' + daysInStage + (typeof daysInStage === 'number' ? 'd' : '') + '</td>' +
+        '<td style="color:#374151">' + esc(stageInfo.next) + '</td>' +
+        '<td>' + cost + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+// END JOBS TAB
+  
   if(loading) loading.style.display='none';
   if(body) body.style.display='block';
   dashLoaded=true;
