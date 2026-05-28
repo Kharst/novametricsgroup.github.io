@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nova Metrics Solar Intelligence — Interactive Tour</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════ EXACT REAL TOOL THEME ═══════════════════ */
@@ -220,6 +221,49 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .done-btn-s{background:rgba(255,255,255,.08);color:var(--text);font-size:14px;font-weight:600;padding:14px 28px;border-radius:10px;border:1px solid rgba(255,255,255,.15);cursor:pointer;text-decoration:none;display:inline-block;transition:background .2s}
 
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════ ANALYTICS SECTION ═══════════════════ */
+#analytics-section{display:none;padding:0 0 48px;}
+#analytics-section.on{display:block}
+.an-header{padding:24px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.an-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text)}
+.an-subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.an-period{display:flex;gap:6px}
+.apbtn{font-size:11px;padding:5px 12px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.apbtn.act{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold);font-weight:600}
+.an-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;padding:20px 24px}
+.an-kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.an-kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.an-kpi .val{font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.an-kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}
+.an-kpi.gold .val{color:var(--gold)}
+.an-kpi.green .val{color:var(--green)}
+.an-kpi.blue .val{color:var(--blue)}
+.an-charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 24px 16px}
+.an-chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.an-chart-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.an-chart-sub{font-size:10px;color:var(--muted);margin-bottom:14px}
+.an-chart-card canvas{max-height:200px}
+.an-full-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin:0 24px 16px}
+.an-full-card .an-chart-title{margin-bottom:4px}
+.an-full-card canvas{max-height:160px}
+.an-funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.an-funnel-label{width:150px;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-funnel-bar-wrap{flex:1;height:10px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden}
+.an-funnel-bar{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.34,1.2,.64,1)}
+.an-funnel-n{width:28px;text-align:right;font-size:12px;font-weight:600;color:var(--text)}
+.an-funnel-pct{width:32px;font-size:10px;color:var(--muted)}
+.an-table{width:100%;border-collapse:collapse;font-size:12px}
+.an-table th{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)}
+.an-table td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text)}
+.an-table tr:hover td{background:rgba(255,255,255,.02)}
+.an-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
+.an-badge.won{background:rgba(52,211,153,.15);color:var(--green)}
+.an-badge.install{background:rgba(122,200,248,.15);color:var(--blue)}
+.an-badge.visit{background:rgba(251,191,36,.15);color:var(--amber)}
+.an-badge.pending{background:rgba(255,255,255,.07);color:var(--muted)}
+@media(max-width:700px){.an-charts{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -282,7 +326,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     <div class="nav-center">
       <div class="nav-chip active">⚡ System Sizing Engine</div>
       <div class="nav-chip">🤖 AI Proposals</div>
-      <div class="nav-chip">📊 Analytics</div>
+      <div class="nav-chip" id="nav-analytics" onclick="showAnalytics()" style="cursor:pointer">📊 Analytics</div>
     </div>
     <div class="nav-right">
       <button class="portal-link ghost" id="btn-job-portal" onclick="showJobPortal()">🔧 Job Portal</button>
@@ -728,6 +772,75 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
     </div>
   </div>
 
+
+<!-- ═══════════════════ ANALYTICS SECTION ═══════════════════ -->
+<div id="analytics-section">
+
+  <div class="an-header" id="an-header">
+    <div>
+      <div class="an-title">Business Analytics</div>
+      <div class="an-subtitle">Last 90 days · Bright Future Solar</div>
+    </div>
+    <div class="an-period">
+      <button class="apbtn">30d</button>
+      <button class="apbtn act">90d</button>
+      <button class="apbtn">6m</button>
+      <button class="apbtn">12m</button>
+    </div>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="an-kpi-grid">
+    <div class="an-kpi gold"><div class="lbl">Total Revenue Won</div><div class="val">R2.84M</div><div class="sub">7 closed deals</div></div>
+    <div class="an-kpi green"><div class="lbl">Win Rate</div><div class="val">39%</div><div class="sub">7 of 18 proposals</div></div>
+    <div class="an-kpi blue"><div class="lbl">Avg Deal Size</div><div class="val">R406k</div><div class="sub">+12% vs prev period</div></div>
+    <div class="an-kpi"><div class="lbl">Avg Payback Period</div><div class="val">4.0<span style="font-size:14px;color:var(--muted)"> yrs</span></div><div class="sub">Client benchmark</div></div>
+    <div class="an-kpi"><div class="lbl">Hot Leads</div><div class="val" style="color:var(--amber)">3</div><div class="sub">Viewed — not won</div></div>
+    <div class="an-kpi"><div class="lbl">Total kWp Installed</div><div class="val">73<span style="font-size:14px;color:var(--muted)"> kWp</span></div><div class="sub">Across 5 sites</div></div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="an-charts">
+    <!-- Revenue over time -->
+    <div class="an-chart-card">
+      <div class="an-chart-title">Monthly Revenue (Won Deals)</div>
+      <div class="an-chart-sub">Cumulative value of accepted proposals</div>
+      <canvas id="an-revenue-chart"></canvas>
+    </div>
+    <!-- Pipeline funnel -->
+    <div class="an-chart-card" id="an-funnel-card">
+      <div class="an-chart-title">Sales Funnel</div>
+      <div class="an-chart-sub">Lead-to-close conversion</div>
+      <div id="an-funnel"></div>
+    </div>
+  </div>
+
+  <!-- Jobs by stage + kWp chart -->
+  <div class="an-charts">
+    <div class="an-chart-card">
+      <div class="an-chart-title">Jobs by Stage</div>
+      <div class="an-chart-sub">Current active pipeline</div>
+      <canvas id="an-stage-chart"></canvas>
+    </div>
+    <div class="an-chart-card">
+      <div class="an-chart-title">System Size Distribution</div>
+      <div class="an-chart-sub">kWp per closed job</div>
+      <canvas id="an-kwp-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Velocity table -->
+  <div class="an-full-card" id="an-portfolio">
+    <div class="an-chart-title">Active Job Portfolio</div>
+    <div class="an-chart-sub" style="margin-bottom:14px">All jobs currently in the pipeline</div>
+    <table class="an-table">
+      <thead><tr><th>Client</th><th>System</th><th>Value</th><th>Location</th><th>Stage</th><th>Days Open</th></tr></thead>
+      <tbody id="an-portfolio-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
 </div><!-- /app -->
 
   <!-- ═══════════════ HANDOVER CERTIFICATE PREVIEW ═══════════════ -->
@@ -927,16 +1040,25 @@ const STEPS = [
   {
     id:'job-portal',
     placement:'top',
-    step:'Step 8 of 9 — Job Portal',
+    step:'Step 8 of 10 — Job Portal',
     title:'Every proposal tracked in real time',
     body:'The Job Portal is your live dashboard. You can see the proposal just generated — Thabo Nkosi, already marked Approved. Below that: a site visit in progress, a pending commercial quote, and a draft. When a client clicks Accept on their email link, the status here updates instantly.',
     label:'See your Handover Certificate →',
     prepare: ()=>{ showJobPortal(); }
   },
   {
+    id:'an-header',
+    placement:'top',
+    step:'Step 9 of 10 — Analytics Dashboard',
+    title:'Every number that matters — in one place',
+    body:'The Analytics dashboard gives you total revenue won, win rate, average deal size, hot leads, and kWp deployed — updated in real time. The sales funnel, revenue chart, stage breakdown, and job velocity table make it easy to spot where deals are stalling and where momentum is building.',
+    label:'See the Handover Certificate →',
+    prepare: ()=>{ showAnalytics(); }
+  },
+  {
     id:'handover-cert',
     placement:'peek',
-    step:'Step 9 of 9 — Handover Certificate',
+    step:'Step 10 of 10 — Handover Certificate',
     title:'Deliverable 2 — the signed handover record',
     body:'Every completed job ends here. This is the handover certificate generated automatically from the job pipeline — COC number, compliance status, equipment details, warranty schedule, and dual signatures. It emails to your client the moment you click Complete Handover, and lives permanently in the job record.',
     label:'Finish tour 🎉',
@@ -1127,6 +1249,11 @@ function runDesign(){
 }
 
 function showTab(t){
+  const anSec=document.getElementById('analytics-section');if(anSec)anSec.classList.remove('on');
+  const inputStrip=document.getElementById('input-strip');if(inputStrip)inputStrip.style.display='';
+  const lbPanel=document.getElementById('lb-panel-wrap')||document.getElementById('lb-wrap');  
+  document.querySelectorAll('.nav-chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('nav-analytics')&&document.getElementById('nav-analytics').classList.remove('active');
   ['solar','battery','inverter','fin','env','prop'].forEach(k=>{
     document.getElementById('tc-'+k).classList.toggle('active',k===t);
     document.getElementById('tab-'+k).classList.toggle('active',k===t);
@@ -1212,5 +1339,140 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
   
+
+
+/* ═══════════════════ ANALYTICS SECTION ═══════════════════ */
+let anChartsInit = false;
+
+function showAnalytics(){
+  // Hide design tool sections
+  ['solar','battery','inverter','fin','env','prop'].forEach(k=>{
+    const tc=document.getElementById('tc-'+k); if(tc)tc.classList.remove('active');
+    const tb=document.getElementById('tab-'+k); if(tb)tb.classList.remove('active');
+  });
+  const strip=document.getElementById('input-strip'); if(strip)strip.style.display='none';
+  const lbw=document.getElementById('lb-panel'); if(lbw)lbw.classList.remove('open');
+  document.querySelectorAll('.nav-chip').forEach(c=>c.classList.remove('active'));
+  const nc=document.getElementById('nav-analytics'); if(nc)nc.classList.add('active');
+
+  const sec=document.getElementById('analytics-section'); sec.classList.add('on');
+  if(!anChartsInit){ renderAnalyticsCharts(); anChartsInit=true; }
+}
+
+function renderAnalyticsCharts(){
+  const gold='#FFD700', green='#34d399', blue='#7ac8f8', amber='#fbbf24', red='#f87171';
+  const gridC='rgba(255,255,255,0.06)', textC='#7a95af';
+  const baseOpts = {
+    responsive:true, maintainAspectRatio:true,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:gridC},ticks:{color:textC,font:{size:10}}},
+      y:{grid:{color:gridC},ticks:{color:textC,font:{size:10}}}
+    }
+  };
+
+  // Revenue chart — monthly bars
+  const months=['Dec','Jan','Feb','Mar','Apr','May'];
+  const revenue=[0,148000,333000,280000,192000,185000];
+  new Chart(document.getElementById('an-revenue-chart'),{
+    type:'bar',
+    data:{
+      labels:months,
+      datasets:[{
+        label:'Revenue (R)',
+        data:revenue,
+        backgroundColor: revenue.map((_,i)=>i===months.length-1?gold:'rgba(255,215,0,0.45)'),
+        borderRadius:6, borderSkipped:false
+      }]
+    },
+    options:{...baseOpts,
+      plugins:{...baseOpts.plugins,
+        tooltip:{callbacks:{label:ctx=>'R'+Math.round(ctx.raw).toLocaleString('en-ZA')}}
+      }
+    }
+  });
+
+  // Funnel
+  const funnelData=[
+    {lbl:'Total Leads',n:18,color:gold},
+    {lbl:'Proposals Generated',n:15,color:amber},
+    {lbl:'Sent to Client',n:13,color:blue},
+    {lbl:'Viewed / Opened',n:10,color:'#f97316'},
+    {lbl:'Won',n:7,color:green},
+  ];
+  const maxN=18;
+  document.getElementById('an-funnel').innerHTML=funnelData.map(d=>{
+    const w=Math.round(d.n/maxN*100);
+    const pct=Math.round(d.n/18*100);
+    return `<div class="an-funnel-row">
+      <div class="an-funnel-label">${d.lbl}</div>
+      <div class="an-funnel-bar-wrap"><div class="an-funnel-bar" style="width:${w}%;background:${d.color}"></div></div>
+      <div class="an-funnel-n">${d.n}</div>
+      <div class="an-funnel-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  // Stage doughnut
+  new Chart(document.getElementById('an-stage-chart'),{
+    type:'doughnut',
+    data:{
+      labels:['Won—Awaiting Visit','Visit Scheduled','Visit Complete','Install Scheduled','Installing','Install Complete','Handed Over'],
+      datasets:[{
+        data:[1,1,1,1,1,1,1],
+        backgroundColor:['#5a6a85','#4a9eff','#7ab8ff','#f5a623','#ffc85a',green,'#1abc9c'],
+        borderWidth:0, hoverOffset:6
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:true,position:'right',labels:{color:textC,font:{size:10},boxWidth:12,padding:8}}}
+    }
+  });
+
+  // kWp bar chart
+  const jobs=[
+    {name:'Sipho D.',kw:10},{name:'Priya N.',kw:8},{name:'Johan vdB.',kw:20},
+    {name:'Fatima M.',kw:6},{name:'Themba K.',kw:15},{name:'Anele B.',kw:10},{name:'Ruan P.',kw:8}
+  ];
+  new Chart(document.getElementById('an-kwp-chart'),{
+    type:'bar',
+    data:{
+      labels:jobs.map(j=>j.name),
+      datasets:[{
+        label:'kWp',
+        data:jobs.map(j=>j.kw),
+        backgroundColor:jobs.map(j=>j.kw>=15?gold:j.kw>=10?amber:blue),
+        borderRadius:4, borderSkipped:false
+      }]
+    },
+    options:{...baseOpts, indexAxis:'y',
+      scales:{
+        x:{...baseOpts.scales.x, ticks:{...baseOpts.scales.x.ticks,callback:v=>v+'kW'}},
+        y:{...baseOpts.scales.y}
+      }
+    }
+  });
+
+  // Portfolio table
+  const portfolio=[
+    {client:'Sipho Dlamini',sys:'10 kWp · 10 kWh',val:'R185,000',loc:'Johannesburg',stage:'Handed Over',days:50,badge:'won'},
+    {client:'Priya Naidoo',sys:'8 kWp · 5 kWh',val:'R148,000',loc:'Pretoria',stage:'Install Complete',days:45,badge:'install'},
+    {client:'Johan van der Berg',sys:'20 kWp · 20 kWh',val:'R380,000',loc:'Sandton',stage:'Installing',days:10,badge:'install'},
+    {client:'Fatima Moosa',sys:'6 kWp · 5 kWh',val:'R112,000',loc:'Centurion',stage:'Install Scheduled',days:8,badge:'visit'},
+    {client:'Themba Khumalo',sys:'15 kWp · 15 kWh',val:'R280,000',loc:'Midrand',stage:'Visit Complete',days:8,badge:'visit'},
+    {client:'Anele Botha',sys:'10 kWp · 10 kWh',val:'R192,000',loc:'Fourways',stage:'Visit Scheduled',days:9,badge:'visit'},
+    {client:'Ruan Pieterse',sys:'8 kWp · 5 kWh',val:'R145,000',loc:'Roodepoort',stage:'Won — Awaiting Visit',days:6,badge:'pending'},
+  ];
+  document.getElementById('an-portfolio-body').innerHTML=portfolio.map(r=>`
+    <tr>
+      <td style="font-weight:600">${r.client}</td>
+      <td style="color:var(--muted)">${r.sys}</td>
+      <td style="color:var(--gold)">${r.val}</td>
+      <td style="color:var(--muted)">${r.loc}</td>
+      <td><span class="an-badge ${r.badge}">${r.stage}</span></td>
+      <td style="color:var(--muted);text-align:right">${r.days}d</td>
+    </tr>`).join('');
+}
+
 </body>
 </html>
