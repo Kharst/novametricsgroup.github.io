@@ -1055,9 +1055,274 @@ body::after {
 .kd-down { color: var(--red2);  font-weight: 700; }
 .kd-neu  { color: var(--text3); }
 
-@media (max-width: 960px) { .briefing-grid { grid-template-columns: 1fr; } }   
-   
-</style>
+
+/* ─────────────────────────────────────────
+   BUSINESS HEALTH SCORE
+───────────────────────────────────────── */
+.health-score-card {
+  background: linear-gradient(135deg, rgba(167,139,250,.07), rgba(74,158,255,.04), rgba(0,214,143,.03));
+  border: 1px solid rgba(167,139,250,.22);
+  border-radius: var(--radius);
+  padding: 26px 30px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: start;
+}
+.health-score-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--purple) 0%, var(--blue) 50%, var(--green) 100%);
+  opacity: .6;
+}
+
+.hs-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.hs-gauge-svg { width: 110px; height: 110px; flex-shrink: 0; }
+
+.hs-score-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  text-align: center;
+}
+
+.hs-center {
+  padding-top: 4px;
+}
+.hs-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.hs-verdict {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hs-drivers {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.hs-driver {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--text2);
+}
+.hs-driver-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hs-driver em { font-style: normal; font-weight: 600; }
+
+.hs-right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 130px;
+}
+.hs-pillar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hs-pillar-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  display: flex;
+  justify-content: space-between;
+}
+.hs-pillar-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.hs-pillar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ─────────────────────────────────────────
+   HERO RADAR VISUAL
+───────────────────────────────────────── */
+.hero-radar-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  position: relative;
+}
+.hero-radar-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(245,166,35,.5) 40%, rgba(0,214,143,.3) 70%, transparent 100%);
+}
+.hero-radar-inner {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 0;
+  align-items: stretch;
+}
+.hero-radar-chart {
+  padding: 20px;
+  position: relative;
+}
+.hero-radar-chart canvas { max-height: 280px; }
+.hero-radar-legend {
+  border-left: 1px solid var(--border);
+  padding: 24px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  justify-content: center;
+}
+.hero-radar-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+.hero-radar-sub {
+  font-size: 10px;
+  color: var(--text3);
+  margin-bottom: 20px;
+  line-height: 1.55;
+}
+.radar-dim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(26,37,64,.5);
+  font-size: 11px;
+  color: var(--text2);
+}
+.radar-dim:last-child { border-bottom: none; }
+.radar-dim-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.radar-dim-fill { height: 100%; border-radius: 2px; }
+.radar-dim-label { width: 90px; font-size: 10px; color: var(--text3); flex-shrink: 0; }
+.radar-dim-score {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   EXPANDED PORTFOLIO
+───────────────────────────────────────── */
+.portfolio-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.portfolio-kpi-strip2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.p-stat {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.p-stat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.p-stat.c-green::before { background: linear-gradient(90deg, var(--green), transparent 75%); }
+.p-stat.c-teal::before  { background: linear-gradient(90deg, var(--teal), transparent 75%); }
+.p-stat.c-blue::before  { background: linear-gradient(90deg, var(--blue), transparent 75%); }
+.p-stat.c-amber::before { background: linear-gradient(90deg, var(--amber), transparent 75%); }
+.p-stat.c-purple::before{ background: linear-gradient(90deg, var(--purple), transparent 75%); }
+.p-stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  margin-bottom: 10px;
+}
+.p-stat-val {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.p-stat.c-green .p-stat-val  { color: var(--green); }
+.p-stat.c-teal  .p-stat-val  { color: var(--teal2); }
+.p-stat.c-blue  .p-stat-val  { color: var(--blue2); }
+.p-stat.c-amber .p-stat-val  { color: var(--amber2); }
+.p-stat.c-purple .p-stat-val { color: var(--purple2); }
+.p-stat-sub { font-size: 10px; color: var(--text3); }
+
+.portfolio-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 960px) {
+  .portfolio-kpi-strip, .portfolio-kpi-strip2 { grid-template-columns: repeat(2, 1fr); }
+  .portfolio-charts { grid-template-columns: 1fr; }
+  .health-score-card { grid-template-columns: 1fr; }
+  .hero-radar-inner { grid-template-columns: 1fr; }
+  .hero-radar-legend { border-left: none; border-top: 1px solid var(--border); }
+}
+
+
 </head>
 <body>
 
@@ -1137,6 +1402,46 @@ body::after {
     </div>
   </div>
 
+  <!-- ══ BUSINESS HEALTH SCORE ══ -->
+  <div class="health-score-card" id="health-score-card">
+    <div class="hs-gauge-wrap">
+      <svg class="hs-gauge-svg" viewBox="0 0 110 110" id="hs-gauge-svg">
+        <!-- Track -->
+        <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="10" stroke-dasharray="207.3 69.1" stroke-dashoffset="-34.6" stroke-linecap="round"/>
+        <!-- Fill — animated via JS -->
+        <circle cx="55" cy="55" r="44" fill="none" stroke="url(#hsGrad)" stroke-width="10" stroke-linecap="round"
+          id="hs-arc" stroke-dasharray="0 276.5" stroke-dashoffset="-34.6"/>
+        <defs>
+          <linearGradient id="hsGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#a78bfa"/>
+            <stop offset="50%"  stop-color="#4a9eff"/>
+            <stop offset="100%" stop-color="#00d68f"/>
+          </linearGradient>
+        </defs>
+        <text x="55" y="51" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="22" font-weight="700" fill="#eef4ff" id="hs-score-num">—</text>
+        <text x="55" y="63" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#4e6080">/100</text>
+      </svg>
+      <div class="hs-score-label">Health Score</div>
+    </div>
+
+    <div class="hs-center">
+      <div class="hs-title">
+        <span>⬡</span> Business Health
+      </div>
+      <div class="hs-verdict" id="hs-verdict">
+        <span id="hs-verdict-ico">⏳</span>
+        <span id="hs-verdict-text">Computing…</span>
+      </div>
+      <div class="hs-drivers" id="hs-drivers">
+        <div class="hs-driver"><div class="hs-driver-dot" style="background:var(--text3)"></div><span>Loading signals…</span></div>
+      </div>
+    </div>
+
+    <div class="hs-right" id="hs-pillars">
+      <!-- Pillar bars injected by JS -->
+    </div>
+  </div>
+
   <!-- ══ EXECUTIVE INTELLIGENCE BRIEFING ══ -->
   <div class="briefing-panel">
     <div class="briefing-hd">
@@ -1170,9 +1475,9 @@ body::after {
       <div class="kpi-sub">completed installs</div>
     </div>
     <div class="kpi c-blue">
-      <div class="kpi-label">Full-Funnel Won Rate</div>
+      <div class="kpi-label">Project Completion Rate</div>
       <div class="kpi-val" id="kpi-wonrate">—</div>
-      <div class="kpi-sub" id="kpi-wonrate-sub">proposal → handover</div>
+      <div class="kpi-sub" id="kpi-wonrate-sub">accepted → handover</div>
     </div>
     <div class="kpi c-purple">
       <div class="kpi-label">Active Jobs</div>
@@ -1188,6 +1493,27 @@ body::after {
       <div class="kpi-label">Avg Cycle Time</div>
       <div class="kpi-val" id="kpi-cycle">—</div>
       <div class="kpi-sub">days: accepted → done</div>
+    </div>
+  </div>
+
+  <!-- ══ PERFORMANCE RADAR ══ -->
+  <div class="hero-radar-card">
+    <div class="cc-header" style="background:rgba(255,255,255,.016);border-bottom:1px solid var(--border)">
+      <div>
+        <div class="cc-title">Business Performance Radar</div>
+        <div class="cc-sub">Five-axis intelligence view — sales, operations, capacity, velocity & pipeline health</div>
+      </div>
+      <span class="cc-badge purple">Command Centre</span>
+    </div>
+    <div class="hero-radar-inner">
+      <div class="hero-radar-chart">
+        <canvas id="chart-radar" style="max-height:280px"></canvas>
+      </div>
+      <div class="hero-radar-legend">
+        <div class="hero-radar-title">Axis Breakdown</div>
+        <div class="hero-radar-sub">Each axis is scored 0–100 against internal benchmarks derived from your own data.</div>
+        <div id="radar-dims"><!-- injected by JS --></div>
+      </div>
     </div>
   </div>
 
@@ -1461,7 +1787,7 @@ body::after {
   <div class="tab-banner">
     <div>
       <div class="tb-title">Portfolio Impact</div>
-      <div class="tb-sub">Cumulative installed capacity and environmental contribution — all time</div>
+      <div class="tb-sub">Cumulative installed capacity, environmental contribution &amp; customer ROI — all time</div>
     </div>
     <div class="tb-right">
       <div class="live-badge" style="border-color:rgba(0,214,143,.2);background:rgba(0,214,143,.06)">
@@ -1470,11 +1796,11 @@ body::after {
     </div>
   </div>
 
+  <!-- Portfolio Legacy Hero (4-up) -->
   <div class="section-hd">
-    <div class="section-title"><div class="stbar"></div>Portfolio Impact</div>
-    <div class="section-sub">All-time cumulative installed capacity and environmental contribution</div>
+    <div class="section-title"><div class="stbar"></div>Installed Capacity</div>
+    <div class="section-sub">All-time cumulative metrics — unaffected by period filter</div>
   </div>
-
   <div class="portfolio-hero" id="portfolio-hero">
     <div class="ph-item">
       <div class="ph-item-label">Total kWp Installed</div>
@@ -1498,13 +1824,118 @@ body::after {
     </div>
   </div>
 
+  <!-- Row 1: Financial ROI stats -->
+  <div class="section-hd">
+    <div class="section-title"><div class="stbar"></div>Financial Impact &amp; Customer ROI</div>
+    <div class="section-sub">Lifetime value delivered to clients based on installed systems</div>
+  </div>
+  <div class="portfolio-kpi-strip">
+    <div class="p-stat c-amber">
+      <div class="p-stat-label">Lifetime Revenue Installed</div>
+      <div class="p-stat-val" id="pf-revenue">—</div>
+      <div class="p-stat-sub">total value of completed jobs</div>
+    </div>
+    <div class="p-stat c-green">
+      <div class="p-stat-label">Est. Lifetime Savings Generated</div>
+      <div class="p-stat-val" id="pf-savings">—</div>
+      <div class="p-stat-sub">cumulative annual savings × 25 yr</div>
+    </div>
+    <div class="p-stat c-teal">
+      <div class="p-stat-label">Avg Customer ROI</div>
+      <div class="p-stat-val" id="pf-roi">—</div>
+      <div class="p-stat-sub">lifetime return on system cost</div>
+    </div>
+    <div class="p-stat c-blue">
+      <div class="p-stat-label">Avg Payback Period</div>
+      <div class="p-stat-val" id="pf-payback">—</div>
+      <div class="p-stat-sub">years to break-even (avg)</div>
+    </div>
+  </div>
+
+  <!-- Row 2: Energy & Environment -->
+  <div class="section-hd">
+    <div class="section-title"><div class="stbar"></div>Energy &amp; Environmental Offset</div>
+  </div>
+  <div class="portfolio-kpi-strip2">
+    <div class="p-stat c-green">
+      <div class="p-stat-label">Est. Annual Solar Production</div>
+      <div class="p-stat-val" id="pf-kwh">—</div>
+      <div class="p-stat-sub">kWh/yr @ 1,400 peak hours (SA)</div>
+    </div>
+    <div class="p-stat c-teal">
+      <div class="p-stat-label">Cumulative Energy Offset</div>
+      <div class="p-stat-val" id="pf-cumkwh">—</div>
+      <div class="p-stat-sub">over 25-year system life</div>
+    </div>
+    <div class="p-stat c-purple">
+      <div class="p-stat-label">Battery Capacity Deployed</div>
+      <div class="p-stat-val" id="pf-battery">—</div>
+      <div class="p-stat-sub">kWh storage across all sites</div>
+    </div>
+    <div class="p-stat c-blue">
+      <div class="p-stat-label">Avg System Size</div>
+      <div class="p-stat-val" id="pf-avgkwp">—</div>
+      <div class="p-stat-sub">kWp per completed install</div>
+    </div>
+  </div>
+
+  <!-- Charts: System Type Distribution + Location Distribution -->
+  <div class="section-hd">
+    <div class="section-title"><div class="stbar"></div>Portfolio Distribution</div>
+    <div class="section-sub">System size tiers and geographic spread across completed installs</div>
+  </div>
+  <div class="portfolio-charts">
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">System Size Distribution</div><div class="cc-sub">Completed jobs by kWp tier — residential vs commercial profile</div></div>
+        <span class="cc-badge green">Capacity</span>
+      </div>
+      <div class="cc-body"><canvas id="chart-portfolio-size"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="cc-header">
+        <div><div class="cc-title">Municipal / Regional Distribution</div><div class="cc-sub">Where your installations are concentrated</div></div>
+        <span class="cc-badge blue">Geography</span>
+      </div>
+      <div class="cc-body"><canvas id="chart-portfolio-location"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Battery deployment stat + pipeline ROI row -->
+  <div class="section-hd">
+    <div class="section-title"><div class="stbar"></div>Pipeline ROI Forecast</div>
+    <div class="section-sub">If all active jobs complete — projected impact</div>
+  </div>
+  <div class="portfolio-kpi-strip">
+    <div class="p-stat c-amber">
+      <div class="p-stat-label">Forecasted Revenue (Pipeline)</div>
+      <div class="p-stat-val" id="pf-fcast-rev">—</div>
+      <div class="p-stat-sub">value of jobs in execution</div>
+    </div>
+    <div class="p-stat c-green">
+      <div class="p-stat-label">Forecasted kWp</div>
+      <div class="p-stat-val" id="pf-fcast-kwp">—</div>
+      <div class="p-stat-sub">pending installs in pipeline</div>
+    </div>
+    <div class="p-stat c-teal">
+      <div class="p-stat-label">Forecasted CO₂ Offset</div>
+      <div class="p-stat-val" id="pf-fcast-co2">—</div>
+      <div class="p-stat-sub">t/yr when pipeline completes</div>
+    </div>
+    <div class="p-stat c-blue">
+      <div class="p-stat-label">Jobs In Progress</div>
+      <div class="p-stat-val" id="pf-fcast-jobs">—</div>
+      <div class="p-stat-sub">active across all stages</div>
+    </div>
+  </div>
+
   <!-- Drill-down links -->
   <div class="drill-bar">
     <span class="drill-label">Drill deeper</span>
-    <a href="prposal_portal.html#analytics" class="drill-btn">📊 Proposal Analytics — Win rates, lead heat, quote value</a>
-    <a href="job-portal.html"               class="drill-btn green">🔧 Job Portal — Stage-by-stage execution view</a>
-    <a href="solar-intelligence.html"        class="drill-btn">⚡ New Design</a>
-    <a href="data-export.html"               class="drill-btn" style="margin-left:auto">⬇ Export Data</a>
+    <a href="prposal_portal.html#analytics" class="drill-btn">📊 Proposal Analytics</a>
+    <a href="job-portal.html" class="drill-btn green">🔧 Job Portal</a>
+    <a href="solar-intelligence.html" class="drill-btn">⚡ New Design</a>
+    <a href="data-export.html" class="drill-btn" style="margin-left:auto">⬇ Export Data</a>
   </div>
 
 </div>
@@ -1655,9 +2086,11 @@ async function loadAll(){
       ppf ? sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,handover_completed_at&job_status=in.(${ACTIVE_STAGES})${ppf}&order=created_at.desc`) : Promise.resolve([]),
     ]);
 
+    renderHealthScore(allProposals, jobs, visits);
     renderBriefing(allProposals, jobs, visits, prevProposals, prevJobs);
     renderSalesPipeline(allProposals);
     renderKPIs(allProposals, jobs, visits, prevProposals, prevJobs);
+    renderRadar(allProposals, jobs, visits);
     renderFunnel(allProposals, jobs);
     renderRevenueChart(allProposals);
     renderStartedDoneChart(jobs);
@@ -1667,6 +2100,7 @@ async function loadAll(){
     renderVelocityTable(jobs);
     renderAlerts(jobs, visits);
     renderPortfolio(jobs);
+    renderPortfolioExpanded(jobs, allProposals);
 
     const now = new Date();
     setText('last-updated', `Updated ${now.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`);
@@ -1698,7 +2132,7 @@ async function loadAll(){
       items.push({sig:'info', ico:'📊', text:`Total pipeline value is <em>${fmtR(currPipeline)}</em> this period`});
     }
 
-    /* ── 2. Win rate vs previous period ── */
+    /* ── 2. Proposal win rate (same formula as Sales tab: accepted/sent) vs previous period ── */
     const currSent = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
     const currWon  = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
     const prevSent = prevProposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
@@ -1805,12 +2239,12 @@ function renderSalesPipeline(proposals){
   const wonRate   = sent.length ? Math.round(won.length/sent.length*100) : 0;
   const avgDeal   = won.length ? wonVal/won.length : 0;
 
-  setText2('sp-total',   proposals.length);
-  setText2('sp-sent',    sent.length);
-  setText2('sp-hot',     hot.length);
-  setText2('sp-won',     won.length);
-  setText2('sp-wonrate', wonRate+'%');
-  setText2('sp-avgdeal', fmtR(avgDeal));
+  setText2('sp-total',   proposals.length||'No leads yet');
+  setText2('sp-sent',    sent.length||'No proposals sent');
+  setText2('sp-hot',     hot.length||'0');
+  setText2('sp-won',     won.length||'0');
+  setText2('sp-wonrate', sent.length?wonRate+'%':'Proposals needed');
+  setText2('sp-avgdeal', won.length?fmtR(avgDeal):'Insufficient win data');
 
   // Funnel bars
   const funnelEl = document.getElementById('sp-funnel');
@@ -1948,8 +2382,11 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
   const pipeline  = jobs.filter(j=>j.job_status!=='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
   const realised  = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
   const totalProp = proposals.length;
-  const doneCount = proposals.filter(j=>j.job_status==='handover_completed').length;
-  const wonRate   = totalProp ? Math.round(doneCount/totalProp*100) : null;
+  const doneJobs  = jobs.filter(j=>j.job_status==='handover_completed');
+  const doneCount = doneJobs.length;
+  /* Completion rate = handovers / total accepted jobs (distinct from proposal win rate shown in Sales tab) */
+  const acceptedJobs = jobs.length;
+  const wonRate   = acceptedJobs > 0 ? Math.round(doneCount/acceptedJobs*100) : null;
   const active    = jobs.filter(j=>j.job_status!=='handover_completed').length;
   const kwp       = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
   const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
@@ -1967,14 +2404,15 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
   const prevAvgCycle  = prevCycled.length ? Math.round(prevCycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/prevCycled.length) : null;
 
   /* ── Render values ── */
-  setText('kpi-pipeline', pipeline>=1000?`R${(pipeline/1000).toFixed(0)}k`:`R${pipeline.toFixed(0)}`);
-  setText('kpi-realised', realised>=1000?`R${(realised/1000).toFixed(0)}k`:`R${realised.toFixed(0)}`);
-  setText('kpi-wonrate', wonRate!==null?`${wonRate}%`:'—');
-  setText('kpi-wonrate-sub', totalProp?`${doneCount} of ${totalProp} proposals`:'proposal → handover');
-  setText('kpi-active', active);
-  setText('kpi-kwp', kwp>=1000?`${(kwp/1000).toFixed(1)}MW`:`${kwp.toFixed(1)}`);
-  setText('kpi-kwp-sub', kwp>=1000?'megawatts installed':'kilowatts peak installed');
-  setText('kpi-cycle', avgCycle!==null?`${avgCycle}d`:'—');
+  setText('kpi-pipeline', pipeline>0?(pipeline>=1000?`R${(pipeline/1000).toFixed(0)}k`:`R${pipeline.toFixed(0)}`):'No active jobs');
+  setText('kpi-realised', realised>0?(realised>=1000?`R${(realised/1000).toFixed(0)}k`:`R${realised.toFixed(0)}`):'Awaiting first handover');
+  setText('kpi-wonrate',  wonRate!==null?`${wonRate}%`:(acceptedJobs===0?'No jobs accepted':'—'));
+  setText('kpi-wonrate-sub', acceptedJobs>0?`${doneCount} of ${acceptedJobs} jobs complete`:'accepted → handover');
+  setText('kpi-active',   active>0?active:'0');
+  const kwpDisplay = kwp>0?(kwp>=1000?`${(kwp/1000).toFixed(1)}MW`:`${kwp.toFixed(1)} kWp`):'Awaiting installs';
+  setText('kpi-kwp',     kwpDisplay);
+  setText('kpi-kwp-sub', kwp>=1000?'megawatts installed':kwp>0?'kilowatts peak installed':'no completions yet');
+  setText('kpi-cycle',   avgCycle!==null?`${avgCycle}d`:'Cycle time after first handover');
 
   /* ── Inject period-over-period deltas ── */
   document.querySelectorAll('.kpi-delta').forEach(el=>el.remove()); // clear old
@@ -2212,6 +2650,284 @@ function renderAlerts(jobs, visits){
       <div class="alert-age" style="color:var(--amber)">${age}d</div>
     </div>`;
   }).join(''):`<div class="empty"><div class="ico">✓</div><p>No pending approvals</p></div>`;
+}
+
+/* ══════════════════════════════════════════
+   BUSINESS HEALTH SCORE
+══════════════════════════════════════════ */
+function renderHealthScore(proposals, jobs, visits){
+  /* ── Score each pillar 0–100 ── */
+
+  /* 1. Sales Health: proposal win rate (sent→accepted). 100 = ≥60% */
+  const sent  = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
+  const won   = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
+  const wr    = sent.length ? won.length/sent.length : null;
+  const salesScore = wr!==null ? Math.min(100, Math.round(wr/0.6*100)) : 50;
+
+  /* 2. Pipeline Health: active jobs present + revenue in pipeline */
+  const activePipe = jobs.filter(j=>j.job_status!=='handover_completed');
+  const pipeVal    = activePipe.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const pipeScore  = Math.min(100, Math.round((activePipe.length > 0 ? 40 : 0) + Math.min(60, pipeVal/50000*60)));
+
+  /* 3. Velocity Health: avg cycle. Ideal ≤30d = 100, ≥90d = 0 */
+  const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+  const avgCycleH = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
+  const velScore  = avgCycleH!==null ? Math.max(0, Math.round(100 - ((avgCycleH-30)/60)*100)) : 50;
+
+  /* 4. Quality Health: low major-redesign rate. 0% major = 100, ≥50% = 0 */
+  const major = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
+  const qualScore = visits.length ? Math.max(0, Math.round(100 - (major/visits.length)*200)) : 75;
+
+  /* 5. Completion Health: stale jobs penalty */
+  const stale     = jobs.filter(j=>j.job_status!=='handover_completed'&&daysBetween(j.created_at,new Date().toISOString())>=14);
+  const compScore = activePipe.length ? Math.max(0, Math.round(100 - (stale.length/Math.max(activePipe.length,1))*100)) : 80;
+
+  /* ── Weighted overall ── */
+  const overall = Math.round(salesScore*.25 + pipeScore*.20 + velScore*.20 + qualScore*.15 + compScore*.20);
+
+  /* ── Verdict ── */
+  const verdicts = [
+    { min:85, ico:'🟢', text:'Operationally excellent',   col:'var(--green)'  },
+    { min:70, ico:'🟡', text:'Operationally stable',      col:'var(--amber2)' },
+    { min:55, ico:'🟠', text:'Needs attention',           col:'var(--orange)'  },
+    { min:0,  ico:'🔴', text:'Action required',           col:'var(--red)'    },
+  ];
+  const v = verdicts.find(x=>overall>=x.min);
+
+  /* ── Driver bullets ── */
+  const drivers = [];
+  if(salesScore>=70)  drivers.push({col:'var(--green)', txt:`Strong proposal win rate (${wr!==null?Math.round(wr*100):'?'}%)`});
+  else                drivers.push({col:'var(--red)',   txt:`Proposal win rate below target`});
+  if(velScore>=70)    drivers.push({col:'var(--green)', txt:`Fast install velocity (${avgCycleH!==null?avgCycleH+'d avg':'baseline'})`});
+  else if(avgCycleH!==null) drivers.push({col:'var(--amber)',txt:`Slow cycle time — ${avgCycleH}d avg (target ≤30d)`});
+  if(qualScore<60)    drivers.push({col:'var(--red)',   txt:`High redesign frequency (${visits.length?Math.round(major/visits.length*100):0}% major)`});
+  else                drivers.push({col:'var(--green)', txt:`Low redesign rate — good pre-visit quality`});
+  if(stale.length>0)  drivers.push({col:'var(--amber)', txt:`${stale.length} stale job${stale.length>1?'s':''} — pipeline risk`});
+  else if(activePipe.length>0) drivers.push({col:'var(--green)',txt:`No stale jobs — pipeline is moving`});
+
+  /* ── Render ── */
+  const arc   = document.getElementById('hs-arc');
+  const numEl = document.getElementById('hs-score-num');
+  if(arc && numEl){
+    const circ = 276.5;
+    const fill = (overall/100)*circ;
+    /* Animate after a tick so transition fires */
+    setTimeout(()=>{ arc.setAttribute('stroke-dasharray', `${fill} ${circ-fill}`); }, 80);
+    numEl.textContent = overall;
+  }
+
+  const verdEl = document.getElementById('hs-verdict');
+  const icoEl  = document.getElementById('hs-verdict-ico');
+  const txtEl  = document.getElementById('hs-verdict-text');
+  if(icoEl) icoEl.textContent = v.ico;
+  if(txtEl){ txtEl.textContent = `${overall}/100 — ${v.text}`; txtEl.style.color = v.col; }
+
+  const drEl = document.getElementById('hs-drivers');
+  if(drEl) drEl.innerHTML = drivers.slice(0,4).map(d=>
+    `<div class="hs-driver"><div class="hs-driver-dot" style="background:${d.col}"></div><span>${d.txt}</span></div>`
+  ).join('');
+
+  const pillars = [
+    { label:'Sales',      score:salesScore,  col:'#f5a623' },
+    { label:'Pipeline',   score:pipeScore,   col:'#4a9eff' },
+    { label:'Velocity',   score:velScore,    col:'#a78bfa' },
+    { label:'Quality',    score:qualScore,   col:'#2dd4bf' },
+    { label:'Completion', score:compScore,   col:'#00d68f' },
+  ];
+  const pillarsEl = document.getElementById('hs-pillars');
+  if(pillarsEl) pillarsEl.innerHTML = pillars.map(p=>`
+    <div class="hs-pillar">
+      <div class="hs-pillar-label"><span>${p.label}</span><span style="color:${p.col}">${p.score}</span></div>
+      <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${p.score}%;background:${p.col}"></div></div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   PERFORMANCE RADAR
+══════════════════════════════════════════ */
+function renderRadar(proposals, jobs, visits){
+  const sent  = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
+  const won   = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
+  const wr    = sent.length ? won.length/sent.length : 0;
+  const salesScore = Math.min(100, Math.round(wr/0.6*100));
+
+  const activePipe = jobs.filter(j=>j.job_status!=='handover_completed');
+  const pipeVal    = activePipe.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const pipeScore  = Math.min(100, Math.round((activePipe.length>0?40:0)+Math.min(60,pipeVal/50000*60)));
+
+  const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+  const avgC      = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
+  const velScore  = avgC!==null ? Math.max(0,Math.round(100-((avgC-30)/60)*100)) : 50;
+
+  const major    = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
+  const qualScore= visits.length ? Math.max(0,Math.round(100-(major/visits.length)*200)) : 75;
+
+  const kwp = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
+  const capScore = Math.min(100, Math.round(kwp/50*100)); /* 50kWp = 100 */
+
+  const dims = [
+    { label:'Sales Conv.',  score:salesScore, col:'#f5a623' },
+    { label:'Pipeline',     score:pipeScore,  col:'#4a9eff' },
+    { label:'Velocity',     score:velScore,   col:'#a78bfa' },
+    { label:'Quality',      score:qualScore,  col:'#2dd4bf' },
+    { label:'Capacity',     score:capScore,   col:'#00d68f' },
+  ];
+
+  destroyChart('chart-radar');
+  const ctx = document.getElementById('chart-radar');
+  if(!ctx) return;
+  charts['chart-radar'] = new Chart(ctx.getContext('2d'), {
+    type: 'radar',
+    data: {
+      labels: dims.map(d=>d.label),
+      datasets: [{
+        label: 'Current Period',
+        data:  dims.map(d=>d.score),
+        backgroundColor: 'rgba(167,139,250,.12)',
+        borderColor:     '#a78bfa',
+        borderWidth: 2,
+        pointBackgroundColor: dims.map(d=>d.col),
+        pointBorderColor: 'transparent',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false, stepSize: 25 },
+          grid:  { color: 'rgba(30,40,64,.9)' },
+          angleLines: { color: 'rgba(30,40,64,.9)' },
+          pointLabels: { color: '#8a9ab8', font: { family:"'IBM Plex Mono'", size: 10 } }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor:'#161c28', borderColor:'#1e2840', borderWidth:1,
+          titleColor:'#f0f4fc', bodyColor:'#8a9ab8', padding:10,
+          titleFont:{family:"'IBM Plex Mono'",size:11}, bodyFont:{family:"'IBM Plex Mono'",size:11},
+          callbacks: { label: ctx => ` Score: ${ctx.raw}/100` }
+        }
+      }
+    }
+  });
+
+  /* Render legend bars */
+  const dimsEl = document.getElementById('radar-dims');
+  if(dimsEl) dimsEl.innerHTML = dims.map(d=>`
+    <div class="radar-dim">
+      <div class="radar-dim-label" style="color:${d.col}">${d.label}</div>
+      <div class="radar-dim-bar"><div class="radar-dim-fill" style="width:${d.score}%;background:${d.col}"></div></div>
+      <div class="radar-dim-score" style="color:${d.col}">${d.score}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   PORTFOLIO EXPANDED
+══════════════════════════════════════════ */
+function renderPortfolioExpanded(allJobs, allProposals){
+  /* All-time — ignore period filter */
+  const fmtR  = v=>v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+  const fmtKwh= v=>v>=1000000?`${(v/1000000).toFixed(1)}GWh`:v>=1000?`${(v/1000).toFixed(0)}MWh`:`${Math.round(v)}kWh`;
+  const fmtKwp= v=>v>=1000?`${(v/1000).toFixed(1)}MW`:`${v.toFixed(1)} kWp`;
+
+  const done   = allJobs.filter(j=>j.job_status==='handover_completed');
+  const active = allJobs.filter(j=>j.job_status!=='handover_completed');
+
+  /* Financial ROI */
+  const totalRev = done.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const annualSav= allProposals.filter(p=>parseFloat(p.annual_savings)>0).reduce((s,p)=>s+(parseFloat(p.annual_savings)||0),0);
+  const lifetimeSav = annualSav * 25;
+  const avgPayback = allProposals.filter(p=>parseFloat(p.payback_years)>0).reduce((s,p,_,a)=>s+(parseFloat(p.payback_years)||0)/a.length, 0) || null;
+  const roi = totalRev>0 ? Math.round((lifetimeSav-totalRev)/totalRev*100) : null;
+
+  /* Energy */
+  const kwpTotal = done.reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
+  const annualKwh = kwpTotal * 1400; /* SA ~1400 peak hrs/yr */
+  const lifetimeKwh= annualKwh * 25;
+  const battery = allProposals.filter(p=>parseFloat(p.battery_capacity_kwh)>0).reduce((s,p)=>s+(parseFloat(p.battery_capacity_kwh)||0),0);
+  const avgKwp = done.length ? kwpTotal/done.length : 0;
+
+  /* Pipeline forecast */
+  const pipeRev = active.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const pipeKwp = active.reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
+  const pipeCo2 = (pipeKwp*0.9).toFixed(1);
+
+  /* Render financial row */
+  setText('pf-revenue', totalRev>0?fmtR(totalRev):'Awaiting completions');
+  setText('pf-savings',  annualSav>0?fmtR(lifetimeSav):'Savings data pending');
+  setText('pf-roi',      roi!==null?`${roi}%`:'Insufficient data');
+  setText('pf-payback',  avgPayback&&avgPayback>0?`${avgPayback.toFixed(1)} yrs`:'Payback pending');
+
+  /* Render energy row */
+  setText('pf-kwh',      annualKwh>0?fmtKwh(annualKwh):'Awaiting installs');
+  setText('pf-cumkwh',   lifetimeKwh>0?fmtKwh(lifetimeKwh):'Lifecycle data pending');
+  setText('pf-battery',  battery>0?`${battery.toFixed(0)} kWh`:'No battery data');
+  setText('pf-avgkwp',   avgKwp>0?`${avgKwp.toFixed(1)} kWp`:'No completions yet');
+
+  /* Render pipeline row */
+  setText('pf-fcast-rev',  pipeRev>0?fmtR(pipeRev):'No active jobs');
+  setText('pf-fcast-kwp',  pipeKwp>0?fmtKwp(pipeKwp):'No active jobs');
+  setText('pf-fcast-co2',  pipeKwp>0?`${pipeCo2}t/yr`:'—');
+  setText('pf-fcast-jobs', active.length||'0');
+
+  /* ── System size distribution chart ── */
+  const tiers = [
+    { label:'<5 kWp',   fn:j=>parseFloat(j.system_size_kw)<5 },
+    { label:'5–10 kWp', fn:j=>{ const k=parseFloat(j.system_size_kw); return k>=5&&k<10; } },
+    { label:'10–20 kWp',fn:j=>{ const k=parseFloat(j.system_size_kw); return k>=10&&k<20; } },
+    { label:'20–50 kWp',fn:j=>{ const k=parseFloat(j.system_size_kw); return k>=20&&k<50; } },
+    { label:'50+ kWp',  fn:j=>parseFloat(j.system_size_kw)>=50 },
+  ];
+  const tierVals = tiers.map(t=>done.filter(j=>t.fn(j)).length);
+  const tierCols = ['#4a9eff','#7ab8ff','#2dd4bf','#00d68f','#f5a623'];
+  destroyChart('chart-portfolio-size');
+  const sCtx = document.getElementById('chart-portfolio-size');
+  if(sCtx) charts['chart-portfolio-size'] = new Chart(sCtx.getContext('2d'),{
+    type:'doughnut',
+    data:{
+      labels: tiers.map(t=>t.label),
+      datasets:[{
+        data: tierVals,
+        backgroundColor: tierCols.map(c=>c+'44'),
+        borderColor: tierCols,
+        borderWidth: 2, hoverOffset: 6
+      }]
+    },
+    options:{...doughnutOpts(), plugins:{
+      ...doughnutOpts().plugins,
+      legend:{position:'bottom',labels:{color:'#8a9ab8',font:{family:"'IBM Plex Mono'",size:10},padding:10,boxWidth:10}}
+    }}
+  });
+
+  /* ── Location distribution chart ── */
+  const byLoc = {};
+  done.forEach(j=>{ if(j.client_name) byLoc['?'] = (byLoc['?']||0)+1; }); /* fallback */
+  allProposals.filter(p=>p.location).forEach(p=>{ byLoc[p.location]=(byLoc[p.location]||0)+1; });
+  const locEntries = Object.entries(byLoc).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  destroyChart('chart-portfolio-location');
+  const lCtx = document.getElementById('chart-portfolio-location');
+  if(lCtx && locEntries.length) charts['chart-portfolio-location'] = new Chart(lCtx.getContext('2d'),{
+    type:'bar',
+    data:{
+      labels: locEntries.map(e=>e[0]),
+      datasets:[{
+        label:'Proposals',
+        data: locEntries.map(e=>e[1]),
+        backgroundColor: locEntries.map((_,i)=>i===0?'rgba(0,214,143,.45)':'rgba(74,158,255,.22)'),
+        borderColor:     locEntries.map((_,i)=>i===0?'#00d68f':'#4a9eff'),
+        borderWidth:1, borderRadius:4
+      }]
+    },
+    options: chartOpts({yLabel:'Proposals',xRotate:true})
+  });
+  else if(lCtx){
+    lCtx.parentElement.innerHTML='<div class="empty"><div class="ico">📍</div><p>Location data available after proposals are generated</p></div>';
+  }
 }
 
 /* ══════════════════════════════════════════
