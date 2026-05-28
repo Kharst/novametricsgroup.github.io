@@ -543,6 +543,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sb-select option{background:#0d2240;color:var(--text);}  
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="nova-demo.js"></script>
 </head>
 <body>
 
@@ -1001,6 +1002,16 @@ async function markAsRejected(){
 
 window.addEventListener('DOMContentLoaded',boot);
 async function boot(){
+  if(window.NOVA_DEMO){
+    installer = window.DEMO_INSTALLER;
+    showPortal();
+    // Demo banner
+    const banner = document.createElement('div');
+    banner.innerHTML = '🎬 <strong>Demo Mode</strong> — Viewing sample proposals. <a href="solar-intelligence.html" style="color:#FFD700;text-decoration:underline">Sign up free →</a>';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#1a2a4a;color:#fff;text-align:center;padding:8px 16px;font-size:13px;border-bottom:2px solid #FFD700;';
+    document.body.prepend(banner);
+    return;
+  }
   try{
     var r=await sb.auth.getSession();
     var session=r.data&&r.data.session;
@@ -1037,6 +1048,23 @@ document.getElementById('signOutBtn').addEventListener('click',async function(){
 });
 
 async function loadClients(){
+  if(window.NOVA_DEMO){
+    // Build allClients from demo proposals
+    allClients = window.DEMO_PROPOSALS.map(function(p){
+      return { lead:{ lead_id:'lead-'+p.ai_id, client_name:p.client_name, client_email:p.client_email, client_phone:'0'+Math.floor(Math.random()*900000000+100000000), address:p.location, created_at:p.created_at }, ai:p };
+    });
+    renderClientList();
+    // Show first client with a proposal
+    var firstIdx = allClients.findIndex(function(c){return c.ai && c.ai.pdf_url;});
+    if(firstIdx >= 0){
+      setTimeout(function(){
+        var rows2 = document.querySelectorAll('.c-row');
+        var row = Array.from(rows2).find(function(r){return parseInt(r.dataset.idx)===firstIdx;});
+        pick(firstIdx, row||null);
+      }, 100);
+    }
+    return;
+  }
   var instId=installer.installer_id;
   var sessResult=await sb.auth.getSession();
   var token=(sessResult.data&&sessResult.data.session)?sessResult.data.session.access_token:ANON;
