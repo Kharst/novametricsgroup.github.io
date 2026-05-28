@@ -927,7 +927,12 @@ function buildSystemResult({ inv, invUnits, panel, panelCount, batt, battUnits,
   const pCost    = panelCount * panel.price;
 
   // ── Battery analysis ─────────────────────────────────────────────
-  const reqKWh       = effDaily * (autonomy / 24);
+  const reqKWh       = lbItems.reduce((s,it)=>{
+    if(it.id==='geyser'&&it.backedUp===false) return s;
+    const t=LOAD_TIMING[it.id]||LOAD_TIMING.custom;
+    if(!t.eveningLoad) return s;
+    return s+(it.watts*it.qty/1000)*Math.min(it.hours,autonomy);
+  },0)||effDaily*(autonomy/24);
   const dod          = battKWh > 0 ? reqKWh / battKWh : 999;
   const headroom     = battKWh > 0 ? battKWh / Math.max(reqKWh, 0.001) : 0;
   const battRechKWh  = reqKWh / BATT_ROUND_TRIP_EFF;
@@ -935,7 +940,7 @@ function buildSystemResult({ inv, invUnits, panel, panelCount, batt, battUnits,
   // Average backup draw = energy the battery is sized for ÷ autonomy window
 // battRuntime = (battKWh / reqKWh) × autonomy  →  always ≥ autonomy
 const avgBackupDrawKW = reqKWh / Math.max(autonomy, 0.001);
-const battRuntime     = battKWh / Math.max(avgBackupDrawKW, 0.001);
+const battRuntime  = battKWh / Math.max(reqKWh/autonomy, 0.001);
 
   // ── Solar energy analysis ────────────────────────────────────────
   const reqSolarEnergy = (dailyUsage - reqKWh) + battRechKWh;
@@ -1078,7 +1083,12 @@ function findBestCompliantSystem(peakLoad, dailyUsage, autonomy, psh, totalDaily
   //   (a) NRS 097 1.3× continuous peak (compliance floor)
   //   (b) surgePeakKW ÷ 2.0 (inverter surge cap = 2× continuous; motor/compressor inrush)
   const reqInvAC  = Math.max(peakLoad * 1.3, surgePeakKW / 2.0);
-  const battKWh    = dailyUsage * (autonomy / 24);            // battery sized on BACKUP usage only
+  const battKWh    = lbItems.reduce((s,it)=>{
+    if(it.id==='geyser'&&it.backedUp===false) return s;
+    const t=LOAD_TIMING[it.id]||LOAD_TIMING.custom;
+    if(!t.eveningLoad) return s;
+    return s+(it.watts*it.qty/1000)*Math.min(it.hours,autonomy);
+  },0)||dailyUsage*(autonomy/24);  // battery sized on actual evening load only
   const battRechKWh= battKWh / BATT_ROUND_TRIP_EFF;          // recharge loss
   const reqSolarE  = (totalDailyUsage - battKWh) + battRechKWh; // solar covers TOTAL usage incl. geyser
   const effFactor  = psh * SYSTEM_PR * SYSTEM_AVAILABILITY;
@@ -1283,7 +1293,7 @@ function renderAll(r){
   setKpi('b-risk',r.battRisk,r.battDod<=BATT_DOD_DESIGN_GOOD?'green':'amber');
   setKpi('b-coverage',r.coverage,r.coverage.includes('Essential')?'amber':'green');
   set('b-needed',fN(r.battBackupKWh,2)+' kWh');set('b-installed',fN(r.iKWh,2)+' kWh');
-  set('b-units',r.battUnits+' unit'+(r.battUnits>1?'s':''));set('b-runtime',fN(r.battRuntime,1)+' hrs');
+  set('b-units',r.battUnits+' unit'+(r.battUnits>1?'s':''));set('b-runtime',r.battRuntime>=r.autonomy?fN(r.autonomy,0)+' hrs ✓':fN(r.battRuntime,1)+' hrs ⚠');
   set('b-model',r.battModel);set('b-usable-per',fN(r.battUsable,2)+' kWh');
   set('b-cap-ratio',fN(r.battCR,2)+'x ('+r.battHS+')');
   set('b-solar-compat','&#10003; '+fN(r.expDaily,2)+' kWh net &#8805; '+fN(r.reqSolarEnergy,2)+' kWh needed');
@@ -1676,7 +1686,8 @@ function calculateLockedSystem() {
     peakLoad, dailyUsage,
     peakLoadBackup: effPeak, dailyUsageBackup: effDaily,
     psh, autonomy, tariff, markup,
-    locName: selectedLoc.label, isRevision: true
+    locName: selectedLoc.label, isRevision: true,
+    eveningBackupKWh: lbItems.reduce((s,it)=>{if(it.id==='geyser'&&it.backedUp===false)return s;const t=LOAD_TIMING[it.id]||LOAD_TIMING.custom;if(!t.eveningLoad)return s;return s+(it.watts*it.qty/1000)*Math.min(it.hours,autonomy);},0)||0
   });
 
   // Run modular validation with no duplicated sizing formulas.
@@ -2480,9 +2491,8 @@ function renderRealWorld(r, tw){
 
   <div class="rw-block">
     <div class="rw-block-hd">🔋 Battery Runtime</div>
-    <div class="rw-row"><span class="rw-lbl">${({'Low Residential':'Expected home runtime','High Residential':'Expected home runtime','Small Commercial':'Expected site runtime','Large Commercial':'Expected site runtime','Industrial':'Expected facility runtime'}[r.seg]||'Expected site runtime')}</span><span class="rw-val ${avgOk?'ok':'warn'}">${fN(tw.avgRuntime,1)} hrs ${avgOk?'✓':''}</span></div>
-    <div class=\"rw-row\"><span class=\"rw-lbl\">Evening peak runtime (all evening loads simultaneous)</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
-  </div>
+    <div class="rw-row"><span class="rw-lbl">${({'Low Residential':'Expected home runtime','High Residential':'Expected home runtime','Small Commercial':'Expected site runtime','Large Commercial':'Expected site runtime','Industrial':'Expected facility runtime'}[r.seg]||'Expected site runtime')}</span><span class="rw-val ${avgOk?'ok':'warn'}">${avgOk?fN(r.autonomy,0)+' hrs ✓':fN(tw.avgRuntime,1)+' hrs ⚠'}</span></div>
+    <div class<div class="rw-row"><span class="rw-lbl">Evening peak runtime (all evening loads on at once)</span><span class="rw-val ${pkOk?'ok':'warn'}">${tw.eveningPeakKW>0?fN(tw.eveningRuntime,1)+' hrs'+(pkOk?' ✓':' ⚠'):'—'}</span></div>
 
   <div class="rw-block">
     <div class="rw-block-hd">⚡ Evening Load</div>
