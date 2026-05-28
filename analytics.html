@@ -967,6 +967,96 @@ body::after {
   .topbar { padding: 0 16px; }
   .tab-btn { padding: 9px 14px; }
 }
+/* ─────────────────────────────────────────
+   EXECUTIVE BRIEFING PANEL
+───────────────────────────────────────── */
+.briefing-panel {
+  background: linear-gradient(135deg, rgba(245,166,35,.065), rgba(74,158,255,.03), rgba(0,214,143,.025));
+  border: 1px solid rgba(245,166,35,.18);
+  border-radius: var(--radius);
+  padding: 26px 30px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.briefing-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--amber) 0%, var(--blue) 50%, var(--green) 100%);
+  opacity: .5;
+}
+.briefing-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.briefing-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--amber2);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.briefing-icon {
+  width: 26px; height: 26px;
+  background: rgba(245,166,35,.1);
+  border: 1px solid rgba(245,166,35,.22);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.briefing-ts {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text4);
+}
+.briefing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.bitem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  background: rgba(255,255,255,.022);
+  border: 1px solid rgba(255,255,255,.04);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.55;
+  border-left-width: 3px;
+}
+.bitem.good  { border-left-color: var(--green); }
+.bitem.warn  { border-left-color: var(--amber); }
+.bitem.alert { border-left-color: var(--red);   }
+.bitem.info  { border-left-color: var(--blue);  }
+.bitem-ico   { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.bitem em    { font-style: normal; font-weight: 600; color: var(--white); }
+
+/* KPI delta rows */
+.kpi-delta {
+  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text4);
+}
+.kd-up   { color: var(--green); font-weight: 700; }
+.kd-down { color: var(--red2);  font-weight: 700; }
+.kd-neu  { color: var(--text3); }
+
+@media (max-width: 960px) { .briefing-grid { grid-template-columns: 1fr; } }   
+   
 </style>
 </head>
 <body>
@@ -1046,6 +1136,23 @@ body::after {
       <span id="period-desc">Last 90 days</span>
     </div>
   </div>
+
+  <!-- ══ EXECUTIVE INTELLIGENCE BRIEFING ══ -->
+  <div class="briefing-panel">
+    <div class="briefing-hd">
+      <div class="briefing-title">
+        <div class="briefing-icon">◈</div>
+        Executive Intelligence Briefing
+      </div>
+      <span class="briefing-ts" id="briefing-ts"></span>
+    </div>
+    <div class="briefing-grid" id="briefing-grid">
+      <div class="bitem info" style="grid-column:1/-1">
+        <span class="bitem-ico">⏳</span>
+        <span>Generating intelligence summary…</span>
+      </div>
+    </div>
+  </div> 
 
   <!-- Business KPIs -->
   <div class="section-hd">
@@ -1497,6 +1604,13 @@ function periodFrom(){
   if(!activePeriod) return null;
   const d=new Date(); d.setDate(d.getDate()-activePeriod); return d.toISOString();
 }
+function prevPeriodFrom(){
+  if(!activePeriod) return null;
+  const d=new Date(); d.setDate(d.getDate()-activePeriod*2); return d.toISOString();
+}
+function prevPeriodTo(){
+  return periodFrom(); // previous period ends where current period begins
+}
 
 /* ── SUPABASE HELPER ── */
 async function sb(table, qs=''){
@@ -1519,11 +1633,15 @@ async function loadAll(){
     const pf   = from ? `&created_at=gte.${from}` : '';
     const pfHo = from ? `&handed_over_at=gte.${from}` : '';
 
-    /* Parallel fetch */
-    const [allProposals, jobs, visits, installs, handovers] = await Promise.all([
-      /* All proposals in period — for funnel top */
+    /* Previous period filter strings */
+    const ppf  = activePeriod ? `&created_at=gte.${prevPeriodFrom()}&created_at=lte.${prevPeriodTo()}` : '';
+    const ppfHo= activePeriod ? `&handed_over_at=gte.${prevPeriodFrom()}&handed_over_at=lte.${prevPeriodTo()}` : '';
+
+    /* Parallel fetch — current + previous period */
+    const [allProposals, jobs, visits, installs, handovers, prevProposals, prevJobs] = await Promise.all([
+      /* All proposals — current period */
       sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at,client_name,email_sent_at,whatsapp_sent_at,email_opened_at,client_engaged,proposal_status,location,pdf_url,annual_savings,monthly_savings,payback_years,panel_number${pf}&order=created_at.desc`),
-      /* Active jobs */
+      /* Active jobs — current period */
       sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,client_name&job_status=in.(${ACTIVE_STAGES})${pf}&order=created_at.desc`),
       /* Site visits */
       sb('site_visits', `select=id,job_id,design_changed,design_change_category,client_approval_status,created_at${pf}&order=created_at.desc`),
@@ -1531,10 +1649,15 @@ async function loadAll(){
       sb('installations', `select=id,job_id,scheduled_date,started_at,completed_at${pf}&order=created_at.desc`),
       /* Handovers */
       sb('handovers', `select=id,job_id,handed_over_at${pfHo}&order=handed_over_at.desc`),
+      /* Previous period — proposals (for delta comparisons) */
+      ppf ? sb('ai_results', `select=ai_id,job_status,total_cost,created_at,sent_at,email_sent_at,whatsapp_sent_at,client_engaged,proposal_status,system_size_kw,handover_completed_at,location,proposal_viewed_at,email_opened_at${ppf}&order=created_at.desc`) : Promise.resolve([]),
+      /* Previous period — active jobs */
+      ppf ? sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,handover_completed_at&job_status=in.(${ACTIVE_STAGES})${ppf}&order=created_at.desc`) : Promise.resolve([]),
     ]);
 
+    renderBriefing(allProposals, jobs, visits, prevProposals, prevJobs);
     renderSalesPipeline(allProposals);
-    renderKPIs(allProposals, jobs, visits);
+    renderKPIs(allProposals, jobs, visits, prevProposals, prevJobs);
     renderFunnel(allProposals, jobs);
     renderRevenueChart(allProposals);
     renderStartedDoneChart(jobs);
@@ -1551,6 +1674,119 @@ async function loadAll(){
   }catch(e){
     setSyncStatus('error');
     console.error('loadAll error:',e);
+  }
+
+   /* ══════════════════════════════════════════
+   EXECUTIVE BRIEFING — narrative intelligence
+══════════════════════════════════════════ */
+  function renderBriefing(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
+    const fmtR = v => v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+    const pct  = (a,b) => b===0?null:Math.round((a-b)/b*100);
+    const now  = new Date();
+    const items = [];
+
+    /* ── 1. Pipeline value vs previous period ── */
+    const currPipeline = proposals.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+    const prevPipeline = prevProposals.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+    const pipeDelta    = pct(currPipeline, prevPipeline);
+    if(pipeDelta!==null){
+      const dir = pipeDelta>=0?'increased':'decreased';
+      const sig = pipeDelta>=0?'good':'warn';
+      items.push({sig, ico:pipeDelta>=0?'📈':'📉',
+        text:`Pipeline value <em>${dir} ${Math.abs(pipeDelta)}%</em> vs previous period — now at <em>${fmtR(currPipeline)}</em>`});
+    } else if(currPipeline>0){
+      items.push({sig:'info', ico:'📊', text:`Total pipeline value is <em>${fmtR(currPipeline)}</em> this period`});
+    }
+
+    /* ── 2. Win rate vs previous period ── */
+    const currSent = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
+    const currWon  = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
+    const prevSent = prevProposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
+    const prevWon  = prevProposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
+    const currWR   = currSent.length ? Math.round(currWon.length/currSent.length*100) : null;
+    const prevWR   = prevSent.length ? Math.round(prevWon.length/prevSent.length*100) : null;
+    if(currWR!==null && prevWR!==null && Math.abs(currWR-prevWR)>=3){
+      const diff = currWR-prevWR;
+      const sig  = diff>0?'good':'warn';
+      const note = diff<0&&currWR<40?' Main drop-off likely after proposal viewing — prioritise same-day follow-up.':diff>0?' Conversion momentum is strong this period.':'';
+      items.push({sig, ico:diff>0?'✅':'⚠️',
+        text:`Win rate <em>${diff>0?'improved':'declined'} ${Math.abs(diff)} pts</em> to <em>${currWR}%</em>.${note}`});
+    } else if(currWR!==null){
+      const sig = currWR>=40?'good':currWR>=25?'warn':'alert';
+      items.push({sig, ico:'🎯',
+        text:`Win rate is <em>${currWR}%</em> — ${currWR>=40?'above target, strong conversion':currWR>=25?'room to improve — review follow-up speed':'below target, review proposal quality and follow-up cadence'}`});
+    }
+
+    /* ── 3. Hot leads requiring action ── */
+    const viewed = proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at);
+    const hot    = viewed.filter(p=>!(p.client_engaged||p.proposal_status==='accepted')&&p.proposal_status!=='rejected');
+    if(hot.length>0){
+      items.push({sig:'warn', ico:'🔥',
+        text:`<em>${hot.length} hot lead${hot.length>1?'s':''}</em> viewed your proposal but haven't accepted — follow up within 24 hours, this is your highest-probability pipeline`});
+    }
+
+    /* ── 4. Install velocity vs previous period ── */
+    const cycled     = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+    const avgCycle   = cycled.length?Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length):null;
+    const prevCycled = prevJobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+    const prevAvgCyc = prevCycled.length?Math.round(prevCycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/prevCycled.length):null;
+    if(avgCycle!==null && prevAvgCyc!==null && Math.abs(avgCycle-prevAvgCyc)>=2){
+      const diff = avgCycle-prevAvgCyc;
+      items.push({sig:diff>0?'warn':'good', ico:diff>0?'🐢':'⚡',
+        text:`Install completion velocity <em>${diff>0?`slowed by ${diff} days`:`improved by ${Math.abs(diff)} days`}</em> vs previous period — avg cycle now <em>${avgCycle}d</em> from acceptance to handover`});
+    } else if(avgCycle!==null){
+      items.push({sig:avgCycle<=30?'good':avgCycle<=60?'warn':'alert', ico:'⏱',
+        text:`Average job cycle is <em>${avgCycle} days</em> from acceptance to handover — ${avgCycle<=30?'excellent velocity':avgCycle<=60?'within acceptable range':'above target, check stage bottlenecks in Operations tab'}`});
+    }
+
+    /* ── 5. Stale jobs risk ── */
+    const stale = jobs.filter(j=>j.job_status!=='handover_completed'&&daysBetween(j.created_at,now.toISOString())>=14);
+    if(stale.length>0){
+      items.push({sig:'alert', ico:'🔴',
+        text:`<em>${stale.length} job${stale.length>1?'s':''}</em> accepted with no stage progression in 14+ days — risk of client dissatisfaction and cash-flow delay`});
+    }
+
+    /* ── 6. Top location insight ── */
+    const byLoc = {};
+    proposals.filter(p=>p.location).forEach(p=>{ byLoc[p.location]=(byLoc[p.location]||0)+1; });
+    const topLoc = Object.entries(byLoc).sort((a,b)=>b[1]-a[1])[0];
+    if(topLoc&&topLoc[1]>1){
+      items.push({sig:'info', ico:'📍',
+        text:`<em>${topLoc[0]}</em> is your highest-volume area with <em>${topLoc[1]} proposals</em> — consider aligning installer capacity to match demand there`});
+    }
+
+    /* ── 7. Design change rate warning ── */
+    if(visits.length>0){
+      const majorDC = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
+      const dcRate  = Math.round(majorDC/visits.length*100);
+      if(dcRate>25){
+        items.push({sig:'warn', ico:'📐',
+          text:`Site-visit redesign rate is <em>${dcRate}%</em> — high redesign frequency adds days to cycle time and cost. Review pre-visit assessment quality.`});
+      }
+    }
+
+    /* ── 8. Pending approvals blocking pipeline ── */
+    const pending = visits.filter(v=>v.design_change_category==='major'&&v.client_approval_status==='pending');
+    if(pending.length>0){
+      items.push({sig:'alert', ico:'⚠️',
+        text:`<em>${pending.length} major design change${pending.length>1?'s':''}</em> awaiting client sign-off — these are blocking installation progression`});
+    }
+
+    /* ── Render ── */
+    const grid = document.getElementById('briefing-grid');
+    const ts   = document.getElementById('briefing-ts');
+    const periodLabels = {30:'30-day',90:'90-day',180:'6-month',365:'12-month',0:'All-time'};
+    if(ts) ts.textContent = `Generated ${now.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})} · ${periodLabels[activePeriod]||''} view`;
+    if(!grid) return;
+
+    if(items.length===0){
+      grid.innerHTML = `<div class="bitem info" style="grid-column:1/-1"><span class="bitem-ico">📊</span><span>Generate and send proposals to unlock your executive intelligence summary.</span></div>`;
+      return;
+    }
+
+    grid.innerHTML = items.slice(0,6).map(it=>
+      `<div class="bitem ${it.sig}"><span class="bitem-ico">${it.ico}</span><span>${it.text}</span></div>`
+    ).join('');
   }
 
   /* ══════════════════════════════════════════
@@ -1693,39 +1929,61 @@ function esc2(s){ const d=document.createElement('div'); d.textContent=s||''; re
 /* ══════════════════════════════════════════
    KPIs
 ══════════════════════════════════════════ */
-function renderKPIs(proposals, jobs, visits){
-  /* Pipeline value = all active jobs total_cost */
-  const pipelineJobs = jobs.filter(j=>j.job_status!=='handover_completed');
-  const pipeline = pipelineJobs.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
+  const fmtR = v => v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+  const pctChange = (curr,prev) => prev===0?null:Math.round((curr-prev)/prev*100);
 
-  /* Revenue realised = handover_completed total_cost */
-  const realised = jobs.filter(j=>j.job_status==='handover_completed')
-    .reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const injectDelta = (elId, curr, prev, invertColor=false) => {
+    const d = pctChange(curr, prev);
+    if(d===null) return;
+    const positive = invertColor ? d<0 : d>0;
+    const cls = d===0?'kd-neu':positive?'kd-up':'kd-down';
+    const arrow = d===0?'→':d>0?'↑':'↓';
+    const el = document.getElementById(elId);
+    if(el) el.insertAdjacentHTML('afterend',
+      `<div class="kpi-delta"><span class="${cls}">${arrow} ${Math.abs(d)}%</span><span>vs prev period</span></div>`);
+  };
 
-  /* Full-funnel won rate = handover_completed / all proposals */
+  /* ── Current period ── */
+  const pipeline  = jobs.filter(j=>j.job_status!=='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const realised  = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
   const totalProp = proposals.length;
   const doneCount = proposals.filter(j=>j.job_status==='handover_completed').length;
   const wonRate   = totalProp ? Math.round(doneCount/totalProp*100) : null;
+  const active    = jobs.filter(j=>j.job_status!=='handover_completed').length;
+  const kwp       = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
+  const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+  const avgCycle  = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
 
-  /* Active jobs (not handed over) */
-  const active = jobs.filter(j=>j.job_status!=='handover_completed').length;
+  /* ── Previous period ── */
+  const prevPipeline  = (prevJobs||[]).filter(j=>j.job_status!=='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const prevRealised  = (prevJobs||[]).filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const prevActive    = (prevJobs||[]).filter(j=>j.job_status!=='handover_completed').length;
+  const prevKwp       = (prevJobs||[]).filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
+  const prevDoneCount = (prevProposals||[]).filter(j=>j.job_status==='handover_completed').length;
+  const prevTotalProp = (prevProposals||[]).length;
+  const prevWonRate   = prevTotalProp ? Math.round(prevDoneCount/prevTotalProp*100) : 0;
+  const prevCycled    = (prevJobs||[]).filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
+  const prevAvgCycle  = prevCycled.length ? Math.round(prevCycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/prevCycled.length) : null;
 
-  /* kWp installed this period */
-  const kwp = jobs.filter(j=>j.job_status==='handover_completed')
-    .reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
-
-  /* Avg cycle time */
-  const cycled = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
-  const avgCycle = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
-
-  setText('kpi-pipeline', pipeline>=1000 ? `R${(pipeline/1000).toFixed(0)}k` : `R${pipeline.toFixed(0)}`);
-  setText('kpi-realised', realised>=1000 ? `R${(realised/1000).toFixed(0)}k` : `R${realised.toFixed(0)}`);
-  setText('kpi-wonrate', wonRate!==null ? `${wonRate}%` : '—');
-  setText('kpi-wonrate-sub', totalProp ? `${doneCount} of ${totalProp} proposals` : 'proposal → handover');
+  /* ── Render values ── */
+  setText('kpi-pipeline', pipeline>=1000?`R${(pipeline/1000).toFixed(0)}k`:`R${pipeline.toFixed(0)}`);
+  setText('kpi-realised', realised>=1000?`R${(realised/1000).toFixed(0)}k`:`R${realised.toFixed(0)}`);
+  setText('kpi-wonrate', wonRate!==null?`${wonRate}%`:'—');
+  setText('kpi-wonrate-sub', totalProp?`${doneCount} of ${totalProp} proposals`:'proposal → handover');
   setText('kpi-active', active);
-  setText('kpi-kwp', kwp>=1000 ? `${(kwp/1000).toFixed(1)}MW` : `${kwp.toFixed(1)}`);
-  setText('kpi-kwp-sub', kwp>=1000 ? 'megawatts installed' : 'kilowatts peak installed');
-  setText('kpi-cycle', avgCycle!==null ? `${avgCycle}d` : '—');
+  setText('kpi-kwp', kwp>=1000?`${(kwp/1000).toFixed(1)}MW`:`${kwp.toFixed(1)}`);
+  setText('kpi-kwp-sub', kwp>=1000?'megawatts installed':'kilowatts peak installed');
+  setText('kpi-cycle', avgCycle!==null?`${avgCycle}d`:'—');
+
+  /* ── Inject period-over-period deltas ── */
+  document.querySelectorAll('.kpi-delta').forEach(el=>el.remove()); // clear old
+  injectDelta('kpi-pipeline', pipeline, prevPipeline);
+  injectDelta('kpi-realised', realised, prevRealised);
+  if(wonRate!==null && prevWonRate>0) injectDelta('kpi-wonrate', wonRate, prevWonRate);
+  injectDelta('kpi-active', active, prevActive);
+  injectDelta('kpi-kwp', kwp, prevKwp);
+  if(avgCycle!==null && prevAvgCycle!==null) injectDelta('kpi-cycle', avgCycle, prevAvgCycle, true); // inverted: lower is better
 }
 
 /* ══════════════════════════════════════════
