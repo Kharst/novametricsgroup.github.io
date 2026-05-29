@@ -1501,27 +1501,6 @@ body::after {
     </div>
   </div>
 
-  <!-- ══ PERFORMANCE RADAR ══ -->
-  <div class="hero-radar-card">
-    <div class="cc-header" style="background:rgba(255,255,255,.016);border-bottom:1px solid var(--border);cursor:pointer" onclick="(function(){var b=document.getElementById('radar-body');var t=document.getElementById('radar-toggle');var open=b.style.display!=='none';b.style.display=open?'none':'grid';t.textContent=open?'▸ Show':'▾ Hide';})()">
-      <div>
-        <div class="cc-title">Business Performance Radar <span id="radar-toggle" style="font-size:9px;color:var(--text3);font-weight:400;margin-left:8px;font-family:var(--sans)">▾ Hide</span></div>
-        <div class="cc-sub">Five-axis intelligence view — collapsed by default on mobile · click to expand</div>
-      </div>
-      <span class="cc-badge purple">Command Centre</span>
-    </div>
-    <div class="hero-radar-inner" id="radar-body">
-      <div class="hero-radar-chart">
-        <canvas id="chart-radar" style="max-height:280px"></canvas>
-      </div>
-      <div class="hero-radar-legend">
-        <div class="hero-radar-title">Axis Breakdown</div>
-        <div class="hero-radar-sub">Each axis is scored 0–100 against internal benchmarks derived from your own data.</div>
-        <div id="radar-dims"><!-- injected by JS --></div>
-      </div>
-    </div>
-  </div>
-
   <!-- Full Customer Journey Funnel -->
   <div class="section-hd">
     <div class="section-title"><div class="stbar"></div>Full Customer Journey</div>
@@ -1561,6 +1540,28 @@ body::after {
   </div>
 
 </div>
+
+<!-- ══ PERFORMANCE RADAR ══ -->
+  <div class="hero-radar-card">
+    <div class="cc-header" style="background:rgba(255,255,255,.016);border-bottom:1px solid var(--border);cursor:pointer" onclick="(function(){var b=document.getElementById('radar-body');var t=document.getElementById('radar-toggle');var open=b.style.display!=='none';b.style.display=open?'none':'grid';t.textContent=open?'▸ Show':'▾ Hide';})()">
+      <div>
+        <div class="cc-title">Business Performance Radar <span id="radar-toggle" style="font-size:9px;color:var(--text3);font-weight:400;margin-left:8px;font-family:var(--sans)">▾ Hide</span></div>
+        <div class="cc-sub">Five-axis intelligence view — collapsed by default on mobile · click to expand</div>
+      </div>
+      <span class="cc-badge purple">Command Centre</span>
+    </div>
+    <div class="hero-radar-inner" id="radar-body">
+      <div class="hero-radar-chart">
+        <canvas id="chart-radar" style="max-height:280px"></canvas>
+      </div>
+      <div class="hero-radar-legend">
+        <div class="hero-radar-title">Axis Breakdown</div>
+        <div class="hero-radar-sub">Each axis is scored 0–100 against internal benchmarks derived from your own data.</div>
+        <div id="radar-dims"><!-- injected by JS --></div>
+      </div>
+    </div>
+  </div>
+   
 </div><!-- /tab-overview -->
 
 
