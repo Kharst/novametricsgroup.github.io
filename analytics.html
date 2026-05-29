@@ -562,6 +562,13 @@ body::after {
   color: var(--white);
 }
 
+ .kpi.c-amber .kpi-val {
+  font-size: 34px;
+}
+.kpi.c-green .kpi-val {
+  font-size: 34px;
+}  
+
 .kpi.c-amber .kpi-val  { color: var(--amber2); }
 .kpi.c-green .kpi-val  { color: var(--green); }
 .kpi.c-blue  .kpi-val  { color: var(--blue2); }
@@ -815,7 +822,7 @@ body::after {
 .alert-dot   { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 .alert-name  { font-weight: 600; color: var(--white); margin-bottom: 2px; }
 .alert-detail{ color: var(--text3); font-size: 11px; }
-.alert-age   { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: auto; flex-shrink: 0; }
+.alert-age   { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text3); margin-left: auto; flex-shrink: 0; }
 
 /* ─────────────────────────────────────────
    DESIGN CHANGE BREAKDOWN
@@ -1472,12 +1479,12 @@ body::after {
     <div class="kpi c-amber">
       <div class="kpi-label">Pipeline Value</div>
       <div class="kpi-val" id="kpi-pipeline">—</div>
-      <div class="kpi-sub">quoted &amp; active</div>
+      <div class="kpi-sub">💰 awaiting completion</div>
     </div>
     <div class="kpi c-green">
       <div class="kpi-label">Revenue Completed</div>
       <div class="kpi-val" id="kpi-realised">—</div>
-      <div class="kpi-sub">completed installs</div>
+      <div class="kpi-sub">✅ cash realised</div>
     </div>
     <div class="kpi c-blue">
       <div class="kpi-label">Project Completion Rate</div>
@@ -1766,15 +1773,15 @@ body::after {
     <div class="section-sub">Jobs that need action to prevent pipeline stall</div>
   </div>
   <div class="alerts-grid">
-    <div class="alert-card">
-      <div class="cc-header" style="background:rgba(255,92,92,.04);border-bottom-color:rgba(255,92,92,.15)">
-        <div><div class="cc-title" style="color:#f87171">🔴 Stale Jobs</div><div class="cc-sub">Accepted but no progress in 14+ days</div></div>
+    <div class="alert-card" style="border-left:3px solid var(--red)">
+      <div class="cc-header" style="background:rgba(255,92,92,.06);border-bottom-color:rgba(255,92,92,.2)">
+        <div><div class="cc-title" style="color:#f87171">🔴 Stale Jobs — Revenue at Risk</div><div class="cc-sub">Accepted but no progress in 14+ days — money stalled</div></div>
       </div>
       <div class="alert-list" id="stale-list"><div class="empty"><div class="ico">✓</div><p>No stale jobs</p></div></div>
     </div>
-    <div class="alert-card">
-      <div class="cc-header" style="background:rgba(245,166,35,.04);border-bottom-color:rgba(245,166,35,.15)">
-        <div><div class="cc-title" style="color:var(--amber)">⚠ Pending Approvals</div><div class="cc-sub">Major design changes awaiting client sign-off</div></div>
+    <div class="alert-card" style="border-left:3px solid var(--amber)">
+      <div class="cc-header" style="background:rgba(245,166,35,.06);border-bottom-color:rgba(245,166,35,.2)">
+        <div><div class="cc-title" style="color:var(--amber)">⚠ Pending Approvals — Delayed Cashflow</div><div class="cc-sub">Major design changes awaiting client sign-off — installs blocked</div></div>
       </div>
       <div class="alert-list" id="approval-list"><div class="empty"><div class="ico">✓</div><p>No pending approvals</p></div></div>
     </div>
@@ -2317,7 +2324,14 @@ function renderSalesPipeline(proposals){
       .slice(0,2).forEach(p=>actions.push('📤 Send proposal to '+esc2(p.client_name||'client')+' — generated but not sent'));
     if(!actions.length) actions.push('✅ All leads actioned — generate new proposals to grow pipeline');
     actionsEl.innerHTML = actions.map(a=>
-      `<div style="font-size:11.5px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);line-height:1.5">${a}</div>`
+      `<div style="font-size:11.5px;color:var(--text2);padding:8px 10px;border-bottom:1px solid var(--border);line-height:1.5;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s" 
+        onmouseover="this.style.background='rgba(255,255,255,.04)'" 
+        onmouseout="this.style.background='transparent'"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText('${a.replace(/'/g,"\\'")}').then(()=>{this.style.background='rgba(0,214,143,.08)';setTimeout(()=>this.style.background='transparent',800)})"
+        title="Click to copy">
+        <span>${a}</span>
+        <span style="font-size:9px;color:var(--text4);flex-shrink:0;font-family:var(--mono)">COPY</span>
+      </div>`
     ).join('');
   }
 
@@ -2640,7 +2654,7 @@ function renderAlerts(jobs, visits){
       <div class="alert-dot" style="background:var(--red)"></div>
       <div><div class="alert-name">${j.client_name||'Job #'+j.ai_id}</div>
       <div class="alert-detail">${JOB_STAGE_LABELS[j.job_status]||j.job_status}</div></div>
-      <div class="alert-age" style="color:var(--red)">${age}d old</div>
+      <div class=\"alert-age\" style=\"color:${age>=30?'#f87171':age>=21?'#fb923c':'var(--amber)'}\">${age}d stalled</div>
     </div>`;
   }).join(''):`<div class="empty"><div class="ico">✓</div><p>No stale jobs</p></div>`;
 
