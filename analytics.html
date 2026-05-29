@@ -1063,8 +1063,8 @@ body::after {
   background: linear-gradient(135deg, rgba(167,139,250,.07), rgba(74,158,255,.04), rgba(0,214,143,.03));
   border: 1px solid rgba(167,139,250,.22);
   border-radius: var(--radius);
-  padding: 26px 30px;
-  margin-bottom: 24px;
+  padding: 32px 36px;
+  margin-bottom: 32px;
   position: relative;
   overflow: hidden;
   display: grid;
@@ -1427,15 +1427,20 @@ body::after {
     <div class="hs-center">
       <div class="hs-title">
         <span>⬡</span> Business Health
+        <span style="font-size:9px;font-weight:400;color:var(--text3);letter-spacing:.06em;font-family:var(--sans);text-transform:none;margin-left:4px">· 5 pillars · 14 signals</span>
       </div>
-      <div class="hs-verdict" id="hs-verdict">
+      <div class="hs-verdict" id="hs-verdict" style="flex-wrap:wrap;gap:6px">
         <span id="hs-verdict-ico">⏳</span>
         <span id="hs-verdict-text">Computing…</span>
       </div>
       <div class="hs-drivers" id="hs-drivers">
         <div class="hs-driver"><div class="hs-driver-dot" style="background:var(--text3)"></div><span>Loading signals…</span></div>
       </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em">METHODOLOGY</span>
+      <span style="font-size:9px;color:var(--text4);line-height:1.5">Sales conv. 25% · Pipeline 20% · Velocity 20% · Completion 20% · Quality 15% · Benchmarks derived from your own data</span>
     </div>
+  </div>
 
     <div class="hs-right" id="hs-pillars">
       <!-- Pillar bars injected by JS -->
@@ -1498,14 +1503,14 @@ body::after {
 
   <!-- ══ PERFORMANCE RADAR ══ -->
   <div class="hero-radar-card">
-    <div class="cc-header" style="background:rgba(255,255,255,.016);border-bottom:1px solid var(--border)">
+    <div class="cc-header" style="background:rgba(255,255,255,.016);border-bottom:1px solid var(--border);cursor:pointer" onclick="(function(){var b=document.getElementById('radar-body');var t=document.getElementById('radar-toggle');var open=b.style.display!=='none';b.style.display=open?'none':'grid';t.textContent=open?'▸ Show':'▾ Hide';})()">
       <div>
-        <div class="cc-title">Business Performance Radar</div>
-        <div class="cc-sub">Five-axis intelligence view — sales, operations, capacity, velocity & pipeline health</div>
+        <div class="cc-title">Business Performance Radar <span id="radar-toggle" style="font-size:9px;color:var(--text3);font-weight:400;margin-left:8px;font-family:var(--sans)">▾ Hide</span></div>
+        <div class="cc-sub">Five-axis intelligence view — collapsed by default on mobile · click to expand</div>
       </div>
       <span class="cc-badge purple">Command Centre</span>
     </div>
-    <div class="hero-radar-inner">
+    <div class="hero-radar-inner" id="radar-body">
       <div class="hero-radar-chart">
         <canvas id="chart-radar" style="max-height:280px"></canvas>
       </div>
