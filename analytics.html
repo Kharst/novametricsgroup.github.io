@@ -2158,7 +2158,7 @@ async function loadAll(){
     /* Parallel fetch — current + previous period */
     const [allProposals, jobs, visits, installs, handovers, prevProposals, prevJobs] = await Promise.all([
       /* All proposals — current period */
-      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at,client_name,email_sent_at,whatsapp_sent_at,email_opened_at,client_engaged,proposal_status,location,pdf_url,annual_savings,monthly_savings,payback_years,panel_number${pf}&order=created_at.desc`),
+      sb('ai_results', `select=ai_id,job_status,system_size_kw,battery_capacity_kwh,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,sent_at,proposal_viewed_at,client_name,contact_email,email_sent_at,whatsapp_sent_at,email_opened_at,client_engaged,proposal_status,location,pdf_url,annual_savings,monthly_savings,payback_years,panel_number${pf}&order=created_at.desc`),
       /* Active jobs — current period */
       sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,site_visit_completed_at,installation_completed_at,handover_completed_at,client_name&job_status=in.(${ACTIVE_STAGES})${pf}&order=created_at.desc`),
       /* Site visits */
@@ -2388,26 +2388,40 @@ function renderSalesPipeline(proposals){
   // Next Best Actions
   const actionsEl = document.getElementById('sp-actions');
   if(actionsEl){
-    const actions = [];
+    const actionItems = [];
     const nowT = Date.now();
+
     viewed.filter(p=>!(p.client_engaged||p.proposal_status==='accepted')&&p.proposal_status!=='rejected')
-      .slice(0,3).forEach(p=>actions.push('📞 Call '+esc2(p.client_name||'client')+' — viewed proposal, follow up now'));
+      .slice(0,3).forEach(p=>{
+        const url='prposal_portal.html?ai_id='+encodeURIComponent(p.ai_id)+'&email='+encodeURIComponent(p.contact_email||'');
+        actionItems.push({icon:'📞',label:'Call '+esc2(p.client_name||'client')+' — viewed proposal, follow up now',tag:'VIEW',tagColor:'var(--blue)',url});
+      });
+
     sent.filter(p=>!p.proposal_viewed_at&&!p.email_opened_at&&!(p.client_engaged||p.proposal_status==='accepted'))
       .filter(p=>{ const t=p.email_sent_at||p.sent_at||p.whatsapp_sent_at; return t&&(nowT-new Date(t).getTime())>3*86400000; })
-      .slice(0,3).forEach(p=>actions.push('📩 Resend to '+esc2(p.client_name||'client')+' — sent 3+ days ago, not opened'));
+      .slice(0,3).forEach(p=>{
+        const url='prposal_portal.html?ai_id='+encodeURIComponent(p.ai_id)+'&email='+encodeURIComponent(p.contact_email||'');
+        actionItems.push({icon:'📩',label:'Resend to '+esc2(p.client_name||'client')+' — sent 3+ days ago, not opened',tag:'RESEND',tagColor:'var(--amber)',url});
+      });
+
     withPdf.filter(p=>!p.email_sent_at&&!p.sent_at&&!p.whatsapp_sent_at)
-      .slice(0,2).forEach(p=>actions.push('📤 Send proposal to '+esc2(p.client_name||'client')+' — generated but not sent'));
-    if(!actions.length) actions.push('✅ All leads actioned — generate new proposals to grow pipeline');
-    actionsEl.innerHTML = actions.map(a=>
-      `<div style="font-size:11.5px;color:var(--text2);padding:8px 10px;border-bottom:1px solid var(--border);line-height:1.5;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .15s" 
-        onmouseover="this.style.background='rgba(255,255,255,.04)'" 
-        onmouseout="this.style.background='transparent'"
-        onclick="navigator.clipboard&&navigator.clipboard.writeText('${a.replace(/'/g,"\\'")}').then(()=>{this.style.background='rgba(0,214,143,.08)';setTimeout(()=>this.style.background='transparent',800)})"
-        title="Click to copy">
-        <span>${a}</span>
-        <span style="font-size:9px;color:var(--text4);flex-shrink:0;font-family:var(--mono)">COPY</span>
-      </div>`
-    ).join('');
+      .slice(0,2).forEach(p=>{
+        const url='prposal_portal.html?ai_id='+encodeURIComponent(p.ai_id)+'&email='+encodeURIComponent(p.contact_email||'');
+        actionItems.push({icon:'📤',label:'Send proposal to '+esc2(p.client_name||'client')+' — generated but not sent',tag:'SEND',tagColor:'var(--green)',url});
+      });
+
+    if(!actionItems.length){
+      actionsEl.innerHTML=`<div style="font-size:11.5px;color:var(--text3);padding:10px;line-height:1.5">✅ All leads actioned — generate new proposals to grow pipeline</div>`;
+    } else {
+      actionsEl.innerHTML=actionItems.map(a=>
+        `<a href="${a.url}" style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border);border-radius:4px;transition:background .15s;color:inherit"
+          onmouseover="this.style.background='rgba(255,255,255,.05)'"
+          onmouseout="this.style.background='transparent'">
+          <span style="font-size:11.5px;color:var(--text2);line-height:1.5">${a.icon} ${a.label}</span>
+          <span style="font-size:9px;font-weight:700;color:${a.tagColor};flex-shrink:0;font-family:var(--mono);border:1px solid ${a.tagColor}44;padding:2px 7px;border-radius:4px;white-space:nowrap">${a.tag} →</span>
+        </a>`
+      ).join('');
+    }
   }
 
   // Pipeline Insights
