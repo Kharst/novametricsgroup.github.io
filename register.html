@@ -395,10 +395,11 @@ async function submitRegistration() {
         'apikey': SUPA_ANON,
       },
       body: JSON.stringify({
-        company_name:   company,
-        email:          email,
-        contact_person: contactPerson || null,
-        contact_number: phone         || null,
+        company_name:    company,
+        email:           email,
+        contact_person:  contactPerson || null,
+        contact_number:  phone         || null,
+        redirect_to:     'https://novametricsgroup.com/solar-intelligence.html',
       }),
     });
 
