@@ -377,6 +377,73 @@ body::after {
 .tab-panel.active   { display: block; }
 
 /* ─────────────────────────────────────────
+   TODAY'S PRIORITIES STRIP
+───────────────────────────────────────── */
+.priorities-strip {
+  background: rgba(10,14,26,.92);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-height: 42px;
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 90;
+  backdrop-filter: blur(12px);
+}
+.priorities-strip::-webkit-scrollbar { display: none; }
+.priorities-strip-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text4);
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  white-space: nowrap;
+  padding-right: 16px;
+  border-right: 1px solid var(--border);
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+.p-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-right: 8px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  cursor: default;
+  transition: opacity .2s;
+}
+.p-chip:hover { opacity: .8; }
+.p-chip.red    { background: rgba(248,113,113,.1);  color: #f87171; border-color: rgba(248,113,113,.2); }
+.p-chip.amber  { background: rgba(251,191,36,.08);  color: #fbbf24; border-color: rgba(251,191,36,.18); }
+.p-chip.green  { background: rgba(52,211,153,.07);  color: #34d399; border-color: rgba(52,211,153,.15); }
+.p-chip.blue   { background: rgba(74,158,255,.08);  color: #7ab8ff; border-color: rgba(74,158,255,.18); }
+.p-chip-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.p-chip.red   .p-chip-dot { background: #f87171; }
+.p-chip.amber .p-chip-dot { background: #fbbf24; }
+.p-chip.green .p-chip-dot { background: #34d399; }
+.p-chip.blue  .p-chip-dot { background: #7ab8ff; }
+.priorities-strip-empty {
+  font-size: 10.5px;
+  color: var(--text4);
+  font-style: italic;
+}
+   
+/* ─────────────────────────────────────────
    PAGE WRAPPER
 ───────────────────────────────────────── */
 .page {
@@ -1391,6 +1458,13 @@ body::after {
   </div>
 </div>
 
+<!-- ══ TODAY'S PRIORITIES STRIP ══ -->
+<div class="priorities-strip" id="priorities-strip">
+  <div class="priorities-strip-label">Today</div>
+  <div id="priorities-chips" style="display:flex;align-items:center;gap:0;flex-wrap:nowrap">
+    <div class="p-chip blue"><div class="p-chip-dot"></div>Loading…</div>
+  </div>
+</div>   
 
 <!-- ══════════════════════════════════════════════════
      TAB 1 — OVERVIEW
@@ -2112,6 +2186,7 @@ async function loadAll(){
     renderCompletionsChart(jobs);
     renderVelocityTable(jobs);
     renderAlerts(jobs, visits);
+     renderPriorities(allProposals, jobs, visits);
     renderPortfolio(jobs);
     renderPortfolioExpanded(jobs, allProposals);
 
@@ -2638,6 +2713,82 @@ function renderVelocityTable(jobs){
 /* ══════════════════════════════════════════
    ALERTS
 ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   TODAY'S PRIORITIES STRIP
+══════════════════════════════════════════ */
+function renderPriorities(proposals, jobs, visits){
+  const chips  = [];
+  const now    = Date.now();
+  const fmtR   = v => v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+
+  /* ── RED: Stalled jobs (14+ days no progress) ── */
+  const stalled = jobs.filter(j =>
+    j.job_status !== 'handover_completed' &&
+    daysBetween(j.created_at, new Date().toISOString()) >= 14
+  );
+  const stalledVal = stalled.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  if(stalled.length > 0){
+    chips.push({ cls:'red', ico:'🔴', text: `${stalled.length} job${stalled.length>1?'s':''} stalled — ${fmtR(stalledVal)} at risk` });
+  }
+
+  /* ── RED: Overdue follow-ups (sent 3+ days, not opened) ── */
+  const overdue = proposals.filter(p => {
+    const t = p.email_sent_at || p.whatsapp_sent_at || p.sent_at;
+    return t &&
+      !p.proposal_viewed_at &&
+      !p.email_opened_at &&
+      !(p.client_engaged || p.proposal_status === 'accepted') &&
+      (now - new Date(t).getTime()) > 3 * 86400000;
+  });
+  if(overdue.length > 0){
+    chips.push({ cls:'amber', ico:'📩', text: `${overdue.length} proposal${overdue.length>1?'s':''} unread 3+ days — follow up` });
+  }
+
+  /* ── AMBER: Pending design approvals ── */
+  const pendingApprovals = visits.filter(v =>
+    v.design_change_category === 'major' && v.client_approval_status === 'pending'
+  );
+  if(pendingApprovals.length > 0){
+    chips.push({ cls:'amber', ico:'⚠️', text: `${pendingApprovals.length} approval${pendingApprovals.length>1?'s':''} pending — install blocked` });
+  }
+
+  /* ── AMBER: Hot leads not yet won ── */
+  const hot = proposals.filter(p =>
+    (p.proposal_viewed_at || p.email_opened_at) &&
+    !(p.client_engaged || p.proposal_status === 'accepted') &&
+    p.proposal_status !== 'rejected'
+  );
+  if(hot.length > 0){
+    const hotVal = hot.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
+    chips.push({ cls:'amber', ico:'🔥', text: `${hot.length} hot lead${hot.length>1?'s':''} — ${fmtR(hotVal)} viewed, not accepted` });
+  }
+
+  /* ── BLUE: Pipeline value summary ── */
+  const activeJobs   = jobs.filter(j => j.job_status !== 'handover_completed');
+  const pipelineVal  = activeJobs.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  if(pipelineVal > 0){
+    chips.push({ cls:'blue', ico:'💰', text: `${fmtR(pipelineVal)} pipeline — ${activeJobs.length} active job${activeJobs.length>1?'s':''}` });
+  }
+
+  /* ── GREEN: All clear signals ── */
+  if(stalled.length === 0)      chips.push({ cls:'green', ico:'✅', text:'No stalled jobs' });
+  if(overdue.length === 0)      chips.push({ cls:'green', ico:'✅', text:'All proposals followed up' });
+  if(pendingApprovals.length === 0) chips.push({ cls:'green', ico:'✅', text:'No pending approvals' });
+
+  /* ── Render ── */
+  const el = document.getElementById('priorities-chips');
+  if(!el) return;
+  if(chips.length === 0){
+    el.innerHTML = `<span class="priorities-strip-empty">All clear — no actions required today</span>`;
+    return;
+  }
+  el.innerHTML = chips.map(c => `
+    <div class="p-chip ${c.cls}">
+      <div class="p-chip-dot"></div>
+      ${c.ico} ${c.text}
+    </div>`
+  ).join('');
+}   
 function renderAlerts(jobs, visits){
   /* Stale: accepted but no progress for 14+ days */
   const now=Date.now();
