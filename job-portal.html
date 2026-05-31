@@ -655,7 +655,8 @@ async function sendVisitNotification(){
     const data=await res.json();if(!data.success)throw new Error(data.error||'Failed');
     const nd={client_notified_at:new Date().toISOString(),client_notified_by:assessor};
     if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,nd);currentVisit={...currentVisit,...nd};}
-    else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd});currentVisit=r?.[0]||null;}
+    else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd,installer_id:currentJob.installer_id||null});currentVisit=r?.[0]||null;}
+    await logActivity('NOTIFICATION'
     await logActivity('NOTIFICATION',`Visit email sent to ${currentJob.client_email}`,assessor);
     renderNotificationStatus();toast(`✓ Email sent to ${currentJob.client_email}`,'success');
   }catch(e){btn.disabled=false;btn.textContent='✉ Email Confirmation';toast('Failed: '+e.message,'error');}
@@ -668,7 +669,7 @@ function openWhatsApp(){
   const msg=`Hi ${j.client_name||''},\n\nYour solar site assessment is confirmed.\n\n📅 *${d.toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} at ${d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}*\n📍 ${j.client_address||'Your property'}\n👷 Assessor: ${assessor}\n⚡ System: ${j.system_size_kw||''}kWp\n🔖 REF: ${String(j.ai_id).padStart(6,'0')}\n\nFrom ${j.installer_name||'your solar installer'}`;
   const phone=(j.client_phone||'').replace(/\D/g,'').replace(/^0/,'27');
   window.open(`https://wa.me/${phone||''}?text=${encodeURIComponent(msg)}`,'_blank');
-  (async()=>{try{const nd={client_notified_at:new Date().toISOString(),client_notified_by:assessor};if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,nd);currentVisit={...currentVisit,...nd};}else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd});currentVisit=r?.[0]||null;}renderNotificationStatus();}catch(e){}})();
+  (async()=>{try{const nd={client_notified_at:new Date().toISOString(),client_notified_by:assessor};if(currentVisit){await sbPatch('site_visits',`id=eq.${currentVisit.id}`,nd);currentVisit={...currentVisit,...nd};}else{const r=await sbPost('site_visits',{job_id:String(currentJob.ai_id),assessor_name:assessor,visited_at:new Date(datetime).toISOString(),...nd,installer_id:currentJob.installer_id||null});currentVisit=r?.[0]||null;}renderNotificationStatus();}catch(e){}})();
 }
 
 function checkDesignChangeLive(){
