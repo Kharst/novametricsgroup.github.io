@@ -146,11 +146,8 @@
   <script>
     var SUPABASE_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
-    // Reset link must land on reset-password.html, NOT the marketing homepage.
-    // This URL must also be in Supabase > Auth > URL Configuration > Redirect URLs.
     var RESET_URL = 'https://novametricsgroup.com/reset-password.html';
 
-    // sbClient is global so handleForgot() can use the SDK (not raw fetch).
     var sbClient = null;
     try {
       if (typeof supabase !== 'undefined') {
@@ -160,13 +157,31 @@
       }
     } catch(e) {}
 
+    // Returns the page to redirect to after login.
+    // Reads ?returnTo= from the URL and whitelists it so we can't be used
+    // as an open redirector. Defaults to solar-intelligence.html.
+    function getReturnTo() {
+      var params   = new URLSearchParams(window.location.search);
+      var returnTo = params.get('returnTo') || '';
+      var allowed  = [
+        'solar-intelligence.html',
+        'job-portal.html',
+        'billing.html',
+        'analytics.html',
+        'prposal_portal.html'
+      ];
+      return (returnTo && allowed.indexOf(returnTo) !== -1)
+        ? returnTo
+        : 'solar-intelligence.html';
+    }
+
     window.addEventListener('DOMContentLoaded', function() {
-      // Redirect already-authenticated users straight to the app.
+      // If the user already has a valid session, skip the login screen entirely.
       if (sbClient) {
         sbClient.auth.getSession().then(function(result) {
           var session = result && result.data && result.data.session;
           if (session && session.user) {
-            window.location.href = 'solar-intelligence.html';
+            window.location.href = getReturnTo();
           }
         }).catch(function(){});
       }
@@ -189,7 +204,6 @@
       document.getElementById('forgotSent').style.display  = 'none';
       document.getElementById('forgotMsg').textContent = '';
       document.getElementById('forgotMsg').className = 'msg';
-      // Pre-fill email if user already typed it on the login screen.
       var loginEmail = document.getElementById('loginEmail').value.trim();
       if (loginEmail) document.getElementById('forgotEmail').value = loginEmail;
       document.getElementById('forgotEmail').focus();
@@ -206,32 +220,30 @@
       var btn      = document.getElementById('loginBtn');
       var msg      = document.getElementById('loginMsg');
       if (!email || !password) { showMsg(msg, 'error', 'Please enter your email and password.'); return; }
+      if (!sbClient) { showMsg(msg, 'error', 'Client not ready — please refresh.'); return; }
       btn.disabled = true;
       showMsg(msg, 'loading', 'Verifying\u2026');
       try {
-        var authRes = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ email: email, password: password })
-        });
-        var authData = await authRes.json();
-        if (!authRes.ok || authData.error) {
+        // FIX: Use the Supabase SDK (not raw fetch) so the session token is
+        // stored in localStorage and every other page can read it via
+        // sbClient.auth.getSession(). Raw fetch got a token but never saved it,
+        // causing every protected page to see no session and redirect back here.
+        var result = await sbClient.auth.signInWithPassword({ email: email, password: password });
+        if (result.error) {
           showMsg(msg, 'error', 'Invalid email or password.');
           btn.disabled = false;
           return;
         }
         showMsg(msg, 'loading', 'Redirecting\u2026');
-        window.location.href = 'solar-intelligence.html';
+        // FIX: Respect returnTo so pages that bounced the user here (e.g.
+        // job-portal.html) get them back instead of always landing on solar-intelligence.
+        window.location.href = getReturnTo();
       } catch(err) {
         showMsg(msg, 'error', 'Connection error. Please try again.');
         btn.disabled = false;
       }
     }
 
-    // Uses Supabase SDK (not raw fetch) so redirectTo is correctly included
-    // in the email link. Without this, Supabase falls back to the default
-    // Site URL (novametricsgroup.com homepage) and the token gets consumed
-    // there, causing the "otp_expired" error the user sees.
     async function handleForgot() {
       var email = document.getElementById('forgotEmail').value.trim().toLowerCase();
       var btn   = document.getElementById('forgotBtn');
@@ -241,11 +253,7 @@
       btn.disabled = true;
       btn.querySelector('span').textContent = 'Sending\u2026';
       try {
-        var result = await sbClient.auth.resetPasswordForEmail(email, {
-          redirectTo: RESET_URL
-        });
-        // Always show the sent screen regardless of whether the email exists.
-        // This prevents user-enumeration (attackers can't probe which emails are registered).
+        await sbClient.auth.resetPasswordForEmail(email, { redirectTo: RESET_URL });
         document.getElementById('forgotForm').style.display = 'none';
         document.getElementById('forgotSent').style.display = 'block';
       } catch(err) {
