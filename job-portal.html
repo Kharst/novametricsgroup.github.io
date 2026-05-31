@@ -426,10 +426,15 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
 
 (async function boot(){
   try{
-    const {data:{session}}=await sbClient.auth.getSession();
-    if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
-    setSyncStatus('online');
-    await loadJobs();
+    const {data:{session}, error}=await sbClient.auth.getSession();
+if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
+
+// Force a token refresh — stale tokens have no valid sub and fail RLS
+const {data:{session:freshSession}}=await sbClient.auth.refreshSession();
+if(!freshSession){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
+
+setSyncStatus('online');
+await loadJobs();
     setInterval(loadJobs,60000);
     const _urlParams=new URLSearchParams(window.location.search);
     const _urlAiId=_urlParams.get('ai_id');
@@ -455,7 +460,7 @@ async function doSignOut(){await sbClient.auth.signOut();window.location.href='n
 
 async function sb(path,method='GET',body=null){
   const {data:{session}}=await sbClient.auth.getSession();
-  const token=session?session.access_token:SUPA_ANON;
+  const token=session?.access_token ?? SUPA_ANON;
   const h={'apikey':SUPA_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
   if(method!=='GET')h['Prefer']='return=representation';
   const opts={method,headers:h};if(body)opts.body=JSON.stringify(body);
