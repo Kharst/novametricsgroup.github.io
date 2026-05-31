@@ -427,7 +427,7 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
 (async function boot(){
   try{
     const {data:{session}}=await sbClient.auth.getSession();
-    if(!session){window.location.href='nova-metrics_1.html';return;}
+    if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
     setSyncStatus('online');
     await loadJobs();
     setInterval(loadJobs,60000);
