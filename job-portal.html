@@ -429,9 +429,6 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
     const {data:{session}, error}=await sbClient.auth.getSession();
 if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
 
-// Force a token refresh — stale tokens have no valid sub and fail RLS
-const {data:{session:freshSession}}=await sbClient.auth.refreshSession();
-if(!freshSession){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
 
 setSyncStatus('online');
 await loadJobs();
@@ -512,7 +509,7 @@ function si(s){return SO.indexOf(s);}
 async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
-  const won='accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
+  const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
   try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
