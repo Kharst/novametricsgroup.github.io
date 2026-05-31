@@ -824,7 +824,7 @@ async function saveCompletionDraft(){if(!currentJob||!currentInstall)return;try{
 async function saveHandoverDraft(){
   if(!currentJob)return;
   const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by')};
-  try{if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',hd);currentHandover=r?.[0]||null;}toast('Progress saved','info');}catch(e){toast('Save failed: '+e.message,'error');}
+  try{if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',{...hd,installer_id:currentJob.installer_id||null});currentHandover=r?.[0]||null;}toast('Progress saved','info');}catch(e){toast('Save failed: '+e.message,'error');}
 }
 
 async function completeSiteVisit(){if(!beginAction('btn-complete-sv'))return;try{await _saveSiteVisit(true);}finally{endAction('btn-complete-sv');}}
@@ -856,7 +856,7 @@ async function _saveInstallPrep(schedule){
   if(!currentJob)return;
   const id={job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),scheduled_date:getVal('inst-date')||null,panels_brand:getVal('inst-panelbrand'),panels_watt:parseInt(getVal('inst-panelwatt'))||null,panels_qty:parseInt(getVal('inst-panelqty'))||null,inverter_brand:getVal('inst-inverterbrand'),inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,battery_brand:getVal('inst-batterybrand'),battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,battery_qty:parseInt(getVal('inst-batteryqty'))||null,install_checklist:collectChecklist()};
   try{
-    if(currentInstall){await sbPatch('installations','id=eq.'+currentInstall.id,id);}else{const r=await sbPost('installations',id);currentInstall=r?.[0]||null;}
+    if(currentInstall){await sbPatch('installations','id=eq.'+currentInstall.id,id);}else{const r=await sbPost('installations',{...id,installer_id:currentJob.installer_id||null});currentInstall=r?.[0]||null;}
     if(schedule){await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'installation_scheduled',installation_date:getVal('inst-date')||null,assigned_team:getVal('inst-teamlead')});await logActivity('INSTALL PREP','Installation scheduled for '+getVal('inst-date'),getVal('inst-teamlead'));toast('Installation scheduled!','success');await openJob(currentJob.ai_id);}
     else toast('Progress saved','info');
   }catch(e){toast('Error: '+e.message,'error');}
@@ -884,7 +884,7 @@ async function completeHandover(){
   if(!beginAction('btn-complete-handover'))return;
   try{
     const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString()};
-    if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',hd);currentHandover=r?.[0]||null;}
+    if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',{...hd,installer_id:currentJob.installer_id||null});currentHandover=r?.[0]||null;}
     /* ── UPDATED: use new stage name handover_completed, also write handover_completed_at ── */
     await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'handover_completed',handover_completed_at:new Date().toISOString()});
     await logActivity('HANDOVER','Handed over by '+getVal('ho-by'),getVal('ho-by'));
@@ -918,7 +918,7 @@ function renderHandoverDoc(){
 }
 
 function printHandover(){if(!currentJob){toast('No job selected','error');return;}renderHandoverDoc();const p4=document.getElementById('panel-4');if(p4)p4.classList.add('open','print-target');window.print();}
-async function logActivity(stage,action,performedBy=''){if(!currentJob)return;try{await sbPost('job_activity_log',{job_id:String(currentJob.ai_id),stage,action,performed_by:performedBy});}catch(e){}}
+async function logActivity(stage,action,performedBy=''){if(!currentJob)return;try{await sbPost('job_activity_log',{job_id:String(currentJob.ai_id),stage,action,performed_by:performedBy,installer_id:currentJob.installer_id||null});}catch(e){}}
 function renderActivityLog(logs){const c=document.getElementById('activity-log-entries');if(!c)return;if(!logs.length){c.innerHTML='<div class="log-entry" style="color:var(--text3);font-size:11px;font-family:var(--mono)">No activity recorded yet.</div>';return;}c.innerHTML=logs.map(l=>'<div class="log-entry"><span class="log-stage">'+(l.stage||'—')+'</span><span class="log-time">'+formatTime(l.created_at)+'</span><span class="log-msg">'+(l.action||'')+(l.performed_by?' <span style="color:var(--text3)">· '+l.performed_by+'</span>':'')+'</span></div>').join('');}
 function formatTime(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});}
 function togglePanel(i){const p=document.getElementById('panel-'+i);if(p&&!p.classList.contains('locked'))p.classList.toggle('open');}
