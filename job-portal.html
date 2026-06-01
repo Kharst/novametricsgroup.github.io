@@ -358,9 +358,18 @@
           <div class="panel-header" onclick="togglePanel(3)"><div class="panel-title-group"><span class="panel-step-num">STEP 4</span><span class="panel-title">Final Completion &amp; Sign-off</span></div><div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-3-badge"></span><span class="panel-toggle">▾</span></div></div>
           <div class="panel-body">
             <div class="section-label">Final System Specs (as installed)</div>
+            <div class="info-card warning" style="margin-bottom:14px;">
+              🔒 <strong>Engineering Baseline Locked</strong> — Inherited from the approved site assessment. Cannot be modified during installation.
+            </div>
             <div class="form-grid">
-              <div class="form-group"><label class="form-label">Final System kWp</label><input type="number" step="0.1" class="form-input" id="comp-kw" placeholder="Total installed kWp"></div>
-              <div class="form-group"><label class="form-label">Final Battery kWh</label><input type="number" step="0.1" class="form-input" id="comp-battery" placeholder="Total installed kWh"></div>
+              <div class="form-group">
+                <label class="form-label">Final System kWp &nbsp;<span style="font-size:9px;color:var(--amber);opacity:0.7;">LOCKED</span></label>
+                <input type="number" step="0.1" class="form-input" id="comp-kw" placeholder="Inherited from site assessment" readonly style="background:rgba(245,166,35,0.05);border-color:rgba(245,166,35,0.25);cursor:not-allowed;color:var(--amber);">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Final Battery kWh &nbsp;<span style="font-size:9px;color:var(--amber);opacity:0.7;">LOCKED</span></label>
+                <input type="number" step="0.1" class="form-input" id="comp-battery" placeholder="Inherited from site assessment" readonly style="background:rgba(245,166,35,0.05);border-color:rgba(245,166,35,0.25);cursor:not-allowed;color:var(--amber);">
+              </div>
               <div class="form-group form-full"><label class="form-label">Punch List / Outstanding Items</label><textarea class="form-textarea" id="comp-punchlist" placeholder="Any items to address after sign-off..."></textarea></div>
             </div>
             <hr class="section-sep">
