@@ -1065,10 +1065,39 @@ document.addEventListener('DOMContentLoaded', function(){
   }
 });
 
+function normalizedProposalStatus(ai){
+  return String((ai&&ai.proposal_status)||'').toLowerCase().trim();
+}
+function flagTrue(v){
+  return v===true||v===1||String(v).toLowerCase().trim()==='true'||String(v).trim()==='1';
+}
+function isProposalAccepted(ai){
+  if(!ai) return false;
+  var ps=normalizedProposalStatus(ai);
+  if(ps==='accepted') return true;
+  if(ps==='rejected') return false;
+  return flagTrue(ai.client_engaged)||!!ai.won_at;
+}
+function isProposalRejected(ai){
+  if(!ai) return false;
+  var ps=normalizedProposalStatus(ai);
+  if(ps==='rejected') return true;
+  if(ps==='accepted') return false;
+  return !!ai.rejected_at;
+}
+function proposalSelectionScore(ai){
+  return(isProposalAccepted(ai)?10000:0)+
+    (ai.pdf_url?100:0)+
+    (ai.email_sent_at||ai.sent_at||ai.whatsapp_sent_at?10:0)+
+    (ai.email_opened_at?5:0)+
+    (ai.proposal_viewed_at?5:0)+
+    (ai.pdf_downloaded_at?5:0);
+}
 function getProposalStatus(ai){
-  if(!ai||!ai.pdf_url) return null;
-  if(ai.proposal_status==='accepted') return 'accepted';
-  if(ai.proposal_status==='rejected') return 'rejected';
+  if(!ai) return null;
+  if(isProposalAccepted(ai)) return 'accepted';
+  if(isProposalRejected(ai)) return 'rejected';
+  if(!ai.pdf_url) return null;
   if(ai.pdf_downloaded_at||ai.proposal_viewed_at||ai.email_opened_at) return 'viewed';
   if(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at) return 'sent';
   return 'generated';
@@ -1104,10 +1133,10 @@ function attnMessage(c){
   return '';
 }
 
-// Recomputes "Won" KPI from allClients — handles both client_engaged and proposal_status='accepted'
+// Recomputes "Won" KPI from allClients using every stored accepted signal.
 function refreshWonCount(){
   var won=allClients.filter(function(c){
-    return c.ai&&(c.ai.client_engaged||c.ai.proposal_status==='accepted');
+    return isProposalAccepted(c.ai);
   }).length;
   var el=document.getElementById('pEngaged');
   if(el) el.textContent=won;
@@ -1118,8 +1147,8 @@ function clientMatchesTab(c,tab){
     case 'all': return true;
     case 'needs_action': return needsAttention(c);
     case 'sent':   return!!(ai&&(ai.email_sent_at||ai.whatsapp_sent_at||ai.sent_at));
-    case 'viewed': return!!(ai&&(ai.email_opened_at||ai.proposal_viewed_at));
-    case 'won':    return!!(ai&&(ai.client_engaged||ai.proposal_status==='accepted'));
+    case 'viewed': return!!(ai&&(ai.email_opened_at||ai.proposal_viewed_at)&&!isProposalAccepted(ai)&&!isProposalRejected(ai));
+    case 'won':    return isProposalAccepted(ai);
     default: return true;
   }
 }
@@ -1178,13 +1207,18 @@ if(filterSel){var naOpt=Array.from(filterSel.options).find(function(o){return o.
 
 async function markAsSent(aiId,method){
   var nowIso=new Date().toISOString();
-  var patch={proposal_status:'sent',sent_at:nowIso};
+  var current=null;
+  allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(aiId)) current=c.ai;});
+  var terminal=isProposalAccepted(current)||isProposalRejected(current);
+  var patch={sent_at:nowIso};
+  if(!terminal) patch.proposal_status='sent';
   if(method==='email') patch.email_sent_at=nowIso;
   if(method==='whatsapp') patch.whatsapp_sent_at=nowIso;
-  allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(aiId)){Object.assign(c.ai,{proposal_status:'sent',sent_at:nowIso});if(method==='email') c.ai.email_sent_at=nowIso;if(method==='whatsapp') c.ai.whatsapp_sent_at=nowIso;}});
+  allClients.forEach(function(c){if(c.ai&&String(c.ai.ai_id)===String(aiId)){Object.assign(c.ai,patch);}});
   renderClientList();
   try{var sess=await sb.auth.getSession();var token=(sess.data&&sess.data.session)?sess.data.session.access_token:ANON;await fetch(SUPA+'/rest/v1/ai_results?ai_id=eq.'+encodeURIComponent(aiId),{method:'PATCH',headers:{'Content-Type':'application/json','apikey':ANON,'Authorization':'Bearer '+token,'Prefer':'return=minimal'},body:JSON.stringify(patch)});}catch(e){console.warn('Status persist failed:',e);}
-  var pill=document.getElementById('chPill');if(pill){pill.className='pill sent';pill.textContent='Sent';}
+  var ps=current?getProposalStatus(current):'sent';
+  var pill=document.getElementById('chPill');if(pill){pill.className='pill '+getPillClass(ps);pill.textContent=getPillLabel(ps,true);}
   document.getElementById('attnBanner').classList.remove('on');
   tevSet('sent',new Date().toISOString(),'Sent');
 }
@@ -1273,7 +1307,7 @@ async function loadClients(){
     var aiRows=await aiRes.json();
     if(!Array.isArray(aiRows)){console.warn('ai_results fetch failed:',aiRows);aiRows=[];}
     var aiByEmail={};
-    (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(!k) return;if(!aiByEmail[k]){aiByEmail[k]=r;return;}var cur=aiByEmail[k];function score(x){return(x.pdf_url?100:0)+(x.email_sent_at||x.sent_at||x.whatsapp_sent_at?10:0)+(x.email_opened_at?5:0)+(x.proposal_viewed_at?5:0)+(x.client_engaged?20:0);}if(score(r)>score(cur)) aiByEmail[k]=r;});
+    (aiRows||[]).forEach(function(r){var k=(r.client_email||'').toLowerCase().trim();if(!k) return;if(!aiByEmail[k]){aiByEmail[k]=r;return;}var cur=aiByEmail[k];if(proposalSelectionScore(r)>proposalSelectionScore(cur)) aiByEmail[k]=r;});
     allClients=unique.map(function(l){var k=(l.client_email||'').toLowerCase().trim();return{lead:l,ai:aiByEmail[k]||null};});
     Object.keys(aiByEmail).forEach(function(k){var exists=unique.some(function(l){return(l.client_email||'').toLowerCase().trim()===k;});if(!exists) allClients.push({lead:null,ai:aiByEmail[k]});});
     renderClientList();
@@ -1462,7 +1496,7 @@ async function loadAnalytics(force){
   /* ── Pipeline counts ── */
   var total=allClients.length;
   var won=allClients.filter(function(c){
-    return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');
+    return isProposalAccepted(c.ai);
   }).length;
   var sent=allClients.filter(function(c){
     return c.ai&&(c.ai.email_sent_at||c.ai.whatsapp_sent_at||c.ai.sent_at);
@@ -1481,13 +1515,13 @@ async function loadAnalytics(force){
 
   /* ── Won-only value & hot leads ── */
   var wonVal=allClients.filter(function(c){
-    return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');
+    return isProposalAccepted(c.ai);
   }).reduce(function(s,c){return s+(parseFloat(c.ai.total_cost)||0);},0);
   var avgDeal=won>0?wonVal/won:0;
   var hotLeads=allClients.filter(function(c){
     return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at)
-        &&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')
-        &&c.ai.proposal_status!=='rejected';
+        &&!isProposalAccepted(c.ai)
+        &&!isProposalRejected(c.ai);
   }).length;
 
   /* ══ FIX 1: HERO METRICS — use correct element IDs (ovPipelineValue etc) ══ */
@@ -1547,7 +1581,7 @@ async function loadAnalytics(force){
   var heatEl=document.getElementById('ovClientHeat');
   if(heatEl){
     var heatClients=allClients.filter(function(c){
-      return c.ai&&c.ai.pdf_url&&c.ai.proposal_status!=='accepted'&&c.ai.proposal_status!=='rejected';
+      return c.ai&&c.ai.pdf_url&&!isProposalAccepted(c.ai)&&!isProposalRejected(c.ai);
     }).sort(function(a,b){
       function sc(x){return(x.ai.proposal_viewed_at?3:0)+(x.ai.email_opened_at?2:0)+((x.ai.email_sent_at||x.ai.sent_at)?1:0);}
       return sc(b)-sc(a);
@@ -1588,8 +1622,8 @@ async function loadAnalytics(force){
     var nowT=Date.now();
     allClients.filter(function(c){
       return c.ai&&c.ai.proposal_viewed_at
-        &&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')
-        &&c.ai.proposal_status!=='rejected';
+        &&!isProposalAccepted(c.ai)
+        &&!isProposalRejected(c.ai);
     }).slice(0,3).forEach(function(c){
       actions.push('📞 Call '+esc(c.ai.client_name||'client')+' — viewed proposal, follow up now');
     });
@@ -1598,7 +1632,7 @@ async function loadAnalytics(force){
       var sentT=ai.email_sent_at||ai.sent_at||ai.whatsapp_sent_at;
       return sentT&&!ai.proposal_viewed_at&&!ai.email_opened_at
         &&(nowT-new Date(sentT).getTime())>3*86400000
-        &&!(ai.client_engaged||ai.proposal_status==='accepted');
+        &&!isProposalAccepted(ai);
     }).slice(0,3).forEach(function(c){
       actions.push('📩 Resend to '+esc(c.ai.client_name||'client')+' — sent 3+ days ago, not opened');
     });
@@ -1719,11 +1753,11 @@ async function loadAnalytics(force){
   var pGen=withPdf.length;
   var pSent=allClients.filter(function(c){return c.ai&&(c.ai.email_sent_at||c.ai.whatsapp_sent_at||c.ai.sent_at);}).length;
   var pViewed=allClients.filter(function(c){return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at);}).length;
-  var pWon=allClients.filter(function(c){return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');}).length;
+  var pWon=allClients.filter(function(c){return isProposalAccepted(c.ai);}).length;
   var pipeVal=allClients.reduce(function(s,c){return s+(c.ai?parseFloat(c.ai.total_cost)||0:0);},0);
-  var wonVal2=allClients.filter(function(c){return c.ai&&(c.ai.client_engaged===true||c.ai.proposal_status==='accepted');}).reduce(function(s,c){return s+(parseFloat(c.ai.total_cost)||0);},0);
+  var wonVal2=allClients.filter(function(c){return isProposalAccepted(c.ai);}).reduce(function(s,c){return s+(parseFloat(c.ai.total_cost)||0);},0);
   var wonRate2=pSent>0?Math.round((pWon/pSent)*100):0;
-  var hotLeads2=allClients.filter(function(c){return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at)&&!(c.ai.client_engaged||c.ai.proposal_status==='accepted')&&c.ai.proposal_status!=='rejected';}).length;
+  var hotLeads2=allClients.filter(function(c){return c.ai&&(c.ai.proposal_viewed_at||c.ai.email_opened_at)&&!isProposalAccepted(c.ai)&&!isProposalRejected(c.ai);}).length;
   var avgDeal2=pWon>0?wonVal2/pWon:0;
 
   document.getElementById('pTotal').textContent=pTotal;
@@ -1820,7 +1854,7 @@ var STAGE_TIMESTAMPS = {
 
 // Pull only won jobs (proposal_status = accepted) from allClients
 var wonJobs = allClients.filter(function(c) {
-  return c.ai && (c.ai.client_engaged === true || c.ai.proposal_status === 'accepted');
+  return isProposalAccepted(c.ai);
 });
 
 var jWonCount = wonJobs.length;
@@ -2063,14 +2097,11 @@ if (jobsTableBody) {
   });
 
   var wonRows=rows.filter(function(r){
-    return r.client_engaged||
-           r.proposal_status==='accepted'||
-           r.won_at;
+    return isProposalAccepted(r);
   });
 
   var rejectedRows=rows.filter(function(r){
-    return r.proposal_status==='rejected'||
-           r.rejected_at;
+    return isProposalRejected(r);
   });
 
   var pipeline=sum(completed,'total_cost');
@@ -2086,11 +2117,7 @@ if (jobsTableBody) {
 
   var hotRows=rows.filter(function(r){
 
-    if(
-      r.client_engaged||
-      r.proposal_status==='accepted'||
-      r.proposal_status==='rejected'
-    ) return false;
+    if(isProposalAccepted(r)||isProposalRejected(r)) return false;
 
     return !!(
       r.pdf_downloaded_at||
@@ -2143,9 +2170,7 @@ function renderAllDashTabs(rows){
          r.whatsapp_sent_at;
 })
     .length,opened=rows.filter(function(r){return r.email_opened_at;}).length,viewed=rows.filter(function(r){return r.proposal_viewed_at;}).length,downloaded=rows.filter(function(r){return r.pdf_downloaded_at;}).length,engaged=rows.filter(function(r){
-  return r.client_engaged||
-         r.proposal_status==='accepted'||
-         r.won_at;
+  return isProposalAccepted(r);
 }).length
   d('pTotal',total);d('pGenerated',generated);d('pSent',sent);d('pEngaged',engaged);
   var rates=[{lbl:'Lead→Proposal',val:pct(generated,total)},{lbl:'Email Open',val:pct(opened,sent)},{lbl:'View Rate',val:pct(viewed,sent)},{lbl:'Download',val:pct(downloaded,sent)},{lbl:'Won Rate',val:pct(engaged,sent)}];
@@ -2160,7 +2185,7 @@ function renderAllDashTabs(rows){
 }).slice(0,20);
   d('pTableCount',sentRows.length+' sent');
   if(!sentRows.length){document.getElementById('pFollowTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:14px">No proposals sent yet</td></tr>';}
-  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var ds=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var st,fu,fc;if(r.proposal_status==='accepted'){st='Won';fu='Closed';fc='fp-closed';}else if(r.pdf_downloaded_at){st='DL';fu='Hot — call now';fc='fp-hot';}else if(r.proposal_viewed_at&&ds>=2){st='Viewed';fu='Hot — call now';fc='fp-hot';}else if(r.email_opened_at&&ds>=3){st='Opened';fu='Warm — follow up';fc='fp-warm';}else if(ds>=7){st='Sent';fu='Cold — resend';fc='fp-cold';}else{st='Sent';fu='Waiting';fc='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong></td><td>'+esc(r.location||'—')+'</td><td>'+st+'</td><td class="'+fc+'">'+fu+'</td><td>'+(ds!==null?ds+'d':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
+  else{document.getElementById('pFollowTable').innerHTML=sentRows.map(function(r){var ds=r.email_sent_at?Math.floor((Date.now()-new Date(r.email_sent_at))/86400000):null;var st,fu,fc;if(isProposalAccepted(r)){st='Won';fu='Closed';fc='fp-closed';}else if(r.pdf_downloaded_at){st='DL';fu='Hot — call now';fc='fp-hot';}else if(r.proposal_viewed_at&&ds>=2){st='Viewed';fu='Hot — call now';fc='fp-hot';}else if(r.email_opened_at&&ds>=3){st='Opened';fu='Warm — follow up';fc='fp-warm';}else if(ds>=7){st='Sent';fu='Cold — resend';fc='fp-cold';}else{st='Sent';fu='Waiting';fc='fp-wait';}return'<tr><td><strong>'+esc(r.client_name||'—')+'</strong></td><td>'+esc(r.location||'—')+'</td><td>'+st+'</td><td class="'+fc+'">'+fu+'</td><td>'+(ds!==null?ds+'d':'—')+'</td><td>R '+fmt(r.total_cost)+'</td></tr>';}).join('');}
 }
 
 function avg(arr,key){var v=arr.map(function(r){return parseFloat(r[key])||0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:0;}
