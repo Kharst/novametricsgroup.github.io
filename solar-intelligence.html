@@ -2236,56 +2236,112 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
   /* Each step: { selector, title, body, position, waitForAction, actionHint } */
   /*   waitForAction: if true, the "next" button is hidden and the tour
        advances automatically when the user interacts with the element  */
-  var DESIGN_STEPS = [
-    {
-      selector: '#loc-display',
-      title: '📍 Step 1: Choose a Location',
-      body: 'Click here and <strong>search for the client\'s city or town</strong>. This sets the solar irradiance for the design. Start typing to filter the list.',
-      position: 'bottom',
-      waitForAction: false
-    },
-    {
-      selector: '#lb-trigger',
-      title: '⚡ Step 2: Add the Client\'s Appliances',
-      body: 'Click <strong>"Add Appliances…"</strong> to open the Load Builder. Pick quick templates like "Average Home" or tap individual appliances. This tells the system how much power the client needs each day.',
-      position: 'bottom',
-      waitForAction: false
-    },
-    {
-      selector: '#sel-autonomy',
-      title: '🌙 Step 3: Set Evening Backup Hours',
-      body: 'Choose how many hours of battery backup the client needs after dark. <strong>8 hours</strong> covers a typical SA evening. Adjust up for longer outages.',
-      position: 'bottom',
-      waitForAction: false
-    },
-    {
-      selector: '#sel-tariff',
-      title: '💰 Step 4: Select the Client\'s Electricity Tariff',
-      body: 'Choose the client\'s <strong>rate per kWh</strong> from their municipality or Eskom bill. This is used to calculate savings and payback period.',
-      position: 'bottom',
-      waitForAction: false
-    },
-    {
-      selector: '#sel-markup',
-      title: '📈 Step 5: Set Your Markup',
-      body: 'Choose your <strong>profit margin</strong> on this job. The system adds this on top of hardware costs to give you the suggested client price. 10–15% is typical.',
-      position: 'bottom',
-      waitForAction: false
-    },
-    {
-      selector: '.btn-calc',
-      title: '⚡ Step 6: Design the System!',
-      body: 'All inputs are set. Click <strong>"⚡ Design System"</strong> — the engine will instantly size the panels, battery, and inverter to meet NRS 097-2-1 compliance. Your results appear in the tabs below.',
-      position: 'top',
-      waitForAction: false,
-      isFinal: true
-    }
-  ];
-
-  /* ── State ──────────────────────────────────────────────────────── */
-  var currentStep = 0;
-  var tourActive  = false;
-  var totalSteps  = DESIGN_STEPS.length;
+ var DESIGN_STEPS = [
+/* ── PHASE 1: Inputs ── /
+{
+selector: '#loc-display',
+title: '📍 Step 1 — Pick the Client's Location',
+body: 'Click here and <strong>search for the client's city or town</strong>. This sets the solar irradiance used for the design. Start typing to filter.',
+position: 'bottom', waitForAction: false
+},
+{
+selector: '#lb-trigger',
+title: '⚡ Step 2 — Add the Client's Appliances',
+body: 'Click <strong>"Add Appliances…"</strong>. Pick a quick template like "Average Home" or tap individual items. This tells the engine how much power is needed each day.',
+position: 'bottom', waitForAction: false
+},
+{
+selector: '#sel-autonomy',
+title: '🌙 Step 3 — Evening Backup Hours',
+body: 'How many hours of battery power does the client need after dark? <strong>8 hours</strong> covers a typical South African evening. Adjust up for longer outage protection.',
+position: 'bottom', waitForAction: false
+},
+{
+selector: '#sel-tariff',
+title: '💰 Step 4 — Client's Electricity Tariff',
+body: 'Select the client's <strong>rate per kWh</strong> from their Eskom or municipality bill. This calculates savings and payback period.',
+position: 'bottom', waitForAction: false
+},
+{
+selector: '#sel-markup',
+title: '📈 Step 5 — Your Markup',
+body: 'Set your <strong>profit margin</strong> on this job. The engine adds it on top of hardware cost to give you the suggested client price. 10–15% is typical.',
+position: 'bottom', waitForAction: false
+},
+{
+selector: '.btn-calc',
+title: '⚡ Step 6 — Design the System',
+body: 'All inputs are set. Click <strong>"⚡ Design System"</strong>. The engine instantly sizes the panels, battery, and inverter to meet NRS 097-2-1 compliance. Your results appear in the tabs below.',
+position: 'top', waitForAction: false, isFinal: false, waitForCalc: false
+},
+/ ── PHASE 2: Results tabs — only shown after calculate() runs ── /
+{
+selector: '.tab[onclick="tab-solar"]',
+title: '☀️ Step 7 — Solar Array Tab',
+body: 'Click the <strong>☀️ Solar Array</strong> tab. You'll see the recommended panel brand, how many panels, roof space needed, and daily generation.',
+position: 'below', waitForCalc: true
+},
+{
+selector: '.tab[onclick*="tab-battery"]',
+title: '🔋 Step 8 — Battery Tab',
+body: 'Click <strong>🔋 Battery</strong>. This shows which battery is recommended, how many units are needed, and runtime during a power outage.',
+position: 'below', waitForCalc: true
+},
+{
+selector: '.tab[onclick*="tab-inverter"]',
+title: '⚡ Step 9 — Inverter Tab',
+body: 'Click <strong>⚡ Inverter</strong>. Check the inverter size, DC/AC ratio, and NRS 097-2-1 compliance status. A green badge means the design is compliant.',
+position: 'below', waitForCalc: true
+},
+{
+selector: '.tab[onclick*="tab-financials"]',
+title: '💰 Step 10 — Financials Tab',
+body: 'Click <strong>💰 Financials</strong>. This shows the payback period, 25-year savings, and NPV — your most powerful tool for closing the sale.',
+position: 'below', waitForCalc: true
+},
+{
+selector: '.tab[onclick*="tab-enviro"]',
+title: '🌿 Step 11 — Environment Tab',
+body: 'Click <strong>🌿 Environment</strong>. Shows CO₂ saved, trees equivalent, and water saved. Very useful for clients who care about green impact.',
+position: 'below', waitForCalc: true
+},
+{
+selector: '.tab[onclick*="tab-proposal"]',
+title: '📋 Step 12 — Generate Proposal Tab',
+body: 'Click <strong>📋 Generate Proposal</strong>. This is where you turn the design into a professional PDF for your client. Click the tab now to continue.',
+position: 'below', waitForCalc: true
+},
+/* ── PHASE 3: Proposal form ── */
+{
+selector: '#p-name',
+title: '👤 Step 13 — Client's Name',
+body: 'Type the <strong>client's full name</strong>. This appears on the front page of the proposal PDF.',
+position: 'bottom', waitForCalc: true
+},
+{
+selector: '#p-email',
+title: '📧 Step 14 — Client's Email',
+body: 'Enter the <strong>client's email address</strong>. You can email the proposal directly from the next screen.',
+position: 'bottom', waitForCalc: true
+},
+{
+selector: '.ct-toggle',
+title: '🏠 Step 15 — Client Type',
+body: 'Choose <strong>Residential</strong> for a homeowner (4-page plain-language PDF) or <strong>Commercial</strong> for a business (8-page technical report with NPV, IRR, and NERSA detail).',
+position: 'bottom', waitForCalc: true
+},
+{
+selector: '#btn-gen',
+title: '📄 Step 16 — Generate the Proposal',
+body: 'Click the green <strong>"Generate Proposal"</strong> button. The AI engine builds a professional PDF in seconds and saves it to your Proposal Portal. You're almost done!',
+position: 'top', waitForCalc: true, isFinal: true
+}
+];
+/* ── State ──────────────────────────────────────────────────────── */
+var currentStep = 0;
+var tourActive  = false;
+var calcDone    = false;
+var totalSteps  = DESIGN_STEPS.length;
 
   /* ── Helpers ──────────────────────────────────────────────────────*/
   function $(sel) { return document.querySelector(sel); }
@@ -2524,76 +2580,168 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
     observer.observe(appScreen, { attributes: true });
   }
 
-  /* ── Hook into the existing calculate() to detect first design ─── */
-  /* We wrap the existing calculate function to detect when it succeeds */
-  function hookCalculate() {
-    // Wait for the page to fully define window.calculate
-    var maxWait = 50;
-    var attempts = 0;
-    var interval = setInterval(function() {
-      attempts++;
-      if (typeof window.calculate === 'function') {
-        clearInterval(interval);
-        var originalCalc = window.calculate;
-        window.calculate = function() {
-          originalCalc.apply(this, arguments);
-          // After calc runs, check if a result was produced
-          setTimeout(function() {
-            // calcResult is defined in the outer scope of the page
-            if (typeof calcResult !== 'undefined' && calcResult && calcResult.systemRecommended) {
-              onFirstDesignComplete();
-            }
-          }, 400);
-        };
-      }
-      if (attempts > maxWait) clearInterval(interval);
-    }, 100);
+  
+/* ── Hook into calculate() — advances tour to tabs after design runs ── /
+function hookCalculate() {
+var attempts = 0;
+var interval = setInterval(function() {
+attempts++;
+if (typeof window.calculate === 'function') {
+clearInterval(interval);
+var originalCalc = window.calculate;
+window.calculate = function() {
+originalCalc.apply(this, arguments);
+setTimeout(function() {
+if (typeof calcResult !== 'undefined' && calcResult && calcResult.systemRecommended) {
+calcDone = true;
+/ Show the V1 first-design banner /
+onFirstDesignComplete();
+/ If tour is still active and on step 6, auto-advance to tab steps */
+if (tourActive && currentStep === 5) {
+currentStep++;
+renderStep(currentStep);
+}
+}
+}, 500);
+};
+}
+if (attempts > 60) clearInterval(interval);
+}, 100);
+}
+/* ── Hook into generateProposal() — fires Phase 4 congrats spotlight ── /
+function hookGenerate() {
+var attempts = 0;
+var interval = setInterval(function() {
+attempts++;
+if (typeof window.generateProposal === 'function') {
+clearInterval(interval);
+var originalGen = window.generateProposal;
+window.generateProposal = function() {
+originalGen.apply(this, arguments);
+/ Poll until .success-card gets class "on" /
+var polls = 0;
+var poll = setInterval(function() {
+polls++;
+var card = document.querySelector('.success-card');
+if (card && card.classList.contains('on')) {
+clearInterval(poll);
+/ End the step tour silently then show congrats */
+tourActive = false;
+try { localStorage.setItem(LS_DESIGN, '1'); } catch(e) {}
+setTimeout(showCongratsSpotlight, 400);
+}
+if (polls > 40) clearInterval(poll);
+}, 300);
+};
+}
+if (attempts > 60) clearInterval(interval);
+}, 100);
+}
+/* ── Phase 4: spotlight the success-actions buttons with congrats ── */
+function showCongratsSpotlight() {
+var actionsEl = document.querySelector('.success-actions');
+if (!actionsEl) return;
+actionsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+setTimeout(function() {
+  var r = rect(actionsEl);
+
+  /* Activate overlay */
+  var overlay = $('#wt-overlay');
+  overlay.classList.add('active');
+
+  /* Curtains */
+  positionCurtains(r);
+
+  /* Gold ring — green tint for success */
+  var ring = $('#wt-ring');
+  ring.style.display  = 'block';
+  ring.style.left     = (r.left - PADDING) + 'px';
+  ring.style.top      = (r.top  - PADDING) + 'px';
+  ring.style.width    = (r.width  + PADDING * 2) + 'px';
+  ring.style.height   = (r.height + PADDING * 2) + 'px';
+  ring.style.borderColor  = '#34d399';
+  ring.style.boxShadow = '0 0 0 4px rgba(52,211,153,.15), 0 0 32px rgba(52,211,153,.22)';
+
+  /* Arrow pointing down at the buttons */
+  var arrow = $('#wt-arrow');
+  arrow.style.display = 'block';
+  arrow.innerHTML     = '👇';
+  arrow.style.left    = (r.left + r.width / 2 - 13) + 'px';
+  arrow.style.top     = (r.bottom + PADDING + 4) + 'px';
+
+  /* Tooltip above the buttons */
+  var tip = $('#wt-tooltip');
+  tip.style.display = 'block';
+
+  var tw = 320, th = 220;
+  var x = r.left + r.width / 2 - tw / 2;
+  var y = r.top - PADDING - 50 - th;
+  x = Math.max(12, Math.min(x, vw() - tw - 12));
+  y = Math.max(12, Math.min(y, vh() - th - 12));
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+  tip.style.borderColor = 'rgba(52,211,153,.35)';
+
+  /* Fill content */
+  $('#wt-step-label').textContent = '🎉 Proposal Ready!';
+  $('#wt-title').innerHTML  = '🎉 First proposal — well done!';
+  $('#wt-body').innerHTML   =
+    'Your proposal PDF is saved. Use the buttons below to <strong>download it</strong>, ' +
+    '<strong>open it in the Proposal Portal</strong>, or start a new design.<br><br>' +
+    'Once you\'ve sent it to your client, hop over to the ' +
+    '<strong>Proposal Portal</strong> — that\'s where all your proposals live.';
+
+  /* Replace the action buttons with two CTAs */
+  var acts = document.getElementById('wt-acts');
+  if (acts) {
+    acts.innerHTML =
+      '<a href="prposal_portal.html" class="wt-btn-next" style="text-decoration:none;background:#34d399;color:#064e3b;flex:1;text-align:center;">Go to Proposal Portal →</a>' +
+      '<button class="wt-btn-skip" id="wt-congrats-done">Got it ✓</button>';
+    var doneBtn = document.getElementById('wt-congrats-done');
+    if (doneBtn) doneBtn.addEventListener('click', function() {
+      endTour(false);
+      /* Reset ring colour for next tour replay */
+      var r2 = $('#wt-ring');
+      if (r2) { r2.style.borderColor = ''; r2.style.boxShadow = ''; }
+      var t2 = $('#wt-tooltip');
+      if (t2) { t2.style.borderColor = ''; }
+    });
   }
 
-  /* ── Called when first design completes ─────────────────────────── */
-  function onFirstDesignComplete() {
-    try {
-      var alreadyShown = localStorage.getItem(LS_FIRST);
-      if (alreadyShown) return; // don't show again
-      localStorage.setItem(LS_FIRST, '1');
-    } catch(e) {}
-
-    // Show the completion banner (it's inside #app-screen, before .input-strip)
-    var banner = document.getElementById('wt-complete-banner');
-    if (banner) banner.classList.add('show');
-
-    // Also move it to just before .input-strip so it's visible at the top
-    var inputStrip = document.querySelector('.input-strip');
-    var appScreen  = document.getElementById('app-screen');
-    if (inputStrip && appScreen && banner) {
-      appScreen.insertBefore(banner, inputStrip);
+  /* Build dots — all done */
+  var dotsEl = $('#wt-dots');
+  if (dotsEl) {
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < 6; i++) {
+      var d = document.createElement('div');
+      d.className = 'wt-dot done';
+      dotsEl.appendChild(d);
     }
   }
 
-  /* ── Reposition on window resize ──────────────────────────────── */
-  function handleResize() {
-    if (!tourActive) return;
-    var step = DESIGN_STEPS[currentStep];
-    if (!step) return;
-    var el = $(step.selector);
-    if (!el) return;
-    var r = rect(el);
-    positionCurtains(r);
-    positionRing(r);
-    positionArrow(r, step.position);
-    positionTooltip(r, step.position);
-  }
-  window.addEventListener('resize', handleResize);
-
-  /* ── Initialise ─────────────────────────────────────────────────── */
-  document.addEventListener('DOMContentLoaded', function() {
-    wireButtons();
-    watchForAppScreen();
-    hookCalculate();
-  });
-
-  /* Also expose for manual trigger from console if needed */
-  window.nmStartTour = startTour;
+}, 400);
+}
+/* ── Override renderStep to skip waitForCalc steps if calc not done ── /
+var _originalRenderStep = renderStep;
+function renderStep(idx) {
+var step = DESIGN_STEPS[idx];
+if (!step) { endTour(false); return; }
+/ Skip tabs/proposal steps if calc hasn't run yet */
+if (step.waitForCalc && !calcDone) { endTour(false); return; }
+_originalRenderStep(idx);
+}
+window.nmStartTour = startTour;
+/* Also expose reset helper for testing */
+window.nmTourReset = function() {
+try {
+localStorage.removeItem(LS_DESIGN);
+localStorage.removeItem(LS_FIRST);
+} catch(e) {}
+calcDone = false;
+currentStep = 0;
+startTour();
+};
 
 })();
 /* ═══════════════════════════════════════════════════════════════════
