@@ -201,6 +201,229 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 .lb-clear{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:5px;transition:.15s;}
 .lb-clear:hover{color:var(--red);}
 
+ /* ═══════════════════════════════════════════════════════════════
+   NOVA METRICS — GUIDED WALKTHROUGH SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dark overlay that covers everything except the spotlight element */
+#wt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+#wt-overlay.active { pointer-events: all; }
+
+/* The four dark curtain panels that surround the spotlight hole */
+.wt-curtain {
+  position: fixed;
+  background: rgba(5, 14, 28, 0.82);
+  backdrop-filter: blur(1px);
+  z-index: 9001;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animated gold ring around the spotlight target */
+.wt-spotlight-ring {
+  position: fixed;
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  box-shadow: 0 0 0 4px rgba(255,215,0,0.18), 0 0 32px rgba(255,215,0,0.22);
+  z-index: 9002;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: wt-pulse 2s ease-in-out infinite;
+}
+@keyframes wt-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,215,0,0.18), 0 0 32px rgba(255,215,0,0.22); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,215,0,0.08), 0 0 48px rgba(255,215,0,0.35); }
+}
+
+/* Animated bouncing arrow pointing at the target */
+.wt-arrow {
+  position: fixed;
+  z-index: 9003;
+  pointer-events: none;
+  font-size: 26px;
+  color: #FFD700;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.7));
+  animation: wt-bounce 0.9s ease-in-out infinite;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes wt-bounce {
+  0%, 100% { transform: translateY(0);  }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Tooltip bubble */
+#wt-tooltip {
+  position: fixed;
+  z-index: 9004;
+  background: #0d2040;
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 14px;
+  padding: 18px 22px;
+  max-width: 320px;
+  min-width: 260px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+#wt-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, #FFD700, transparent);
+}
+.wt-step-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wt-step-dots {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.wt-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.2);
+  transition: background 0.2s;
+}
+.wt-dot.done { background: #FFD700; }
+.wt-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: #f0f4f8;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.wt-body {
+  font-size: 12.5px;
+  color: #7a95af;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.wt-body strong { color: #f0f4f8; }
+.wt-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wt-btn-next {
+  background: #FFD700;
+  color: #0B1F3A;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+.wt-btn-next:hover { background: #fff; }
+.wt-btn-skip {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #7a95af;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.wt-btn-skip:hover { color: #f87171; border-color: rgba(248,113,113,0.3); }
+
+/* Completion banner shown after first successful design */
+#wt-complete-banner {
+  display: none;
+  background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.04));
+  border: 1.5px solid rgba(52,211,153,0.35);
+  border-radius: 13px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: wt-up 0.4s ease;
+}
+#wt-complete-banner.show { display: flex; }
+@keyframes wt-up {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.wt-banner-icon {
+  width: 44px; height: 44px;
+  background: rgba(52,211,153,0.15);
+  border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.wt-banner-text { flex: 1; }
+.wt-banner-text strong {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #f0f4f8;
+  display: block;
+  margin-bottom: 3px;
+}
+.wt-banner-text span { font-size: 12px; color: #7a95af; line-height: 1.5; }
+.wt-banner-cta {
+  background: #FFD700;
+  color: #0B1F3A;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.wt-banner-cta:hover { background: #fff; transform: translateY(-1px); }
+
+/* "?" help button — always visible so installer can re-trigger tour */
+#wt-help-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.3);
+  color: #FFD700;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 8999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+#wt-help-btn:hover { background: rgba(255,215,0,0.22); transform: scale(1.1); }
+#wt-help-btn.visible { display: flex; } 
+
   /* ── Real-World Performance Panel ── */
 .rw-panel{border:1px solid rgba(251,191,36,.20);border-radius:10px;padding:16px 18px;background:rgba(251,191,36,.04);margin-top:18px;}
 .rw-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;display:flex;align-items:center;gap:7px;}
@@ -801,6 +1024,55 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);m
 </div>
 
 <div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     NOVA METRICS GUIDED WALKTHROUGH — HTML ELEMENTS
+     ═══════════════════════════════════════════════════════ -->
+
+<!-- Completion banner — shown inside #app-screen after first design -->
+<div id="wt-complete-banner">
+  <div class="wt-banner-icon">🎉</div>
+  <div class="wt-banner-text">
+    <strong>First design complete — well done!</strong>
+    <span>Your system is sized. Now open the <strong style="color:#f0f4f8">Proposal Portal</strong> to turn it into a professional PDF your client can sign.</span>
+  </div>
+  <a href="prposal_portal.html" class="wt-banner-cta" id="wt-go-portal">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Open Proposal Portal
+  </a>
+</div>
+
+<!-- Overlay curtains (4 panels around the spotlight hole) -->
+<div id="wt-overlay">
+  <div class="wt-curtain" id="wt-top"></div>
+  <div class="wt-curtain" id="wt-bottom"></div>
+  <div class="wt-curtain" id="wt-left"></div>
+  <div class="wt-curtain" id="wt-right"></div>
+</div>
+
+<!-- Gold ring around highlighted element -->
+<div class="wt-spotlight-ring" id="wt-ring" style="display:none"></div>
+
+<!-- Bouncing arrow -->
+<div class="wt-arrow" id="wt-arrow" style="display:none">👆</div>
+
+<!-- Tooltip bubble -->
+<div id="wt-tooltip" style="display:none">
+  <div class="wt-step-badge">
+    <span id="wt-step-label">Step 1 of 6</span>
+    <div class="wt-step-dots" id="wt-dots"></div>
+  </div>
+  <div class="wt-title" id="wt-title"></div>
+  <div class="wt-body" id="wt-body"></div>
+  <div class="wt-actions">
+    <button class="wt-btn-next" id="wt-btn-next">Got it — next ➜</button>
+    <button class="wt-btn-skip" id="wt-btn-skip">Skip tour</button>
+  </div>
+</div>
+
+<!-- Floating help button -->
+<button id="wt-help-btn" title="Show guided tour">?</button>
+  
 <script>
 const SUPA_URL  = 'https://zloxcqrhkcohheeixfns.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
@@ -1948,7 +2220,387 @@ function setClientType(type){
   else{h.className='ct-hint commercial';h.innerHTML='&#127970; <strong>Commercial PDF:</strong> Full technical proposal &#8212; NPV, IRR, Section 12B, NERSA.';if(p)p.textContent='&#127970; Commercial PDF';}
 }
 function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getElementById('panel-'+p).style.display=p===name?'block':'none';});}
-supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'||event==='SIGNED_IN'&&session&&!session.user.last_sign_in_at){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
+
+  /* ═══════════════════════════════════════════════════════════════════
+   NOVA METRICS — GUIDED WALKTHROUGH ENGINE
+   Fires once for first-time installers. Tracks progress in localStorage.
+   ═══════════════════════════════════════════════════════════════════ */
+(function() {
+
+  /* ── Keys ──────────────────────────────────────────────────────── */
+  var LS_DESIGN  = 'nm_tour_design_done';   // set when design tour finished
+  var LS_FIRST   = 'nm_first_design_done';  // set when first calculation done
+  var PADDING    = 10; // px breathing room around spotlight target
+
+  /* ── Tour steps for solar-intelligence.html ────────────────────── */
+  /* Each step: { selector, title, body, position, waitForAction, actionHint } */
+  /*   waitForAction: if true, the "next" button is hidden and the tour
+       advances automatically when the user interacts with the element  */
+  var DESIGN_STEPS = [
+    {
+      selector: '#loc-display',
+      title: '📍 Step 1: Choose a Location',
+      body: 'Click here and <strong>search for the client\'s city or town</strong>. This sets the solar irradiance for the design. Start typing to filter the list.',
+      position: 'bottom',
+      waitForAction: false
+    },
+    {
+      selector: '#lb-trigger',
+      title: '⚡ Step 2: Add the Client\'s Appliances',
+      body: 'Click <strong>"Add Appliances…"</strong> to open the Load Builder. Pick quick templates like "Average Home" or tap individual appliances. This tells the system how much power the client needs each day.',
+      position: 'bottom',
+      waitForAction: false
+    },
+    {
+      selector: '#sel-autonomy',
+      title: '🌙 Step 3: Set Evening Backup Hours',
+      body: 'Choose how many hours of battery backup the client needs after dark. <strong>8 hours</strong> covers a typical SA evening. Adjust up for longer outages.',
+      position: 'bottom',
+      waitForAction: false
+    },
+    {
+      selector: '#sel-tariff',
+      title: '💰 Step 4: Select the Client\'s Electricity Tariff',
+      body: 'Choose the client\'s <strong>rate per kWh</strong> from their municipality or Eskom bill. This is used to calculate savings and payback period.',
+      position: 'bottom',
+      waitForAction: false
+    },
+    {
+      selector: '#sel-markup',
+      title: '📈 Step 5: Set Your Markup',
+      body: 'Choose your <strong>profit margin</strong> on this job. The system adds this on top of hardware costs to give you the suggested client price. 10–15% is typical.',
+      position: 'bottom',
+      waitForAction: false
+    },
+    {
+      selector: '.btn-calc',
+      title: '⚡ Step 6: Design the System!',
+      body: 'All inputs are set. Click <strong>"⚡ Design System"</strong> — the engine will instantly size the panels, battery, and inverter to meet NRS 097-2-1 compliance. Your results appear in the tabs below.',
+      position: 'top',
+      waitForAction: false,
+      isFinal: true
+    }
+  ];
+
+  /* ── State ──────────────────────────────────────────────────────── */
+  var currentStep = 0;
+  var tourActive  = false;
+  var totalSteps  = DESIGN_STEPS.length;
+
+  /* ── Helpers ──────────────────────────────────────────────────────*/
+  function $(sel) { return document.querySelector(sel); }
+  function rect(el) { return el.getBoundingClientRect(); }
+  function vw() { return window.innerWidth; }
+  function vh() { return window.innerHeight; }
+
+  /* ── Build dot indicators ─────────────────────────────────────── */
+  function buildDots() {
+    var container = $('#wt-dots');
+    if (!container) return;
+    container.innerHTML = '';
+    for (var i = 0; i < totalSteps; i++) {
+      var d = document.createElement('div');
+      d.className = 'wt-dot' + (i < currentStep ? ' done' : '');
+      container.appendChild(d);
+    }
+  }
+
+  /* ── Position the four curtain panels around the target ─────────── */
+  function positionCurtains(r) {
+    var top    = $('#wt-top'),
+        bottom = $('#wt-bottom'),
+        left   = $('#wt-left'),
+        right  = $('#wt-right');
+
+    var x1 = r.left   - PADDING;
+    var y1 = r.top    - PADDING;
+    var x2 = r.right  + PADDING;
+    var y2 = r.bottom + PADDING;
+
+    // Top curtain
+    top.style.cssText    = 'top:0;left:0;right:0;height:' + Math.max(0,y1) + 'px;';
+    // Bottom curtain
+    bottom.style.cssText = 'top:' + y2 + 'px;left:0;right:0;bottom:0;';
+    // Left curtain
+    left.style.cssText   = 'top:' + y1 + 'px;left:0;width:' + Math.max(0,x1) + 'px;height:' + (y2-y1) + 'px;';
+    // Right curtain
+    right.style.cssText  = 'top:' + y1 + 'px;left:' + x2 + 'px;right:0;height:' + (y2-y1) + 'px;';
+  }
+
+  /* ── Position the gold spotlight ring ──────────────────────────── */
+  function positionRing(r) {
+    var ring = $('#wt-ring');
+    ring.style.display = 'block';
+    ring.style.left    = (r.left   - PADDING) + 'px';
+    ring.style.top     = (r.top    - PADDING) + 'px';
+    ring.style.width   = (r.width  + PADDING*2) + 'px';
+    ring.style.height  = (r.height + PADDING*2) + 'px';
+  }
+
+  /* ── Position the bouncing arrow ───────────────────────────────── */
+  function positionArrow(r, pos) {
+    var arrow = $('#wt-arrow');
+    arrow.style.display = 'block';
+    if (pos === 'top') {
+      // Arrow below element pointing up — flip it
+      arrow.innerHTML = '👇';
+      arrow.style.left = (r.left + r.width/2 - 13) + 'px';
+      arrow.style.top  = (r.bottom + PADDING + 6) + 'px';
+    } else {
+      // Arrow above element pointing down
+      arrow.innerHTML = '👆';
+      arrow.style.left = (r.left + r.width/2 - 13) + 'px';
+      arrow.style.top  = (r.top - PADDING - 42) + 'px';
+    }
+  }
+
+  /* ── Position the tooltip ──────────────────────────────────────── */
+  function positionTooltip(r, pos) {
+    var tip = $('#wt-tooltip');
+    tip.style.display = 'block';
+    var tw = 320, th = 180; // estimated tooltip size
+    var x, y;
+
+    if (pos === 'bottom') {
+      y = r.bottom + PADDING + 50; // below the element + arrow space
+      x = r.left + r.width/2 - tw/2;
+    } else {
+      y = r.top - PADDING - 50 - th; // above the element
+      x = r.left + r.width/2 - tw/2;
+    }
+
+    // Keep inside viewport
+    x = Math.max(12, Math.min(x, vw() - tw - 12));
+    y = Math.max(12, Math.min(y, vh() - th - 12));
+
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  }
+
+  /* ── Scroll element into view if needed ────────────────────────── */
+  function scrollIntoView(el) {
+    var r = rect(el);
+    var buffer = 100;
+    if (r.top < buffer || r.bottom > vh() - buffer) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  /* ── Render a single step ──────────────────────────────────────── */
+  function renderStep(idx) {
+    var step = DESIGN_STEPS[idx];
+    var el   = $(step.selector);
+    if (!el) { advanceStep(); return; }
+
+    scrollIntoView(el);
+
+    // Small delay to let scroll settle before measuring
+    setTimeout(function() {
+      var r = rect(el);
+
+      // Activate overlay
+      var overlay = $('#wt-overlay');
+      overlay.classList.add('active');
+
+      positionCurtains(r);
+      positionRing(r);
+      positionArrow(r, step.position);
+      positionTooltip(r, step.position);
+
+      // Fill tooltip content
+      $('#wt-step-label').textContent = 'Step ' + (idx+1) + ' of ' + totalSteps;
+      $('#wt-title').innerHTML = step.title;
+      $('#wt-body').innerHTML  = step.body;
+      buildDots();
+
+      // Button label
+      var btn = $('#wt-btn-next');
+      if (step.isFinal) {
+        btn.textContent = 'Got it — let\'s design! ⚡';
+      } else {
+        btn.textContent = 'Got it — next ➜';
+      }
+
+    }, 350);
+  }
+
+  /* ── Advance to the next step ──────────────────────────────────── */
+  function advanceStep() {
+    currentStep++;
+    if (currentStep >= totalSteps) {
+      endTour(false); // finished without calculating yet
+      return;
+    }
+    renderStep(currentStep);
+  }
+
+  /* ── End (or skip) the tour ──────────────────────────────────────*/
+  function endTour(skipped) {
+    tourActive = false;
+    var overlay = $('#wt-overlay');
+    overlay.classList.remove('active');
+
+    ['wt-top','wt-bottom','wt-left','wt-right'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.cssText = 'top:0;left:0;width:0;height:0;';
+    });
+
+    var ring  = $('#wt-ring');
+    var arrow = $('#wt-arrow');
+    var tip   = $('#wt-tooltip');
+    if (ring)  ring.style.display  = 'none';
+    if (arrow) arrow.style.display = 'none';
+    if (tip)   tip.style.display   = 'none';
+
+    if (!skipped) {
+      // Mark tour as done so it never shows again
+      try { localStorage.setItem(LS_DESIGN, '1'); } catch(e) {}
+    }
+
+    // Show the floating ? help button
+    var hbtn = $('#wt-help-btn');
+    if (hbtn) hbtn.classList.add('visible');
+  }
+
+  /* ── Start the tour ─────────────────────────────────────────────── */
+  function startTour() {
+    // Only show on the app screen (after login)
+    var appScreen = $('#app-screen');
+    if (!appScreen || appScreen.style.display === 'none') return;
+
+    tourActive    = true;
+    currentStep   = 0;
+    renderStep(0);
+  }
+
+  /* ── Check if we should auto-start ─────────────────────────────── */
+  function maybeAutoStart() {
+    try {
+      var done = localStorage.getItem(LS_DESIGN);
+      if (!done) {
+        // First time — start tour after a short welcome delay
+        setTimeout(startTour, 800);
+      } else {
+        // Already completed — just show the ? help button quietly
+        var hbtn = $('#wt-help-btn');
+        if (hbtn) hbtn.classList.add('visible');
+      }
+    } catch(e) { /* localStorage blocked — just start the tour */ startTour(); }
+  }
+
+  /* ── Wire up button events ──────────────────────────────────────── */
+  function wireButtons() {
+    var nextBtn = document.getElementById('wt-btn-next');
+    var skipBtn = document.getElementById('wt-btn-skip');
+    var helpBtn = document.getElementById('wt-help-btn');
+
+    if (nextBtn) nextBtn.addEventListener('click', function() { advanceStep(); });
+    if (skipBtn) skipBtn.addEventListener('click', function() { endTour(true); });
+    if (helpBtn) helpBtn.addEventListener('click', function() {
+      // Reset and restart
+      currentStep = 0;
+      startTour();
+    });
+  }
+
+  /* ── Hook into the existing showApp() / data loaded moment ─────── */
+  /* We watch for #app-screen becoming visible using MutationObserver */
+  function watchForAppScreen() {
+    var appScreen = document.getElementById('app-screen');
+    if (!appScreen) return;
+
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        if (m.type === 'attributes' && m.attributeName === 'style') {
+          var display = window.getComputedStyle(appScreen).display;
+          if (display !== 'none') {
+            observer.disconnect();
+            // Give the app screen a moment to fully render
+            setTimeout(maybeAutoStart, 600);
+          }
+        }
+      });
+    });
+    observer.observe(appScreen, { attributes: true });
+  }
+
+  /* ── Hook into the existing calculate() to detect first design ─── */
+  /* We wrap the existing calculate function to detect when it succeeds */
+  function hookCalculate() {
+    // Wait for the page to fully define window.calculate
+    var maxWait = 50;
+    var attempts = 0;
+    var interval = setInterval(function() {
+      attempts++;
+      if (typeof window.calculate === 'function') {
+        clearInterval(interval);
+        var originalCalc = window.calculate;
+        window.calculate = function() {
+          originalCalc.apply(this, arguments);
+          // After calc runs, check if a result was produced
+          setTimeout(function() {
+            // calcResult is defined in the outer scope of the page
+            if (typeof calcResult !== 'undefined' && calcResult && calcResult.systemRecommended) {
+              onFirstDesignComplete();
+            }
+          }, 400);
+        };
+      }
+      if (attempts > maxWait) clearInterval(interval);
+    }, 100);
+  }
+
+  /* ── Called when first design completes ─────────────────────────── */
+  function onFirstDesignComplete() {
+    try {
+      var alreadyShown = localStorage.getItem(LS_FIRST);
+      if (alreadyShown) return; // don't show again
+      localStorage.setItem(LS_FIRST, '1');
+    } catch(e) {}
+
+    // Show the completion banner (it's inside #app-screen, before .input-strip)
+    var banner = document.getElementById('wt-complete-banner');
+    if (banner) banner.classList.add('show');
+
+    // Also move it to just before .input-strip so it's visible at the top
+    var inputStrip = document.querySelector('.input-strip');
+    var appScreen  = document.getElementById('app-screen');
+    if (inputStrip && appScreen && banner) {
+      appScreen.insertBefore(banner, inputStrip);
+    }
+  }
+
+  /* ── Reposition on window resize ──────────────────────────────── */
+  function handleResize() {
+    if (!tourActive) return;
+    var step = DESIGN_STEPS[currentStep];
+    if (!step) return;
+    var el = $(step.selector);
+    if (!el) return;
+    var r = rect(el);
+    positionCurtains(r);
+    positionRing(r);
+    positionArrow(r, step.position);
+    positionTooltip(r, step.position);
+  }
+  window.addEventListener('resize', handleResize);
+
+  /* ── Initialise ─────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function() {
+    wireButtons();
+    watchForAppScreen();
+    hookCalculate();
+  });
+
+  /* Also expose for manual trigger from console if needed */
+  window.nmStartTour = startTour;
+
+})();
+/* ═══════════════════════════════════════════════════════════════════
+   END WALKTHROUGH ENGINE
+   ═══════════════════════════════════════════════════════════════════ */
+  
+  supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'||event==='SIGNED_IN'&&session&&!session.user.last_sign_in_at){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const hash=window.location.hash;const isInvite=hash.includes('type=invite');if(isInvite){const{data:{session}}=await supabaseClient.auth.getSession();if(session){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}}const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}})();
 async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
