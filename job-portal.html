@@ -742,8 +742,8 @@ async function dismissDesignChange(){
   if(!currentVisit)return;
   if(!confirm('Proceed with the original proposal design?\n\nThis will be noted in the activity log.'))return;
   try{
-    await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{design_change_acknowledged:true,design_change_reason:'Installer chose to proceed with original proposal design.'});
-    currentVisit={...currentVisit,design_change_acknowledged:true};
+    await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{design_changed:false,design_change_acknowledged:false,design_change_reason:null,design_change_category:null,client_notified_of_change_at:null});
+    currentVisit={...currentVisit,design_changed:false,design_change_acknowledged:false,design_change_reason:null};
     await logActivity('DESIGN CHANGE','Installer confirmed original design — site differences noted');
     const al=document.getElementById('design-change-alert');if(al)al.classList.remove('visible');
     toast('Proceeding with original design','info');
