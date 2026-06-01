@@ -541,6 +541,230 @@ body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);h
 .sb-select{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;padding:6px 8px;border-radius:7px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a95af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:22px;transition:border-color .15s;text-transform:uppercase;letter-spacing:.04em;}
 .sb-select:focus{border-color:rgba(255,215,0,.4);background:rgba(255,215,0,.06);}
 .sb-select option{background:#0d2240;color:var(--text);}  
+
+/* ═══════════════════════════════════════════════════════════════
+   NOVA METRICS — GUIDED WALKTHROUGH SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dark overlay that covers everything except the spotlight element */
+#wt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+}
+#wt-overlay.active { pointer-events: all; }
+
+/* The four dark curtain panels that surround the spotlight hole */
+.wt-curtain {
+  position: fixed;
+  background: rgba(5, 14, 28, 0.82);
+  backdrop-filter: blur(1px);
+  z-index: 9001;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animated gold ring around the spotlight target */
+.wt-spotlight-ring {
+  position: fixed;
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  box-shadow: 0 0 0 4px rgba(255,215,0,0.18), 0 0 32px rgba(255,215,0,0.22);
+  z-index: 9002;
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: wt-pulse 2s ease-in-out infinite;
+}
+@keyframes wt-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(255,215,0,0.18), 0 0 32px rgba(255,215,0,0.22); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,215,0,0.08), 0 0 48px rgba(255,215,0,0.35); }
+}
+
+/* Animated bouncing arrow pointing at the target */
+.wt-arrow {
+  position: fixed;
+  z-index: 9003;
+  pointer-events: none;
+  font-size: 26px;
+  color: #FFD700;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,0.7));
+  animation: wt-bounce 0.9s ease-in-out infinite;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes wt-bounce {
+  0%, 100% { transform: translateY(0);  }
+  50%       { transform: translateY(-8px); }
+}
+
+/* Tooltip bubble */
+#wt-tooltip {
+  position: fixed;
+  z-index: 9004;
+  background: #0d2040;
+  border: 1px solid rgba(255,215,0,0.35);
+  border-radius: 14px;
+  padding: 18px 22px;
+  max-width: 320px;
+  min-width: 260px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+#wt-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, #FFD700, transparent);
+}
+.wt-step-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wt-step-dots {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.wt-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.2);
+  transition: background 0.2s;
+}
+.wt-dot.done { background: #FFD700; }
+.wt-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.05rem;
+  color: #f0f4f8;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.wt-body {
+  font-size: 12.5px;
+  color: #7a95af;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.wt-body strong { color: #f0f4f8; }
+.wt-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wt-btn-next {
+  background: #FFD700;
+  color: #0B1F3A;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+.wt-btn-next:hover { background: #fff; }
+.wt-btn-skip {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #7a95af;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.wt-btn-skip:hover { color: #f87171; border-color: rgba(248,113,113,0.3); }
+
+/* Completion banner shown after first successful design */
+#wt-complete-banner {
+  display: none;
+  background: linear-gradient(135deg, rgba(52,211,153,0.1), rgba(52,211,153,0.04));
+  border: 1.5px solid rgba(52,211,153,0.35);
+  border-radius: 13px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  animation: wt-up 0.4s ease;
+}
+#wt-complete-banner.show { display: flex; }
+@keyframes wt-up {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.wt-banner-icon {
+  width: 44px; height: 44px;
+  background: rgba(52,211,153,0.15);
+  border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.wt-banner-text { flex: 1; }
+.wt-banner-text strong {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem;
+  color: #f0f4f8;
+  display: block;
+  margin-bottom: 3px;
+}
+.wt-banner-text span { font-size: 12px; color: #7a95af; line-height: 1.5; }
+.wt-banner-cta {
+  background: #FFD700;
+  color: #0B1F3A;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.wt-banner-cta:hover { background: #fff; transform: translateY(-1px); }
+
+/* "?" help button — always visible so installer can re-trigger tour */
+#wt-help-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.3);
+  color: #FFD700;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 8999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+#wt-help-btn:hover { background: rgba(255,215,0,0.22); transform: scale(1.1); }
+#wt-help-btn.visible { display: flex; }
+  
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
@@ -1954,6 +2178,221 @@ function vis(id,show,dv){var e=document.getElementById(id);if(e)e.style.display=
 function init(n){return(n||'?').split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();}
 function handleFilterChange(val){activeFilterTab=val;displayCount=PAGE_SIZE;renderClientList();}
 function handleSortChange(val){sortMode=val;displayCount=PAGE_SIZE;renderClientList();}  
+
+/* ═══════════════════════════════════════════════════════════════════
+   NOVA METRICS — PROPOSAL PORTAL GUIDED WALKTHROUGH
+   ═══════════════════════════════════════════════════════════════════ */
+(function() {
+
+  var LS_KEY   = 'nm_tour_portal_done';
+  var PADDING  = 10;
+
+  /* ── Portal-specific tour steps ──────────────────────────────────
+     IMPORTANT: Replace the selectors below with the ACTUAL IDs/classes
+     that exist in your prposal_portal.html. These are best-guess names
+     based on the portal's likely structure. Open the portal in Chrome,
+     right-click each element → Inspect → copy the id or class.
+     ──────────────────────────────────────────────────────────────── */
+  var PORTAL_STEPS = [
+    {
+      selector: '#proposals-list, .proposals-table, table, .proposal-row, [class*="proposal"]',
+      fallbackSelector: 'body',
+      title: '📋 Your Proposals Live Here',
+      body: 'This is the <strong>Proposal Portal</strong>. Every quote you generate in the System Designer appears here as a row. You can open, download as PDF, or send each one to your client.',
+      position: 'bottom'
+    },
+    {
+      selector: '#search-input, input[type="search"], input[placeholder*="search"], input[placeholder*="Search"]',
+      fallbackSelector: 'input[type="text"]',
+      title: '🔍 Find Any Proposal Fast',
+      body: 'Type a <strong>client name, date, or system size</strong> to filter the list. Useful when you have many jobs.',
+      position: 'bottom'
+    },
+    {
+      selector: 'a[href*="pdf"], button[id*="pdf"], button[id*="download"], [class*="download"], [class*="pdf"]',
+      fallbackSelector: '.action-btn, button',
+      title: '📄 Download or Send the PDF',
+      body: 'Click the <strong>PDF / Download</strong> button on any row to get the proposal as a file. You can email it straight to the client or print it to bring to the site.',
+      position: 'top'
+    },
+    {
+      selector: 'a[href*="solar-intelligence"], .nav-link, [href*="solar"]',
+      fallbackSelector: '.top-nav, nav',
+      title: '🔄 Go Back to Design More Systems',
+      body: 'When you\'re ready to design another system for a new client, go back to the <strong>System Designer</strong> using the navigation above. You can run as many designs as you need.',
+      position: 'bottom',
+      isFinal: true
+    }
+  ];
+
+  var currentStep = 0;
+  var tourActive  = false;
+  var totalSteps  = PORTAL_STEPS.length;
+
+  function $(sel) {
+    // Try each comma-separated selector until one matches
+    var parts = sel.split(',');
+    for (var i = 0; i < parts.length; i++) {
+      var el = document.querySelector(parts[i].trim());
+      if (el) return el;
+    }
+    return null;
+  }
+  function rect(el)  { return el.getBoundingClientRect(); }
+  function vw()      { return window.innerWidth; }
+  function vh()      { return window.innerHeight; }
+
+  function buildDots() {
+    var c = document.getElementById('wt-dots');
+    if (!c) return;
+    c.innerHTML = '';
+    for (var i = 0; i < totalSteps; i++) {
+      var d = document.createElement('div');
+      d.className = 'wt-dot' + (i < currentStep ? ' done' : '');
+      c.appendChild(d);
+    }
+  }
+
+  function resolveElement(step) {
+    var el = $(step.selector);
+    if (!el && step.fallbackSelector) el = document.querySelector(step.fallbackSelector);
+    return el;
+  }
+
+  function positionCurtains(r) {
+    var x1=r.left-PADDING, y1=r.top-PADDING, x2=r.right+PADDING, y2=r.bottom+PADDING;
+    document.getElementById('wt-top').style.cssText    = 'top:0;left:0;right:0;height:'+Math.max(0,y1)+'px;';
+    document.getElementById('wt-bottom').style.cssText = 'top:'+y2+'px;left:0;right:0;bottom:0;';
+    document.getElementById('wt-left').style.cssText   = 'top:'+y1+'px;left:0;width:'+Math.max(0,x1)+'px;height:'+(y2-y1)+'px;';
+    document.getElementById('wt-right').style.cssText  = 'top:'+y1+'px;left:'+x2+'px;right:0;height:'+(y2-y1)+'px;';
+  }
+
+  function positionRing(r) {
+    var ring=document.getElementById('wt-ring');
+    ring.style.display='block';
+    ring.style.left=(r.left-PADDING)+'px'; ring.style.top=(r.top-PADDING)+'px';
+    ring.style.width=(r.width+PADDING*2)+'px'; ring.style.height=(r.height+PADDING*2)+'px';
+  }
+
+  function positionArrow(r, pos) {
+    var a=document.getElementById('wt-arrow'); a.style.display='block';
+    if (pos==='top') {
+      a.innerHTML='👇';
+      a.style.left=(r.left+r.width/2-13)+'px'; a.style.top=(r.bottom+PADDING+6)+'px';
+    } else {
+      a.innerHTML='👆';
+      a.style.left=(r.left+r.width/2-13)+'px'; a.style.top=(r.top-PADDING-42)+'px';
+    }
+  }
+
+  function positionTooltip(r, pos) {
+    var tip=document.getElementById('wt-tooltip'), tw=320, th=200, x, y;
+    tip.style.display='block';
+    if (pos==='bottom') { y=r.bottom+PADDING+50; x=r.left+r.width/2-tw/2; }
+    else                { y=r.top-PADDING-50-th;  x=r.left+r.width/2-tw/2; }
+    x=Math.max(12,Math.min(x,vw()-tw-12)); y=Math.max(12,Math.min(y,vh()-th-12));
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+  }
+
+  function renderStep(idx) {
+    var step=PORTAL_STEPS[idx], el=resolveElement(step);
+    if (!el) { advanceStep(); return; }
+    if (el.scrollIntoView) el.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(function() {
+      var r=rect(el);
+      document.getElementById('wt-overlay').classList.add('active');
+      positionCurtains(r); positionRing(r); positionArrow(r,step.position); positionTooltip(r,step.position);
+      document.getElementById('wt-step-label').textContent='Step '+(idx+1)+' of '+totalSteps;
+      document.getElementById('wt-title').innerHTML=step.title;
+      document.getElementById('wt-body').innerHTML=step.body;
+      buildDots();
+      var btn=document.getElementById('wt-btn-next');
+      btn.textContent=step.isFinal?'Finish tour ✓':'Got it — next ➜';
+    }, 350);
+  }
+
+  function advanceStep() {
+    currentStep++;
+    if (currentStep>=totalSteps) { endTour(false); return; }
+    renderStep(currentStep);
+  }
+
+  function endTour(skipped) {
+    tourActive=false;
+    document.getElementById('wt-overlay').classList.remove('active');
+    ['wt-top','wt-bottom','wt-left','wt-right'].forEach(function(id){
+      var e=document.getElementById(id); if(e) e.style.cssText='top:0;left:0;width:0;height:0;';
+    });
+    ['wt-ring','wt-arrow','wt-tooltip'].forEach(function(id){
+      var e=document.getElementById(id); if(e) e.style.display='none';
+    });
+    if (!skipped) { try { localStorage.setItem(LS_KEY,'1'); } catch(e){} }
+    var h=document.getElementById('wt-help-btn'); if(h) h.classList.add('visible');
+  }
+
+  function startTour() {
+    tourActive=true; currentStep=0; renderStep(0);
+  }
+
+  function maybeAutoStart() {
+    try {
+      if (!localStorage.getItem(LS_KEY)) { setTimeout(startTour, 800); }
+      else { var h=document.getElementById('wt-help-btn'); if(h) h.classList.add('visible'); }
+    } catch(e) { startTour(); }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var nextBtn=document.getElementById('wt-btn-next');
+    var skipBtn=document.getElementById('wt-btn-skip');
+    var helpBtn=document.getElementById('wt-help-btn');
+    if (nextBtn) nextBtn.addEventListener('click', advanceStep);
+    if (skipBtn) skipBtn.addEventListener('click', function(){ endTour(true); });
+    if (helpBtn) helpBtn.addEventListener('click', function(){ currentStep=0; startTour(); });
+    maybeAutoStart();
+  });
+
+  window.addEventListener('resize', function(){
+    if (!tourActive) return;
+    var step=PORTAL_STEPS[currentStep]; if(!step) return;
+    var el=resolveElement(step); if(!el) return;
+    var r=rect(el);
+    positionCurtains(r); positionRing(r); positionArrow(r,step.position); positionTooltip(r,step.position);
+  });
+
+  window.nmStartPortalTour = startTour;
+
+})();
+/* ═══════════════════════════════════════════════════════════════════
+   END PROPOSAL PORTAL WALKTHROUGH
+   ═══════════════════════════════════════════════════════════════════ */
+  
 </script>
+
+<!-- ═══════════════════════════════════════════════════════
+     NOVA METRICS GUIDED WALKTHROUGH — PROPOSAL PORTAL
+     ═══════════════════════════════════════════════════════ -->
+
+<div id="wt-overlay">
+  <div class="wt-curtain" id="wt-top"></div>
+  <div class="wt-curtain" id="wt-bottom"></div>
+  <div class="wt-curtain" id="wt-left"></div>
+  <div class="wt-curtain" id="wt-right"></div>
+</div>
+<div class="wt-spotlight-ring" id="wt-ring" style="display:none"></div>
+<div class="wt-arrow" id="wt-arrow" style="display:none">👆</div>
+<div id="wt-tooltip" style="display:none">
+  <div class="wt-step-badge">
+    <span id="wt-step-label">Step 1 of 4</span>
+    <div class="wt-step-dots" id="wt-dots"></div>
+  </div>
+  <div class="wt-title" id="wt-title"></div>
+  <div class="wt-body"  id="wt-body"></div>
+  <div class="wt-actions">
+    <button class="wt-btn-next" id="wt-btn-next">Got it — next ➜</button>
+    <button class="wt-btn-skip" id="wt-btn-skip">Skip tour</button>
+  </div>
+</div>
+<button id="wt-help-btn" title="Show guided tour">?</button>
+  
 </body>
 </html>
