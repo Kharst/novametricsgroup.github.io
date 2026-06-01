@@ -2732,6 +2732,13 @@ if (step.waitForCalc && !calcDone) { endTour(false); return; }
 _originalRenderStep(idx);
 }
 window.nmStartTour = startTour;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    wireButtons();
+    watchForAppScreen();
+    hookCalculate();
+    hookGenerate();
+  });
 /* Also expose reset helper for testing */
 window.nmTourReset = function() {
 try {
