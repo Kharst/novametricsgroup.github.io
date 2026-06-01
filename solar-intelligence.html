@@ -2221,97 +2221,90 @@ function setClientType(type){
 }
 function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getElementById('panel-'+p).style.display=p===name?'block':'none';});}
 
-  /* ═══════════════════════════════════════════════════════════════════
-   NOVA METRICS — GUIDED WALKTHROUGH ENGINE
-   Fires once for first-time installers. Tracks progress in localStorage.
-   ═══════════════════════════════════════════════════════════════════ */
+  /* ================================================================
+NOVA METRICS — GUIDED WALKTHROUGH ENGINE v2
+Complete, correct version. Replace the entire block with this.
+================================================================ */
 (function() {
-
-  /* ── Keys ──────────────────────────────────────────────────────── */
-  var LS_DESIGN  = 'nm_tour_design_done';   // set when design tour finished
-  var LS_FIRST   = 'nm_first_design_done';  // set when first calculation done
-  var PADDING    = 10; // px breathing room around spotlight target
-
-  /* ── Tour steps for solar-intelligence.html ────────────────────── */
-  /* Each step: { selector, title, body, position, waitForAction, actionHint } */
-  /*   waitForAction: if true, the "next" button is hidden and the tour
-       advances automatically when the user interacts with the element  */
- var DESIGN_STEPS = [
-/* ── PHASE 1: Inputs ── /
+var LS_DESIGN = 'nm_tour_design_done';
+var LS_FIRST  = 'nm_first_design_done';
+var PADDING   = 10;
+var DESIGN_STEPS = [
+/* PHASE 1 — Inputs /
 {
 selector: '#loc-display',
 title: '📍 Step 1 — Pick the Client's Location',
 body: 'Click here and <strong>search for the client's city or town</strong>. This sets the solar irradiance used for the design. Start typing to filter.',
-position: 'bottom', waitForAction: false
+position: 'bottom', waitForCalc: false
 },
 {
 selector: '#lb-trigger',
 title: '⚡ Step 2 — Add the Client's Appliances',
 body: 'Click <strong>"Add Appliances…"</strong>. Pick a quick template like "Average Home" or tap individual items. This tells the engine how much power is needed each day.',
-position: 'bottom', waitForAction: false
+position: 'bottom', waitForCalc: false
 },
 {
 selector: '#sel-autonomy',
 title: '🌙 Step 3 — Evening Backup Hours',
 body: 'How many hours of battery power does the client need after dark? <strong>8 hours</strong> covers a typical South African evening. Adjust up for longer outage protection.',
-position: 'bottom', waitForAction: false
+position: 'bottom', waitForCalc: false
 },
 {
 selector: '#sel-tariff',
 title: '💰 Step 4 — Client's Electricity Tariff',
 body: 'Select the client's <strong>rate per kWh</strong> from their Eskom or municipality bill. This calculates savings and payback period.',
-position: 'bottom', waitForAction: false
+position: 'bottom', waitForCalc: false
 },
 {
 selector: '#sel-markup',
 title: '📈 Step 5 — Your Markup',
 body: 'Set your <strong>profit margin</strong> on this job. The engine adds it on top of hardware cost to give you the suggested client price. 10–15% is typical.',
-position: 'bottom', waitForAction: false
+position: 'bottom', waitForCalc: false
 },
 {
 selector: '.btn-calc',
 title: '⚡ Step 6 — Design the System',
-body: 'All inputs are set. Click <strong>"⚡ Design System"</strong>. The engine instantly sizes the panels, battery, and inverter to meet NRS 097-2-1 compliance. Your results appear in the tabs below.',
-position: 'top', waitForAction: false, isFinal: false, waitForCalc: false
+body: 'All inputs are set. Click <strong>"⚡ Design System"</strong>. The engine instantly sizes the panels, battery, and inverter to meet NRS 097-2-1 compliance. Results appear in the tabs below.',
+position: 'top', waitForCalc: false
 },
-/ ── PHASE 2: Results tabs — only shown after calculate() runs ── /
+/ PHASE 2 — Results tabs (only after calculate() runs) /
 {
 selector: '.tab[onclick="tab-solar"]',
 title: '☀️ Step 7 — Solar Array Tab',
 body: 'Click the <strong>☀️ Solar Array</strong> tab. You'll see the recommended panel brand, how many panels, roof space needed, and daily generation.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
 {
 selector: '.tab[onclick*="tab-battery"]',
 title: '🔋 Step 8 — Battery Tab',
 body: 'Click <strong>🔋 Battery</strong>. This shows which battery is recommended, how many units are needed, and runtime during a power outage.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
 {
 selector: '.tab[onclick*="tab-inverter"]',
 title: '⚡ Step 9 — Inverter Tab',
 body: 'Click <strong>⚡ Inverter</strong>. Check the inverter size, DC/AC ratio, and NRS 097-2-1 compliance status. A green badge means the design is compliant.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
 {
 selector: '.tab[onclick*="tab-financials"]',
 title: '💰 Step 10 — Financials Tab',
 body: 'Click <strong>💰 Financials</strong>. This shows the payback period, 25-year savings, and NPV — your most powerful tool for closing the sale.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
 {
 selector: '.tab[onclick*="tab-enviro"]',
 title: '🌿 Step 11 — Environment Tab',
 body: 'Click <strong>🌿 Environment</strong>. Shows CO₂ saved, trees equivalent, and water saved. Very useful for clients who care about green impact.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
 {
 selector: '.tab[onclick*="tab-proposal"]',
 title: '📋 Step 12 — Generate Proposal Tab',
 body: 'Click <strong>📋 Generate Proposal</strong>. This is where you turn the design into a professional PDF for your client. Click the tab now to continue.',
-position: 'below', waitForCalc: true
+position: 'bottom', waitForCalc: true
 },
-/* ── PHASE 3: Proposal form ── */
+/* PHASE 3 — Proposal form */
 {
 selector: '#p-name',
 title: '👤 Step 13 — Client's Name',
@@ -2333,255 +2326,241 @@ position: 'bottom', waitForCalc: true
 {
 selector: '#btn-gen',
 title: '📄 Step 16 — Generate the Proposal',
-body: 'Click the green <strong>"Generate Proposal"</strong> button. The AI engine builds a professional PDF in seconds and saves it to your Proposal Portal. You're almost done!',
+body: 'Click the green <strong>"Generate Proposal"</strong> button. The AI engine builds a professional PDF in seconds and saves it to your Proposal Portal.',
 position: 'top', waitForCalc: true, isFinal: true
 }
 ];
-/* ── State ──────────────────────────────────────────────────────── */
 var currentStep = 0;
 var tourActive  = false;
 var calcDone    = false;
 var totalSteps  = DESIGN_STEPS.length;
+function $(sel) { return document.querySelector(sel); }
+function rect(el) { return el.getBoundingClientRect(); }
+function vw() { return window.innerWidth; }
+function vh() { return window.innerHeight; }
+function buildDots() {
+var container = $('#wt-dots');
+if (!container) return;
+container.innerHTML = '';
+for (var i = 0; i < totalSteps; i++) {
+var d = document.createElement('div');
+d.className = 'wt-dot' + (i < currentStep ? ' done' : '');
+container.appendChild(d);
+}
+}
+function positionCurtains(r) {
+var x1 = r.left - PADDING, y1 = r.top - PADDING;
+var x2 = r.right + PADDING, y2 = r.bottom + PADDING;
+document.getElementById('wt-top').style.cssText    = 'top:0;left:0;right:0;height:' + Math.max(0,y1) + 'px;';
+document.getElementById('wt-bottom').style.cssText = 'top:' + y2 + 'px;left:0;right:0;bottom:0;';
+document.getElementById('wt-left').style.cssText   = 'top:' + y1 + 'px;left:0;width:' + Math.max(0,x1) + 'px;height:' + (y2-y1) + 'px;';
+document.getElementById('wt-right').style.cssText  = 'top:' + y1 + 'px;left:' + x2 + 'px;right:0;height:' + (y2-y1) + 'px;';
+}
+function positionRing(r) {
+var ring = $('#wt-ring');
+ring.style.display = 'block';
+ring.style.borderColor = '';
+ring.style.boxShadow = '';
+ring.style.left   = (r.left - PADDING) + 'px';
+ring.style.top    = (r.top  - PADDING) + 'px';
+ring.style.width  = (r.width  + PADDING2) + 'px';
+ring.style.height = (r.height + PADDING2) + 'px';
+}
+function positionArrow(r, pos) {
+var arrow = $('#wt-arrow');
+arrow.style.display = 'block';
+if (pos === 'top') {
+arrow.innerHTML  = '👇';
+arrow.style.left = (r.left + r.width/2 - 13) + 'px';
+arrow.style.top  = (r.bottom + PADDING + 6) + 'px';
+} else {
+arrow.innerHTML  = '👆';
+arrow.style.left = (r.left + r.width/2 - 13) + 'px';
+arrow.style.top  = (r.top - PADDING - 42) + 'px';
+}
+}
+function positionTooltip(r, pos) {
+var tip = $('#wt-tooltip');
+tip.style.display = 'block';
+tip.style.borderColor = '';
+var tw = 320, th = 180, x, y;
+if (pos === 'bottom') {
+y = r.bottom + PADDING + 50;
+x = r.left + r.width/2 - tw/2;
+} else {
+y = r.top - PADDING - 50 - th;
+x = r.left + r.width/2 - tw/2;
+}
+x = Math.max(12, Math.min(x, vw() - tw - 12));
+y = Math.max(12, Math.min(y, vh() - th - 12));
+tip.style.left = x + 'px';
+tip.style.top  = y + 'px';
+}
+function scrollIntoView(el) {
+var r = rect(el);
+if (r.top < 100 || r.bottom > vh() - 100) {
+el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+}
+function renderStep(idx) {
+var step = DESIGN_STEPS[idx];
+if (!step) { endTour(false); return; }
+if (step.waitForCalc && !calcDone) { endTour(false); return; }
+var el = document.querySelector(step.selector);
+if (!el) { advanceStep(); return; }
 
-  /* ── Helpers ──────────────────────────────────────────────────────*/
-  function $(sel) { return document.querySelector(sel); }
-  function rect(el) { return el.getBoundingClientRect(); }
-  function vw() { return window.innerWidth; }
-  function vh() { return window.innerHeight; }
+scrollIntoView(el);
 
-  /* ── Build dot indicators ─────────────────────────────────────── */
-  function buildDots() {
-    var container = $('#wt-dots');
-    if (!container) return;
-    container.innerHTML = '';
-    for (var i = 0; i < totalSteps; i++) {
+setTimeout(function() {
+  var r = rect(el);
+  var overlay = $('#wt-overlay');
+  overlay.classList.add('active');
+
+  positionCurtains(r);
+  positionRing(r);
+  positionArrow(r, step.position);
+  positionTooltip(r, step.position);
+
+  $('#wt-step-label').textContent = 'Step ' + (idx+1) + ' of ' + totalSteps;
+  $('#wt-title').innerHTML = step.title;
+  $('#wt-body').innerHTML  = step.body;
+  buildDots();
+
+  var btn = $('#wt-btn-next');
+  if (btn) btn.textContent = step.isFinal ? 'Got it — let\'s generate! ⚡' : 'Got it — next ➜';
+
+}, 350);
+}
+function advanceStep() {
+currentStep++;
+if (currentStep >= totalSteps) { endTour(false); return; }
+renderStep(currentStep);
+}
+function endTour(skipped) {
+tourActive = false;
+var overlay = $('#wt-overlay');
+if (overlay) overlay.classList.remove('active');
+['wt-top','wt-bottom','wt-left','wt-right'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.cssText = 'top:0;left:0;width:0;height:0;';
+});
+
+var ring  = $('#wt-ring');
+var arrow = $('#wt-arrow');
+var tip   = $('#wt-tooltip');
+if (ring)  ring.style.display  = 'none';
+if (arrow) arrow.style.display = 'none';
+if (tip)   tip.style.display   = 'none';
+
+if (!skipped) {
+  try { localStorage.setItem(LS_DESIGN, '1'); } catch(e) {}
+}
+
+var hbtn = $('#wt-help-btn');
+if (hbtn) hbtn.classList.add('visible');
+}
+function showCongratsSpotlight() {
+var actionsEl = document.querySelector('.success-actions');
+if (!actionsEl) return;
+actionsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+setTimeout(function() {
+  var r = rect(actionsEl);
+  var overlay = $('#wt-overlay');
+  overlay.classList.add('active');
+  positionCurtains(r);
+
+  var ring = $('#wt-ring');
+  ring.style.display     = 'block';
+  ring.style.left        = (r.left - PADDING) + 'px';
+  ring.style.top         = (r.top  - PADDING) + 'px';
+  ring.style.width       = (r.width  + PADDING*2) + 'px';
+  ring.style.height      = (r.height + PADDING*2) + 'px';
+  ring.style.borderColor = '#34d399';
+  ring.style.boxShadow   = '0 0 0 4px rgba(52,211,153,.15), 0 0 32px rgba(52,211,153,.22)';
+
+  var arrow = $('#wt-arrow');
+  arrow.style.display = 'block';
+  arrow.innerHTML     = '👇';
+  arrow.style.left    = (r.left + r.width/2 - 13) + 'px';
+  arrow.style.top     = (r.bottom + PADDING + 4) + 'px';
+
+  var tip = $('#wt-tooltip');
+  tip.style.display     = 'block';
+  tip.style.borderColor = 'rgba(52,211,153,.35)';
+
+  var tw = 320, th = 220;
+  var x = r.left + r.width/2 - tw/2;
+  var y = r.top - PADDING - 50 - th;
+  x = Math.max(12, Math.min(x, vw() - tw - 12));
+  y = Math.max(12, Math.min(y, vh() - th - 12));
+  tip.style.left = x + 'px';
+  tip.style.top  = y + 'px';
+
+  $('#wt-step-label').textContent = 'You are done!';
+  $('#wt-title').innerHTML  = '🎉 First proposal — well done!';
+  $('#wt-body').innerHTML   = 'Your proposal PDF is saved. Use the buttons below to <strong>download it</strong>, <strong>open it in the Proposal Portal</strong>, or start a new design.<br><br>Once you\'ve sent it to your client, hop over to the <strong>Proposal Portal</strong> — that\'s where all your proposals live.';
+
+  var acts = document.getElementById('wt-acts');
+  if (acts) {
+    acts.innerHTML =
+      '<a href="prposal_portal.html" class="wt-btn-next" style="text-decoration:none;background:#34d399;color:#064e3b;flex:1;text-align:center;">Go to Proposal Portal →</a>' +
+      '<button class="wt-btn-skip" id="wt-congrats-done">Got it ✓</button>';
+    var doneBtn = document.getElementById('wt-congrats-done');
+    if (doneBtn) doneBtn.addEventListener('click', function() { endTour(false); });
+  }
+
+  var dotsEl = $('#wt-dots');
+  if (dotsEl) {
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < 6; i++) {
       var d = document.createElement('div');
-      d.className = 'wt-dot' + (i < currentStep ? ' done' : '');
-      container.appendChild(d);
+      d.className = 'wt-dot done';
+      dotsEl.appendChild(d);
     }
   }
-
-  /* ── Position the four curtain panels around the target ─────────── */
-  function positionCurtains(r) {
-    var top    = $('#wt-top'),
-        bottom = $('#wt-bottom'),
-        left   = $('#wt-left'),
-        right  = $('#wt-right');
-
-    var x1 = r.left   - PADDING;
-    var y1 = r.top    - PADDING;
-    var x2 = r.right  + PADDING;
-    var y2 = r.bottom + PADDING;
-
-    // Top curtain
-    top.style.cssText    = 'top:0;left:0;right:0;height:' + Math.max(0,y1) + 'px;';
-    // Bottom curtain
-    bottom.style.cssText = 'top:' + y2 + 'px;left:0;right:0;bottom:0;';
-    // Left curtain
-    left.style.cssText   = 'top:' + y1 + 'px;left:0;width:' + Math.max(0,x1) + 'px;height:' + (y2-y1) + 'px;';
-    // Right curtain
-    right.style.cssText  = 'top:' + y1 + 'px;left:' + x2 + 'px;right:0;height:' + (y2-y1) + 'px;';
-  }
-
-  /* ── Position the gold spotlight ring ──────────────────────────── */
-  function positionRing(r) {
-    var ring = $('#wt-ring');
-    ring.style.display = 'block';
-    ring.style.left    = (r.left   - PADDING) + 'px';
-    ring.style.top     = (r.top    - PADDING) + 'px';
-    ring.style.width   = (r.width  + PADDING*2) + 'px';
-    ring.style.height  = (r.height + PADDING*2) + 'px';
-  }
-
-  /* ── Position the bouncing arrow ───────────────────────────────── */
-  function positionArrow(r, pos) {
-    var arrow = $('#wt-arrow');
-    arrow.style.display = 'block';
-    if (pos === 'top') {
-      // Arrow below element pointing up — flip it
-      arrow.innerHTML = '👇';
-      arrow.style.left = (r.left + r.width/2 - 13) + 'px';
-      arrow.style.top  = (r.bottom + PADDING + 6) + 'px';
-    } else {
-      // Arrow above element pointing down
-      arrow.innerHTML = '👆';
-      arrow.style.left = (r.left + r.width/2 - 13) + 'px';
-      arrow.style.top  = (r.top - PADDING - 42) + 'px';
-    }
-  }
-
-  /* ── Position the tooltip ──────────────────────────────────────── */
-  function positionTooltip(r, pos) {
-    var tip = $('#wt-tooltip');
-    tip.style.display = 'block';
-    var tw = 320, th = 180; // estimated tooltip size
-    var x, y;
-
-    if (pos === 'bottom') {
-      y = r.bottom + PADDING + 50; // below the element + arrow space
-      x = r.left + r.width/2 - tw/2;
-    } else {
-      y = r.top - PADDING - 50 - th; // above the element
-      x = r.left + r.width/2 - tw/2;
-    }
-
-    // Keep inside viewport
-    x = Math.max(12, Math.min(x, vw() - tw - 12));
-    y = Math.max(12, Math.min(y, vh() - th - 12));
-
-    tip.style.left = x + 'px';
-    tip.style.top  = y + 'px';
-  }
-
-  /* ── Scroll element into view if needed ────────────────────────── */
-  function scrollIntoView(el) {
-    var r = rect(el);
-    var buffer = 100;
-    if (r.top < buffer || r.bottom > vh() - buffer) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }
-
-  /* ── Render a single step ──────────────────────────────────────── */
-  function renderStep(idx) {
-    var step = DESIGN_STEPS[idx];
-    var el   = $(step.selector);
-    if (!el) { advanceStep(); return; }
-
-    scrollIntoView(el);
-
-    // Small delay to let scroll settle before measuring
-    setTimeout(function() {
-      var r = rect(el);
-
-      // Activate overlay
-      var overlay = $('#wt-overlay');
-      overlay.classList.add('active');
-
-      positionCurtains(r);
-      positionRing(r);
-      positionArrow(r, step.position);
-      positionTooltip(r, step.position);
-
-      // Fill tooltip content
-      $('#wt-step-label').textContent = 'Step ' + (idx+1) + ' of ' + totalSteps;
-      $('#wt-title').innerHTML = step.title;
-      $('#wt-body').innerHTML  = step.body;
-      buildDots();
-
-      // Button label
-      var btn = $('#wt-btn-next');
-      if (step.isFinal) {
-        btn.textContent = 'Got it — let\'s design! ⚡';
-      } else {
-        btn.textContent = 'Got it — next ➜';
-      }
-
-    }, 350);
-  }
-
-  /* ── Advance to the next step ──────────────────────────────────── */
-  function advanceStep() {
-    currentStep++;
-    if (currentStep >= totalSteps) {
-      endTour(false); // finished without calculating yet
-      return;
-    }
-    renderStep(currentStep);
-  }
-
-  /* ── End (or skip) the tour ──────────────────────────────────────*/
-  function endTour(skipped) {
-    tourActive = false;
-    var overlay = $('#wt-overlay');
-    overlay.classList.remove('active');
-
-    ['wt-top','wt-bottom','wt-left','wt-right'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.style.cssText = 'top:0;left:0;width:0;height:0;';
-    });
-
-    var ring  = $('#wt-ring');
-    var arrow = $('#wt-arrow');
-    var tip   = $('#wt-tooltip');
-    if (ring)  ring.style.display  = 'none';
-    if (arrow) arrow.style.display = 'none';
-    if (tip)   tip.style.display   = 'none';
-
-    if (!skipped) {
-      // Mark tour as done so it never shows again
-      try { localStorage.setItem(LS_DESIGN, '1'); } catch(e) {}
-    }
-
-    // Show the floating ? help button
-    var hbtn = $('#wt-help-btn');
-    if (hbtn) hbtn.classList.add('visible');
-  }
-
-  /* ── Start the tour ─────────────────────────────────────────────── */
-  function startTour() {
-    // Only show on the app screen (after login)
-    var appScreen = $('#app-screen');
-    if (!appScreen || appScreen.style.display === 'none') return;
-
-    tourActive    = true;
-    currentStep   = 0;
-    renderStep(0);
-  }
-
-  /* ── Check if we should auto-start ─────────────────────────────── */
-  function maybeAutoStart() {
-    try {
-      var done = localStorage.getItem(LS_DESIGN);
-      if (!done) {
-        // First time — start tour after a short welcome delay
-        setTimeout(startTour, 800);
-      } else {
-        // Already completed — just show the ? help button quietly
-        var hbtn = $('#wt-help-btn');
-        if (hbtn) hbtn.classList.add('visible');
-      }
-    } catch(e) { /* localStorage blocked — just start the tour */ startTour(); }
-  }
-
-  /* ── Wire up button events ──────────────────────────────────────── */
-  function wireButtons() {
-    var nextBtn = document.getElementById('wt-btn-next');
-    var skipBtn = document.getElementById('wt-btn-skip');
-    var helpBtn = document.getElementById('wt-help-btn');
-
-    if (nextBtn) nextBtn.addEventListener('click', function() { advanceStep(); });
-    if (skipBtn) skipBtn.addEventListener('click', function() { endTour(true); });
-    if (helpBtn) helpBtn.addEventListener('click', function() {
-      // Reset and restart
-      currentStep = 0;
-      startTour();
-    });
-  }
-
-  /* ── Hook into the existing showApp() / data loaded moment ─────── */
-  /* We watch for #app-screen becoming visible using MutationObserver */
-  function watchForAppScreen() {
-    var appScreen = document.getElementById('app-screen');
-    if (!appScreen) return;
-
-    var observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(m) {
-        if (m.type === 'attributes' && m.attributeName === 'style') {
-          var display = window.getComputedStyle(appScreen).display;
-          if (display !== 'none') {
-            observer.disconnect();
-            // Give the app screen a moment to fully render
-            setTimeout(maybeAutoStart, 600);
-          }
-        }
-      });
-    });
-    observer.observe(appScreen, { attributes: true });
-  }
-
-  
-/* ── Hook into calculate() — advances tour to tabs after design runs ── /
+}, 400);
+}
+function startTour() {
+var appScreen = $('#app-screen');
+if (!appScreen || appScreen.style.display === 'none') return;
+tourActive   = true;
+currentStep  = 0;
+renderStep(0);
+}
+function maybeAutoStart() {
+try {
+if (!localStorage.getItem(LS_DESIGN)) {
+setTimeout(startTour, 800);
+} else {
+var hbtn = $('#wt-help-btn');
+if (hbtn) hbtn.classList.add('visible');
+}
+} catch(e) { startTour(); }
+}
+function wireButtons() {
+var nextBtn = document.getElementById('wt-btn-next');
+var skipBtn = document.getElementById('wt-btn-skip');
+var helpBtn = document.getElementById('wt-help-btn');
+if (nextBtn) nextBtn.addEventListener('click', function() { advanceStep(); });
+if (skipBtn) skipBtn.addEventListener('click', function() { endTour(true); });
+if (helpBtn) helpBtn.addEventListener('click', function() { currentStep = 0; calcDone = false; startTour(); });
+}
+function watchForAppScreen() {
+var appScreen = document.getElementById('app-screen');
+if (!appScreen) return;
+var observer = new MutationObserver(function(mutations) {
+mutations.forEach(function(m) {
+if (m.attributeName === 'style') {
+var display = window.getComputedStyle(appScreen).display;
+if (display !== 'none') {
+observer.disconnect();
+setTimeout(maybeAutoStart, 600);
+}
+}
+});
+});
+observer.observe(appScreen, { attributes: true });
+}
 function hookCalculate() {
 var attempts = 0;
 var interval = setInterval(function() {
@@ -2594,9 +2573,7 @@ originalCalc.apply(this, arguments);
 setTimeout(function() {
 if (typeof calcResult !== 'undefined' && calcResult && calcResult.systemRecommended) {
 calcDone = true;
-/ Show the V1 first-design banner /
 onFirstDesignComplete();
-/ If tour is still active and on step 6, auto-advance to tab steps */
 if (tourActive && currentStep === 5) {
 currentStep++;
 renderStep(currentStep);
@@ -2608,7 +2585,6 @@ renderStep(currentStep);
 if (attempts > 60) clearInterval(interval);
 }, 100);
 }
-/* ── Hook into generateProposal() — fires Phase 4 congrats spotlight ── /
 function hookGenerate() {
 var attempts = 0;
 var interval = setInterval(function() {
@@ -2618,14 +2594,12 @@ clearInterval(interval);
 var originalGen = window.generateProposal;
 window.generateProposal = function() {
 originalGen.apply(this, arguments);
-/ Poll until .success-card gets class "on" /
 var polls = 0;
 var poll = setInterval(function() {
 polls++;
 var card = document.querySelector('.success-card');
 if (card && card.classList.contains('on')) {
 clearInterval(poll);
-/ End the step tour silently then show congrats */
 tourActive = false;
 try { localStorage.setItem(LS_DESIGN, '1'); } catch(e) {}
 setTimeout(showCongratsSpotlight, 400);
@@ -2637,109 +2611,39 @@ if (polls > 40) clearInterval(poll);
 if (attempts > 60) clearInterval(interval);
 }, 100);
 }
-/* ── Phase 4: spotlight the success-actions buttons with congrats ── */
-function showCongratsSpotlight() {
-var actionsEl = document.querySelector('.success-actions');
-if (!actionsEl) return;
-actionsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-setTimeout(function() {
-  var r = rect(actionsEl);
-
-  /* Activate overlay */
-  var overlay = $('#wt-overlay');
-  overlay.classList.add('active');
-
-  /* Curtains */
-  positionCurtains(r);
-
-  /* Gold ring — green tint for success */
-  var ring = $('#wt-ring');
-  ring.style.display  = 'block';
-  ring.style.left     = (r.left - PADDING) + 'px';
-  ring.style.top      = (r.top  - PADDING) + 'px';
-  ring.style.width    = (r.width  + PADDING * 2) + 'px';
-  ring.style.height   = (r.height + PADDING * 2) + 'px';
-  ring.style.borderColor  = '#34d399';
-  ring.style.boxShadow = '0 0 0 4px rgba(52,211,153,.15), 0 0 32px rgba(52,211,153,.22)';
-
-  /* Arrow pointing down at the buttons */
-  var arrow = $('#wt-arrow');
-  arrow.style.display = 'block';
-  arrow.innerHTML     = '👇';
-  arrow.style.left    = (r.left + r.width / 2 - 13) + 'px';
-  arrow.style.top     = (r.bottom + PADDING + 4) + 'px';
-
-  /* Tooltip above the buttons */
-  var tip = $('#wt-tooltip');
-  tip.style.display = 'block';
-
-  var tw = 320, th = 220;
-  var x = r.left + r.width / 2 - tw / 2;
-  var y = r.top - PADDING - 50 - th;
-  x = Math.max(12, Math.min(x, vw() - tw - 12));
-  y = Math.max(12, Math.min(y, vh() - th - 12));
-  tip.style.left = x + 'px';
-  tip.style.top  = y + 'px';
-  tip.style.borderColor = 'rgba(52,211,153,.35)';
-
-  /* Fill content */
-  $('#wt-step-label').textContent = '🎉 Proposal Ready!';
-  $('#wt-title').innerHTML  = '🎉 First proposal — well done!';
-  $('#wt-body').innerHTML   =
-    'Your proposal PDF is saved. Use the buttons below to <strong>download it</strong>, ' +
-    '<strong>open it in the Proposal Portal</strong>, or start a new design.<br><br>' +
-    'Once you\'ve sent it to your client, hop over to the ' +
-    '<strong>Proposal Portal</strong> — that\'s where all your proposals live.';
-
-  /* Replace the action buttons with two CTAs */
-  var acts = document.getElementById('wt-acts');
-  if (acts) {
-    acts.innerHTML =
-      '<a href="prposal_portal.html" class="wt-btn-next" style="text-decoration:none;background:#34d399;color:#064e3b;flex:1;text-align:center;">Go to Proposal Portal →</a>' +
-      '<button class="wt-btn-skip" id="wt-congrats-done">Got it ✓</button>';
-    var doneBtn = document.getElementById('wt-congrats-done');
-    if (doneBtn) doneBtn.addEventListener('click', function() {
-      endTour(false);
-      /* Reset ring colour for next tour replay */
-      var r2 = $('#wt-ring');
-      if (r2) { r2.style.borderColor = ''; r2.style.boxShadow = ''; }
-      var t2 = $('#wt-tooltip');
-      if (t2) { t2.style.borderColor = ''; }
-    });
-  }
-
-  /* Build dots — all done */
-  var dotsEl = $('#wt-dots');
-  if (dotsEl) {
-    dotsEl.innerHTML = '';
-    for (var i = 0; i < 6; i++) {
-      var d = document.createElement('div');
-      d.className = 'wt-dot done';
-      dotsEl.appendChild(d);
-    }
-  }
-
-}, 400);
+function onFirstDesignComplete() {
+try {
+if (localStorage.getItem(LS_FIRST)) return;
+localStorage.setItem(LS_FIRST, '1');
+} catch(e) {}
+var banner = document.getElementById('wt-complete-banner');
+if (banner) banner.classList.add('show');
+var inputStrip = document.querySelector('.input-strip');
+var appScreen  = document.getElementById('app-screen');
+if (inputStrip && appScreen && banner) {
+appScreen.insertBefore(banner, inputStrip);
 }
-/* ── Override renderStep to skip waitForCalc steps if calc not done ── /
-var _originalRenderStep = renderStep;
-function renderStep(idx) {
-var step = DESIGN_STEPS[idx];
-if (!step) { endTour(false); return; }
-/ Skip tabs/proposal steps if calc hasn't run yet */
-if (step.waitForCalc && !calcDone) { endTour(false); return; }
-_originalRenderStep(idx);
 }
+function handleResize() {
+if (!tourActive) return;
+var step = DESIGN_STEPS[currentStep];
+if (!step) return;
+var el = document.querySelector(step.selector);
+if (!el) return;
+var r = rect(el);
+positionCurtains(r);
+positionRing(r);
+positionArrow(r, step.position);
+positionTooltip(r, step.position);
+}
+window.addEventListener('resize', handleResize);
+document.addEventListener('DOMContentLoaded', function() {
+wireButtons();
+watchForAppScreen();
+hookCalculate();
+hookGenerate();
+});
 window.nmStartTour = startTour;
-
-  document.addEventListener('DOMContentLoaded', function() {
-    wireButtons();
-    watchForAppScreen();
-    hookCalculate();
-    hookGenerate();
-  });
-/* Also expose reset helper for testing */
 window.nmTourReset = function() {
 try {
 localStorage.removeItem(LS_DESIGN);
