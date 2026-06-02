@@ -2662,7 +2662,7 @@ startTour();
   supabaseClient.auth.onAuthStateChange(async(event,session)=>{if(event==='PASSWORD_RECOVERY'||event==='SIGNED_IN'&&session&&!session.user.last_sign_in_at){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');}});
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const hash=window.location.hash;const isInvite=hash.includes('type=invite');if(isInvite){const{data:{session}}=await supabaseClient.auth.getSession();if(session){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}}const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){console.error('boot error:',e);hideLoadingOverlay();showApp();}}})();
-async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
+async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version&limit=1');if(!rows||rows.length===0){installer={installer_id:null,installer_name:'My Account',contact_email:email,logo_url:null,primary_color:null,secondary_color:null,accent_color:null,contact_number:null,terms_accepted_at:new Date().toISOString(),terms_version:null};return;}installer=rows[0];
 function showLoadingOverlay(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
 function hideLoadingOverlay(){document.getElementById('dataLoading').classList.remove('on');}
 function showDataError(err){document.getElementById('dlMsg').textContent='Failed to load data';document.getElementById('dlErr').textContent=String(err);document.getElementById('dlErr').style.display='block';}
@@ -2720,7 +2720,7 @@ function populateDropdowns(){
 
 function showApp(){
   document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';
-  const b=document.getElementById('installer-badge');b.textContent=installer.installer_name;b.style.display='inline-block';
+  const b=document.getElementById('installer-badge');if(installer){b.textContent=installer.installer_name;b.style.display='inline-block';}
   // ── Terms acceptance check for existing installers ──
 if (installer && !installer.terms_accepted_at) {
   showTermsAcceptanceModal(installer.installer_id);
@@ -2767,7 +2767,7 @@ async function doLogin(){
   btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Signing in\u2026';
   const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
   if(error){errEl.textContent=error.message==='Invalid login credentials'?'Incorrect email or password.':error.message;pEl.value='';pEl.focus();btn.disabled=false;btn.textContent='Sign In';return;}
-  try{showLoadingOverlay('Loading your workspace\u2026');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){console.error('showApp error:',e);hideLoadingOverlay();showApp();}
+  try{showLoadingOverlay('Loading your workspace\u2026');await loadInstallerProfile(data.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){hideLoadingOverlay();document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';console.error('login catch:',e);}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'){const ls=document.getElementById('login-screen');if(ls&&ls.style.display!=='none'){const ap=['signin','forgot','setpass'].find(p=>document.getElementById('panel-'+p).style.display!=='none');if(ap==='signin')doLogin();if(ap==='forgot')doForgotPassword();if(ap==='setpass')doSetPassword();}}});
 async function doForgotPassword(){
