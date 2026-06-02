@@ -2087,20 +2087,18 @@ var DESIGN_STEPS = [
   { selector:"#sel-autonomy", title:"Step 3: Set Backup Hours", body:"Choose how many evening backup hours the client needs from the battery.", position:"bottom" },
   { selector:"#sel-tariff", title:"Step 4: Select Tariff", body:"Choose the electricity tariff used to calculate savings and payback.", position:"bottom" },
   { selector:"#sel-markup", title:"Step 5: Set Markup", body:"Set your margin so the proposal uses your intended client price.", position:"bottom" },
-  { selector:".btn-calc", title:"Step 6: Design the System", body:"Click this to run the sizing engine. The tour will continue after the system has generated real results.", position:"top", actionLabel:"Design system", runCalculation:true },
-
-  { selector:"#r-panel-model", closest:".kpi", tab:"tab-solar", requiresCalc:true, title:"Step 7: Solar Array Result", body:"This card shows the selected panel model and the solar design result.", position:"bottom" },
-{ selector:"#r-dc-cap", closest:".kpi", tab:"tab-solar", requiresCalc:true, title:"Step 8: DC Capacity", body:"This card shows the recommended installed solar DC capacity.", position:"bottom" },
-{ selector:"#sys-rec-kpi", tab:"tab-battery", requiresCalc:true, title:"Step 9: System Compliance", body:"This section confirms whether the solar, battery, inverter, and DC/AC ratio work together.", position:"bottom" },
-{ selector:"#b-needed", closest:".kpi", tab:"tab-battery", requiresCalc:true, title:"Step 10: Battery Sizing", body:"This card explains the evening energy requirement and backup sizing.", position:"bottom" },
-{ selector:"#i-model-kpi", tab:"tab-inverter", requiresCalc:true, title:"Step 11: Inverter Selection", body:"This card shows the recommended inverter and its compliance status.", position:"bottom" },
-{ selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", requiresCalc:true, title:"Step 12: NRS Compliance", body:"This row shows the NRS 097-2-1 grid connection compliance check.", position:"bottom" },
-{ selector:"#f-total-cost", closest:".kpi", tab:"tab-financials", requiresCalc:true, title:"Step 13: Financial Summary", body:"This card shows the total recommended system cost.", position:"bottom" },
-{ selector:"#f-npv", closest:".status-row", tab:"tab-financials", requiresCalc:true, title:"Step 14: Investment Model", body:"This row shows the NPV, payback, and investment case.", position:"bottom" },
-{ selector:"#p-name", closest:".client-form", tab:"tab-proposal", requiresCalc:true, title:"Step 15: Client Details", body:"Enter the client details before generating the proposal.", position:"bottom" },
-{ selector:"#btn-gen", closest:".proposal-strip", tab:"tab-proposal", requiresCalc:true, title:"Step 16: Generate Proposal", body:"Generate the branded proposal and open it in the Proposal Portal.", position:"top", isFinal:true }
+  { selector:"#r-panel-model", closest:".kpi", tab:"tab-solar", title:"Step 6: Solar Array Result", body:"After designing, this card shows the selected panel model and solar array size.", position:"bottom" },
+  { selector:"#r-dc-cap", closest:".kpi", tab:"tab-solar", title:"Step 7: DC Capacity", body:"This card shows the recommended installed solar DC capacity sized to your load.", position:"bottom" },
+  { selector:"#sys-rec-kpi", tab:"tab-battery", title:"Step 8: System Compliance", body:"This section confirms whether the solar, battery, inverter, and DC/AC ratio all pass.", position:"bottom" },
+  { selector:"#b-needed", closest:".kpi", tab:"tab-battery", title:"Step 9: Battery Sizing", body:"This card shows the evening energy requirement and how the backup is sized.", position:"bottom" },
+  { selector:"#i-model-kpi", tab:"tab-inverter", title:"Step 10: Inverter Selection", body:"This card shows the recommended inverter selected to match your load and solar array.", position:"bottom" },
+  { selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", title:"Step 11: NRS Compliance", body:"This row shows the NRS 097-2-1 grid connection compliance check result.", position:"bottom" },
+  { selector:"#f-total-cost", closest:".kpi", tab:"tab-financials", title:"Step 12: Financial Summary", body:"This card shows the total recommended system cost including your markup.", position:"bottom" },
+  { selector:"#f-npv", closest:".status-row", tab:"tab-financials", title:"Step 13: Investment Model", body:"This row shows the NPV, payback period, and the 25-year investment case.", position:"bottom" },
+  { selector:"#p-name", closest:".client-form", tab:"tab-proposal", title:"Step 14: Client Details", body:"Enter the client details here before generating the proposal.", position:"bottom" },
+  { selector:"#btn-gen", closest:".proposal-strip", tab:"tab-proposal", title:"Step 15: Generate Proposal", body:"Click here to generate the branded proposal and open it in the Proposal Portal.", position:"top", isFinal:true }
 ];
-var currentStep=0,tourActive=false,calcDone=false,totalSteps=DESIGN_STEPS.length;
+var currentStep=0,tourActive=false,calcDone=true,totalSteps=DESIGN_STEPS.length;
 function $(sel){return document.querySelector(sel);}
 function rect(el){return el.getBoundingClientRect();}
 function vw(){return window.innerWidth;}
@@ -2172,19 +2170,6 @@ function wireButtons(){
 
   if(nextBtn)nextBtn.addEventListener('click',function(){
     var step=DESIGN_STEPS[currentStep];
-
-    if(step && step.runCalculation){
-      var calcBtn=document.querySelector('.btn-calc');
-      if(calcBtn){calcBtn.click();}
-      var polls=0;var poll=setInterval(function(){polls++;
-        var hasResult=document.querySelector('#r-panel-model .value');
-        if(hasResult&&hasResult.textContent&&hasResult.textContent.trim()!=='—'&&hasResult.textContent.trim()!==''){
-          clearInterval(poll);calcDone=true;onFirstDesignComplete();currentStep++;renderStep(currentStep);
-        }
-        if(polls>60)clearInterval(poll);
-      },300);
-      return;
-    }
 
     advanceStep();
   });
