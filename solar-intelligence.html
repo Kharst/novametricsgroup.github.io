@@ -2089,14 +2089,30 @@ var DESIGN_STEPS = [
   { selector:"#sel-markup", title:"Step 5: Markup %", body:"Set your installer margin. The proposal will use this to calculate the client-facing price.", position:"bottom" },
   { selector:".btn-calc", title:"Step 6: Design System", body:"Click <strong>⚡ Design System</strong> to run the sizing engine. It finds the best compliant panel, battery, and inverter combination for your client's load.", position:"top" },
   { selector:"#r-panel-model", closest:".kpi", tab:"tab-solar", title:"Step 7: Solar Array — Recommended Panel", body:"On the Solar Array tab, this card shows the panel the engine selected for this design.", position:"bottom" },
-  { selector:"#r-dc-cap", closest:".kpi", tab:"tab-solar", title:"Step 8: Solar Array — Recommended DC Capacity", body:"This card shows the total installed DC capacity the engine sized to cover your client's daily load.", position:"bottom" },
+ {
+  {
+  selector:"#r-dc-cap",
+  closest:".kpi",
+  tab:"tab-solar",
+  title:"Step 8: Generate Proposal — Client Details",
+  body:"On the Generate Proposal tab, enter the client's name, email, phone, and address for the proposal cover page.",
+  position:"bottom"
+},
+},
   { selector:"#sys-rec-kpi", tab:"tab-battery", title:"Step 9: Battery — ⚡ System Compliance", body:"On the Battery tab, this card confirms whether the solar, battery, inverter, and DC/AC ratio all pass together.", position:"bottom" },
   { selector:"#b-needed", closest:".kpi", tab:"tab-battery", title:"Step 10: Battery — Evening Energy Required", body:"This card shows how much energy the battery must supply overnight based on the backup hours set.", position:"bottom" },
   { selector:"#i-model-kpi", tab:"tab-inverter", title:"Step 11: Inverter — Recommended Inverter", body:"On the Inverter tab, this card shows the inverter the engine selected to match your load and solar array.", position:"bottom" },
   { selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", title:"Step 12: Inverter — NRS 097-2-1 Grid Connection Standard", body:"This row shows the NRS 097-2-1 compliance check result. It must pass before a proposal can be generated.", position:"bottom" },
   { selector:"#f-total-cost", closest:".kpi", tab:"tab-financials", title:"Step 13: Financials — Recommended Total System Cost", body:"On the Financials tab, this card shows the full system cost with your markup applied.", position:"bottom" },
   { selector:"#f-npv", closest:".status-row", tab:"tab-financials", title:"Step 14: Financials — NPV @ 12% Discount Rate (25 yr)", body:"This row shows the 25-year net present value and real payback period for your client's investment case.", position:"bottom" },
-  { selector:"#p-name", closest:".client-form", tab:"tab-proposal", title:"Step 15: Generate Proposal — Client Details", body:"On the Generate Proposal tab, enter the client's name, email, phone, and address for the proposal cover page.", position:"bottom" },
+ {
+  selector:"#p-name",
+  closest:".client-form",
+  tab:"tab-proposal",
+  title:"Step 15: Proposal Details Confirmation",
+  body:"Review and confirm the client information before generating the proposal. Ensure the client's name, contact details and installation address are correct, as these details will appear in the final proposal document.",
+  position:"bottom"
+},
   { selector:"#btn-gen", closest:".proposal-strip", tab:"tab-proposal", title:"Step 16: Generate Proposal", body:"Click <strong>Generate Proposal</strong> to produce the branded PDF. It saves automatically and opens in the Proposal Portal.", position:"top", isFinal:true }
 ];
 var currentStep=0,tourActive=false,calcDone=true,totalSteps=DESIGN_STEPS.length;
