@@ -327,19 +327,16 @@
               <div class="form-group"><label class="form-label">Installation Date</label><input type="date" class="form-input" id="inst-date"></div>
             </div>
             <hr class="section-sep">
-            <div class="section-label">🔒 Approved System Snapshot</div>
-            <div id="locked-snapshot" style="background:rgba(46,204,138,.05);border:1px solid rgba(46,204,138,.2);border-radius:8px;padding:16px 20px;margin-bottom:4px">
-              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:14px">Locked — approved design. Cannot be edited here.</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Panel Brand</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-panelbrand-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Panel Wattage</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-panelwatt-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Panel Qty</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-panelqty-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Inverter Brand</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-inverterbrand-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Inverter kW</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-inverterkw-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Battery Brand</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-batterybrand-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Battery kWh</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-batterykwh-ro">—</div></div>
-                <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Battery Qty</div><div class="form-input" style="opacity:.7;cursor:not-allowed" id="inst-batteryqty-ro">—</div></div>
-              </div>
+            <div class="section-label">Equipment Specification</div>
+            <div class="form-grid-3">
+              <div class="form-group"><label class="form-label">Panel Brand</label><input type="text" class="form-input" id="inst-panelbrand" placeholder="e.g. JA Solar"></div>
+              <div class="form-group"><label class="form-label">Panel Wattage</label><input type="number" class="form-input" id="inst-panelwatt" placeholder="e.g. 550"></div>
+              <div class="form-group"><label class="form-label">Panel Quantity</label><input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20"></div>
+              <div class="form-group"><label class="form-label">Inverter Brand</label><input type="text" class="form-input" id="inst-inverterbrand" placeholder="e.g. Sungrow"></div>
+              <div class="form-group"><label class="form-label">Inverter Size (kW)</label><input type="number" step="0.1" class="form-input" id="inst-inverterkw" placeholder="e.g. 10.0"></div>
+              <div class="form-group"><label class="form-label">Battery Brand</label><input type="text" class="form-input" id="inst-batterybrand" placeholder="e.g. BYD"></div>
+              <div class="form-group"><label class="form-label">Battery kWh (each)</label><input type="number" step="0.1" class="form-input" id="inst-batterykwh" placeholder="e.g. 10.0"></div>
+              <div class="form-group"><label class="form-label">Battery Quantity</label><input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1"></div>
             </div>
             <div class="btn-row"><button class="btn btn-primary" id="btn-schedule" onclick="scheduleInstallation()">✓ Schedule Installation</button><button class="btn btn-ghost" onclick="saveInstallPrepDraft()">💾 Save Progress</button></div>
           </div>
@@ -436,15 +433,10 @@ let _busy=false;
 function beginAction(id){if(_busy)return false;_busy=true;const b=document.getElementById(id);if(b){b.disabled=true;b.style.opacity='0.6';}return true;}
 function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.disabled=false;b.style.opacity='';}}
 
- (async function ssoInit(){
-  const urlTok=new URLSearchParams(window.location.search).get('t');
-  if(urlTok){try{await sbClient.auth.setSession({access_token:urlTok,refresh_token:urlTok});}catch(e){}
-  history.replaceState({},'','job-portal.html');}
-})(); 
 (async function boot(){
   try{
     const {data:{session}, error}=await sbClient.auth.getSession();
-if(!session){window.location.href='solar-intelligence.html';return;}
+if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
 
 
 setSyncStatus('online');
@@ -527,20 +519,7 @@ async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
   const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
-  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);
-// Deduplicate: keep only most-progressed job per client email
-var _stageOrder=['accepted','site_visit_scheduled','site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'];
-function _stageScore(j){var i=_stageOrder.indexOf(j.job_status||'accepted');return i<0?0:i;}
-var _seen={},_deduped=[];
-(d||[]).forEach(function(j){
-  var k=(j.client_email||'').toLowerCase().trim();
-  if(!k){_deduped.push(j);return;}
-  if(!_seen[k]||_stageScore(j)>_stageScore(_seen[k])||(_stageScore(j)===_stageScore(_seen[k])&&j.ai_id>_seen[k].ai_id)){_seen[k]=j;}
-});
-Object.keys(_seen).forEach(function(k){_deduped.push(_seen[k]);});
-_deduped.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
-jobs=_deduped;
-renderSidebar();setSyncStatus('online');
+  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
   }
@@ -828,9 +807,9 @@ function prefillForms(){
   const v=currentVisit;
   if(v){setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);checkDesignChangeLive();}
   const latestVersion=currentProposalVersions[0];
-  if(latestVersion){setText('inst-panelbrand-ro',latestVersion.panel_brand||'—');setText('inst-panelwatt-ro',latestVersion.panel_watt||'—');setText('inst-panelqty-ro',latestVersion.panels_qty||'—');setText('inst-inverterbrand-ro',latestVersion.inverter_brand||'—');setText('inst-inverterkw-ro',latestVersion.inverter_kw||'—');setText('inst-batterybrand-ro',latestVersion.battery_brand||'—');setText('inst-batterykwh-ro',latestVersion.battery_unit_kwh||'—');setText('inst-batteryqty-ro',latestVersion.battery_qty||'—');}
+  if(latestVersion&&!currentInstall){setVal('inst-panelbrand',latestVersion.panel_brand);setVal('inst-panelwatt',latestVersion.panel_watt);setVal('inst-panelqty',latestVersion.panels_qty);setVal('inst-inverterbrand',latestVersion.inverter_brand);setVal('inst-inverterkw',latestVersion.inverter_kw);setVal('inst-batterybrand',latestVersion.battery_brand);setVal('inst-batterykwh',latestVersion.battery_unit_kwh);setVal('inst-batteryqty',latestVersion.battery_qty);}
   const inst=currentInstall;
-  if(inst){setVal('inst-teamlead',inst.team_lead);setVal('inst-team',inst.team_members);setVal('inst-date',inst.scheduled_date);setText('inst-panelbrand-ro',inst.panels_brand||'—');setText('inst-panelwatt-ro',inst.panels_watt||'—');setText('inst-panelqty-ro',inst.panels_qty||'—');setText('inst-inverterbrand-ro',inst.inverter_brand||'—');setText('inst-inverterkw-ro',inst.inverter_kw||'—');setText('inst-batterybrand-ro',inst.battery_brand||'—');setText('inst-batterykwh-ro',inst.battery_kwh||'—');setText('inst-batteryqty-ro',inst.battery_qty||'—');setVal('comp-kw',v?.recommended_system_kw||inst.final_system_kw);setVal('comp-battery',v?.recommended_battery_kwh||inst.final_battery_kwh);setVal('comp-punchlist',inst.punch_list);setVal('comp-inspector',inst.inspector_name);setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');if(inst.install_checklist?.length)reloadChecklist(inst.install_checklist);}
+  if(inst){setVal('inst-teamlead',inst.team_lead);setVal('inst-team',inst.team_members);setVal('inst-date',inst.scheduled_date);setVal('inst-panelbrand',inst.panels_brand);setVal('inst-panelwatt',inst.panels_watt);setVal('inst-panelqty',inst.panels_qty);setVal('inst-inverterbrand',inst.inverter_brand);setVal('inst-inverterkw',inst.inverter_kw);setVal('inst-batterybrand',inst.battery_brand);setVal('inst-batterykwh',inst.battery_kwh);setVal('inst-batteryqty',inst.battery_qty);setVal('comp-kw',v?.recommended_system_kw||inst.final_system_kw);setVal('comp-battery',v?.recommended_battery_kwh||inst.final_battery_kwh);setVal('comp-punchlist',inst.punch_list);setVal('comp-inspector',inst.inspector_name);setVal('comp-inspdate',inst.inspector_signed_at?inst.inspector_signed_at.slice(0,10):'');if(inst.install_checklist?.length)reloadChecklist(inst.install_checklist);}
   const ho=currentHandover;
   if(ho){setVal('ho-cocnum',ho.coc_number);setVal('ho-cocby',ho.coc_issued_by);setVal('ho-cocdate',ho.coc_issued_at);setVal('ho-gridref',ho.grid_application_number);setVal('ho-gridapproved',String(ho.grid_approved));setVal('ho-trained',String(ho.customer_trained));setVal('ho-trainingnotes',ho.training_notes);setVal('ho-by',ho.handed_over_by);if(ho.handed_over_at)renderHandoverDoc();}
   checkNotifyReady();
@@ -886,7 +865,7 @@ async function _saveSiteVisit(complete){
 async function scheduleInstallation(){if(!beginAction('btn-schedule'))return;try{await _saveInstallPrep(true);}finally{endAction('btn-schedule');}}
 async function _saveInstallPrep(schedule){
   if(!currentJob)return;
-  const id={job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),scheduled_date:getVal('inst-date')||null,install_checklist:collectChecklist()};
+  const id={job_id:String(currentJob.ai_id),team_lead:getVal('inst-teamlead'),team_members:getVal('inst-team'),scheduled_date:getVal('inst-date')||null,panels_brand:getVal('inst-panelbrand'),panels_watt:parseInt(getVal('inst-panelwatt'))||null,panels_qty:parseInt(getVal('inst-panelqty'))||null,inverter_brand:getVal('inst-inverterbrand'),inverter_kw:parseFloat(getVal('inst-inverterkw'))||null,battery_brand:getVal('inst-batterybrand'),battery_kwh:parseFloat(getVal('inst-batterykwh'))||null,battery_qty:parseInt(getVal('inst-batteryqty'))||null,install_checklist:collectChecklist()};
   try{
     if(currentInstall){await sbPatch('installations','id=eq.'+currentInstall.id,id);}else{const r=await sbPost('installations',{...id,installer_id:currentJob.installer_id||null});currentInstall=r?.[0]||null;}
     if(schedule){await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'installation_scheduled',installation_date:getVal('inst-date')||null,assigned_team:getVal('inst-teamlead')});await logActivity('INSTALL PREP','Installation scheduled for '+getVal('inst-date'),getVal('inst-teamlead'));toast('Installation scheduled!','success');await openJob(currentJob.ai_id);}
