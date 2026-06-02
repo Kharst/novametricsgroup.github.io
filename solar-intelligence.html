@@ -2082,21 +2082,21 @@ var LS_DESIGN = 'nm_tour_design_done';
 var LS_FIRST  = 'nm_first_design_done';
 var PADDING   = 10;
 var DESIGN_STEPS = [
-  { selector:"#loc-display", title:"Step 1: Choose a Location", body:"Pick the client location so irradiance and yield use the correct design value.", position:"bottom" },
+  { selector:"#loc-display", title:"Step 1: Location", body:"Pick the client location — irradiance and yield use this design value.", position:"bottom" },
   { selector:"#lb-trigger", title:"Step 2: Load Builder", body:"Open the Load Builder and add the client's appliances or choose a quick template.", position:"bottom" },
   { selector:"#sel-autonomy", title:"Step 3: Evening Backup Hours", body:"Choose how many evening backup hours the client needs from the battery.", position:"bottom" },
   { selector:"#sel-tariff", title:"Step 4: Tariff (R/kWh)", body:"Choose the electricity tariff used to calculate savings and payback.", position:"bottom" },
   { selector:"#sel-markup", title:"Step 5: Markup %", body:"Set your margin so the proposal uses your intended client price.", position:"bottom" },
-  { selector:".btn-calc", title:"Step 6: Design System", body:"Once your inputs are set, click <strong>⚡ Design System</strong> to run the sizing engine. It selects the best compliant panel, battery, and inverter combination for your client.", position:"top" },
+  { selector:".btn-calc", title:"Step 6: Design System", body:"Once your inputs are set, click <strong>⚡ Design System</strong> to run the sizing engine. It selects the best compliant panel, battery, and inverter for your client.", position:"top" },
   { selector:"#r-panel-model", closest:".kpi", tab:"tab-solar", title:"Step 7: Solar Array — Recommended Panel", body:"The engine selects the best panel for your client's load. This card shows the model chosen.", position:"bottom" },
   { selector:"#r-dc-cap", closest:".kpi", tab:"tab-solar", title:"Step 8: Solar Array — Recommended DC Capacity", body:"This card shows the total installed solar DC capacity sized to cover your client's daily usage.", position:"bottom" },
-  { selector:"#sys-rec-kpi", tab:"tab-battery", title:"Step 9: Battery — System Compliance", body:"This section confirms whether the solar array, battery, inverter, and DC/AC ratio all pass together.", position:"bottom" },
-  { selector:"#b-needed", closest:".kpi", tab:"tab-battery", title:"Step 10: Battery — Evening Energy Required", body:"This card shows how much energy the battery must cover overnight based on the backup hours you set.", position:"bottom" },
-  { selector:"#i-model-kpi", tab:"tab-inverter", title:"Step 11: Inverter — Recommended Model", body:"The engine picks the best compliant inverter for your load and solar array. This card shows the selection.", position:"bottom" },
-  { selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", title:"Step 12: Inverter — NRS 097-2-1 Compliance", body:"This row shows the NRS 097-2-1 grid connection compliance check. It must pass before a proposal can be generated.", position:"bottom" },
+  { selector:"#sys-rec-kpi", tab:"tab-battery", title:"Step 9: Battery — System Compliance", body:"This card confirms whether the solar array, battery, inverter, and DC/AC ratio all pass together.", position:"bottom" },
+  { selector:"#b-needed", closest:".kpi", tab:"tab-battery", title:"Step 10: Battery — Evening Energy Required", body:"This card shows the energy the battery must cover overnight based on the backup hours you set.", position:"bottom" },
+  { selector:"#i-model-kpi", tab:"tab-inverter", title:"Step 11: Inverter — Recommended Inverter", body:"The engine picks the best compliant inverter for your load and solar array. This card shows the selection.", position:"bottom" },
+  { selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", title:"Step 12: Inverter — NRS 097-2-1 Grid Connection Standard", body:"This row shows the NRS 097-2-1 compliance check. It must pass before a proposal can be generated.", position:"bottom" },
   { selector:"#f-total-cost", closest:".kpi", tab:"tab-financials", title:"Step 13: Financials — Recommended Total System Cost", body:"This card shows the full system cost including your markup, ready to present to the client.", position:"bottom" },
-  { selector:"#f-npv", closest:".status-row", tab:"tab-financials", title:"Step 14: Financials — NPV @ 12% Discount Rate", body:"This row shows the 25-year net present value, real payback period, and IRR for your client's investment.", position:"bottom" },
-  { selector:"#p-name", closest:".client-form", tab:"tab-proposal", title:"Step 15: Generate Proposal — Client Details", body:"Enter the client's name, email, phone, and address. These appear on the cover page of the proposal PDF.", position:"bottom" },
+  { selector:"#f-npv", closest:".status-row", tab:"tab-financials", title:"Step 14: Financials — NPV @ 12% Discount Rate (25 yr)", body:"This row shows the 25-year net present value and real payback period for your client's investment.", position:"bottom" },
+  { selector:"#p-name", closest:".client-form", tab:"tab-proposal", title:"Step 15: Generate Proposal — Client Details", body:"Enter the client's name, email, phone, and address — these appear on the proposal cover page.", position:"bottom" },
   { selector:"#btn-gen", closest:".proposal-strip", tab:"tab-proposal", title:"Step 16: Generate Proposal", body:"Click <strong>Generate Proposal</strong> to produce the branded PDF. It saves automatically and opens in the Proposal Portal.", position:"top", isFinal:true }
 ];
 var currentStep=0,tourActive=false,calcDone=true,totalSteps=DESIGN_STEPS.length;
