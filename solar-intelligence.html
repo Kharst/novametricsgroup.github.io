@@ -2111,18 +2111,44 @@ function positionRing(r){var ring=$('#wt-ring');ring.style.display='block';ring.
 function positionArrow(r,pos){var arrow=$('#wt-arrow');arrow.style.display='block';if(pos==='top'){arrow.innerHTML='👇';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.bottom+PADDING+6)+'px';}else{arrow.innerHTML='👆';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.top-PADDING-42)+'px';}}
 function positionTooltip(r,pos){var tip=$('#wt-tooltip');tip.style.display='block';tip.style.borderColor='';var tw=320,th=180,x,y;if(pos==='bottom'){y=r.bottom+PADDING+50;x=r.left+r.width/2-tw/2;}else{y=r.top-PADDING-50-th;x=r.left+r.width/2-tw/2;}x=Math.max(12,Math.min(x,vw()-tw-12));y=Math.max(12,Math.min(y,vh()-th-12));tip.style.left=x+'px';tip.style.top=y+'px';}
 function scrollIntoView(el){var r=rect(el);if(r.top<100||r.bottom>vh()-100){el.scrollIntoView({behavior:'smooth',block:'center'});}}
-function renderStep(idx){var step=DESIGN_STEPS[idx];if (step.tab && typeof window.showTab === 'function') {
-  window.showTab(step.tab);
-}if(!step){endTour(false);return;}if(step.waitForCalc&&!calcDone){endTour(false);return;}var el=document.querySelector(step.selector);if(!el){advanceStep();return;}scrollIntoView(el);setTimeout(function(){var r=rect(el);var overlay=$('#wt-overlay');overlay.classList.add('active');positionCurtains(r);positionRing(r);positionArrow(r,step.position);positionTooltip(r,step.position);$('#wt-step-label').textContent='Step '+(idx+1)+' of '+totalSteps;$('#wt-title').innerHTML=step.title;$('#wt-body').innerHTML=step.body;buildDots();// Button label
-// Button label
-var btn = $('#wt-btn-next');
-if (step.actionLabel) {
-  btn.textContent = step.actionLabel;
-} else if (step.isFinal) {
-  btn.textContent = 'Finish tour';
-} else {
-  btn.textContent = 'Got it - next';
-},350);}
+function renderStep(idx){
+  var step=DESIGN_STEPS[idx];
+  if(!step){endTour(false);return;}
+
+  if (step.tab && typeof window.showTab === 'function') {
+    window.showTab(step.tab);
+  }
+
+  if(step.waitForCalc&&!calcDone){endTour(false);return;}
+
+  var el=document.querySelector(step.selector);
+  if(!el){advanceStep();return;}
+
+  scrollIntoView(el);
+
+  setTimeout(function(){
+    var r=rect(el);
+    var overlay=$('#wt-overlay');
+    overlay.classList.add('active');
+    positionCurtains(r);
+    positionRing(r);
+    positionArrow(r,step.position);
+    positionTooltip(r,step.position);
+    $('#wt-step-label').textContent='Step '+(idx+1)+' of '+totalSteps;
+    $('#wt-title').innerHTML=step.title;
+    $('#wt-body').innerHTML=step.body;
+    buildDots();
+
+    var btn = $('#wt-btn-next');
+    if (step.actionLabel) {
+      btn.textContent = step.actionLabel;
+    } else if (step.isFinal) {
+      btn.textContent = 'Finish tour';
+    } else {
+      btn.textContent = 'Got it - next';
+    }
+  },350);
+}
 function advanceStep(){currentStep++;if(currentStep>=totalSteps){endTour(false);return;}renderStep(currentStep);}
 function endTour(skipped){tourActive=false;var overlay=$('#wt-overlay');if(overlay)overlay.classList.remove('active');['wt-top','wt-bottom','wt-left','wt-right'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.cssText='top:0;left:0;width:0;height:0;';});var ring=$('#wt-ring'),arrow=$('#wt-arrow'),tip=$('#wt-tooltip');if(ring)ring.style.display='none';if(arrow)arrow.style.display='none';if(tip)tip.style.display='none';if(!skipped){try{localStorage.setItem(LS_DESIGN,'1');}catch(e){}}var hbtn=$('#wt-help-btn');if(hbtn)hbtn.classList.add('visible');}
 function showCongratsSpotlight(){var actionsEl=document.querySelector('.success-actions');if(!actionsEl)return;actionsEl.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){var r=rect(actionsEl);var overlay=$('#wt-overlay');overlay.classList.add('active');positionCurtains(r);var ring=$('#wt-ring');ring.style.display='block';ring.style.left=(r.left-PADDING)+'px';ring.style.top=(r.top-PADDING)+'px';ring.style.width=(r.width+PADDING*2)+'px';ring.style.height=(r.height+PADDING*2)+'px';ring.style.borderColor='#34d399';ring.style.boxShadow='0 0 0 4px rgba(52,211,153,.15),0 0 32px rgba(52,211,153,.22)';var arrow=$('#wt-arrow');arrow.style.display='block';arrow.innerHTML='👇';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.bottom+PADDING+4)+'px';var tip=$('#wt-tooltip');tip.style.display='block';tip.style.borderColor='rgba(52,211,153,.35)';var tw=320,th=220,x=r.left+r.width/2-tw/2,y=r.top-PADDING-50-th;x=Math.max(12,Math.min(x,vw()-tw-12));y=Math.max(12,Math.min(y,vh()-th-12));tip.style.left=x+'px';tip.style.top=y+'px';$('#wt-step-label').textContent='You are done!';$('#wt-title').innerHTML='🎉 First proposal — well done!';$('#wt-body').innerHTML='Your proposal PDF is saved. Use the buttons below to <strong>download it</strong>, <strong>open it in the Proposal Portal</strong>, or start a new design.<br><br>Once you\'ve sent it to your client, hop over to the <strong>Proposal Portal</strong> — that\'s where all your proposals live.';var acts=document.getElementById('wt-acts');if(acts){acts.innerHTML='<a href="prposal_portal.html" class="wt-btn-next" style="text-decoration:none;background:#34d399;color:#064e3b;flex:1;text-align:center;">Go to Proposal Portal →</a><button class="wt-btn-skip" id="wt-congrats-done">Got it ✓</button>';var doneBtn=document.getElementById('wt-congrats-done');if(doneBtn)doneBtn.addEventListener('click',function(){endTour(false);});}var dotsEl=$('#wt-dots');if(dotsEl){dotsEl.innerHTML='';for(var i=0;i<6;i++){var d=document.createElement('div');d.className='wt-dot done';dotsEl.appendChild(d);}}},400);}
