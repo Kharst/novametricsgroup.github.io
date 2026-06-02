@@ -436,10 +436,15 @@ let _busy=false;
 function beginAction(id){if(_busy)return false;_busy=true;const b=document.getElementById(id);if(b){b.disabled=true;b.style.opacity='0.6';}return true;}
 function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.disabled=false;b.style.opacity='';}}
 
+ (async function ssoInit(){
+  const urlTok=new URLSearchParams(window.location.search).get('t');
+  if(urlTok){try{await sbClient.auth.setSession({access_token:urlTok,refresh_token:urlTok});}catch(e){}
+  history.replaceState({},'','job-portal.html');}
+})(); 
 (async function boot(){
   try{
     const {data:{session}, error}=await sbClient.auth.getSession();
-if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
+if(!session){window.location.href='solar-intelligence.html';return;}
 
 
 setSyncStatus('online');
@@ -522,7 +527,20 @@ async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
   const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
-  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
+  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);
+// Deduplicate: keep only most-progressed job per client email
+var _stageOrder=['accepted','site_visit_scheduled','site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'];
+function _stageScore(j){var i=_stageOrder.indexOf(j.job_status||'accepted');return i<0?0:i;}
+var _seen={},_deduped=[];
+(d||[]).forEach(function(j){
+  var k=(j.client_email||'').toLowerCase().trim();
+  if(!k){_deduped.push(j);return;}
+  if(!_seen[k]||_stageScore(j)>_stageScore(_seen[k])||(_stageScore(j)===_stageScore(_seen[k])&&j.ai_id>_seen[k].ai_id)){_seen[k]=j;}
+});
+Object.keys(_seen).forEach(function(k){_deduped.push(_seen[k]);});
+_deduped.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+jobs=_deduped;
+renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
   }
