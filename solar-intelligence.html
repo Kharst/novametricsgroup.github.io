@@ -2133,7 +2133,7 @@ function renderStep(idx){
   var el=getTourTarget(step);
   if(!el){advanceStep();return;}
 
-  scrollIntoView(el);
+  el.scrollIntoView({behavior:'smooth', block:'center'});
 
   setTimeout(function(){
     var r=rect(el);
