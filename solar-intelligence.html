@@ -2087,18 +2087,18 @@ var DESIGN_STEPS = [
   { selector:"#sel-autonomy", title:"Step 3: Set Backup Hours", body:"Choose how many evening backup hours the client needs from the battery.", position:"bottom" },
   { selector:"#sel-tariff", title:"Step 4: Select Tariff", body:"Choose the electricity tariff used to calculate savings and payback.", position:"bottom" },
   { selector:"#sel-markup", title:"Step 5: Set Markup", body:"Set your margin so the proposal uses your intended client price.", position:"bottom" },
-  { selector:".btn-calc", title:"Step 6: Design the System", body:"Run the design once the inputs are ready. The results appear across the tabs below.", position:"top", actionLabel:"Next: review results" },
+  { selector:".btn-calc", title:"Step 6: Design the System", body:"Click this to run the sizing engine. The tour will continue after the system has generated real results.", position:"top", actionLabel:"Design system", runCalculation:true },
 
-  { selector:"#r-panel-model", tab:"tab-solar", title:"Step 7: Solar Array Result", body:"The Solar Array tab shows the selected panel model, array size, panel count, roof fit, and yield assumptions.", position:"bottom" },
-  { selector:"#r-dc-cap", tab:"tab-solar", title:"Step 8: DC Capacity", body:"This is the recommended installed solar DC capacity for the design.", position:"bottom" },
-  { selector:"#sys-rec-kpi", tab:"tab-battery", title:"Step 9: System Compliance", body:"The Battery tab starts with the cross-system compliance result across solar, battery, inverter, and DC/AC ratio.", position:"bottom" },
-  { selector:"#b-needed", tab:"tab-battery", title:"Step 10: Battery Sizing", body:"Review evening energy required, installed battery capacity, battery units, and expected runtime.", position:"bottom" },
-  { selector:"#i-model-kpi", tab:"tab-inverter", title:"Step 11: Inverter Selection", body:"The Inverter tab shows the recommended inverter and whether it can handle the selected load.", position:"bottom" },
-  { selector:"#i-nrs097-status", tab:"tab-inverter", title:"Step 12: NRS Compliance", body:"This check confirms the inverter and design align with the NRS 097-2-1 grid connection requirements.", position:"bottom" },
-  { selector:"#f-total-cost", tab:"tab-financials", title:"Step 13: Financial Summary", body:"The Financials tab shows recommended total cost, client price, profit, and year-one savings.", position:"bottom" },
-  { selector:"#f-npv", tab:"tab-financials", title:"Step 14: Investment Model", body:"Review NPV, IRR, payback, lifetime savings, and tariff escalation assumptions.", position:"bottom" },
-  { selector:"#p-name", tab:"tab-proposal", title:"Step 15: Client Details", body:"Enter the client details and choose residential or commercial proposal format.", position:"bottom" },
-  { selector:"#btn-gen", tab:"tab-proposal", title:"Step 16: Generate Proposal", body:"After a compliant design is ready, generate the branded proposal and open it in the Proposal Portal.", position:"top", isFinal:true }
+  { selector:"#r-panel-model", closest:".kpi", tab:"tab-solar", requiresCalc:true, title:"Step 7: Solar Array Result", body:"This card shows the selected panel model and the solar design result.", position:"bottom" },
+{ selector:"#r-dc-cap", closest:".kpi", tab:"tab-solar", requiresCalc:true, title:"Step 8: DC Capacity", body:"This card shows the recommended installed solar DC capacity.", position:"bottom" },
+{ selector:"#sys-rec-kpi", tab:"tab-battery", requiresCalc:true, title:"Step 9: System Compliance", body:"This section confirms whether the solar, battery, inverter, and DC/AC ratio work together.", position:"bottom" },
+{ selector:"#b-needed", closest:".kpi", tab:"tab-battery", requiresCalc:true, title:"Step 10: Battery Sizing", body:"This card explains the evening energy requirement and backup sizing.", position:"bottom" },
+{ selector:"#i-model-kpi", tab:"tab-inverter", requiresCalc:true, title:"Step 11: Inverter Selection", body:"This card shows the recommended inverter and its compliance status.", position:"bottom" },
+{ selector:"#i-nrs097-status", closest:".status-row", tab:"tab-inverter", requiresCalc:true, title:"Step 12: NRS Compliance", body:"This row shows the NRS 097-2-1 grid connection compliance check.", position:"bottom" },
+{ selector:"#f-total-cost", closest:".kpi", tab:"tab-financials", requiresCalc:true, title:"Step 13: Financial Summary", body:"This card shows the total recommended system cost.", position:"bottom" },
+{ selector:"#f-npv", closest:".status-row", tab:"tab-financials", requiresCalc:true, title:"Step 14: Investment Model", body:"This row shows the NPV, payback, and investment case.", position:"bottom" },
+{ selector:"#p-name", closest:".client-form", tab:"tab-proposal", requiresCalc:true, title:"Step 15: Client Details", body:"Enter the client details before generating the proposal.", position:"bottom" },
+{ selector:"#btn-gen", closest:".proposal-strip", tab:"tab-proposal", requiresCalc:true, title:"Step 16: Generate Proposal", body:"Generate the branded proposal and open it in the Proposal Portal.", position:"top", isFinal:true }
 ];
 var currentStep=0,tourActive=false,calcDone=false,totalSteps=DESIGN_STEPS.length;
 function $(sel){return document.querySelector(sel);}
@@ -2111,7 +2111,14 @@ function positionRing(r){var ring=$('#wt-ring');ring.style.display='block';ring.
 function positionArrow(r,pos){var arrow=$('#wt-arrow');arrow.style.display='block';if(pos==='top'){arrow.innerHTML='👇';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.bottom+PADDING+6)+'px';}else{arrow.innerHTML='👆';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.top-PADDING-42)+'px';}}
 function positionTooltip(r,pos){var tip=$('#wt-tooltip');tip.style.display='block';tip.style.borderColor='';var tw=320,th=180,x,y;if(pos==='bottom'){y=r.bottom+PADDING+50;x=r.left+r.width/2-tw/2;}else{y=r.top-PADDING-50-th;x=r.left+r.width/2-tw/2;}x=Math.max(12,Math.min(x,vw()-tw-12));y=Math.max(12,Math.min(y,vh()-th-12));tip.style.left=x+'px';tip.style.top=y+'px';}
 function scrollIntoView(el){var r=rect(el);if(r.top<100||r.bottom>vh()-100){el.scrollIntoView({behavior:'smooth',block:'center'});}}
-function renderStep(idx){
+function 
+  function getTourTarget(step){
+  var el=document.querySelector(step.selector);
+  if(el && step.closest) el=el.closest(step.closest)||el;
+  return el;
+}
+  
+  renderStep(idx){
   var step=DESIGN_STEPS[idx];
   if(!step){endTour(false);return;}
 
@@ -2121,7 +2128,7 @@ function renderStep(idx){
 
   if(step.waitForCalc&&!calcDone){endTour(false);return;}
 
-  var el=document.querySelector(step.selector);
+  var el=getTourTarget(step);
   if(!el){advanceStep();return;}
 
   scrollIntoView(el);
@@ -2154,7 +2161,25 @@ function endTour(skipped){tourActive=false;var overlay=$('#wt-overlay');if(overl
 function showCongratsSpotlight(){var actionsEl=document.querySelector('.success-actions');if(!actionsEl)return;actionsEl.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){var r=rect(actionsEl);var overlay=$('#wt-overlay');overlay.classList.add('active');positionCurtains(r);var ring=$('#wt-ring');ring.style.display='block';ring.style.left=(r.left-PADDING)+'px';ring.style.top=(r.top-PADDING)+'px';ring.style.width=(r.width+PADDING*2)+'px';ring.style.height=(r.height+PADDING*2)+'px';ring.style.borderColor='#34d399';ring.style.boxShadow='0 0 0 4px rgba(52,211,153,.15),0 0 32px rgba(52,211,153,.22)';var arrow=$('#wt-arrow');arrow.style.display='block';arrow.innerHTML='👇';arrow.style.left=(r.left+r.width/2-13)+'px';arrow.style.top=(r.bottom+PADDING+4)+'px';var tip=$('#wt-tooltip');tip.style.display='block';tip.style.borderColor='rgba(52,211,153,.35)';var tw=320,th=220,x=r.left+r.width/2-tw/2,y=r.top-PADDING-50-th;x=Math.max(12,Math.min(x,vw()-tw-12));y=Math.max(12,Math.min(y,vh()-th-12));tip.style.left=x+'px';tip.style.top=y+'px';$('#wt-step-label').textContent='You are done!';$('#wt-title').innerHTML='🎉 First proposal — well done!';$('#wt-body').innerHTML='Your proposal PDF is saved. Use the buttons below to <strong>download it</strong>, <strong>open it in the Proposal Portal</strong>, or start a new design.<br><br>Once you\'ve sent it to your client, hop over to the <strong>Proposal Portal</strong> — that\'s where all your proposals live.';var acts=document.getElementById('wt-acts');if(acts){acts.innerHTML='<a href="prposal_portal.html" class="wt-btn-next" style="text-decoration:none;background:#34d399;color:#064e3b;flex:1;text-align:center;">Go to Proposal Portal →</a><button class="wt-btn-skip" id="wt-congrats-done">Got it ✓</button>';var doneBtn=document.getElementById('wt-congrats-done');if(doneBtn)doneBtn.addEventListener('click',function(){endTour(false);});}var dotsEl=$('#wt-dots');if(dotsEl){dotsEl.innerHTML='';for(var i=0;i<6;i++){var d=document.createElement('div');d.className='wt-dot done';dotsEl.appendChild(d);}}},400);}
 function startTour(){var appScreen=$('#app-screen');if(!appScreen||appScreen.style.display==='none')return;tourActive=true;currentStep=0;renderStep(0);}
 function maybeAutoStart(){try{if(!localStorage.getItem(LS_DESIGN)){setTimeout(startTour,800);}else{var hbtn=$('#wt-help-btn');if(hbtn)hbtn.classList.add('visible');}}catch(e){startTour();}}
-function wireButtons(){var nextBtn=document.getElementById('wt-btn-next'),skipBtn=document.getElementById('wt-btn-skip'),helpBtn=document.getElementById('wt-help-btn');if(nextBtn)nextBtn.addEventListener('click',function(){advanceStep();});if(skipBtn)skipBtn.addEventListener('click',function(){endTour(true);});if(helpBtn)helpBtn.addEventListener('click',function(){currentStep=0;calcDone=false;startTour();});}
+function wireButtons(){
+  var nextBtn=document.getElementById('wt-btn-next'),
+      skipBtn=document.getElementById('wt-btn-skip'),
+      helpBtn=document.getElementById('wt-help-btn');
+
+  if(nextBtn)nextBtn.addEventListener('click',function(){
+    var step=DESIGN_STEPS[currentStep];
+
+    if(step && step.runCalculation){
+      if(typeof window.calculate==='function') window.calculate();
+      return;
+    }
+
+    advanceStep();
+  });
+
+  if(skipBtn)skipBtn.addEventListener('click',function(){endTour(true);});
+  if(helpBtn)helpBtn.addEventListener('click',function(){currentStep=0;calcDone=false;startTour();});
+}
 function watchForAppScreen(){var appScreen=document.getElementById('app-screen');if(!appScreen)return;var observer=new MutationObserver(function(mutations){mutations.forEach(function(m){if(m.attributeName==='style'){var display=window.getComputedStyle(appScreen).display;if(display!=='none'){observer.disconnect();setTimeout(maybeAutoStart,600);}}});});observer.observe(appScreen,{attributes:true});}
 function hookCalculate(){var attempts=0;var interval=setInterval(function(){attempts++;if(typeof window.calculate==='function'){clearInterval(interval);var originalCalc=window.calculate;window.calculate=function(){originalCalc.apply(this,arguments);setTimeout(function(){if(typeof calcResult!=='undefined'&&calcResult&&calcResult.systemRecommended){calcDone=true;onFirstDesignComplete();if(tourActive&&currentStep===5){currentStep++;renderStep(currentStep);}}},500);};}if(attempts>60)clearInterval(interval);},100);}
 function hookGenerate(){var attempts=0;var interval=setInterval(function(){attempts++;if(typeof window.generateProposal==='function'){clearInterval(interval);var originalGen=window.generateProposal;window.generateProposal=function(){originalGen.apply(this,arguments);var polls=0;var poll=setInterval(function(){polls++;var card=document.querySelector('.success-card');if(card&&card.classList.contains('on')){clearInterval(poll);tourActive=false;try{localStorage.setItem(LS_DESIGN,'1');}catch(e){}setTimeout(showCongratsSpotlight,400);}if(polls>40)clearInterval(poll);},300);};}if(attempts>60)clearInterval(interval);},100);}
