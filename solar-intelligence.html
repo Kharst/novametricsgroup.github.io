@@ -2114,6 +2114,7 @@ function scrollIntoView(el){var r=rect(el);if(r.top<100||r.bottom>vh()-100){el.s
 function renderStep(idx){var step=DESIGN_STEPS[idx];if (step.tab && typeof window.showTab === 'function') {
   window.showTab(step.tab);
 }if(!step){endTour(false);return;}if(step.waitForCalc&&!calcDone){endTour(false);return;}var el=document.querySelector(step.selector);if(!el){advanceStep();return;}scrollIntoView(el);setTimeout(function(){var r=rect(el);var overlay=$('#wt-overlay');overlay.classList.add('active');positionCurtains(r);positionRing(r);positionArrow(r,step.position);positionTooltip(r,step.position);$('#wt-step-label').textContent='Step '+(idx+1)+' of '+totalSteps;$('#wt-title').innerHTML=step.title;$('#wt-body').innerHTML=step.body;buildDots();// Button label
+// Button label
 var btn = $('#wt-btn-next');
 if (step.actionLabel) {
   btn.textContent = step.actionLabel;
