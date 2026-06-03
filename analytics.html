@@ -1240,6 +1240,15 @@ body::after {
   border-radius: 2px;
   overflow: hidden;
 }
+
+ .hs-tip { position:relative; display:inline-flex; align-items:center; gap:4px; }
+.hs-tip-icon { width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,.05); border:1px solid var(--border2); font-size:8px; display:inline-flex; align-items:center; justify-content:center; color:var(--text3); cursor:help; flex-shrink:0; font-style:normal; font-family:var(--sans); font-weight:700; transition:all .15s; }
+.hs-tip:hover .hs-tip-icon { background:rgba(245,166,35,.14); border-color:rgba(245,166,35,.4); color:var(--amber); }
+.hs-tip-box { position:absolute; bottom:calc(100% + 10px); right:0; width:230px; background:#161f30; border:1px solid var(--border2); border-radius:9px; padding:13px 15px; font-family:var(--sans); font-size:11.5px; color:var(--text2); line-height:1.65; opacity:0; pointer-events:none; transition:opacity .18s; z-index:600; box-shadow:0 10px 32px rgba(0,0,0,.65); text-transform:none; letter-spacing:0; font-weight:400; }
+.hs-tip-box strong { display:block; font-size:10.5px; font-weight:700; color:var(--white); margin-bottom:6px; font-family:var(--mono); letter-spacing:.04em; text-transform:uppercase; }
+.hs-tip-box .tip-calc { font-family:var(--mono); font-size:9px; color:var(--text3); margin-top:7px; padding-top:7px; border-top:1px solid rgba(255,255,255,.06); line-height:1.55; }
+.hs-tip:hover .hs-tip-box { opacity:1; }
+.hs-tip-box::after { content:''; position:absolute; top:100%; right:14px; border:5px solid transparent; border-top-color:var(--border2); }  
 .hs-pillar-fill {
   height: 100%;
   border-radius: 2px;
@@ -1490,7 +1499,6 @@ body::after {
       <div class="tb-sub">Revenue, active jobs, pipeline value and what needs your attention today</div>
     </div>
     <div class="tb-right">
-      <div class="live-badge"><span class="sync-dot online" style="width:6px;height:6px"></span>LIVE</div>
       <span id="period-desc">Last 90 days</span>
     </div>
   </div>
@@ -2835,7 +2843,7 @@ function renderPriorities(proposals, jobs, visits){
   );
   const stalledVal = stalled.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
   if(stalled.length > 0){
-    chips.push({ cls:'red', ico:'🔴', text: `${stalled.length} job${stalled.length>1?'s':''} stalled — ${fmtR(stalledVal)} at risk` });
+    chips.push({ cls:'red', ico:'🔴', tab:'ops', text: `${stalled.length} job${stalled.length>1?'s':''} stalled — ${fmtR(stalledVal)} at risk` });
   }
 
   /* ── RED: Overdue follow-ups (sent 3+ days, not opened) ── */
@@ -2856,7 +2864,7 @@ function renderPriorities(proposals, jobs, visits){
     v.design_change_category === 'major' && v.client_approval_status === 'pending'
   );
   if(pendingApprovals.length > 0){
-    chips.push({ cls:'amber', ico:'⚠️', text: `${pendingApprovals.length} approval${pendingApprovals.length>1?'s':''} pending — install blocked` });
+    chips.push({ cls:'amber', ico:'⚠️', tab:'ops', text: `${pendingApprovals.length} approval${pendingApprovals.length>1?'s':''} pending — install blocked` });
   }
 
   /* ── AMBER: Hot leads not yet won ── */
@@ -2867,14 +2875,14 @@ function renderPriorities(proposals, jobs, visits){
   );
   if(hot.length > 0){
     const hotVal = hot.reduce((s,p)=>s+(parseFloat(p.total_cost)||0),0);
-    chips.push({ cls:'amber', ico:'🔥', text: `${hot.length} hot lead${hot.length>1?'s':''} — ${fmtR(hotVal)} viewed, not accepted` });
+    chips.push({ cls:'amber', ico:'🔥', tab:'sales', text: `${hot.length} hot lead${hot.length>1?'s':''} — ${fmtR(hotVal)} viewed, not accepted` });
   }
 
   /* ── BLUE: Pipeline value summary ── */
   const activeJobs   = jobs.filter(j => j.job_status !== 'handover_completed');
   const pipelineVal  = activeJobs.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
   if(pipelineVal > 0){
-    chips.push({ cls:'blue', ico:'💰', text: `${fmtR(pipelineVal)} pipeline — ${activeJobs.length} active job${activeJobs.length>1?'s':''}` });
+    chips.push({ cls:'blue', ico:'💰', tab:'overview', text: `${fmtR(pipelineVal)} pipeline — ${activeJobs.length} active job${activeJobs.length>1?'s':''}` });
   }
 
   /* ── GREEN: All clear signals ── */
@@ -2890,9 +2898,9 @@ function renderPriorities(proposals, jobs, visits){
     return;
   }
   el.innerHTML = chips.map(c => `
-    <div class="p-chip ${c.cls}">
+    <div class="p-chip ${c.cls}" ${c.tab ? `onclick="switchTab('${c.tab}');this.style.opacity='.7';setTimeout(()=>this.style.opacity='1',200)" style="cursor:pointer"` : ''}>
       <div class="p-chip-dot"></div>
-      ${c.ico} ${c.text}
+      ${c.ico} ${c.text}${c.tab ? '<span style="margin-left:5px;opacity:.5;font-size:9px">→</span>' : ''}
     </div>`
   ).join('');
 }   
