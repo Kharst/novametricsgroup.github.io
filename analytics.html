@@ -51,8 +51,8 @@
 
   --text:  #c8d4e8;
   --text2: #8a9ab8;
-  --text3: #4e6080;
-  --text4: #2e3e5a;
+  --text3: #6a7f9e;
+  --text4: #4e6080;
   --white: #eef4ff;
 
   --mono: 'IBM Plex Mono', monospace;
@@ -1466,6 +1466,18 @@ body::after {
   </div>
 </div>   
 
+<!-- ══ SAMPLE DATA BANNER — hidden by default, shown for new users ══ -->
+<div id="sample-banner" style="display:none;background:linear-gradient(90deg,rgba(245,166,35,.12),rgba(245,166,35,.06));border-bottom:1px solid rgba(245,166,35,.25);padding:10px 32px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:14px">🎯</span>
+    <div>
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.08em;text-transform:uppercase">Sample Data</span>
+      <span style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-left:8px">This is what your dashboard looks like once you start using the platform — all numbers are illustrative</span>
+    </div>
+  </div>
+  <a href="prposal_portal.html" style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);text-decoration:none;padding:5px 14px;border:1px solid rgba(245,166,35,.4);border-radius:5px;white-space:nowrap;transition:all .2s" onmouseover="this.style.background='rgba(245,166,35,.1)'" onmouseout="this.style.background='transparent'">Generate your first proposal →</a>
+</div>
+   
 <!-- ══════════════════════════════════════════════════
      TAB 1 — OVERVIEW
 ══════════════════════════════════════════════════ -->
@@ -1508,7 +1520,7 @@ body::after {
     <div class="hs-center">
       <div class="hs-title">
         <span>⬡</span> Business Health
-        <span style="font-size:9px;font-weight:400;color:var(--text3);letter-spacing:.06em;font-family:var(--sans);text-transform:none;margin-left:4px">· based on 5 performance areas</span>
+        <span onclick="document.getElementById('hs-method-row').style.display=document.getElementById('hs-method-row').style.display==='none'?'flex':'none'" style="font-size:9px;font-weight:400;color:var(--text3);letter-spacing:.06em;font-family:var(--sans);text-transform:none;margin-left:4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-style:dotted">· based on 5 performance areas ▾</span>
       </div>
       <div class="hs-verdict" id="hs-verdict" style="flex-wrap:wrap;gap:6px">
         <span id="hs-verdict-ico">⏳</span>
@@ -1517,7 +1529,7 @@ body::after {
       <div class="hs-drivers" id="hs-drivers">
         <div class="hs-driver"><div class="hs-driver-dot" style="background:var(--text3)"></div><span>Loading signals…</span></div>
       </div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div id="hs-method-row" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);display:none;align-items:center;gap:8px;flex-wrap:wrap">
       <span style="font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em">METHODOLOGY</span>
       <span style="font-size:9px;color:var(--text4);line-height:1.5">Sales conv. 25% · Pipeline 20% · Velocity 20% · Completion 20% · Quality 15% · Benchmarks derived from your own data</span>
     </div>
@@ -2088,6 +2100,36 @@ const JOB_STAGE_COLORS = {
   installation_completed:'#2ecc8a', handover_completed:'#1abc9c'
 };
 
+/* ══════════════════════════════════════════
+   SAMPLE DATA — shown to new users with no proposals yet
+══════════════════════════════════════════ */
+function buildSampleData(){
+  const ago = n => { const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString(); };
+
+  const proposals = [
+    { ai_id:'demo-1', job_status:'handover_completed', system_size_kw:9.9, battery_capacity_kwh:14.3, total_cost:185000, created_at:ago(72), sent_at:ago(72), proposal_viewed_at:ago(71), email_sent_at:ago(72), client_engaged:true, proposal_status:'accepted', location:'Johannesburg North', pdf_url:'demo', annual_savings:28000, monthly_savings:2333, payback_years:7.2, panel_number:22, client_name:'Bongani Dlamini', contact_email:'demo@example.com', site_visit_completed_at:ago(65), installation_completed_at:ago(48), handover_completed_at:ago(40) },
+    { ai_id:'demo-2', job_status:'installation_in_progress', system_size_kw:13.5, battery_capacity_kwh:28.6, total_cost:248000, created_at:ago(54), sent_at:ago(54), proposal_viewed_at:ago(53), email_sent_at:ago(54), client_engaged:true, proposal_status:'accepted', location:'Pretoria East', pdf_url:'demo', annual_savings:36500, monthly_savings:3042, payback_years:7.8, panel_number:30, client_name:'Richard Schultz', contact_email:'demo@example.com', site_visit_completed_at:ago(44), installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-3', job_status:'site_visit_completed', system_size_kw:8.8, battery_capacity_kwh:14.3, total_cost:155000, created_at:ago(38), sent_at:ago(38), proposal_viewed_at:ago(37), email_sent_at:ago(38), client_engaged:true, proposal_status:'accepted', location:'Sandton', pdf_url:'demo', annual_savings:24000, monthly_savings:2000, payback_years:7.1, panel_number:20, client_name:'Fatima Asvat', contact_email:'demo@example.com', site_visit_completed_at:ago(28), installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-4', job_status:'viewed', system_size_kw:11.0, battery_capacity_kwh:14.3, total_cost:198000, created_at:ago(22), sent_at:ago(21), proposal_viewed_at:ago(19), email_sent_at:ago(21), client_engaged:false, proposal_status:'pending', location:'Cape Town', pdf_url:'demo', annual_savings:31000, monthly_savings:2583, payback_years:7.4, panel_number:24, client_name:'Pieter van der Berg', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-5', job_status:'viewed', system_size_kw:6.6, battery_capacity_kwh:0, total_cost:88000, created_at:ago(18), sent_at:ago(17), proposal_viewed_at:ago(15), email_sent_at:ago(17), client_engaged:false, proposal_status:'pending', location:'Durban North', pdf_url:'demo', annual_savings:16500, monthly_savings:1375, payback_years:5.9, panel_number:16, client_name:'Nomvula Sithole', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-6', job_status:'sent', system_size_kw:14.85, battery_capacity_kwh:28.6, total_cost:268000, created_at:ago(12), sent_at:ago(11), proposal_viewed_at:null, email_sent_at:ago(11), client_engaged:false, proposal_status:'pending', location:'Centurion', pdf_url:'demo', annual_savings:39000, monthly_savings:3250, payback_years:8.1, panel_number:33, client_name:'Marcus Swanepoel', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-7', job_status:'sent', system_size_kw:4.4, battery_capacity_kwh:0, total_cost:62000, created_at:ago(9), sent_at:ago(8), proposal_viewed_at:null, email_sent_at:ago(8), client_engaged:false, proposal_status:'pending', location:'Roodepoort', pdf_url:'demo', annual_savings:12800, monthly_savings:1067, payback_years:5.4, panel_number:10, client_name:'Zanele Mokoena', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-8', job_status:'generated', system_size_kw:5.5, battery_capacity_kwh:14.3, total_cost:78000, created_at:ago(4), sent_at:null, proposal_viewed_at:null, email_sent_at:null, client_engaged:false, proposal_status:'generated', location:'Midrand', pdf_url:'demo', annual_savings:15200, monthly_savings:1267, payback_years:5.7, panel_number:12, client_name:'Johan Botha', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-9', job_status:'rejected', system_size_kw:9.9, battery_capacity_kwh:0, total_cost:132000, created_at:ago(45), sent_at:ago(44), proposal_viewed_at:ago(43), email_sent_at:ago(44), client_engaged:false, proposal_status:'rejected', location:'Randburg', pdf_url:'demo', annual_savings:22000, monthly_savings:1833, payback_years:6.6, panel_number:22, client_name:'Lerato Molefe', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+    { ai_id:'demo-10', job_status:'generated', system_size_kw:7.7, battery_capacity_kwh:14.3, total_cost:118000, created_at:ago(2), sent_at:null, proposal_viewed_at:null, email_sent_at:null, client_engaged:false, proposal_status:'generated', location:'Soweto', pdf_url:'demo', annual_savings:19500, monthly_savings:1625, payback_years:6.7, panel_number:18, client_name:'Thabo Nkosi', contact_email:'demo@example.com', site_visit_completed_at:null, installation_completed_at:null, handover_completed_at:null },
+  ];
+
+  const jobs = proposals.filter(p => ['accepted','site_visit_scheduled','site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(p.job_status));
+
+  const visits = [
+    { id:'v1', job_id:'demo-1', design_changed:false, design_change_category:null, client_approval_status:'approved', created_at:ago(65) },
+    { id:'v2', job_id:'demo-2', design_changed:false, design_change_category:null, client_approval_status:'approved', created_at:ago(44) },
+    { id:'v3', job_id:'demo-3', design_changed:true,  design_change_category:'minor', client_approval_status:'approved', created_at:ago(28) },
+  ];
+
+  return { proposals, jobs, visits };
+}   
+
 /* ── AUTH BOOT ── */
 (async function boot(){
   try{
@@ -2173,22 +2215,35 @@ async function loadAll(){
       ppf ? sb('ai_results', `select=ai_id,job_status,system_size_kw,total_cost,created_at,handover_completed_at&job_status=in.(${ACTIVE_STAGES})${ppf}&order=created_at.desc`) : Promise.resolve([]),
     ]);
 
-    renderHealthScore(allProposals, jobs, visits);
-    renderBriefing(allProposals, jobs, visits, prevProposals, prevJobs);
-    renderSalesPipeline(allProposals);
-    renderKPIs(allProposals, jobs, visits, prevProposals, prevJobs);
-    renderRadar(allProposals, jobs, visits);
-    renderFunnel(allProposals, jobs);
-    renderRevenueChart(allProposals);
-    renderStartedDoneChart(jobs);
-    renderKwpStageChart(jobs);
-    renderDcChart(visits);
-    renderCompletionsChart(jobs);
-    renderVelocityTable(jobs);
-    renderAlerts(jobs, visits);
-     renderPriorities(allProposals, jobs, visits);
-    renderPortfolio(jobs);
-    renderPortfolioExpanded(jobs, allProposals);
+    /* ── Sample data mode: show demo data to new users with no proposals ── */
+    let _proposals = allProposals, _jobs = jobs, _visits = visits;
+    const isFreshAccount = allProposals.length === 0 && jobs.length === 0;
+    if(isFreshAccount){
+      const s = buildSampleData();
+      _proposals = s.proposals; _jobs = s.jobs; _visits = s.visits;
+      const banner = document.getElementById('sample-banner');
+      if(banner){ banner.style.display='flex'; }
+    } else {
+      const banner = document.getElementById('sample-banner');
+      if(banner){ banner.style.display='none'; }
+    }
+
+    renderHealthScore(_proposals, _jobs, _visits);
+    renderBriefing(_proposals, _jobs, _visits, prevProposals, prevJobs);
+    renderSalesPipeline(_proposals);
+    renderKPIs(_proposals, _jobs, _visits, prevProposals, prevJobs);
+    renderRadar(_proposals, _jobs, _visits);
+    renderFunnel(_proposals, _jobs);
+    renderRevenueChart(_proposals);
+    renderStartedDoneChart(_jobs);
+    renderKwpStageChart(_jobs);
+    renderDcChart(_visits);
+    renderCompletionsChart(_jobs);
+    renderVelocityTable(_jobs);
+    renderAlerts(_jobs, _visits);
+    renderPriorities(_proposals, _jobs, _visits);
+    renderPortfolio(_jobs);
+    renderPortfolioExpanded(_jobs, _proposals);
 
     const now = new Date();
     setText('last-updated', `Updated ${now.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}`);
