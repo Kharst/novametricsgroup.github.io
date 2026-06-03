@@ -1595,7 +1595,23 @@ body::after {
     </div>
   </div>
 
+
+   
   <!-- Full Customer Journey Funnel -->
+<div style="background:linear-gradient(135deg,rgba(0,214,143,.07),rgba(0,214,143,.02));border:1px solid rgba(0,214,143,.2);border-radius:12px;padding:20px 28px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:relative;overflow:hidden">
+  <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent 70%)"></div>
+  <div>
+    <div style="font-family:var(--mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Forecasted Revenue</div>
+    <div style="font-family:var(--mono);font-size:32px;font-weight:700;color:var(--white);line-height:1" id="kpi-forecast">—</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px">total value if all active jobs complete</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;font-family:var(--mono);font-size:10px">
+    <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3)">Near complete</span><span style="color:var(--green);font-weight:700" id="kpi-forecast-near">—</span></div>
+    <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3)">In progress</span><span style="color:var(--amber);font-weight:700" id="kpi-forecast-active">—</span></div>
+    <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3)">Newly accepted</span><span style="color:var(--blue2);font-weight:700" id="kpi-forecast-new">—</span></div>
+  </div>
+</div>
+   
   <div class="section-hd">
     <div class="section-title"><div class="stbar"></div>Sales Pipeline</div>
     <div class="section-sub">Proposal generated through to handover completed</div>
@@ -2579,6 +2595,20 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
   setText('kpi-kwp-sub', kwp>=1000?'megawatts installed':kwp>0?'kilowatts peak installed':'no completions yet');
   setText('kpi-cycle',   avgCycle!==null?`${avgCycle}d`:'Cycle time after first handover');
 
+  /* ── Revenue forecast ── */
+  const fmtF = v => v>=1000000?`R${(v/1000000).toFixed(1)}M`:v>=1000?`R${(v/1000).toFixed(0)}k`:`R${Math.round(v)}`;
+  const nearComplete = jobs.filter(j=>['installation_completed','handover_completed'].includes(j.job_status));
+  const inProgress   = jobs.filter(j=>['installation_in_progress','installation_scheduled'].includes(j.job_status));
+  const newlyWon     = jobs.filter(j=>['accepted','site_visit_scheduled','site_visit_completed'].includes(j.job_status));
+  const nearVal   = nearComplete.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const progVal   = inProgress.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const newVal    = newlyWon.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
+  const totalFcast = nearVal + progVal + newVal;
+  setText('kpi-forecast',       totalFcast > 0 ? fmtF(totalFcast) : 'No active jobs');
+  setText('kpi-forecast-near',  nearVal > 0   ? fmtF(nearVal)   : '—');
+  setText('kpi-forecast-active',progVal > 0   ? fmtF(progVal)   : '—');
+  setText('kpi-forecast-new',   newVal > 0    ? fmtF(newVal)    : '—'); 
+
   /* ── Inject period-over-period deltas ── */
   document.querySelectorAll('.kpi-delta').forEach(el=>el.remove()); // clear old
   injectDelta('kpi-pipeline', pipeline, prevPipeline);
@@ -2595,13 +2625,21 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
 function renderFunnel(proposals, jobs){
   /* Count each funnel stage */
   const counts = {
-    generated: proposals.length,
-    sent:       proposals.filter(p=>p.sent_at||p.job_status&&p.job_status!=='lead').length,
-    viewed:     proposals.filter(p=>p.proposal_viewed_at).length,
-    accepted:   jobs.filter(j=>JOB_STAGE_ORDER.includes(j.job_status)).length,
-    site_visit_completed: jobs.filter(j=>['site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(j.job_status)).length,
-    installation_completed: jobs.filter(j=>['installation_completed','handover_completed'].includes(j.job_status)).length,
-    handover_completed: jobs.filter(j=>j.job_status==='handover_completed').length,
+    const _gen  = proposals.length;
+const _sent = Math.min(_gen,  proposals.filter(p=>p.sent_at||p.email_sent_at||p.whatsapp_sent_at||p.job_status&&p.job_status!=='lead').length);
+const _view = Math.min(_sent, proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at).length);
+const _acc  = Math.min(_sent, jobs.filter(j=>JOB_STAGE_ORDER.includes(j.job_status)).length);
+const _svc  = Math.min(_acc,  jobs.filter(j=>['site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(j.job_status)).length);
+const _inst = Math.min(_svc,  jobs.filter(j=>['installation_completed','handover_completed'].includes(j.job_status)).length);
+const _hand = Math.min(_inst, jobs.filter(j=>j.job_status==='handover_completed').length);
+const counts = {
+  generated:              _gen,
+  sent:                   _sent,
+  viewed:                 _view,
+  accepted:               _acc,
+  site_visit_completed:   _svc,
+  installation_completed: _inst,
+  handover_completed:     _hand,
   };
 
   const top = counts.generated || 1;
@@ -2913,11 +2951,11 @@ function renderHealthScore(proposals, jobs, visits){
   /* 3. Velocity Health: avg cycle. Ideal ≤30d = 100, ≥90d = 0 */
   const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
   const avgCycleH = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
-  const velScore  = avgCycleH!==null ? Math.max(0, Math.round(100 - ((avgCycleH-30)/60)*100)) : 50;
+  const velScore  = avgCycleH!==null ? Math.min(100, Math.max(0, Math.round(100 - ((avgCycleH-30)/60)*100))) : 50;
 
   /* 4. Quality Health: low major-redesign rate. 0% major = 100, ≥50% = 0 */
   const major = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
-  const qualScore = visits.length ? Math.max(0, Math.round(100 - (major/visits.length)*200)) : 75;
+  const qualScore = visits.length ? Math.max(15, Math.round(100 - (major/visits.length)*100)) : 75;
 
   /* 5. Completion Health: stale jobs penalty */
   const stale     = jobs.filter(j=>j.job_status!=='handover_completed'&&daysBetween(j.created_at,new Date().toISOString())>=14);
@@ -3041,10 +3079,10 @@ function renderRadar(proposals, jobs, visits){
 
   const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
   const avgC      = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
-  const velScore  = avgC!==null ? Math.max(0,Math.round(100-((avgC-30)/60)*100)) : 50;
+  const velScore  = avgC!==null ? Math.min(100,Math.max(0,Math.round(100-((avgC-30)/60)*100))) : 50;
 
   const major    = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
-  const qualScore= visits.length ? Math.max(0,Math.round(100-(major/visits.length)*200)) : 75;
+  const qualScore= visits.length ? Math.max(15,Math.round(100-(major/visits.length)*100)) : 75;
 
   const kwp = jobs.filter(j=>j.job_status==='handover_completed').reduce((s,j)=>s+(parseFloat(j.system_size_kw)||0),0);
   const capScore = Math.min(100, Math.round(kwp/50*100)); /* 50kWp = 100 */
