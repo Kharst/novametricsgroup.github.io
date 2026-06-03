@@ -2624,7 +2624,6 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
 ══════════════════════════════════════════ */
 function renderFunnel(proposals, jobs){
   /* Count each funnel stage */
-  const counts = {
     const _gen  = proposals.length;
 const _sent = Math.min(_gen,  proposals.filter(p=>p.sent_at||p.email_sent_at||p.whatsapp_sent_at||p.job_status&&p.job_status!=='lead').length);
 const _view = Math.min(_sent, proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at).length);
