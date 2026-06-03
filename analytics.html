@@ -1541,22 +1541,22 @@ body::after {
     </div>
   </div>
 
-  <!-- ══ EXECUTIVE INTELLIGENCE BRIEFING ══ -->
   <div class="briefing-panel">
-    <div class="briefing-hd">
-      <div class="briefing-title">
-        <div class="briefing-icon">◈</div>
-        Business Summary
-      </div>
-      <span class="briefing-ts" id="briefing-ts"></span>
+  <div class="briefing-hd" onclick="const g=document.getElementById('briefing-grid');const a=document.getElementById('briefing-arrow');if(g){const open=g.style.display!=='none';g.style.display=open?'none':'grid';a.textContent=open?'▸':'▾';}" style="cursor:pointer;user-select:none">
+    <div class="briefing-title">
+      <div class="briefing-icon">◈</div>
+      Business Summary
+      <span id="briefing-arrow" style="font-size:10px;color:var(--text3);margin-left:6px">▾</span>
     </div>
-    <div class="briefing-grid" id="briefing-grid">
-      <div class="bitem info" style="grid-column:1/-1">
-        <span class="bitem-ico">⏳</span>
-        <span>Generating intelligence summary…</span>
-      </div>
+    <span class="briefing-ts" id="briefing-ts"></span>
+  </div>
+  <div class="briefing-grid" id="briefing-grid">
+    <div class="bitem info" style="grid-column:1/-1">
+      <span class="bitem-ico">⏳</span>
+      <span>Generating intelligence summary…</span>
     </div>
-  </div> 
+  </div>
+</div>
 
   <!-- Business KPIs -->
   <div class="section-hd">
@@ -3006,31 +3006,38 @@ function renderHealthScore(proposals, jobs, visits){
   ).join('');
 
   /* Build tooltip content — plain English, not analyst jargon */
+  const verdict = s => s>=90?['Excellent','#00d68f']:s>=75?['Good','#4a9eff']:s>=60?['Fair','#f5a623']:s>=40?['Below target','#f59e0b']:['Needs work','#ff6b6b'];
+
   const TIPS = {
     Sales: {
+      short: 'Proposal-to-win rate',
       title: 'Sales Conversion · 25% of score',
-      body: 'How many of the proposals you sent actually turned into won jobs. If you sent 10 proposals and 4 clients said yes, that\'s a 40% win rate.',
+      body: 'How many proposals you sent actually turned into won jobs. Sent 10, won 4 = 40% win rate.',
       calc: `Target: 60%+ = 100 pts · Your rate: ${wr!==null ? Math.round(wr*100)+'%' : 'no sent proposals yet'}`
     },
     Pipeline: {
+      short: 'How full your active job pipeline is',
       title: 'Pipeline Health · 20% of score',
-      body: 'Are you staying busy? This checks how many accepted jobs are currently in progress and what they\'re worth. An empty pipeline scores 0.',
-      calc: `${activePipe.length} active job${activePipe.length!==1?'s':''} · R${Math.round(pipeVal/1000)}k value in pipeline · R50k+ = max pts`
+      body: 'Are you staying busy? Checks how many accepted jobs are in progress and what they\'re worth. Empty pipeline scores 0.',
+      calc: `${activePipe.length} active job${activePipe.length!==1?'s':''} · R${Math.round(pipeVal/1000)}k value · R50k+ = max pts`
     },
     Velocity: {
+      short: 'How fast jobs go from won to handed over',
       title: 'Execution Speed · 20% of score',
-      body: 'How fast your team completes jobs from the day a client accepts your proposal to the day you hand over the finished system. Slow jobs tie up your capacity.',
+      body: 'Time from accepted proposal to signed handover. Slow jobs block your team and delay cash.',
       calc: `Under 30 days = 100 pts · Over 90 days = 0 pts · ${avgCycleH!==null ? 'Your avg: '+avgCycleH+'d' : 'No completed jobs yet'}`
     },
     Quality: {
+      short: 'How often site visits force a redesign',
       title: 'Design Quality · 15% of score',
-      body: 'How often your site visits end up changing the original proposal. If the assessor arrives and the design needs a major rework, that means the original quote wasn\'t accurate — costing you time and money.',
-      calc: `Major redesigns: ${visits.length ? Math.round(major/visits.length*100) : 0}% of site visits · Target: below 10%`
+      body: 'Frequent major redesigns mean the original quote wasn\'t accurate — costs time and erodes client trust.',
+      calc: `Major redesigns: ${visits.length ? Math.round(major/visits.length*100) : 0}% of visits · Target: below 10%`
     },
     Completion: {
+      short: 'Are accepted jobs actually moving forward',
       title: 'Job Completion · 20% of score',
-      body: 'Are your accepted jobs actually moving forward? A job sitting in one stage for 14+ days with no progress is a risk to your cash flow and your client\'s patience.',
-      calc: `${stale.length} stalled job${stale.length!==1?'s':''} out of ${activePipe.length} active · stalled jobs reduce this score`
+      body: 'Jobs stalled in one stage for 14+ days pull this score down. A moving pipeline keeps cash flowing.',
+      calc: `${stale.length} stalled job${stale.length!==1?'s':''} of ${activePipe.length} active · stalled jobs reduce this score`
     }
   };
 
@@ -3044,6 +3051,7 @@ function renderHealthScore(proposals, jobs, visits){
   const pillarsEl = document.getElementById('hs-pillars');
   if(pillarsEl) pillarsEl.innerHTML = pillars.map(p => {
     const t = TIPS[p.label] || {};
+    const [vLabel, vCol] = verdict(p.score);
     return `
     <div class="hs-pillar">
       <div class="hs-pillar-label">
@@ -3052,13 +3060,17 @@ function renderHealthScore(proposals, jobs, visits){
           <span class="hs-tip-icon">i</span>
           <div class="hs-tip-box">
             <strong>${t.title||p.label}</strong>
-            ${t.body||''}
+            <span style="display:block;font-size:11.5px;color:var(--white);font-weight:600;margin-bottom:5px">${t.short||''}</span>
+            <span style="font-size:10.5px;color:var(--text3);line-height:1.55">${t.body||''}</span>
             <div class="tip-calc">${t.calc||''}</div>
           </div>
         </span>
-        <span style="color:${p.col};font-weight:700">${p.score}</span>
+        <span style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:9px;color:${vCol};font-weight:600;font-family:var(--sans);white-space:nowrap">${vLabel}</span>
+          <span style="color:${p.col};font-weight:700">${p.score}</span>
+        </span>
       </div>
-      <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${p.score}%;background:${p.col}"></div></div>
+      <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${Math.min(p.score,100)}%;background:${p.col}"></div></div>
     </div>`;
   }).join('');
 }
