@@ -1529,10 +1529,11 @@ body::after {
       <div class="hs-drivers" id="hs-drivers">
         <div class="hs-driver"><div class="hs-driver-dot" style="background:var(--text3)"></div><span>Loading signals…</span></div>
       </div>
-    <div id="hs-method-row" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);display:none;align-items:center;gap:8px;flex-wrap:wrap">
-      <span style="font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em">METHODOLOGY</span>
-      <span style="font-size:9px;color:var(--text4);line-height:1.5">Sales conv. 25% · Pipeline 20% · Velocity 20% · Completion 20% · Quality 15% · Benchmarks derived from your own data</span>
-    </div>
+    <div id="hs-method-row" style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);display:none;flex-direction:column;gap:6px">
+  <span style="font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.08em">HOW THE SCORE IS CALCULATED</span>
+  <span style="font-size:11px;color:var(--text2);line-height:1.7">Five areas of your business each contribute to the score. <strong style="color:var(--white)">Sales conversion</strong> (how often proposals become jobs, 25%) and <strong style="color:var(--white)">job completion</strong> (are accepted jobs moving forward, 20%) carry the most weight because they directly affect cash. <strong style="color:var(--white)">Pipeline health</strong> checks if you have enough active work (20%), <strong style="color:var(--white)">velocity</strong> measures how fast you finish jobs (20%), and <strong style="color:var(--white)">design quality</strong> tracks how often site visits force a redesign (15%).</span>
+  <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">All benchmarks come from your own data — not industry averages imposed from outside.</span>
+</div>
   </div>
 
     <div class="hs-right" id="hs-pillars">
@@ -2967,6 +2968,35 @@ function renderHealthScore(proposals, jobs, visits){
     `<div class="hs-driver"><div class="hs-driver-dot" style="background:${d.col}"></div><span>${d.txt}</span></div>`
   ).join('');
 
+  /* Build tooltip content — plain English, not analyst jargon */
+  const TIPS = {
+    Sales: {
+      title: 'Sales Conversion · 25% of score',
+      body: 'How many of the proposals you sent actually turned into won jobs. If you sent 10 proposals and 4 clients said yes, that\'s a 40% win rate.',
+      calc: `Target: 60%+ = 100 pts · Your rate: ${wr!==null ? Math.round(wr*100)+'%' : 'no sent proposals yet'}`
+    },
+    Pipeline: {
+      title: 'Pipeline Health · 20% of score',
+      body: 'Are you staying busy? This checks how many accepted jobs are currently in progress and what they\'re worth. An empty pipeline scores 0.',
+      calc: `${activePipe.length} active job${activePipe.length!==1?'s':''} · R${Math.round(pipeVal/1000)}k value in pipeline · R50k+ = max pts`
+    },
+    Velocity: {
+      title: 'Execution Speed · 20% of score',
+      body: 'How fast your team completes jobs from the day a client accepts your proposal to the day you hand over the finished system. Slow jobs tie up your capacity.',
+      calc: `Under 30 days = 100 pts · Over 90 days = 0 pts · ${avgCycleH!==null ? 'Your avg: '+avgCycleH+'d' : 'No completed jobs yet'}`
+    },
+    Quality: {
+      title: 'Design Quality · 15% of score',
+      body: 'How often your site visits end up changing the original proposal. If the assessor arrives and the design needs a major rework, that means the original quote wasn\'t accurate — costing you time and money.',
+      calc: `Major redesigns: ${visits.length ? Math.round(major/visits.length*100) : 0}% of site visits · Target: below 10%`
+    },
+    Completion: {
+      title: 'Job Completion · 20% of score',
+      body: 'Are your accepted jobs actually moving forward? A job sitting in one stage for 14+ days with no progress is a risk to your cash flow and your client\'s patience.',
+      calc: `${stale.length} stalled job${stale.length!==1?'s':''} out of ${activePipe.length} active · stalled jobs reduce this score`
+    }
+  };
+
   const pillars = [
     { label:'Sales',      score:salesScore,  col:'#f5a623' },
     { label:'Pipeline',   score:pipeScore,   col:'#4a9eff' },
@@ -2975,11 +3005,25 @@ function renderHealthScore(proposals, jobs, visits){
     { label:'Completion', score:compScore,   col:'#00d68f' },
   ];
   const pillarsEl = document.getElementById('hs-pillars');
-  if(pillarsEl) pillarsEl.innerHTML = pillars.map(p=>`
+  if(pillarsEl) pillarsEl.innerHTML = pillars.map(p => {
+    const t = TIPS[p.label] || {};
+    return `
     <div class="hs-pillar">
-      <div class="hs-pillar-label"><span>${p.label}</span><span style="color:${p.col}">${p.score}</span></div>
+      <div class="hs-pillar-label">
+        <span class="hs-tip">
+          <span>${p.label}</span>
+          <span class="hs-tip-icon">i</span>
+          <div class="hs-tip-box">
+            <strong>${t.title||p.label}</strong>
+            ${t.body||''}
+            <div class="tip-calc">${t.calc||''}</div>
+          </div>
+        </span>
+        <span style="color:${p.col};font-weight:700">${p.score}</span>
+      </div>
       <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${p.score}%;background:${p.col}"></div></div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════
