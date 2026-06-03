@@ -2620,26 +2620,28 @@ function renderKPIs(proposals, jobs, visits, prevProposals=[], prevJobs=[]){
 }
 
 /* ══════════════════════════════════════════
+/* ══════════════════════════════════════════
    FULL FUNNEL
 ══════════════════════════════════════════ */
 function renderFunnel(proposals, jobs){
   /* Count each funnel stage */
+
+  const _gen  = proposals.length;
+  const _sent = Math.min(_gen, proposals.filter(p=>p.sent_at||p.email_sent_at||p.whatsapp_sent_at||(p.job_status&&p.job_status!=='lead')).length);
+  const _view = Math.min(_sent, proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at).length);
+  const _acc  = Math.min(_view, jobs.filter(j=>JOB_STAGE_ORDER.includes(j.job_status)).length);
+  const _svc  = Math.min(_acc, jobs.filter(j=>['site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(j.job_status)).length);
+  const _inst = Math.min(_svc, jobs.filter(j=>['installation_completed','handover_completed'].includes(j.job_status)).length);
+  const _hand = Math.min(_inst, jobs.filter(j=>j.job_status==='handover_completed').length);
+
   const counts = {
-    const _gen  = proposals.length;
-const _sent = Math.min(_gen,  proposals.filter(p=>p.sent_at||p.email_sent_at||p.whatsapp_sent_at||p.job_status&&p.job_status!=='lead').length);
-const _view = Math.min(_sent, proposals.filter(p=>p.proposal_viewed_at||p.email_opened_at).length);
-const _acc  = Math.min(_sent, jobs.filter(j=>JOB_STAGE_ORDER.includes(j.job_status)).length);
-const _svc  = Math.min(_acc,  jobs.filter(j=>['site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'].includes(j.job_status)).length);
-const _inst = Math.min(_svc,  jobs.filter(j=>['installation_completed','handover_completed'].includes(j.job_status)).length);
-const _hand = Math.min(_inst, jobs.filter(j=>j.job_status==='handover_completed').length);
-const counts = {
-  generated:              _gen,
-  sent:                   _sent,
-  viewed:                 _view,
-  accepted:               _acc,
-  site_visit_completed:   _svc,
-  installation_completed: _inst,
-  handover_completed:     _hand,
+    generated: _gen,
+    sent: _sent,
+    viewed: _view,
+    accepted: _acc,
+    site_visit_completed: _svc,
+    installation_completed: _inst,
+    handover_completed: _hand,
   };
 
   const top = counts.generated || 1;
@@ -2658,6 +2660,7 @@ const counts = {
       <div class="f-pct">${n>0?pct+'%':''}</div>
     </div>`;
   }).join('');
+}
 
   /* Drop-off indicators */
   const dropoff = document.getElementById('funnel-dropoff');
