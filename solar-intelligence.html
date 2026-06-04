@@ -2285,6 +2285,7 @@ async function doSetPassword(){
   try{
   showLoadingOverlay('Setting up your workspace\u2026');
   await loadInstallerProfile(data.user.email);
+if(!installer)throw new Error('Profile not found after password set.');
   // Record terms acceptance for this new installer
   if (installer && !installer.terms_accepted_at) {
     const{data:{session}}=await supabaseClient.auth.getSession();
@@ -2970,6 +2971,7 @@ function showFirstTimeGuide() {
 let wizStep = 1;
 
 function showSetupWizard() {
+  if (!installer || !installer.installer_id) return;
   if (localStorage.getItem('setup_wizard_done_' + installer.installer_id)) return;
   const missing = !installer.logo_url || !installer.primary_color;
   if (!missing) { localStorage.setItem('setup_wizard_done_' + installer.installer_id, '1'); return; }
