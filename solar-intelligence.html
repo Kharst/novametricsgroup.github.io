@@ -2018,7 +2018,7 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
 supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
   const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;if(isNewInvite)isNewInviteUser=true;
-const needsPassword=event==='PASSWORD_RECOVERY'||isNewInvite;
+const needsPassword = event === 'PASSWORD_RECOVERY';
   if(needsPassword){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
   if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
 });
@@ -2275,33 +2275,66 @@ async function doForgotPassword(){
   if(error)errEl.textContent=error.message;else sucEl.textContent='\u2713 Reset link sent! Check your inbox and spam folder.';
 }
 async function doSetPassword(){
-  const pass=document.getElementById('new-password').value,confirm=document.getElementById('new-password-confirm').value,errEl=document.getElementById('setpass-error'),btn=document.getElementById('setpass-btn');
+
+  const pass=document.getElementById('new-password').value,
+        confirm=document.getElementById('new-password-confirm').value,
+        errEl=document.getElementById('setpass-error'),
+        btn=document.getElementById('setpass-btn');
+
   errEl.textContent='';
-  if(pass.length<8){errEl.textContent='Password must be at least 8 characters.';return;}
-  if(pass!==confirm){errEl.textContent='Passwords do not match.';return;}
-  btn.disabled=true;btn.innerHTML='<span class="login-spinner"></span>Setting password\u2026';
-  const{data,error}=await supabaseClient.auth.updateUser({password:pass});
-  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';return;}
-  try{
-  showLoadingOverlay('Setting up your workspace\u2026');
-  await loadInstallerProfile(data.user.email);
-if(!installer)throw new Error('Profile not found after password set.');
-  // Record terms acceptance for this new installer
-  if (installer && !installer.terms_accepted_at) {
-    const{data:{session}}=await supabaseClient.auth.getSession();
-  const token=session?session.access_token:SUPA_ANON;
-  await fetch(SUPA_URL+'/rest/v1/installers?installer_id=eq.'+installer.installer_id,{
-    method:'PATCH',
-    headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({terms_accepted_at:new Date().toISOString(),terms_version:'v1.0 May 2026'})
-  });
-    installer.terms_accepted_at = new Date().toISOString();
+
+  if(pass.length<8){
+    errEl.textContent='Password must be at least 8 characters.';
+    return;
   }
-  await loadAllData();
-  hideLoadingOverlay();
-  showApp();
-  fetch('https://zloxcqrhkcohheeixfns.supabase.co/functions/v1/welcome-email',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_ANON},body:JSON.stringify({installer_id:installer.installer_id,email_number:1})}).catch(()=>{});  
-}catch(e){showDataError(e);}
+
+  if(pass!==confirm){
+    errEl.textContent='Passwords do not match.';
+    return;
+  }
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="login-spinner"></span>Setting password…';
+
+  const { data, error } =
+    await supabaseClient.auth.updateUser({
+      password: pass
+    });
+
+  if(error){
+    errEl.textContent=error.message;
+    btn.disabled=false;
+    btn.textContent='Set Password & Sign In';
+    return;
+  }
+
+  // IMPORTANT FIXES
+  isNewInviteUser = false;
+
+  // remove recovery hash/token
+  window.history.replaceState(
+    {},
+    document.title,
+    window.location.pathname
+  );
+
+  try{
+    showLoadingOverlay('Setting up your workspace…');
+
+    await loadInstallerProfile(data.user.email);
+
+    if(!installer)
+      throw new Error('Profile not found after password set.');
+
+    await loadAllData();
+
+    hideLoadingOverlay();
+
+    showApp();
+
+  }catch(e){
+    showDataError(e);
+  }
 }
 function showTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
