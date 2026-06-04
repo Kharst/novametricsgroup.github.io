@@ -2293,7 +2293,7 @@ if(!installer)throw new Error('Profile not found after password set.');
   await fetch(SUPA_URL+'/rest/v1/installers?installer_id=eq.'+installer.installer_id,{
     method:'PATCH',
     headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=minimal'},
-    body:JSON.stringify({logo_url:logo||null,primary_color:pc||null,secondary_color:sc||null,accent_color:ac||null})
+    body:JSON.stringify({terms_accepted_at:new Date().toISOString(),terms_version:'v1.0 May 2026'})
   });
     installer.terms_accepted_at = new Date().toISOString();
   }
