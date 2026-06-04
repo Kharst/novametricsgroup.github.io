@@ -2018,7 +2018,7 @@ supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
   const needsPassword=event==='PASSWORD_RECOVERY'||(event==='SIGNED_IN'&&session&&(hash.includes('type=invite')||hash.includes('type=recovery')));
   if(needsPassword){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
-  if(event==='SIGNED_IN'&&session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
+  if(event==='SIGNED_IN'&&session&&!installer){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
 });
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const hash=window.location.hash;if(hash.includes('type=invite')||hash.includes('type=recovery'))return;const{data:{session}}=await supabaseClient.auth.getSession();if(session){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}})();
