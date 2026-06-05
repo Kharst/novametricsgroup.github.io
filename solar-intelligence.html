@@ -2222,6 +2222,8 @@ function showApp(){
   // ── Terms acceptance check for existing installers ──
 if (installer && !installer.terms_accepted_at) {
   showTermsAcceptanceModal(installer.installer_id);
+} else {
+  showSetupWizard();
 }
   showHwBanner();
   checkBillingStatus();
@@ -3005,8 +3007,7 @@ let wizStep = 1;
 function showSetupWizard() {
   if (!installer || !installer.installer_id) return;
   if (localStorage.getItem('setup_wizard_done_' + installer.installer_id)) return;
-  const missing = !installer.logo_url || !installer.primary_color;
-  if (!missing) { localStorage.setItem('setup_wizard_done_' + installer.installer_id, '1'); return; }
+  if (document.getElementById('setup-wizard')) return;
   const el = document.createElement('div');
   el.id = 'setup-wizard';
   el.innerHTML = wizHTML(1);
@@ -3174,11 +3175,20 @@ function wizDone() {
   checkFirstTimeUser();
 }
 async function acceptTermsFromModal(installerId) {
-  await supabaseClient.from('installers').update({
+  const btn = document.getElementById('modal-accept-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  const { error } = await supabaseClient.from('installers').update({
     terms_accepted_at: new Date().toISOString(),
     terms_version:     'v1.0 May 2026'
-  }).eq('installer_id', installerId);
+  }).eq('auth_user_id', installer.auth_user_id);
+  if (error) {
+    if (btn) { btn.disabled = false; btn.textContent = 'I accept — continue to platform'; }
+    console.error('Terms save failed:', error);
+    return;
+  }
+  installer.terms_accepted_at = new Date().toISOString();
   document.getElementById('terms-modal')?.remove();
+  showSetupWizard();
 }
   
   
