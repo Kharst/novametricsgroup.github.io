@@ -876,6 +876,8 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let isNewInviteUser = false;  
+let isHandlingAuth = false;
+  
 let installer = null, calcResult = null, selectedLoc = null, selectedClientType = 'residential';
 
 let currentJob = null; // set when portal opens a job and passes ai_id
@@ -2019,8 +2021,8 @@ supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
   const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;if(isNewInvite)isNewInviteUser=true;
 const needsPassword = event === 'PASSWORD_RECOVERY';
-  if(needsPassword){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
-  if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
+  if(needsPassword&&!isHandlingAuth){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
+  if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser&&!isHandlingAuth){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
 });
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(!session)return;const created=session.user.created_at,lastSign=session.user.last_sign_in_at;const brandNew=created&&lastSign&&(new Date(lastSign)-new Date(created))<30000;if(brandNew)return;showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}})();
@@ -2295,18 +2297,15 @@ async function doSetPassword(){
 
   btn.disabled=true;
   btn.innerHTML='<span class="login-spinner"></span>Setting password…';
+  isHandlingAuth = true;
 
   const { data, error } =
     await supabaseClient.auth.updateUser({
       password: pass
     });
 
-  if(error){
-    errEl.textContent=error.message;
-    btn.disabled=false;
-    btn.textContent='Set Password & Sign In';
-    return;
-  }
+  if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';isHandlingAuth=false;return;}
+  isNewInviteUser = false;
 
   // IMPORTANT FIXES
   isNewInviteUser = false;
@@ -2951,6 +2950,7 @@ async function checkFirstTimeUser() {
 
 function showFirstTimeGuide() {
   if (document.getElementById('terms-modal')) return;
+  if (document.getElementById('setup-wizard')) return;
   const firstName = (installer.installer_name || 'there').split(' ')[0];
   const steps = [
     { icon:'📍', n:1, title:'Pick a location',
@@ -3153,6 +3153,7 @@ async function wizSave2() {
 function wizDone() {
   localStorage.setItem('setup_wizard_done_' + installer.installer_id, '1');
   document.getElementById('setup-wizard').remove();
+  checkFirstTimeUser();
 }
 async function acceptTermsFromModal(installerId) {
   await supabaseClient.from('installers').update({
