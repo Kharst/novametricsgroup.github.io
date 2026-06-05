@@ -3120,15 +3120,26 @@ async function wizSave1() {
   const btn = document.getElementById('wiz-next-btn');
   btn.disabled = true; btn.textContent = 'Saving…';
   const logo = document.getElementById('wiz-logo').value.trim();
-  const pc   = document.getElementById('wiz-ph').value.trim();
-  const sc   = document.getElementById('wiz-sh').value.trim();
-  const ac   = document.getElementById('wiz-ah').value.trim();
-  await supabaseClient.from('installers').update({
+  const pc   = document.getElementById('wiz-ph').value.trim() || '#0A2540';
+  const sc   = document.getElementById('wiz-sh').value.trim() || '#FFFFFF';
+  const ac   = document.getElementById('wiz-ah').value.trim() || '#B8962E';
+  const { error } = await supabaseClient.from('installers').update({
     logo_url:        logo || null,
-    primary_color:   pc   || null,
-    secondary_color: sc   || null,
-    accent_color:    ac   || null,
+    primary_color:   pc,
+    secondary_color: sc,
+    accent_color:    ac,
   }).eq('installer_id', installer.installer_id);
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Save & continue →';
+    const errEl = document.getElementById('wiz-next-btn').closest('.wiz-btn-row');
+    if (errEl) {
+      let e = document.getElementById('wiz-save-err');
+      if (!e) { e = document.createElement('p'); e.id = 'wiz-save-err'; e.style.cssText = 'color:#e05c5c;font-size:12px;margin:6px 0 0'; errEl.parentNode.insertBefore(e, errEl); }
+      e.textContent = 'Save failed: ' + (error.message || 'unknown error');
+    }
+    return;
+  }
   installer.logo_url        = logo;
   installer.primary_color   = pc;
   installer.secondary_color = sc;
