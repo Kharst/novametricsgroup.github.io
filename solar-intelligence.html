@@ -2027,7 +2027,7 @@ supabaseClient.auth.onAuthStateChange(async(event,session)=>{
 });
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(!session)return;const created=session.user.created_at,lastSign=session.user.last_sign_in_at;const brandNew=created&&lastSign&&(new Date(lastSign)-new Date(created))<30000;if(brandNew)return;showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}})();
-async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
+async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version,auth_user_id&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
 function showLoadingOverlay(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
 function hideLoadingOverlay(){document.getElementById('dataLoading').classList.remove('on');}
 function showDataError(err){document.getElementById('dlMsg').textContent='Failed to load data';document.getElementById('dlErr').textContent=String(err)+' — try signing out and back in.';document.getElementById('dlErr').style.display='block';const b=document.createElement('button');b.textContent='Sign Out';b.style.cssText='margin-top:12px;padding:8px 20px;background:#B8962E;color:#0A1628;border:none;border-radius:6px;cursor:pointer;font-weight:600';b.onclick=()=>supabaseClient.auth.signOut().then(()=>location.reload());document.getElementById('dataLoading').appendChild(b);}
@@ -3128,16 +3128,18 @@ async function wizSave1() {
     primary_color:   pc,
     secondary_color: sc,
     accent_color:    ac,
-  }).eq('installer_id', installer.installer_id);
+  }).eq('auth_user_id', installer.auth_user_id);
   if (error) {
     btn.disabled = false;
     btn.textContent = 'Save & continue →';
-    const errEl = document.getElementById('wiz-next-btn').closest('.wiz-btn-row');
-    if (errEl) {
-      let e = document.getElementById('wiz-save-err');
-      if (!e) { e = document.createElement('p'); e.id = 'wiz-save-err'; e.style.cssText = 'color:#e05c5c;font-size:12px;margin:6px 0 0'; errEl.parentNode.insertBefore(e, errEl); }
-      e.textContent = 'Save failed: ' + (error.message || 'unknown error');
+    let errEl = document.getElementById('wiz-save-err');
+    if (!errEl) {
+      errEl = document.createElement('p');
+      errEl.id = 'wiz-save-err';
+      errEl.style.cssText = 'color:#e05c5c;font-size:12px;margin:8px 0 0';
+      btn.parentNode.parentNode.insertBefore(errEl, btn.parentNode);
     }
+    errEl.textContent = 'Save failed: ' + (error.message || 'unknown error');
     return;
   }
   installer.logo_url        = logo;
@@ -3149,12 +3151,18 @@ async function wizSave1() {
 }
 
 async function wizSave2() {
+  const btn = document.querySelector('#setup-wizard .wiz-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
   const reg = document.getElementById('wiz-reg').value.trim();
   const acc = document.getElementById('wiz-acc').value.trim();
-  await supabaseClient.from('installers').update({
+  const { error } = await supabaseClient.from('installers').update({
     registration_number: reg || null,
     accreditation:       acc || null,
-  }).eq('installer_id', installer.installer_id);
+  }).eq('auth_user_id', installer.auth_user_id);
+  if (error) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save & continue →'; }
+    return;
+  }
   installer.registration_number = reg;
   installer.accreditation       = acc;
   wizGoTo(3);
