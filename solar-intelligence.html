@@ -2326,14 +2326,11 @@ async function doSetPassword(){
       throw new Error('Profile not found after password set.');
 
     await loadAllData();
-
     hideLoadingOverlay();
-
+    isHandlingAuth = false;
+    isNewInviteUser = false;
     showApp();
-
-  }catch(e){
-    showDataError(e);
-  }
+  }catch(e){isHandlingAuth=false;showDataError(e);}
 }
 function showTab(id){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
