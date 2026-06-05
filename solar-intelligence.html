@@ -2019,10 +2019,11 @@ function setClientType(type){
 function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getElementById('panel-'+p).style.display=p===name?'block':'none';});}
 supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
-  const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;if(isNewInvite)isNewInviteUser=true;
-const needsPassword = event === 'PASSWORD_RECOVERY';
+  const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;
+  if(isNewInvite){isNewInviteUser=true;isHandlingAuth=true;document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
+  const needsPassword = event === 'PASSWORD_RECOVERY';
   if(needsPassword&&!isHandlingAuth){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
-  if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser&&!isHandlingAuth){showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
+  if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser&&!isHandlingAuth){showLoadingOverlay('Loading your workspace…');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
 });
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
 (async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(!session)return;const created=session.user.created_at,lastSign=session.user.last_sign_in_at;const brandNew=created&&lastSign&&(new Date(lastSign)-new Date(created))<30000;if(brandNew)return;showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}})();
@@ -2330,6 +2331,7 @@ async function doSetPassword(){
     isHandlingAuth = false;
     isNewInviteUser = false;
     showApp();
+    if(!localStorage.getItem('setup_wizard_done_'+installer.installer_id)){showSetupWizard();}
   }catch(e){isHandlingAuth=false;showDataError(e);}
 }
 function showTab(id){
