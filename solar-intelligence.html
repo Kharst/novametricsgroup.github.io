@@ -877,6 +877,8 @@ const supabaseClient = supabase.createClient(SUPA_URL, SUPA_ANON);
 let DB = { locations:[], panels:[], inverters:[], batteries:[], loadProfiles:[], hwSource: null };
 let isNewInviteUser = false;  
 let isHandlingAuth = false;
+
+let newInstallerPasswordSet = false;  
   
 let installer = null, calcResult = null, selectedLoc = null, selectedClientType = 'residential';
 
@@ -2020,7 +2022,7 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
 supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
   const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;
-  if(isNewInvite){isNewInviteUser=true;isHandlingAuth=true;document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
+  if(isNewInvite&&!newInstallerPasswordSet){isNewInviteUser=true;isHandlingAuth=true;document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
   const needsPassword = event === 'PASSWORD_RECOVERY';
   if(needsPassword&&!isHandlingAuth){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
   if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser&&!isHandlingAuth){showLoadingOverlay('Loading your workspace…');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
@@ -2230,7 +2232,6 @@ if (installer && !installer.terms_accepted_at) {
  showProfileNudges();
   showGreeting();
   checkFirstTimeUser();
-  showSetupWizard();
 }
 function showProfileNudges() {
   const tips = [];
@@ -2332,8 +2333,8 @@ async function doSetPassword(){
     hideLoadingOverlay();
     isHandlingAuth = false;
     isNewInviteUser = false;
+    newInstallerPasswordSet = true;
     showApp();
-    if(!localStorage.getItem('setup_wizard_done_'+installer.installer_id)){showSetupWizard();}
   }catch(e){isHandlingAuth=false;showDataError(e);}
 }
 function showTab(id){
