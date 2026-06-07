@@ -2022,13 +2022,14 @@ function showPanel(name){['signin','forgot','setpass'].forEach(p=>{document.getE
 supabaseClient.auth.onAuthStateChange(async(event,session)=>{
   const hash=window.location.hash;
   const isNewInvite=event==='SIGNED_IN'&&session&&session.user&&session.user.created_at&&session.user.last_sign_in_at&&(new Date(session.user.last_sign_in_at)-new Date(session.user.created_at))<30000;
-  if(isNewInvite&&!newInstallerPasswordSet){isNewInviteUser=true;isHandlingAuth=true;document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
+  const passwordAlreadySet=session&&session.user&&!!localStorage.getItem('nm_pwd_set_'+session.user.id);
+  if(isNewInvite&&!passwordAlreadySet){isNewInviteUser=true;isHandlingAuth=true;document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
   const needsPassword = event === 'PASSWORD_RECOVERY';
   if(needsPassword&&!isHandlingAuth){document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';showPanel('setpass');return;}
   if(event==='SIGNED_IN'&&session&&!installer&&!isNewInviteUser&&!isHandlingAuth){showLoadingOverlay('Loading your workspace…');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}}
 });
 async function sbFetch(path){const{data:{session}}=await supabaseClient.auth.getSession();const token=session?session.access_token:SUPA_ANON;const res=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_ANON,'Authorization':'Bearer '+token,'Accept':'application/json'}});if(!res.ok)throw new Error(path+' -> '+res.status);return res.json();}
-(async function boot(){const{data:{session}}=await supabaseClient.auth.getSession();if(!session)return;const created=session.user.created_at,lastSign=session.user.last_sign_in_at;const brandNew=created&&lastSign&&(new Date(lastSign)-new Date(created))<30000;if(brandNew)return;showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();showApp();}catch(e){showDataError(e);}})();
+(async function boot(){isHandlingAuth=true;const{data:{session}}=await supabaseClient.auth.getSession();if(!session){isHandlingAuth=false;return;}const created=session.user.created_at,lastSign=session.user.last_sign_in_at;const brandNew=created&&lastSign&&(new Date(lastSign)-new Date(created))<30000;if(brandNew){isHandlingAuth=false;return;}showLoadingOverlay('Loading your workspace\u2026');try{await loadInstallerProfile(session.user.email);await loadAllData();hideLoadingOverlay();isHandlingAuth=false;showApp();}catch(e){isHandlingAuth=false;showDataError(e);}})();
 async function loadInstallerProfile(email){const rows=await sbFetch('/rest/v1/installers?contact_email=eq.'+encodeURIComponent(email)+'&select=installer_id,installer_name,contact_email,logo_url,primary_color,secondary_color,accent_color,contact_number,terms_accepted_at,terms_version,auth_user_id&limit=1');if(!rows||rows.length===0)throw new Error('No installer profile found for this account.');installer=rows[0];}
 function showLoadingOverlay(msg){document.getElementById('dlMsg').textContent=msg||'Loading\u2026';document.getElementById('dlErr').style.display='none';document.getElementById('dataLoading').classList.add('on');}
 function hideLoadingOverlay(){document.getElementById('dataLoading').classList.remove('on');}
@@ -2310,6 +2311,7 @@ async function doSetPassword(){
 
   if(error){errEl.textContent=error.message;btn.disabled=false;btn.textContent='Set Password & Sign In';isHandlingAuth=false;return;}
   isNewInviteUser = false;
+  if(data&&data.user)localStorage.setItem('nm_pwd_set_'+data.user.id,'1');
 
   // IMPORTANT FIXES
   isNewInviteUser = false;
