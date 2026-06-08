@@ -1526,6 +1526,7 @@ body::after {
         <text x="55" y="63" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="8" fill="#4e6080">/100</text>
       </svg>
       <div class="hs-score-label">Health Score</div>
+      <div id="hs-confidence-label" style="font-family:var(--mono);font-size:8px;color:var(--text4);text-align:center;margin-top:2px"></div>
     </div>
 
     <div class="hs-center">
@@ -2951,17 +2952,18 @@ function renderHealthScore(proposals, jobs, visits){
   const sent  = proposals.filter(p=>p.email_sent_at||p.whatsapp_sent_at||p.sent_at);
   const won   = proposals.filter(p=>p.client_engaged||p.proposal_status==='accepted');
   const wr    = sent.length ? won.length/sent.length : null;
-  const salesScore = wr!==null ? Math.min(100, Math.round(wr/0.6*100)) : 50;
+  const salesScore = wr!==null ? Math.min(100, Math.round(wr/0.6*100)) : null;
 
   /* 2. Pipeline Health: active jobs present + revenue in pipeline */
   const activePipe = jobs.filter(j=>j.job_status!=='handover_completed');
   const pipeVal    = activePipe.reduce((s,j)=>s+(parseFloat(j.total_cost)||0),0);
-  const pipeScore  = Math.min(100, Math.round((activePipe.length > 0 ? 40 : 0) + Math.min(60, pipeVal/50000*60)));
+  const proposalCredit=proposals.length>0?Math.min(30,Math.round(proposals.length/5*30)):0;
+const pipeScore=(activePipe.length===0&&proposals.length===0)?null:Math.min(100,Math.round((activePipe.length>0?40:proposalCredit)+Math.min(60,pipeVal/50000*60)));
 
   /* 3. Velocity Health: avg cycle. Ideal ≤30d = 100, ≥90d = 0 */
   const cycled    = jobs.filter(j=>j.job_status==='handover_completed'&&j.handover_completed_at&&j.created_at);
   const avgCycleH = cycled.length ? Math.round(cycled.reduce((s,j)=>s+daysBetween(j.created_at,j.handover_completed_at),0)/cycled.length) : null;
-  const velScore  = avgCycleH!==null ? Math.min(100, Math.max(0, Math.round(100 - ((avgCycleH-30)/60)*100))) : 50;
+  const velScore  = avgCycleH!==null ? Math.min(100, Math.max(10, Math.round(100 - ((avgCycleH-30)/120)*90))) : null;
 
   /* 4. Quality Health: low major-redesign rate. 0% major = 100, ≥50% = 0 */
   const major = visits.filter(v=>v.design_changed&&v.design_change_category==='major').length;
@@ -2969,10 +2971,14 @@ function renderHealthScore(proposals, jobs, visits){
 
   /* 5. Completion Health: stale jobs penalty */
   const stale     = jobs.filter(j=>j.job_status!=='handover_completed'&&daysBetween(j.created_at,new Date().toISOString())>=14);
-  const compScore = activePipe.length ? Math.max(0, Math.round(100 - (stale.length/Math.max(activePipe.length,1))*100)) : 80;
+  const compScore = activePipe.length ? Math.max(0, Math.round(100 - (stale.length/Math.max(activePipe.length,1))*100)) : null;
 
   /* ── Weighted overall ── */
-  const overall = Math.round(salesScore*.25 + pipeScore*.20 + velScore*.20 + qualScore*.15 + compScore*.20);
+  const pillarsW=[{s:salesScore,w:.25},{s:pipeScore,w:.20},{s:velScore,w:.20},{s:qualScore,w:.15},{s:compScore,w:.20}];
+const validW=pillarsW.filter(p=>p.s!==null);
+const totalW=validW.reduce((s,p)=>s+p.w,0);
+const overall=validW.length>=2?Math.round(validW.reduce((s,p)=>s+p.s*(p.w/totalW),0)):null;
+const confidence=Math.round(validW.length/pillarsW.length*100);
 
   /* ── Verdict ── */
   const verdicts = [
@@ -2981,14 +2987,16 @@ function renderHealthScore(proposals, jobs, visits){
     { min:55, ico:'🟠', text:'Needs attention',           col:'var(--orange)'  },
     { min:0,  ico:'🔴', text:'Action required',           col:'var(--red)'    },
   ];
-  const v = verdicts.find(x=>overall>=x.min);
+  const v = overall!==null ? verdicts.find(x=>overall>=x.min) : {ico:'⚙️', text:'Building baseline — keep adding proposals', col:'var(--text2)'};
 
   /* ── Driver bullets ── */
   const drivers = [];
-  if(salesScore>=70)  drivers.push({col:'var(--green)', txt:`Strong proposal win rate (${wr!==null?Math.round(wr*100):'?'}%)`});
-  else                drivers.push({col:'var(--red)',   txt:`Proposal win rate below target`});
-  if(velScore>=70)    drivers.push({col:'var(--green)', txt:`Fast install velocity (${avgCycleH!==null?avgCycleH+'d avg':'baseline'})`});
-  else if(avgCycleH!==null) drivers.push({col:'var(--amber)',txt:`Slow cycle time — ${avgCycleH}d avg (target ≤30d)`});
+  if(salesScore===null)         drivers.push({col:'var(--text3)', txt:'Send first proposal to track win rate'});
+  else if(salesScore>=70)       drivers.push({col:'var(--green)', txt:`Strong win rate — ${Math.round(wr*100)}% of sent proposals accepted`});
+  else                          drivers.push({col:'var(--red)',   txt:`Win rate ${Math.round(wr*100)}% — target is 60%+`});
+  if(velScore===null)           drivers.push({col:'var(--text3)', txt:'Complete first job to measure delivery speed'});
+  else if(velScore>=70)         drivers.push({col:'var(--green)', txt:`Strong delivery speed — ${avgCycleH}d avg (target ≤45d)`});
+  else if(avgCycleH!==null)     drivers.push({col:'var(--amber)', txt:`Delivery averaging ${avgCycleH}d — target 30–45d`});
   if(qualScore<60)    drivers.push({col:'var(--red)',   txt:`High redesign frequency (${visits.length?Math.round(major/visits.length*100):0}% major)`});
   else                drivers.push({col:'var(--green)', txt:`Low redesign rate — good pre-visit quality`});
   if(stale.length>0)  drivers.push({col:'var(--amber)', txt:`${stale.length} stale job${stale.length>1?'s':''} — pipeline risk`});
@@ -3002,7 +3010,9 @@ function renderHealthScore(proposals, jobs, visits){
     const fill = (overall/100)*circ;
     /* Animate after a tick so transition fires */
     setTimeout(()=>{ arc.setAttribute('stroke-dasharray', `${fill} ${circ-fill}`); }, 80);
-    numEl.textContent = overall;
+    numEl.textContent = overall!==null ? overall : '—';
+    const confEl=document.getElementById('hs-confidence-label');
+    if(confEl) confEl.textContent=confidence>=80?'High confidence':confidence>=60?'Moderate data':confidence>=40?'Limited data':'Building baseline';
   }
 
   const verdEl = document.getElementById('hs-verdict');
@@ -3017,7 +3027,7 @@ function renderHealthScore(proposals, jobs, visits){
   ).join('');
 
   /* Build tooltip content — plain English, not analyst jargon */
-  const verdict = s => s>=90?['Excellent','#00d68f']:s>=75?['Good','#4a9eff']:s>=60?['Fair','#f5a623']:s>=40?['Below target','#f59e0b']:['Needs work','#ff6b6b'];
+  const verdict = s => s===null?['No data','#4e6080']:s>=90?['Excellent','#00d68f']:s>=75?['Good','#4a9eff']:s>=60?['Fair','#f5a623']:s>=40?['Developing','#f59e0b']:['Needs work','#ff6b6b'];
 
   const TIPS = {
     Sales: {
@@ -3078,10 +3088,10 @@ function renderHealthScore(proposals, jobs, visits){
         </span>
         <span style="display:flex;align-items:center;gap:5px">
           <span style="font-size:9px;color:${vCol};font-weight:600;font-family:var(--sans);white-space:nowrap">${vLabel}</span>
-          <span style="color:${p.col};font-weight:700">${p.score}</span>
+          <span style="color:${p.score===null?'var(--text3)':p.col};font-weight:700">${p.score!==null?p.score:'—'}</span>
         </span>
       </div>
-      <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${Math.min(p.score,100)}%;background:${p.col}"></div></div>
+      <div class="hs-pillar-bar"><div class="hs-pillar-fill" style="width:${p.score!==null?Math.min(p.score,100):0}%;background:${p.score!==null?p.col:'#2a3450'}"></div></div>
     </div>`;
   }).join('');
 }
