@@ -443,7 +443,7 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
 (async function boot(){
   try{
     const {data:{session}, error}=await sbClient.auth.getSession();
-if(!session){const _rp='job-portal.html'+window.location.search;window.location.href='nova-metrics_1.html?returnTo='+encodeURIComponent(_rp);return;}
+if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
 
 
 setSyncStatus('online');
@@ -526,8 +526,7 @@ async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
   const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
-  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);
-  jobs=d||[];renderSidebar();setSyncStatus('online');
+  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
   }
@@ -548,7 +547,7 @@ function renderSidebar(){
   document.getElementById('job-count').textContent=f.length;list.innerHTML='';
   if(!f.length){
     if(!jobs.length){
-      list.innerHTML='<div class=\"job-list-empty\"><span style=\"font-size:28px;opacity:.9\">☀️</span><div style=\"font-size:12px;font-weight:600;color:#cbd5e1;margin-bottom:4px\">No jobs yet</div><div style=\"font-size:11px;color:#64748b;line-height:1.6\">Jobs appear here once a site visit has been booked in the Proposal Portal.<br>Win a proposal, then schedule the site visit to get started.</div><a href=\"prposal_portal.html\" style=\"display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:6px 14px;border-radius:7px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.25);color:#ffd700;font-size:11px;font-weight:600;text-decoration:none\" onmouseover=\"this.style.background=\\'rgba(255,215,0,.22)\\'\" onmouseout=\"this.style.background=\\'rgba(255,215,0,.12)\\'\">← Proposal Portal</a></div>';
+      list.innerHTML='<div class="job-list-empty"><span style="font-size:28px;opacity:.9">☀️</span><div style="font-size:12px;font-weight:600;color:#cbd5e1;margin-bottom:4px">No jobs yet</div><div style="font-size:11px;color:#64748b;line-height:1.6">When a client accepts a proposal it appears here as a job.<br>Generate your first proposal in</div><a href="solar-intelligence.html" style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:6px 14px;border-radius:7px;background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.25);color:#ffd700;font-size:11px;font-weight:600;text-decoration:none" onmouseover="this.style.background=\'rgba(255,215,0,.22)\'" onmouseout="this.style.background=\'rgba(255,215,0,.12)\'">⚡ New Design</a></div>';
     } else {
       list.innerHTML='<div class="job-list-empty"><span>🔍</span>No jobs match.<br>Try a different filter or search.</div>';
     }
@@ -568,7 +567,7 @@ async function openJob(id){
     const data=await sbGet('ai_results',`ai_id=eq.${id}&select=*`);
     if(!data||!data[0]){toast('Job not found','error');return;}
     currentJob=data[0];currentInstallerProfile=null;
-    if(currentJob.installer_id){try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation,auth_user_id`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}}
+    if(currentJob.installer_id){try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}}
     const[visits,installs,handovers,logs,versions]=await Promise.all([
   sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
   sbGet('installations',`job_id=eq.${id}&order=created_at.desc&limit=1`),
