@@ -509,7 +509,7 @@ const STAGE_LABELS={
 };
 
 const PANEL_UNLOCK=[
-  ['lead','accepted','site_visit_scheduled','site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
+  ['site_visit_scheduled','site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
   ['site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
   ['installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
   ['installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
@@ -525,7 +525,7 @@ function si(s){return SO.indexOf(s);}
 async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
-  const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
+  const won='site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
   try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
