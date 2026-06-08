@@ -3009,8 +3009,13 @@ const confidence=Math.round(validW.length/pillarsW.length*100);
     const circ = 276.5;
     const fill = (overall/100)*circ;
     /* Animate after a tick so transition fires */
+    const scoreColor=overall===null?'#4e6080':overall>=70?'#00d68f':overall>=55?'#f5a623':overall>=40?'#fb923c':'#ff5c5c';
+    arc.setAttribute('stroke', scoreColor);
+    numEl.setAttribute('fill', scoreColor);
     setTimeout(()=>{ arc.setAttribute('stroke-dasharray', `${fill} ${circ-fill}`); }, 80);
     numEl.textContent = overall!==null ? overall : '—';
+    const card=document.getElementById('health-score-card');
+    if(card) card.style.borderColor=scoreColor+'44';
     const confEl=document.getElementById('hs-confidence-label');
     if(confEl) confEl.textContent=confidence>=80?'High confidence':confidence>=60?'Moderate data':confidence>=40?'Limited data':'Building baseline';
   }
@@ -3019,7 +3024,7 @@ const confidence=Math.round(validW.length/pillarsW.length*100);
   const icoEl  = document.getElementById('hs-verdict-ico');
   const txtEl  = document.getElementById('hs-verdict-text');
   if(icoEl) icoEl.textContent = v.ico;
-  if(txtEl){ txtEl.textContent = `${overall}/100 — ${v.text}`; txtEl.style.color = v.col; }
+  if(txtEl){ txtEl.textContent = overall!==null?`${overall}/100 — ${v.text}`:v.text; txtEl.style.color = v.col; }
 
   const drEl = document.getElementById('hs-drivers');
   if(drEl) drEl.innerHTML = drivers.slice(0,4).map(d=>
@@ -3046,7 +3051,7 @@ const confidence=Math.round(validW.length/pillarsW.length*100);
       short: 'How fast jobs go from won to handed over',
       title: 'Execution Speed · 20% of score',
       body: 'Time from accepted proposal to signed handover. Slow jobs block your team and delay cash.',
-      calc: `Under 30 days = 100 pts · Over 90 days = 0 pts · ${avgCycleH!==null ? 'Your avg: '+avgCycleH+'d' : 'No completed jobs yet'}`
+      calc: `30d = 100 pts · 90d ≈ 55 pts · 150d = 10 pts (min, no project is worthless) · ${avgCycleH!==null ? 'Your avg: '+avgCycleH+'d' : 'No completed jobs yet — tracking begins after first handover'}`
     },
     Quality: {
       short: 'How often site visits force a redesign',
@@ -3062,13 +3067,14 @@ const confidence=Math.round(validW.length/pillarsW.length*100);
     }
   };
 
-  const pillars = [
-    { label:'Sales',      score:salesScore,  col:'#f5a623' },
-    { label:'Pipeline',   score:pipeScore,   col:'#4a9eff' },
-    { label:'Velocity',   score:velScore,    col:'#a78bfa' },
-    { label:'Quality',    score:qualScore,   col:'#2dd4bf' },
-    { label:'Completion', score:compScore,   col:'#00d68f' },
-  ];
+  const pillarColor=s=>s===null?'#3a4a65':s>=75?'#00d68f':s>=55?'#f5a623':s>=35?'#fb923c':'#ff5c5c';
+  const pillars=[
+    {label:'Sales',      score:salesScore},
+    {label:'Pipeline',   score:pipeScore},
+    {label:'Velocity',   score:velScore},
+    {label:'Quality',    score:qualScore},
+    {label:'Completion', score:compScore},
+  ].map(p=>({...p,col:pillarColor(p.score)}));
   const pillarsEl = document.getElementById('hs-pillars');
   if(pillarsEl) pillarsEl.innerHTML = pillars.map(p => {
     const t = TIPS[p.label] || {};
