@@ -443,7 +443,7 @@ function endAction(id){_busy=false;const b=document.getElementById(id);if(b){b.d
 (async function boot(){
   try{
     const {data:{session}, error}=await sbClient.auth.getSession();
-if(!session){window.location.href='nova-metrics_1.html?returnTo=job-portal.html';return;}
+if(!session){const _rp='job-portal.html'+window.location.search;window.location.href='nova-metrics_1.html?returnTo='+encodeURIComponent(_rp);return;}
 
 
 setSyncStatus('online');
