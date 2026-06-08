@@ -3051,7 +3051,7 @@ const confidence=Math.round(validW.length/pillarsW.length*100);
       short: 'How fast jobs go from won to handed over',
       title: 'Execution Speed · 20% of score',
       body: 'Time from accepted proposal to signed handover. Slow jobs block your team and delay cash.',
-      calc: `30d = 100 pts · 90d ≈ 55 pts · 150d = 10 pts (min, no project is worthless) · ${avgCycleH!==null ? 'Your avg: '+avgCycleH+'d' : 'No completed jobs yet — tracking begins after first handover'}`
+      calc: `30 days = top-quartile SA residential performance (100 pts). The score scales down gradually — 45d = 79 pts, 60d = 68 pts, 90d = 55 pts, 150d = 10 pts minimum. No job scores zero. ${avgCycleH!==null ? 'Your current avg: '+avgCycleH+'d.' : 'Tracking begins after your first handover.'}`
     },
     Quality: {
       short: 'How often site visits force a redesign',
