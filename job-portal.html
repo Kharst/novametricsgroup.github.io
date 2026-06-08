@@ -526,7 +526,7 @@ async function loadJobs(){
   setSyncStatus('loading');
   /* ── UPDATED: query uses new stage names ── */
   const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
-  try{const d=await sbGet('ai_results',`select=*&or=(job_status.in.(${won}),job_status.is.null)&order=created_at.desc`);
+  try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);
   jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
     if(noJobsPanel) noJobsPanel.style.display=jobs.length===0?'block':'none';
@@ -568,7 +568,7 @@ async function openJob(id){
     const data=await sbGet('ai_results',`ai_id=eq.${id}&select=*`);
     if(!data||!data[0]){toast('Job not found','error');return;}
     currentJob=data[0];currentInstallerProfile=null;
-    if(currentJob.installer_id){try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}}
+    if(currentJob.installer_id){try{const r=await sbGet('installers',`installer_id=eq.${currentJob.installer_id}&select=installer_name,contact_email,contact_number,contact_person,registration_number,accreditation,auth_user_id`);if(r&&r[0])currentInstallerProfile=r[0];}catch(e){}}
     const[visits,installs,handovers,logs,versions]=await Promise.all([
   sbGet('site_visits',`job_id=eq.${id}&order=created_at.desc&limit=1`),
   sbGet('installations',`job_id=eq.${id}&order=created_at.desc&limit=1`),
