@@ -1076,7 +1076,7 @@ function isProposalAccepted(ai){
   var ps=normalizedProposalStatus(ai);
   if(ps==='accepted') return true;
   if(ps==='rejected') return false;
-  return flagTrue(ai.client_engaged)||!!ai.won_at;
+  return !!ai.won_at;
 }
 function isProposalRejected(ai){
   if(!ai) return false;
