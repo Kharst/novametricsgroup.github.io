@@ -130,6 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-
     <div class="top-actions">
       <button class="btn-top btn-top-ghost print-hide" onclick="window.print()">🖨 Print</button>
       <button class="btn-top btn-top-ghost print-hide" onclick="copyLink()">🔗 Share Link</button>
+      <a href="assessments.html" class="btn-top btn-top-ghost print-hide">📋 History</a>
       <a href="index.html" class="btn-top btn-top-solid print-hide">+ New Assessment</a>
     </div>
   </div>
@@ -255,8 +256,8 @@ function buildGauge(score,rating){
   const wrap=document.getElementById('gaugeWrap');
   wrap.innerHTML=`<svg viewBox="0 0 240 130" width="240" height="130" style="overflow:visible">
     <path d="M 25 105 A 85 85 0 0 1 215 105" fill="none" stroke="#E0ECEC" stroke-width="14" stroke-linecap="round"/>
-    <path class="g-fill" d="M 25 105 A 85 85 0 0 1 215 105" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${arcLen.toFixed(1)}" stroke-dashoffset="${arcLen.toFixed(1)}" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
-    <circle id="gDot" cx="25" cy="105" r="7" fill="${col}" style="transition:all 1.4s cubic-bezier(.4,0,.2,1)"/>
+    <path class="g-fill" d="M 25 105 A 85 85 0 0 1 215 105" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${arcLen.toFixed(1)}" stroke-dashoffset="${arcLen.toFixed(1)}" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);transform-origin:center;transform:scaleX(-1)"/>
+    <circle id="gDot" cx="215" cy="105" r="7" fill="${col}" style="transition:all 1.4s cubic-bezier(.4,0,.2,1)"/>
     <text x="120" y="88" text-anchor="middle" font-family="'Playfair Display',serif" font-size="44" font-weight="700" fill="${col}">${score}</text>
     <text x="24" y="122" font-size="9" fill="#90AAAA" text-anchor="middle">0</text>
     <text x="216" y="122" font-size="9" fill="#90AAAA" text-anchor="middle">100</text>
@@ -269,7 +270,7 @@ function buildGauge(score,rating){
     if(fill)fill.style.strokeDashoffset=dashOffset.toFixed(1);
     const dot=document.getElementById('gDot');
     if(dot){
-      const angle=Math.PI-(score/100)*Math.PI;
+      const angle=(score/100)*Math.PI;
       dot.setAttribute('cx',(120+85*Math.cos(angle)).toFixed(1));
       dot.setAttribute('cy',(105-85*Math.sin(angle)).toFixed(1));
     }
