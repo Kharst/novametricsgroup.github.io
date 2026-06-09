@@ -1349,9 +1349,9 @@ async function loadInstallerHardware(){
   let demoPanels=[],demoInverters=[],demoBatteries=[];
   try{
     const[dp,di,db]=await Promise.all([
-      sbGet('demo_panels','order=brand.asc,panel_model.asc'),
-      sbGet('demo_inverters','order=brand.asc,inverter_model.asc'),
-      sbGet('demo_batteries','order=brand.asc,battery_model.asc'),
+      sbGet('PanelModels','order=brand.asc,panel_model.asc'),
+      sbGet('InverterModels','order=brand.asc,inverter_model.asc'),
+      sbGet('BatteryModels_DB','order=brand.asc,battery_model.asc'),
     ]);
     demoPanels=dp||[];demoInverters=di||[];demoBatteries=db||[];
   }catch(e){}
