@@ -462,7 +462,7 @@ await loadJobs();
         const ns=payload.new.client_approval_status;
         if(ns===currentVisit.client_approval_status)return;
         currentVisit={...currentVisit,...payload.new};
-        renderDesignChangeAlert();renderApprovalBanner();renderPanel1DesignNote();
+        renderDesignChangeAlert();renderApprovalBanner();renderPanel1DesignNote();renderPanels();
         if(ns==='approved'||ns==='accepted')toast('🎉 Client accepted the revised design!','success');
         else if(ns==='declined'||ns==='rejected')toast('⚠ Client declined the revised design.','error');
       }).subscribe();
@@ -605,14 +605,15 @@ function renderPipeline(){
     else{dot.className='pipe-dot';lbl.className='pipe-label';if(arr)arr.className='pipe-arrow';}
   });
 }
-function jumpToPanel(i){const p=document.getElementById(`panel-${i}`);if(p&&!p.classList.contains('locked')){p.classList.add('open');p.scrollIntoView({behavior:'smooth',block:'start'});}}
+function jumpToPanel(i){const p=document.getElementById(`panel-${i}`);if(p&&!p.classList.contains('locked')){p.classList.add('open');p.scrollIntoView({behavior:'smooth',block:'start'});}else if(p&&p.classList.contains('locked')&&i>0){const majorPending=currentVisit&&currentVisit.design_change_category==='major'&&currentVisit.client_approval_status!=='approved'&&currentVisit.client_approval_status!=='accepted';if(majorPending)toast('⏳ Awaiting client approval — steps unlocked once client accepts.','info');}}
 
 function renderPanels(){
   const status=currentJob.job_status||'lead';
+  const majorPending=currentVisit&&currentVisit.design_change_category==='major'&&currentVisit.client_approval_status!=='approved'&&currentVisit.client_approval_status!=='accepted';
   PANEL_UNLOCK.forEach((unlock,i)=>{
     const panel=document.getElementById(`panel-${i}`),badge=document.getElementById(`panel-${i}-badge`);
     if(!panel||!badge)return;
-    const unlocked=unlock.includes(status);panel.classList.toggle('locked',!unlocked);
+    const unlocked=unlock.includes(status)&&!(majorPending&&i>0);panel.classList.toggle('locked',!unlocked);
     const done={
       0:['site_visit_completed','deposit_received','materials_ordered','installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
       1:['installation_scheduled','installation_in_progress','installation_completed','coc_issued','sseg_submitted','handover_completed'],
