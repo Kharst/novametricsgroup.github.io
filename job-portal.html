@@ -340,15 +340,73 @@
             </div>
             <hr class="section-sep">
             <div class="section-label">Equipment Specification</div>
-            <div class="form-grid-3">
-              <div class="form-group"><label class="form-label">Panel Brand</label><input type="text" class="form-input" id="inst-panelbrand" placeholder="e.g. JA Solar"></div>
-              <div class="form-group"><label class="form-label">Panel Wattage</label><input type="number" class="form-input" id="inst-panelwatt" placeholder="e.g. 550"></div>
-              <div class="form-group"><label class="form-label">Panel Quantity</label><input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20"></div>
-              <div class="form-group"><label class="form-label">Inverter Brand</label><input type="text" class="form-input" id="inst-inverterbrand" placeholder="e.g. Sungrow"></div>
-              <div class="form-group"><label class="form-label">Inverter Size (kW)</label><input type="number" step="0.1" class="form-input" id="inst-inverterkw" placeholder="e.g. 10.0"></div>
-              <div class="form-group"><label class="form-label">Battery Brand</label><input type="text" class="form-input" id="inst-batterybrand" placeholder="e.g. BYD"></div>
-              <div class="form-group"><label class="form-label">Battery kWh (each)</label><input type="number" step="0.1" class="form-input" id="inst-batterykwh" placeholder="e.g. 10.0"></div>
-              <div class="form-group"><label class="form-label">Battery Quantity</label><input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1"></div>
+
+            <!-- Agreed spec — locked amber zone -->
+            <div style="background:rgba(245,166,35,.04);border:1px solid rgba(245,166,35,.18);border-radius:7px;padding:14px 16px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <div style="width:3px;height:14px;background:var(--amber);border-radius:2px;flex-shrink:0"></div>
+                <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.1em">Contracted Spec — Locked</span>
+                <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:4px">From approved design. Equipment selected below must deliver this.</span>
+              </div>
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label class="form-label">System Size <span style="color:var(--amber);font-size:9px;margin-left:4px">LOCKED</span></label>
+                  <input type="text" class="form-input" id="inst-agreed-kw" readonly style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);cursor:not-allowed;color:var(--amber)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Battery Storage <span style="color:var(--amber);font-size:9px;margin-left:4px">LOCKED</span></label>
+                  <input type="text" class="form-input" id="inst-agreed-batt" readonly style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);cursor:not-allowed;color:var(--amber)">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Panel Target <span style="color:var(--amber);font-size:9px;margin-left:4px">LOCKED</span></label>
+                  <input type="text" class="form-input" id="inst-agreed-panels" readonly style="background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2);cursor:not-allowed;color:var(--amber)">
+                </div>
+              </div>
+            </div>
+
+            <!-- Equipment selection from installer's hardware list -->
+            <div style="background:rgba(74,158,255,.03);border:1px solid rgba(74,158,255,.1);border-radius:7px;padding:14px 16px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <div style="width:3px;height:14px;background:var(--blue);border-radius:2px;flex-shrink:0"></div>
+                <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.1em">Equipment Selection — Your Hardware</span>
+                <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:4px">Select from your uploaded product list.</span>
+              </div>
+              <div class="form-grid-3">
+                <div class="form-group">
+                  <label class="form-label">Panel</label>
+                  <select class="form-select" id="inst-panel-select" onchange="onPanelSelect()">
+                    <option value="">Loading panels…</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Panel Quantity</label>
+                  <input type="number" class="form-input" id="inst-panelqty" placeholder="e.g. 20" oninput="calcActualKw()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Inverter</label>
+                  <select class="form-select" id="inst-inverter-select" onchange="onInverterSelect()">
+                    <option value="">Loading inverters…</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Battery</label>
+                  <select class="form-select" id="inst-battery-select" onchange="onBatterySelect()">
+                    <option value="">Loading batteries…</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Battery Quantity</label>
+                  <input type="number" class="form-input" id="inst-batteryqty" placeholder="e.g. 1" oninput="calcActualBatt()">
+                </div>
+              </div>
+              <!-- hidden fields that _saveInstallPrep reads — populated by the select handlers -->
+              <input type="hidden" id="inst-panelbrand">
+              <input type="hidden" id="inst-panelwatt">
+              <input type="hidden" id="inst-inverterbrand">
+              <input type="hidden" id="inst-inverterkw">
+              <input type="hidden" id="inst-batterybrand">
+              <input type="hidden" id="inst-batterykwh">
+              <div id="inst-spec-validation" style="display:none;margin-top:12px;padding:10px 14px;border-radius:5px;font-family:var(--mono);font-size:11px"></div>
             </div>
             <div class="btn-row"><button class="btn btn-primary" id="btn-schedule" onclick="scheduleInstallation()">✓ Schedule Installation</button><button class="btn btn-ghost" onclick="saveInstallPrepDraft()">💾 Save Progress</button></div>
           </div>
@@ -861,6 +919,18 @@ function renderProposalVersions(){
 
 function prefillForms(){
   const v=currentVisit;
+
+  /* Step 2: locked agreed spec */
+  const approvedKw=v?.recommended_system_kw||currentJob?.system_size_kw||'';
+  const approvedBatt=v?.recommended_battery_kwh||currentJob?.battery_capacity_kwh||'';
+  const approvedPanels=currentProposalVersions[0]?.panels_qty||'';
+  setVal('inst-agreed-kw', approvedKw?approvedKw+' kWp':'—');
+  setVal('inst-agreed-batt', approvedBatt?approvedBatt+' kWh':'—');
+  setVal('inst-agreed-panels', approvedPanels?approvedPanels+' panels':'—');
+
+  /* Step 2: load hardware dropdowns from installer's product list */
+  loadInstallerHardware();
+
   if(v){setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);checkDesignChangeLive();}
   const latestVersion=currentProposalVersions[0];
   if(latestVersion&&!currentInstall){setVal('inst-panelbrand',latestVersion.panel_brand);setVal('inst-panelwatt',latestVersion.panel_watt);setVal('inst-panelqty',latestVersion.panels_qty);setVal('inst-inverterbrand',latestVersion.inverter_brand);setVal('inst-inverterkw',latestVersion.inverter_kw);setVal('inst-batterybrand',latestVersion.battery_brand);setVal('inst-batterykwh',latestVersion.battery_unit_kwh);setVal('inst-batteryqty',latestVersion.battery_qty);}
@@ -991,6 +1061,127 @@ function renderActivityLog(logs){const c=document.getElementById('activity-log-e
 function formatTime(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});}
 function togglePanel(i){const p=document.getElementById('panel-'+i);if(p&&!p.classList.contains('locked'))p.classList.toggle('open');}
 function getVal(id){return document.getElementById(id)?.value?.trim()||'';}
+
+/* ── Step 2: load installer hardware into dropdowns ── */
+let _hwPanels=[],_hwInverters=[],_hwBatteries=[];
+
+async function loadInstallerHardware(){
+  const iid=currentJob?.installer_id;
+  if(!iid)return;
+  try{
+    const[panels,inverters,batteries]=await Promise.all([
+      sbGet('installer_panels',`installer_id=eq.${iid}&order=brand.asc,panel_model.asc`),
+      sbGet('installer_inverters',`installer_id=eq.${iid}&order=brand.asc,inverter_model.asc`),
+      sbGet('installer_batteries',`installer_id=eq.${iid}&order=brand.asc,battery_model.asc`),
+    ]);
+    _hwPanels=panels||[];_hwInverters=inverters||[];_hwBatteries=batteries||[];
+  }catch(e){_hwPanels=[];_hwInverters=[];_hwBatteries=[];}
+
+  const ps=document.getElementById('inst-panel-select');
+  const is=document.getElementById('inst-inverter-select');
+  const bs=document.getElementById('inst-battery-select');
+
+  if(ps){
+    ps.innerHTML=_hwPanels.length
+      ?'<option value="">Select panel…</option>'+_hwPanels.map(p=>`<option value="${p.id}">${p.brand} ${p.panel_model} — ${p.watts}W</option>`).join('')
+      :'<option value="">No panels on file — add in Solar Intelligence</option>';
+  }
+  if(is){
+    is.innerHTML=_hwInverters.length
+      ?'<option value="">Select inverter…</option>'+_hwInverters.map(i=>`<option value="${i.id}">${i.brand} ${i.inverter_model} — ${i.ac_continuous_kw}kW</option>`).join('')
+      :'<option value="">No inverters on file — add in Solar Intelligence</option>';
+  }
+  if(bs){
+    bs.innerHTML=_hwBatteries.length
+      ?'<option value="">Select battery…</option>'+_hwBatteries.map(b=>`<option value="${b.id}">${b.brand} ${b.battery_model} — ${b.usable_kwh}kWh</option>`).join('')
+      :'<option value="">No batteries on file — add in Solar Intelligence</option>';
+  }
+
+  /* re-select previously saved values if currentInstall exists */
+  if(currentInstall){
+    _reselectHardware();
+  }
+}
+
+function _reselectHardware(){
+  const inst=currentInstall;
+  if(!inst)return;
+  /* match saved brand+watt back to a panel option */
+  const pMatch=_hwPanels.find(p=>p.brand===inst.panels_brand&&p.watts==inst.panels_watt);
+  if(pMatch){const ps=document.getElementById('inst-panel-select');if(ps)ps.value=String(pMatch.id);onPanelSelect(true);}
+  const iMatch=_hwInverters.find(i=>i.brand===inst.inverter_brand&&Number(i.ac_continuous_kw)==Number(inst.inverter_kw));
+  if(iMatch){const is=document.getElementById('inst-inverter-select');if(is)is.value=String(iMatch.id);onInverterSelect(true);}
+  const bMatch=_hwBatteries.find(b=>b.brand===inst.battery_brand&&Number(b.usable_kwh)==Number(inst.battery_kwh));
+  if(bMatch){const bs=document.getElementById('inst-battery-select');if(bs)bs.value=String(bMatch.id);onBatterySelect(true);}
+}
+
+function onPanelSelect(silent){
+  const sel=document.getElementById('inst-panel-select');
+  if(!sel||!sel.value)return;
+  const p=_hwPanels.find(x=>String(x.id)===sel.value);
+  if(!p)return;
+  document.getElementById('inst-panelbrand').value=p.brand;
+  document.getElementById('inst-panelwatt').value=p.watts;
+  if(!silent)calcActualKw();
+}
+
+function onInverterSelect(silent){
+  const sel=document.getElementById('inst-inverter-select');
+  if(!sel||!sel.value)return;
+  const inv=_hwInverters.find(x=>String(x.id)===sel.value);
+  if(!inv)return;
+  document.getElementById('inst-inverterbrand').value=inv.brand;
+  document.getElementById('inst-inverterkw').value=inv.ac_continuous_kw;
+}
+
+function onBatterySelect(silent){
+  const sel=document.getElementById('inst-battery-select');
+  if(!sel||!sel.value)return;
+  const b=_hwBatteries.find(x=>String(x.id)===sel.value);
+  if(!b)return;
+  document.getElementById('inst-batterybrand').value=b.brand;
+  document.getElementById('inst-batterykwh').value=b.usable_kwh;
+  if(!silent)calcActualBatt();
+}
+
+function calcActualKw(){
+  const qty=parseInt(getVal('inst-panelqty'))||0;
+  const watt=parseInt(document.getElementById('inst-panelwatt')?.value)||0;
+  if(!qty||!watt)return;
+  const actualKw=(qty*watt)/1000;
+  const agreedStr=getVal('inst-agreed-kw');
+  const agreedKw=parseFloat(agreedStr)||0;
+  const el=document.getElementById('inst-spec-validation');
+  if(!el)return;
+  if(agreedKw>0){
+    const drift=Math.abs((actualKw-agreedKw)/agreedKw);
+    el.style.display='block';
+    if(drift>0.10){
+      el.style.background='rgba(224,82,82,.08)';el.style.border='1px solid rgba(224,82,82,.25)';el.style.color='var(--red)';
+      el.textContent='⚠ Panel selection produces '+actualKw.toFixed(2)+' kWp — '+Math.round(drift*100)+'% off the agreed '+agreedKw+' kWp. Adjust quantity or choose a different panel.';
+    }else{
+      el.style.background='rgba(46,204,138,.06)';el.style.border='1px solid rgba(46,204,138,.2)';el.style.color='var(--green)';
+      el.textContent='✓ Panel selection produces '+actualKw.toFixed(2)+' kWp — within tolerance of agreed '+agreedKw+' kWp.';
+    }
+  }
+}
+
+function calcActualBatt(){
+  const qty=parseInt(getVal('inst-batteryqty'))||0;
+  const kwh=parseFloat(document.getElementById('inst-batterykwh')?.value)||0;
+  if(!qty||!kwh)return;
+  const actualBatt=qty*kwh;
+  const agreedStr=getVal('inst-agreed-batt');
+  const agreedBatt=parseFloat(agreedStr)||0;
+  const el=document.getElementById('inst-spec-validation');
+  if(!el||!agreedBatt)return;
+  const drift=Math.abs((actualBatt-agreedBatt)/agreedBatt);
+  if(drift>0.10){
+    el.style.display='block';
+    el.style.background='rgba(224,82,82,.08)';el.style.border='1px solid rgba(224,82,82,.25)';el.style.color='var(--red)';
+    el.textContent='⚠ Battery selection totals '+actualBatt.toFixed(1)+' kWh — '+Math.round(drift*100)+'% off the agreed '+agreedBatt+' kWh.';
+  }
+}
 function toast(msg,type='info'){const c=document.getElementById('toast-container');const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;c.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),300);},3800);}
 </script>
 </body>
