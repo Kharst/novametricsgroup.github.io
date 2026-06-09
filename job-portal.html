@@ -276,7 +276,8 @@
         <div class="panel" id="panel-0">
           <div class="panel-header" onclick="togglePanel(0)"><div class="panel-title-group"><span class="panel-step-num">STEP 1</span><span class="panel-title">Site Visit Assessment</span></div><div style="display:flex;align-items:center;gap:10px"><span class="stage-pill" id="panel-0-badge"></span><span class="panel-toggle">▾</span></div></div>
           <div class="panel-body">
-            <div class="section-label" style="margin-bottom:8px">Client Notification</div>
+            <div id=\"sv-context-banner\" style=\"display:none;margin-bottom:16px;padding:12px 16px;border-radius:7px;font-size:12px;line-height:1.6\"></div>
+            <div class=\"section-label\" style=\"margin-bottom:8px\">Client Notification</div>
             <div class="notify-block">
               <div class="notify-status-row"><div class="notify-status"><div class="notify-dot unsent" id="notify-dot"></div><div><div class="notify-label unsent" id="notify-label">Client not yet notified</div><div class="notify-sub" id="notify-sub">Fill in the assessor name and visit date/time below, then notify the client.</div></div></div></div>
               <div class="notify-actions"><button class="btn btn-blue" id="btn-notify-email" onclick="sendVisitNotification()" disabled>✉ Email Confirmation</button><button class="btn btn-wa" id="btn-notify-wa" onclick="openWhatsApp()" disabled>💬 WhatsApp</button></div>
@@ -455,6 +456,9 @@ await loadJobs();
       await openJob(_urlAiId);
       const _jobItem=Array.from(document.querySelectorAll('.job-card')).find(function(el){return el.dataset.aiId===String(_urlAiId);});
       if(_jobItem)_jobItem.scrollIntoView({behavior:'smooth',block:'nearest'});
+      const _svDate=_urlParams.get('sv_date');const _svTime=_urlParams.get('sv_time');const _svNotes=_urlParams.get('sv_notes');
+      if(_svDate){const _dtEl=document.getElementById('sv-datetime');if(_dtEl&&!_dtEl.value){_dtEl.value=_svDate+(_svTime?'T'+_svTime:'');checkNotifyReady();}}
+      if(_svNotes){const _notesEl=document.getElementById('sv-notes');if(_notesEl&&!_notesEl.value)_notesEl.value=_svNotes;}
     }
     sbClient.channel('design-approvals')
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'site_visits'},payload=>{
@@ -496,7 +500,7 @@ function setSyncStatus(s){
 const STAGE_LABELS={
   lead:'Won — Awaiting Visit',
   accepted:'Won — Awaiting Visit',
-  site_visit_scheduled:'Visit Scheduled',
+  site_visit_scheduled:'Visit Booked — Notify Client',
   site_visit_completed:'Visit Complete',
   deposit_received:'Deposit Received',
   materials_ordered:'Materials Ordered',
@@ -645,6 +649,14 @@ function renderApprovalBanner(){
 function renderNotificationStatus(){
   const v=currentVisit,dot=document.getElementById('notify-dot'),label=document.getElementById('notify-label'),hint=document.getElementById('notify-hint');
   if(!dot||!label)return;
+  const banner=document.getElementById('sv-context-banner');
+  const notified=!!(v&&v.client_notified_at);
+  const visitDone=!!(v&&v.completed_at);
+  if(banner){
+    if(visitDone){banner.style.display='block';banner.style.background='rgba(46,204,138,.08)';banner.style.border='1px solid rgba(46,204,138,.25)';banner.style.color='var(--green)';banner.innerHTML='<strong>📋 ON-SITE MODE</strong> — You are at the property. Fill in the assessment fields below based on what you observe.';}
+    else if(notified){banner.style.display='block';banner.style.background='rgba(74,158,255,.07)';banner.style.border='1px solid rgba(74,158,255,.2)';banner.style.color='var(--blue)';banner.innerHTML='<strong>⏳ VISIT CONFIRMED</strong> — Client has been notified. Fill in the assessment fields when you arrive on site.';}
+    else{banner.style.display='block';banner.style.background='rgba(245,166,35,.07)';banner.style.border='1px solid rgba(245,166,35,.2)';banner.style.color='var(--amber)';banner.innerHTML='<strong>📅 BOOKING STAGE</strong> — Enter the assessor name and visit date/time below, then send the client their confirmation before leaving this screen.';}
+  }
   if(v&&v.client_notified_at){
     dot.className='notify-dot sent';label.className='notify-label sent';
     const d=new Date(v.client_notified_at);
