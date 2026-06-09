@@ -408,6 +408,19 @@
               <input type="hidden" id="inst-batterykwh">
               <div id="inst-spec-validation" style="display:none;margin-top:12px;padding:10px 14px;border-radius:5px;font-family:var(--mono);font-size:11px"></div>
             </div>
+           <!-- Compliance Review -->
+            <div style="background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:14px 16px;margin-bottom:14px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:3px;height:14px;background:var(--green);border-radius:2px;flex-shrink:0"></div>
+                  <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.1em">Compliance Review</span>
+                  <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:4px">Run before scheduling — verifies selected hardware against SA standards.</span>
+                </div>
+                <button class="btn btn-ghost" id="btn-run-recalc" onclick="runSiteRecalc()" style="font-size:11px;padding:5px 14px">⚡ Run Compliance Check</button>
+              </div>
+              <div id="recalc-result" style="display:none"></div>
+            </div>
+
             <div class="btn-row"><button class="btn btn-primary" id="btn-schedule" onclick="scheduleInstallation()">✓ Schedule Installation</button><button class="btn btn-ghost" onclick="saveInstallPrepDraft()">💾 Save Progress</button></div>
           </div>
         </div>
@@ -1061,6 +1074,258 @@ function renderActivityLog(logs){const c=document.getElementById('activity-log-e
 function formatTime(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('en-ZA',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});}
 function togglePanel(i){const p=document.getElementById('panel-'+i);if(p&&!p.classList.contains('locked'))p.classList.toggle('open');}
 function getVal(id){return document.getElementById(id)?.value?.trim()||'';}
+
+/* ══════════════════════════════════════════════════════════════════
+   SITE-VISIT RECALCULATION ENGINE
+   Runs the same NRS 097 compliance checks as Solar Intelligence,
+   using the installer's selected hardware + original load inputs.
+══════════════════════════════════════════════════════════════════ */
+const RC_PR=0.80,RC_AVAIL=0.97,RC_BOS=3000,RC_DOD_LIMIT=0.85,RC_DOD_GOOD=0.70;
+const RC_DCAC_MIN=1.00,RC_DCAC_TARGET=1.30,RC_DCAC_MAX=1.50;
+const RC_BATT_HEAD_MIN=1.10,RC_BATT_HEAD_IDEAL=1.35;
+
+function rcDcAcStatus(r){
+  if(r>RC_DCAC_MAX)  return{txt:'FAIL — Exceeds NRS 097-2-1 max (1.5)',cls:'red'};
+  if(r>1.35)         return{txt:'Above target — within NRS 097 limit',cls:'amber'};
+  if(r>=1.15)        return{txt:'✓ Compliant — meets 1.3:1 NRS 097 target',cls:'green'};
+  if(r>=RC_DCAC_MIN) return{txt:'Below target — inverter oversized vs array',cls:'amber'};
+  return{txt:'DC/AC < 1.0 — under-utilised',cls:'amber'};
+}
+function rcBattStatus(h){
+  if(h<RC_BATT_HEAD_MIN) return{txt:'Undersized — DoD risk',cls:'red'};
+  if(h<=RC_BATT_HEAD_IDEAL) return{txt:'Balanced — well designed',cls:'green'};
+  return{txt:'Conservative reserve',cls:'amber'};
+}
+function rcColor(cls){return cls==='green'?'var(--green)':cls==='red'?'var(--red)':'var(--amber)';}
+
+function rcRow(label,val,color,sub){
+  return `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border)">
+    <span style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1">${label}</span>
+    <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${color||'var(--text)'};text-align:right">${val}${sub?'<br><span style="font-size:9px;font-weight:400;color:var(--text3)">'+sub+'</span>':''}</span>
+  </div>`;
+}
+
+async function runSiteRecalc(){
+  const el=document.getElementById('recalc-result');
+  if(!el)return;
+  if(!currentJob){el.style.display='block';el.innerHTML='<span style="font-family:var(--mono);font-size:11px;color:var(--red)">No job loaded.</span>';return;}
+
+  /* ── Collect selected hardware ── */
+  const panelId=document.getElementById('inst-panel-select')?.value;
+  const invId=document.getElementById('inst-inverter-select')?.value;
+  const battId=document.getElementById('inst-battery-select')?.value;
+  const panelQty=parseInt(getVal('inst-panelqty'))||0;
+  const battQty=parseInt(getVal('inst-batteryqty'))||0;
+
+  if(!panelId||!invId||!battId||!panelQty||!battQty){
+    el.style.display='block';
+    el.innerHTML='<span style="font-family:var(--mono);font-size:11px;color:var(--amber)">⚠ Select panel, inverter, battery and quantities first.</span>';
+    return;
+  }
+
+  const panel=_hwPanels.find(p=>String(p.id)===panelId);
+  const inv=_hwInverters.find(i=>String(i.id)===invId);
+  const batt=_hwBatteries.find(b=>String(b.id)===battId);
+  if(!panel||!inv||!batt){el.style.display='block';el.innerHTML='<span style="color:var(--red);font-family:var(--mono);font-size:11px">Hardware data missing — reload the job.</span>';return;}
+
+  el.style.display='block';
+  el.innerHTML='<span style="font-family:var(--mono);font-size:11px;color:var(--text3)">⏳ Running compliance check…</span>';
+
+  /* ── Fetch PSH from design_gti using job location ── */
+  let psh=4.5; // SA average fallback
+  try{
+    const locKey=currentJob.location||'';
+    const gtiRows=await sbGet('design_gti',`city=ilike.${encodeURIComponent(locKey.split('–')[0].trim()+'%')}&select=design_gti_kwh_m2_day&limit=1`);
+    if(gtiRows&&gtiRows[0])psh=parseFloat(gtiRows[0].design_gti_kwh_m2_day)||4.5;
+  }catch(e){}
+
+  /* ── Load parameters from original job ── */
+  const peakLoad=parseFloat(currentJob.required_load_kw)||2.0;
+  const dailyUsage=parseFloat(currentJob.annual_consumption_kwh)/365||10;
+  const autonomy=parseFloat(currentJob.required_autonomy_hrs)||8;
+  const tariff=parseFloat(currentJob.markup_pct?1.5:1.5); // default ZA tariff
+  const markup=(parseFloat(currentJob.markup_pct)||10)/100;
+
+  /* ── Recalculate using selected hardware ── */
+  const invAC=parseFloat(inv.ac_continuous_kw)||0;
+  const invDC=parseFloat(inv.dc_max_kw)||invAC*RC_DCAC_TARGET;
+  const panelWatts=parseFloat(panel.watts)||0;
+  const battUsable=parseFloat(batt.usable_kwh)||0;
+
+  const sysDC=(panelQty*panelWatts)/1000;
+  const battTotal=battQty*battUsable;
+  const battKW=parseFloat(batt.nominal_kw)*battQty||battUsable*battQty*0.5;
+  const dcAc=invAC>0?sysDC/invAC:0;
+  const reqKWh=dailyUsage*(autonomy/24);
+  const dod=battTotal>0?reqKWh/battTotal:99;
+  const headroom=battTotal>0?battTotal/Math.max(reqKWh,0.001):0;
+  const expDaily=sysDC*psh*RC_PR*RC_AVAIL;
+  const reqSolarKW=(dailyUsage-reqKWh)/(psh*RC_PR*RC_AVAIL);
+  const osP=reqSolarKW>0?(sysDC-reqSolarKW)/reqSolarKW:0;
+  const battRuntime=reqKWh>0?battTotal/(reqKWh/autonomy):0;
+  const bosCost=sysDC*RC_BOS;
+  const hwCost=(panelQty*parseFloat(panel.unit_price_r||0))+(battQty*parseFloat(batt.unit_price_r||0))+parseFloat(inv.unit_price_r||0);
+  const totCost=hwCost+bosCost;
+  const sellP=totCost*(1+markup);
+  const annSav=Math.min(expDaily,dailyUsage)*1.5*365; // ~R1.50/kWh default
+  const simpPb=annSav>0?totCost/annSav:99;
+
+  const dcAcSt=rcDcAcStatus(dcAc);
+  const battSt=rcBattStatus(headroom);
+  const nrsPass=dcAc>=RC_DCAC_MIN&&dcAc<=RC_DCAC_MAX;
+  const battPass=dod<=RC_DOD_LIMIT&&headroom>=RC_BATT_HEAD_MIN;
+  const sizeOk=sysDC>0;
+  const overallPass=nrsPass&&battPass&&sizeOk;
+
+  const nersa=sysDC<=1?'Category A (≤1 kW — no licence)':sysDC<=10?'Category B (1–10 kW — notify municipality)':sysDC<=100?'Category C (10–100 kW — NERSA SSEG licence required)':'Category D (>100 kW — full NERSA licence)';
+  const nersaColor=sysDC<=10?'var(--green)':'var(--amber)';
+
+  /* ── Check if client notification cap is already reached ── */
+  const alreadyNotified=!!(currentVisit?.client_notified_of_change_at);
+  const approvalDone=currentVisit?.client_approval_status==='approved'||currentVisit?.client_approval_status==='accepted';
+
+  /* ── Render compliance dashboard card ── */
+  el.innerHTML=`
+    <div style="border:1px solid ${overallPass?'rgba(46,204,138,.25)':'rgba(224,82,82,.25)'};border-radius:7px;overflow:hidden;margin-top:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${overallPass?'rgba(46,204,138,.06)':'rgba(224,82,82,.06)'};border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:16px">${overallPass?'✅':'❌'}</span>
+          <span style="font-family:var(--mono);font-size:11px;font-weight:600;color:${overallPass?'var(--green)':'var(--red)'}">${overallPass?'COMPLIANT — Meets NRS 097-2-1':'NON-COMPLIANT — Review required'}</span>
+        </div>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${panel.brand} ${panel.panel_model} · ${inv.brand} ${inv.inverter_model} · ${batt.brand} ${batt.battery_model}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0 14px">
+        <div style="padding:12px 0;border-right:1px solid var(--border)">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">System Output</div>
+          ${rcRow('Array Size',sysDC.toFixed(2)+' kWp')}
+          ${rcRow('Inverter Output',invAC.toFixed(1)+' kW AC')}
+          ${rcRow('DC/AC Ratio',dcAc.toFixed(2),rcColor(dcAcSt.cls),dcAcSt.txt)}
+          ${rcRow('Daily Generation',expDaily.toFixed(1)+' kWh/day','var(--text2)','at '+psh+' PSH')}
+          ${rcRow('Array Oversizing',(osP*100).toFixed(0)+'%','var(--text2)',osP<=0.15?'Optimal':osP<=0.30?'Safety margin':osP<=0.40?'Acceptable rounding':'Review layout')}
+        </div>
+        <div style="padding:12px 0 12px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Battery & Backup</div>
+          ${rcRow('Battery Storage',battTotal.toFixed(1)+' kWh')}
+          ${rcRow('Battery DoD',(dod*100).toFixed(0)+'%',dod<=RC_DOD_GOOD?'var(--green)':dod<=RC_DOD_LIMIT?'var(--amber)':'var(--red)',dod<=RC_DOD_GOOD?'Low stress — ideal':'Watch cycle depth')}
+          ${rcRow('Backup Runtime',battRuntime.toFixed(1)+' hrs',battRuntime>=autonomy?'var(--green)':'var(--amber)',battRuntime>=autonomy?'Meets '+autonomy+'h target':'Below '+autonomy+'h target')}
+          ${rcRow('Battery Headroom',headroom.toFixed(2)+'×',rcColor(battSt.cls),battSt.txt)}
+          ${rcRow('Peak Load Cover',peakLoad.toFixed(1)+' kW backup demand')}
+        </div>
+      </div>
+
+      <div style="padding:10px 14px;border-top:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Compliance & Registration</div>
+        ${rcRow('NRS 097-2-1 Grid Standard',nrsPass?'✓ Pass':'✗ Fail — review DC/AC ratio',nrsPass?'var(--green)':'var(--red)')}
+        ${rcRow('NERSA SSEG Category',nersa,nersaColor)}
+        ${rcRow('Vs V1 System Size',(currentJob.system_size_kw||'—')+' kWp → '+sysDC.toFixed(2)+' kWp',Math.abs(sysDC-(currentJob.system_size_kw||sysDC))>0.5?'var(--amber)':'var(--green)',(((sysDC-(currentJob.system_size_kw||sysDC))/(currentJob.system_size_kw||sysDC))*100).toFixed(0)+'% change from original proposal')}
+        ${rcRow('Vs V1 Battery',(currentJob.battery_capacity_kwh||'—')+' kWh → '+battTotal.toFixed(1)+' kWh',Math.abs(battTotal-(currentJob.battery_capacity_kwh||battTotal))>1?'var(--amber)':'var(--green)')}
+      </div>
+
+      ${totCost>0?`<div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap">
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Cost (excl. markup)</div><div style="font-family:var(--mono);font-size:13px;color:var(--amber);font-weight:600;margin-top:3px">R${Math.round(totCost).toLocaleString('en-ZA')}</div></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Client Price (${Math.round(markup*100)}% markup)</div><div style="font-family:var(--mono);font-size:13px;color:var(--white);font-weight:600;margin-top:3px">R${Math.round(sellP).toLocaleString('en-ZA')}</div></div>
+        <div><div style="font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">Est. Simple Payback</div><div style="font-family:var(--mono);font-size:13px;color:var(--text2);font-weight:600;margin-top:3px">${simpPb<99?simpPb.toFixed(1)+' yrs':'—'}</div></div>
+      </div>`:''}
+
+      <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">
+          ${approvalDone?'✓ Client already approved revised design — ready to proceed.':alreadyNotified?'⚠ Client notification already sent — cannot resend.':'Review compliance above. If design differs from V1, create a revision to send to client.'}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${!approvalDone&&!alreadyNotified?`<button class="btn btn-primary" style="font-size:11px;padding:6px 14px" onclick="createRevisionVersion(${JSON.stringify({sysDC,battTotal,panelQty,panelWatts,panelBrand:panel.brand,panelModel:panel.panel_model,invBrand:inv.brand,invModel:inv.inverter_model,invKw:invAC,battBrand:batt.brand,battModel:batt.battery_model,battUnitKwh:battUsable,battQty,totCost,sellP}).replace(/"/g,'&quot;')})">📄 Create Revision → Proposal V2</button>`:''}
+          ${approvalDone?`<span style="font-family:var(--mono);font-size:10px;padding:6px 10px;background:rgba(46,204,138,.1);color:var(--green);border-radius:4px;border:1px solid rgba(46,204,138,.2)">✓ Approved — proceed to schedule</span>`:''}
+        </div>
+      </div>
+    </div>`;
+}
+
+async function createRevisionVersion(calc){
+  if(!currentJob){toast('No job loaded','error');return;}
+  if(!confirm('This will create Proposal V2 linked to V1 and trigger client approval.\n\nProceed?'))return;
+
+  try{
+    const v1=currentProposalVersions[currentProposalVersions.length-1]; // oldest = original
+    const origId=v1?.id||null;
+    const v1Kw=parseFloat(currentJob.system_size_kw)||0;
+    const v1Batt=parseFloat(currentJob.battery_capacity_kwh)||0;
+    const deltaKw=v1Kw>0?(calc.sysDC-v1Kw)/v1Kw:0;
+    const deltaBatt=v1Batt>0?(calc.battTotal-v1Batt)/v1Batt:0;
+    const maxDelta=Math.max(Math.abs(deltaKw),Math.abs(deltaBatt));
+    const category=maxDelta>=0.20?'Major Change':maxDelta>=0.10?'Moderate Change':'Minor Refinement';
+    const deltaSign=calc.sysDC>v1Kw?'↑':'↓';
+
+    const payload={
+      ai_id:String(currentJob.ai_id),
+      version_number:(currentProposalVersions.length||0)+1,
+      status:'pending_approval',
+      system_kw:parseFloat(calc.sysDC.toFixed(2)),
+      battery_kwh:parseFloat(calc.battTotal.toFixed(1)),
+      panels_qty:calc.panelQty,
+      panel_brand:calc.panelBrand,
+      panel_watt:calc.panelWatts,
+      inverter_brand:calc.invBrand,
+      inverter_kw:calc.invKw,
+      battery_brand:calc.battBrand,
+      battery_unit_kwh:calc.battUnitKwh,
+      battery_qty:calc.battQty,
+      system_cost:parseFloat(calc.totCost.toFixed(0))||null,
+      total_cost:parseFloat(calc.sellP.toFixed(0))||null,
+      delta_system_kw:parseFloat((calc.sysDC-v1Kw).toFixed(2)),
+      delta_battery_kwh:parseFloat((calc.battTotal-v1Batt).toFixed(1)),
+      delta_cost:parseFloat((calc.sellP-(currentJob.total_cost||0)).toFixed(0))||null,
+      delta_pct:parseFloat((maxDelta*100).toFixed(1)),
+      delta_category:category,
+      delta_summary:`${deltaSign} ${Math.abs(deltaKw*100).toFixed(0)}% system · Site visit hardware selection (${calc.panelBrand} ${calc.panelWatts}W · ${calc.invBrand} ${calc.invKw}kW · ${calc.battBrand})`,
+      site_visit_id:currentVisit?.id||null,
+      original_version_id:origId,
+      installer_id:currentJob.installer_id||null,
+      created_by:getVal('sv-assessor')||'installer',
+      revision_reason:getVal('design-change-reason')||'Hardware selection after site visit',
+    };
+
+    const newVer=await sbPost('proposal_versions',payload);
+    if(!newVer||!newVer[0])throw new Error('Insert returned empty');
+
+    await logActivity('PROPOSAL REVISION','V'+(payload.version_number)+' created: '+payload.delta_summary,payload.created_by);
+
+    /* Reload proposal versions and trigger design change notification if major/moderate */
+    currentProposalVersions=await sbGet('proposal_versions',`ai_id=eq.${currentJob.ai_id}&order=created_at.desc&limit=10`)||[];
+    renderProposalVersions();
+    toast('✓ Proposal V'+payload.version_number+' created','success');
+
+    /* Patch site_visit to reflect the revised spec */
+    if(currentVisit){
+      await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{
+        recommended_system_kw:calc.sysDC,
+        recommended_battery_kwh:calc.battTotal,
+        design_changed:true,
+        design_change_category:maxDelta>=0.20?'major':maxDelta>=0.10?'minor':'none',
+        design_change_acknowledged:true,
+        design_change_reason:payload.revision_reason,
+      });
+      currentVisit={...currentVisit,
+        recommended_system_kw:calc.sysDC,
+        recommended_battery_kwh:calc.battTotal,
+        design_changed:true,
+        design_change_category:maxDelta>=0.20?'major':maxDelta>=0.10?'minor':'none',
+        design_change_acknowledged:true,
+      };
+    }
+
+    /* Send notification if major or moderate — the existing function handles the one-send cap */
+    if(maxDelta>=0.10&&currentJob.client_email&&!currentVisit?.client_notified_of_change_at){
+      await sendDesignChangeNotification(currentJob,currentVisit,maxDelta>=0.20?'major':'minor');
+    }
+
+    /* Update agreed spec locked fields */
+    setVal('inst-agreed-kw',calc.sysDC.toFixed(2)+' kWp');
+    setVal('inst-agreed-batt',calc.battTotal.toFixed(1)+' kWh');
+    renderPanel1DesignNote();
+    renderDesignChangeAlert();
+
+  }catch(e){toast('Failed to create revision: '+e.message,'error');console.error(e);}
+}
 
 /* ── Step 2: load installer hardware into dropdowns ── */
 let _hwPanels=[],_hwInverters=[],_hwBatteries=[];
