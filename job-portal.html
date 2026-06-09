@@ -371,7 +371,7 @@
                 <span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.1em">Equipment Selection — Your Hardware</span>
                 <span style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:4px">Select from your uploaded product list.</span>
               </div>
-              <div class="form-grid-3">
+              <div class="form-grid-3" data-hw-zone>
                 <div class="form-group">
                   <label class="form-label">Panel</label>
                   <select class="form-select" id="inst-panel-select" onchange="onPanelSelect()">
@@ -1333,36 +1333,97 @@ let _hwPanels=[],_hwInverters=[],_hwBatteries=[];
 async function loadInstallerHardware(){
   const iid=currentJob?.installer_id;
   if(!iid)return;
+
+  /* ── Fetch installer-specific hardware ── */
+  let instPanels=[],instInverters=[],instBatteries=[];
   try{
     const[panels,inverters,batteries]=await Promise.all([
       sbGet('installer_panels',`installer_id=eq.${iid}&order=brand.asc,panel_model.asc`),
       sbGet('installer_inverters',`installer_id=eq.${iid}&order=brand.asc,inverter_model.asc`),
       sbGet('installer_batteries',`installer_id=eq.${iid}&order=brand.asc,battery_model.asc`),
     ]);
-    _hwPanels=panels||[];_hwInverters=inverters||[];_hwBatteries=batteries||[];
-  }catch(e){_hwPanels=[];_hwInverters=[];_hwBatteries=[];}
+    instPanels=panels||[];instInverters=inverters||[];instBatteries=batteries||[];
+  }catch(e){}
 
+  /* ── Fetch demo/shared hardware as fallback ── */
+  let demoPanels=[],demoInverters=[],demoBatteries=[];
+  try{
+    const[dp,di,db]=await Promise.all([
+      sbGet('demo_panels','order=brand.asc,panel_model.asc'),
+      sbGet('demo_inverters','order=brand.asc,inverter_model.asc'),
+      sbGet('demo_batteries','order=brand.asc,battery_model.asc'),
+    ]);
+    demoPanels=dp||[];demoInverters=di||[];demoBatteries=db||[];
+  }catch(e){}
+
+  /* ── Decide which set to use; tag source for UI feedback ── */
+  const usingDemoPanels=instPanels.length===0;
+  const usingDemoInverters=instInverters.length===0;
+  const usingDemoBatteries=instBatteries.length===0;
+  _hwPanels   = usingDemoPanels    ? demoPanels.map(p=>({...p,_demo:true}))   : instPanels;
+  _hwInverters= usingDemoInverters ? demoInverters.map(i=>({...i,_demo:true})): instInverters;
+  _hwBatteries= usingDemoBatteries ? demoBatteries.map(b=>({...b,_demo:true})): instBatteries;
+
+  /* ── Show/hide demo-hardware notice banner ── */
+  const anyDemo=usingDemoPanels||usingDemoInverters||usingDemoBatteries;
+  let demoNotice=document.getElementById('hw-demo-notice');
+  if(!demoNotice){
+    /* Create the notice element just above the equipment dropdowns zone */
+    const equipZone=document.querySelector('[data-hw-zone]');
+    if(equipZone){
+      demoNotice=document.createElement('div');
+      demoNotice.id='hw-demo-notice';
+      equipZone.parentNode.insertBefore(demoNotice,equipZone);
+    }
+  }
+  if(demoNotice){
+    if(anyDemo){
+      const missingLabels=[];
+      if(usingDemoPanels)missingLabels.push('<a href="solar-intelligence.html#hardware-panels" style="color:var(--amber);font-weight:700;text-decoration:underline">panels</a>');
+      if(usingDemoInverters)missingLabels.push('<a href="solar-intelligence.html#hardware-inverters" style="color:var(--amber);font-weight:700;text-decoration:underline">inverters</a>');
+      if(usingDemoBatteries)missingLabels.push('<a href="solar-intelligence.html#hardware-batteries" style="color:var(--amber);font-weight:700;text-decoration:underline">batteries</a>');
+      const listStr=missingLabels.join(', ');
+      demoNotice.style.cssText='display:block;margin-bottom:12px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.25);border-radius:6px;font-size:11px;line-height:1.6;color:var(--text2)';
+      demoNotice.innerHTML=`<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.05em">📦 Using Demo Stock</span><br>`+
+        `Showing sample hardware for ${listStr}. The compliance check and pricing will use this demo data, which may not match your actual products. `+
+        `<a href="solar-intelligence.html#hardware" style="color:var(--blue);font-weight:600;text-decoration:underline">Upload your own hardware in Solar Intelligence → Hardware tab</a> for accurate results.`;
+    }else{
+      demoNotice.style.display='none';
+    }
+  }
+
+  /* ── Populate dropdowns ── */
   const ps=document.getElementById('inst-panel-select');
   const is=document.getElementById('inst-inverter-select');
   const bs=document.getElementById('inst-battery-select');
 
   if(ps){
-    ps.innerHTML=_hwPanels.length
-      ?'<option value="">Select panel…</option>'+_hwPanels.map(p=>`<option value="${p.id}">${p.brand} ${p.panel_model} — ${p.watts}W</option>`).join('')
-      :'<option value="">No panels on file — add in Solar Intelligence</option>';
+    if(_hwPanels.length){
+      const demoLabel=usingDemoPanels?' <span style="font-size:9px;color:var(--text3)">(demo)</span>':'';
+      ps.innerHTML='<option value="">Select panel…</option>'+
+        _hwPanels.map(p=>`<option value="${p.id}">${p.brand} ${p.panel_model} — ${p.watts}W${p._demo?' ★demo':''}</option>`).join('');
+    }else{
+      ps.innerHTML='<option value="">No panels available</option>';
+    }
   }
   if(is){
-    is.innerHTML=_hwInverters.length
-      ?'<option value="">Select inverter…</option>'+_hwInverters.map(i=>`<option value="${i.id}">${i.brand} ${i.inverter_model} — ${i.ac_continuous_kw}kW</option>`).join('')
-      :'<option value="">No inverters on file — add in Solar Intelligence</option>';
+    if(_hwInverters.length){
+      is.innerHTML='<option value="">Select inverter…</option>'+
+        _hwInverters.map(i=>`<option value="${i.id}">${i.brand} ${i.inverter_model} — ${i.ac_continuous_kw}kW${i._demo?' ★demo':''}</option>`).join('');
+    }else{
+      is.innerHTML='<option value="">No inverters available</option>';
+    }
   }
   if(bs){
-    bs.innerHTML=_hwBatteries.length
-      ?'<option value="">Select battery…</option>'+_hwBatteries.map(b=>`<option value="${b.id}">${b.brand} ${b.battery_model} — ${b.usable_kwh}kWh</option>`).join('')
-      :'<option value="">No batteries on file — add in Solar Intelligence</option>';
+    if(_hwBatteries.length){
+      bs.innerHTML='<option value="">Select battery…</option>'+
+        _hwBatteries.map(b=>`<option value="${b.id}">${b.brand} ${b.battery_model} — ${b.usable_kwh}kWh${b._demo?' ★demo':''}</option>`).join('');
+    }else{
+      bs.innerHTML='<option value="">No batteries available</option>';
+    }
   }
 
-  /* re-select previously saved values if currentInstall exists */
+  /* ── Re-select previously saved values if currentInstall exists ── */
   if(currentInstall){
     _reselectHardware();
   }
