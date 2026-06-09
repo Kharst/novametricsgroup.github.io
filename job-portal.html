@@ -811,20 +811,52 @@ function renderProposalVersions(){
   if(!container)return;
   if(!currentProposalVersions.length){container.style.display='none';return;}
   container.style.display='block';
-  const rows=currentProposalVersions.map((v,i)=>{
-    const date=v.created_at?new Date(v.created_at).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}):'—';
-    const cat=v.delta_category||'Revision';
-    const catColor=cat.includes('Major')?'var(--red)':cat.includes('Moderate')?'var(--amber)':'var(--green)';
-    const costSign=v.delta_cost>0?'+':'';
-    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);${i===0?'background:rgba(245,166,35,.04)':''}">
-      <div style="font-family:var(--mono);font-size:9px;color:${i===0?'var(--amber)':'var(--text3)'};padding-top:2px;white-space:nowrap">${i===0?'LATEST':'V'+(currentProposalVersions.length-i)}</div>
-      <div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text2);margin-bottom:3px">${v.delta_summary||'Design revision'}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><span style="font-family:var(--mono);font-size:10px;color:${catColor}">${cat}</span>
-      ${v.delta_cost?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${costSign}R${Math.abs(Math.round(v.delta_cost)).toLocaleString('en-ZA')} cost</span>`:''}
-      ${v.system_kw?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${v.system_kw} kWp · ${v.battery_kwh} kWh</span>`:''}</div></div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap">${date}</div></div>`;
+  const v=currentVisit;
+  const majorPending=v&&v.design_change_category==='major'&&v.client_approval_status!=='approved'&&v.client_approval_status!=='accepted';
+  const majorApproved=v&&v.design_change_category==='major'&&(v.client_approval_status==='approved'||v.client_approval_status==='accepted');
+  let approvalBadge='';
+  if(majorPending){
+    approvalBadge=`<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(245,166,35,.07);border-bottom:1px solid rgba(245,166,35,.2)">
+      <span style="font-size:14px">⏳</span>
+      <div style="flex:1"><div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--amber)">DESIGN CHANGE — AWAITING CLIENT APPROVAL</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">Revised proposal sent to client. Steps 2–5 locked until they respond.</div></div>
+      <button onclick="refreshCurrentJob()" style="font-family:var(--mono);font-size:10px;background:none;border:1px solid rgba(245,166,35,.3);color:var(--amber);padding:4px 10px;border-radius:4px;cursor:pointer">↻ Check</button>
+    </div>`;
+  } else if(majorApproved){
+    approvalBadge=`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(46,204,138,.06);border-bottom:1px solid rgba(46,204,138,.2)">
+      <span style="font-size:13px">✓</span>
+      <div style="font-family:var(--mono);font-size:11px;font-weight:600;color:var(--green)">CLIENT APPROVED REVISED DESIGN — cleared to proceed</div>
+    </div>`;
+  }
+  const rows=currentProposalVersions.map((pv,i)=>{
+    const date=pv.created_at?new Date(pv.created_at).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    const cat=pv.delta_category||'Revision';
+    const isMajor=cat.includes('Major');
+    const catColor=isMajor?'var(--red)':cat.includes('Moderate')?'var(--amber)':'var(--green)';
+    const costSign=pv.delta_cost>0?'+':'';
+    const isLatest=i===0;
+    const isPending=isLatest&&majorPending;
+    return `<div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);${isLatest?'background:rgba(245,166,35,.03)':''}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:1px">
+        <div style="font-family:var(--mono);font-size:9px;color:${isLatest?'var(--amber)':'var(--text3)'};white-space:nowrap">${isLatest?'LATEST':'V'+(currentProposalVersions.length-i)}</div>
+        ${isPending?`<div style="width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse-slow 2s ease-in-out infinite"></div>`:''}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${pv.delta_summary||'Design revision'}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;background:${isMajor?'rgba(224,82,82,.12)':'rgba(46,204,138,.1)'};color:${catColor}">${cat}</span>
+          ${pv.delta_cost?`<span style="font-family:var(--mono);font-size:10px;color:var(--text3)">${costSign}R${Math.abs(Math.round(pv.delta_cost)).toLocaleString('en-ZA')}</span>`:''}
+          ${pv.system_kw?`<span style="font-family:var(--mono);font-size:10px;color:var(--text2)">${pv.system_kw} kWp · ${pv.battery_kwh} kWh</span>`:''}
+          ${isPending?`<span style="font-family:var(--mono);font-size:9px;color:var(--amber)">⏳ pending approval</span>`:''}
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);white-space:nowrap">${date}</div>
+    </div>`;
   }).join('');
-  container.innerHTML=`<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">📋 Proposal Versions — ${currentProposalVersions.length} version${currentProposalVersions.length>1?'s':''}</div>${rows}<div style="padding:8px 14px;font-size:11px;color:var(--text3)">Latest version hardware pre-filled in Install Prep below.</div>`;
+  const footer=majorPending
+    ?`<div style="padding:8px 14px;font-size:11px;color:var(--amber);font-family:var(--mono)">⚠ Install Prep pre-filled with revised spec — locked until client approves.</div>`
+    :`<div style="padding:8px 14px;font-size:11px;color:var(--text3)">Latest version hardware pre-filled in Install Prep below.</div>`;
+  container.innerHTML=`<div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--border)">📋 Proposal Versions — ${currentProposalVersions.length} version${currentProposalVersions.length>1?'s':''}</div>${approvalBadge}${rows}${footer}`;
 }
 
 function prefillForms(){
