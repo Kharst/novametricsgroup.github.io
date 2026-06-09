@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Intelligence Report — Nova Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1B5D6B;--teal-dk:#124350;--teal-g:rgba(27,93,107,.07);
+  --grn:#2D6A4F;--grn-lt:#EBF5EF;--grn-dk:#1A4A36;
+  --amb:#C6975F;
+  --bg:#EDF3F2;--surf:#fff;
+  --bdr:#D3E2E0;--bdr-s:#A8C3C0;
+  --txt:#192928;--txt-m:#5C7876;--txt-l:#90AAAA;
+  --sh:0 4px 20px rgba(27,93,107,.10);--sh-sm:0 1px 4px rgba(27,93,107,.07);
+  --r:14px;--r-sm:8px;
+  --ok:#059669;--warn:#D97706;--bad:#DC2626
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+.topbar{background:var(--teal);height:58px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.topbar-inner{width:100%;max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand-logo{width:36px;height:36px;background:var(--amb);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:#fff;flex-shrink:0}
+.brand-name{color:#fff;font-size:14px;font-weight:600;display:block;line-height:1.15}
+.brand-sub{color:rgba(255,255,255,.55);font-size:10.5px;display:block}
+.top-actions{display:flex;gap:8px;flex-shrink:0}
+.btn-top{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;transition:.2s;border:none}
+.btn-top-ghost{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85)}
+.btn-top-ghost:hover{background:rgba(255,255,255,.22);color:#fff}
+.btn-top-solid{background:var(--amb);color:#fff}
+.btn-top-solid:hover{background:#B8844A}
+.load-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px}
+.spin{width:44px;height:44px;border:3px solid var(--bdr);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-txt{font-size:14px;color:var(--txt-m)}
+.report-wrap{max-width:1000px;margin:0 auto;padding:36px 20px 60px}
+.school-header{background:linear-gradient(135deg,var(--teal-dk) 0%,var(--teal) 60%,#2A7A8A 100%);border-radius:var(--r);padding:32px 36px;color:#fff;margin-bottom:24px;position:relative;overflow:hidden}
+.school-header::after{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:rgba(255,255,255,.04);border-radius:50%}
+.school-header::before{content:'';position:absolute;bottom:-80px;left:40%;width:200px;height:200px;background:rgba(255,255,255,.03);border-radius:50%}
+.sh-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative;z-index:1}
+.sh-badge{display:inline-block;background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;color:rgba(255,255,255,.85)}
+.sh-name{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;margin-bottom:4px;line-height:1.15}
+.sh-meta{font-size:13px;color:rgba(255,255,255,.7);display:flex;flex-wrap:wrap;gap:10px}
+.sh-dot{opacity:.4}
+.sh-date{font-size:12px;color:rgba(255,255,255,.55);margin-top:8px}
+.sh-right{text-align:right;position:relative;z-index:1;flex-shrink:0}
+.sh-assessor-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.5);margin-bottom:4px}
+.sh-assessor{font-size:14px;color:#fff;font-weight:500}
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start;margin-bottom:20px}
+.gauge-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr);padding:28px;box-shadow:var(--sh-sm);text-align:center}
+.gauge-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt-l);margin-bottom:20px}
+#gaugeWrap{display:flex;justify-content:center;align-items:center;margin-bottom:12px}
+.gauge-rating{font-family:'Playfair Display',serif;font-size:22px;color:var(--txt);margin-bottom:8px}
+.gauge-sub{font-size:12px;color:var(--txt-m);line-height:1.5;margin-bottom:20px;max-width:260px;margin-left:auto;margin-right:auto}
+.gauge-detail{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left}
+.gd-item{background:var(--bg);border-radius:var(--r-sm);padding:10px 12px}
+.gd-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--txt-l);margin-bottom:3px}
+.gd-val{font-size:16px;font-weight:600;color:var(--txt);font-family:'Playfair Display',serif}
+.scores-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr);padding:28px;box-shadow:var(--sh-sm)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.card-title-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--txt-l)}
+.card-title{font-size:13px;font-weight:600;color:var(--txt)}
+.weight-note{font-size:11px;color:var(--txt-l)}
+.score-rows{display:flex;flex-direction:column;gap:12px}
+.score-row{display:grid;grid-template-columns:130px 1fr 38px;gap:10px;align-items:center}
+.sr-label{font-size:12px;color:var(--txt-m);white-space:nowrap}
+.sr-bar{background:var(--bg);border-radius:20px;height:8px;overflow:hidden}
+.sr-fill{height:100%;border-radius:20px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sr-score{font-size:13px;font-weight:600;text-align:right}
+.section-card{background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr);padding:28px;box-shadow:var(--sh-sm);margin-bottom:20px}
+.sec-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.sec-title-ico{font-size:16px}
+.flags-list{display:flex;flex-direction:column;gap:10px}
+.flag{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5}
+.flag-ico{font-size:16px;flex-shrink:0}
+.flag.critical{background:#FEF2F2;color:#7F1D1D;border:1px solid #FECACA}
+.flag.high{background:#FFF7ED;color:#7C2D12;border:1px solid #FED7AA}
+.flag.medium{background:#FFFBEB;color:#713F12;border:1px solid #FDE68A}
+.flag.positive{background:var(--grn-lt);color:#14532D;border:1px solid #BBF7D0}
+.val-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.val-col{border-radius:var(--r);padding:22px 18px;text-align:center;border:1px solid var(--bdr)}
+.val-col.mid{background:var(--teal);border-color:var(--teal);color:#fff}
+.val-lbl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;opacity:.6;margin-bottom:6px}
+.val-col.mid .val-lbl{opacity:.8;color:rgba(255,255,255,.85)}
+.val-amount{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;color:var(--txt)}
+.val-col.mid .val-amount{color:#fff}
+.val-desc{font-size:11px;color:var(--txt-m)}
+.val-col.mid .val-desc{color:rgba(255,255,255,.7)}
+.val-method{background:var(--bg);border-radius:var(--r-sm);padding:14px 16px;font-size:12.5px;color:var(--txt-m);line-height:1.6}
+.val-method strong{color:var(--txt);font-weight:600}
+.recs-list{display:flex;flex-direction:column;gap:12px}
+.rec{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--bg);border-radius:10px;border:1px solid var(--bdr)}
+.rec-badge{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.rec-badge.p1{background:var(--bad)}
+.rec-badge.p2{background:var(--warn)}
+.rec-badge.p3{background:var(--teal)}
+.rec-text{font-size:13px;color:var(--txt);line-height:1.6}
+.rec-priority{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--txt-l);margin-bottom:4px}
+.report-footer{text-align:center;padding:32px 20px;color:var(--txt-l);font-size:12px;line-height:1.7}
+.report-footer strong{color:var(--txt-m)}
+@media print{
+  .topbar,.top-actions,.print-hide{display:none!important}
+  body{background:#fff}
+  .report-wrap{padding:0;max-width:100%}
+  .school-header,.sr-fill,.flag,.val-col.mid,.rec-badge{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .main-grid{grid-template-columns:280px 1fr}
+}
+@media(max-width:700px){
+  .main-grid{grid-template-columns:1fr}
+  .val-grid{grid-template-columns:1fr}
+  .sh-name{font-size:22px}
+  .score-row{grid-template-columns:100px 1fr 32px}
+  .sr-label{font-size:11px}
+  .report-wrap{padding:20px 14px 40px}
+}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">N</div>
+      <div><span class="brand-name">Nova Metrics</span><span class="brand-sub">School Intelligence</span></div>
+    </a>
+    <div class="top-actions">
+      <button class="btn-top btn-top-ghost print-hide" onclick="window.print()">🖨 Print</button>
+      <button class="btn-top btn-top-ghost print-hide" onclick="copyLink()">🔗 Share Link</button>
+      <a href="index.html" class="btn-top btn-top-solid print-hide">+ New Assessment</a>
+    </div>
+  </div>
+</nav>
+<div class="load-wrap" id="loadWrap"><div class="spin"></div><div class="load-txt">Loading report…</div></div>
+<div class="report-wrap" id="reportMain" style="display:none">
+  <div class="school-header" id="schoolHeader"></div>
+  <div class="main-grid">
+    <div class="gauge-card">
+      <div class="gauge-title">School Intelligence Score</div>
+      <div id="gaugeWrap"></div>
+      <div class="gauge-rating" id="gaugeRating"></div>
+      <div class="gauge-sub" id="gaugeSub"></div>
+      <div class="gauge-detail" id="gaugeDetail"></div>
+    </div>
+    <div class="scores-card">
+      <div class="card-hdr">
+        <div><div class="card-title-tag">Score Breakdown</div><div class="card-title">10-Factor Survival Model</div></div>
+        <div class="weight-note">Factor weights shown</div>
+      </div>
+      <div class="score-rows" id="scoreRows"></div>
+    </div>
+  </div>
+  <div class="section-card"><div class="sec-title"><span class="sec-title-ico">🔍</span> Risk Intelligence</div><div class="flags-list" id="flagsList"></div></div>
+  <div class="section-card"><div class="sec-title"><span class="sec-title-ico">💼</span> Business Valuation Range</div><div class="val-grid" id="valGrid"></div><div class="val-method" id="valMethod"></div></div>
+  <div class="section-card"><div class="sec-title"><span class="sec-title-ico">🗺</span> Strategic Roadmap</div><div class="recs-list" id="recsList"></div></div>
+  <div class="report-footer"><div>Generated by <strong>School Intelligence</strong> · Nova Metrics Group · novametricsgroup.com</div><div>This report is based on self-reported data and should be used as a guide alongside professional due diligence.</div></div>
+</div>
+<script>
+const SB_URL='https://zloxcqrhkcohheeixfns.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+function computeScores(d){
+  const sc={};
+  const util=d.max_capacity>0?(d.current_enrollment/d.max_capacity)*100:0;
+  let e=util>=95?60:util>=85?50:util>=70?35:util>=50?15:0;
+  const wlp=d.max_capacity>0?(d.waitlist_count/d.max_capacity)*100:0;
+  e+=wlp>=10?20:wlp>=1?10:0;
+  e+=({growing_fast:20,growing:15,stable:10,declining_slightly:5,declining_fast:0}[d.enrollment_trend]??10);
+  sc.enrollment=Math.min(100,e);
+  const ret=d.annual_retention_rate||0;
+  let r=ret>=90?70:ret>=80?50:ret>=70?30:ret>=60?15:0;
+  r+=(d.sibling_enrollment_rate||0)>=40?30:(d.sibling_enrollment_rate||0)>=20?20:(d.sibling_enrollment_rate||0)>=10?10:0;
+  sc.retention=Math.min(100,r);
+  const mg=d.annual_revenue>0?(d.annual_profit/d.annual_revenue)*100:0;
+  let f=mg>20?50:mg>=15?40:mg>=10?30:mg>=5?15:0;
+  const me=d.annual_revenue>0?(d.annual_revenue-d.annual_profit)/12:1;
+  const cm=me>0?(d.cash_reserves||0)/me:0;
+  f+=cm>=6?25:cm>=3?18:cm>=1?10:0;
+  const fc=d.fee_collection_rate||0;
+  f+=fc>=95?25:fc>=90?18:fc>=80?10:0;
+  sc.financial=Math.min(100,f);
+  let dep=100;
+  if(d.owner_teaches)dep-=30;
+  if(d.owner_manages_admissions)dep-=25;
+  if(d.owner_primary_contact)dep-=20;
+  if(!d.has_ops_manual)dep-=15;
+  if(!d.school_runs_without_owner)dep-=10;
+  sc.dependency=Math.max(0,dep);
+  const seats=(d.montessori_competitors||0)*60+(d.curro_competitors||0)*80+(d.independent_competitors||0)*50+(d.church_schools||0)*40+(d.daycare_centres||0)*30;
+  const pop=d.preschool_population_5km||500;
+  const cr=pop>0?seats/pop:0;
+  sc.competition=cr<0.3?100:cr<0.5?80:cr<0.7?60:cr<1.0?40:20;
+  const dn={high:35,medium:20,low:5};const gn={growing_fast:40,growing:30,stable:20,declining:5};const inc={high:25,upper_middle:20,middle:15,lower_middle:8};
+  let dm=(dn[d.children_0_6_density]||15)+(gn[d.area_growth_trend]||20)+(inc[d.household_income_level]||15);
+  if(d.new_developments)dm+=10;
+  sc.demographics=Math.min(100,dm);
+  const gr=d.google_rating||0;
+  let rp=gr>=4.8?50:gr>=4.5?40:gr>=4.0?25:gr>=3.5?10:0;
+  const gc=d.google_review_count||0;
+  rp+=gc>=50?20:gc>=20?15:gc>=10?10:5;
+  rp+=(d.referral_rate||0)>=50?30:(d.referral_rate||0)>=30?20:(d.referral_rate||0)>=10?10:0;
+  sc.reputation=Math.min(100,rp);
+  const to=d.annual_turnover_pct||0;
+  let st=to<10?40:to<20?25:to<30?10:0;
+  const mq=d.montessori_qualified_pct||0;
+  st+=mq>=80?35:mq>=60?25:mq>=40?15:5;
+  const ay=d.avg_years_employed||0;
+  st+=ay>=5?25:ay>=3?18:ay>=1?10:0;
+  sc.staff=Math.min(100,st);
+  const pm={owned:35,long_lease:25,medium_lease:15,short_lease:0};
+  const cm2={excellent:40,good:30,fair:15,poor:0};
+  const sm2={high:25,medium:15,low:0};
+  sc.facilities=Math.min(100,(pm[d.property_status]||15)+(cm2[d.facility_condition]||15)+(sm2[d.security_level]||10));
+  let reg=0;
+  if(d.registered_governing_body)reg+=50;
+  if(d.recent_clean_inspection)reg+=30;
+  if(!d.has_compliance_issues)reg+=20;
+  sc.regulatory=reg;
+  sc.survival=Math.round(sc.enrollment*0.18+sc.retention*0.12+sc.financial*0.18+sc.dependency*0.10+sc.competition*0.08+sc.demographics*0.10+sc.reputation*0.05+sc.staff*0.10+sc.facilities*0.05+sc.regulatory*0.04);
+  sc.rating=sc.survival>=85?'Thriving':sc.survival>=70?'Healthy':sc.survival>=55?'Stable but Vulnerable':sc.survival>=40?'High Risk':'Likely Decline';
+  return sc;
+}
+function computeValuation(d,sc){
+  const p=d.annual_profit||0,r=d.annual_revenue||0,sv=sc.survival;
+  const base=sv>=85?3.5:sv>=70?3.0:sv>=55?2.5:sv>=40?2.0:1.5;
+  const qm=sv>=90?1.4:sv>=80?1.2:sv>=70?1.0:sv>=60?0.8:0.5;
+  const multi=base*qm;
+  const mA=p*multi;
+  const mB=r*(sv>=80?1.0:sv>=65?0.7:sv>=50?0.5:0.3);
+  const mid=mA*0.6+mB*0.4;
+  const exp=d.expansion_possible?(d.potential_additional_capacity||0)*(d.monthly_fees||0)*12*0.3:0;
+  const rnd=v=>Math.round(v/10000)*10000;
+  return{low:rnd(mid*0.82),mid:rnd(mid+exp*0.5),high:rnd(mid*1.22+exp),multiple:multi.toFixed(1)};
+}
+function scoreColor(s){return s>=85?'#059669':s>=70?'#16A34A':s>=55?'#D97706':s>=40?'#EA580C':'#DC2626';}
+function fmtR(n){
+  if(!n||n===0)return 'R 0';
+  if(n>=1000000)return 'R '+(n/1000000).toFixed(2)+'m';
+  if(n>=1000)return 'R '+(n/1000).toFixed(0)+'k';
+  return 'R '+n;
+}
+function fmtDate(str){
+  const d=new Date(str);
+  return d.toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'});
+}
+function buildGauge(score,rating){
+  const arcLen=Math.PI*85;
+  const fillLen=(score/100)*arcLen;
+  const dashOffset=arcLen-fillLen;
+  const col=scoreColor(score);
+  const verdicts={'Thriving':'Strong operational foundations, healthy demand, and growing financials. Excellent acquisition or growth investment.','Healthy':'Good fundamentals with manageable vulnerabilities. Standard due diligence recommended before acquisition.','Stable but Vulnerable':'Operational platform is viable but specific risk factors need addressing to protect value.','High Risk':'Multiple concerning indicators. Significant remediation required before this school reaches investment grade.','Likely Decline':'Critical intervention needed. Without material changes, closure risk is real within 24–36 months.'};
+  const wrap=document.getElementById('gaugeWrap');
+  wrap.innerHTML=`<svg viewBox="0 0 240 130" width="240" height="130" style="overflow:visible">
+    <path d="M 25 105 A 85 85 0 0 1 215 105" fill="none" stroke="#E0ECEC" stroke-width="14" stroke-linecap="round"/>
+    <path class="g-fill" d="M 25 105 A 85 85 0 0 1 215 105" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${arcLen.toFixed(1)}" stroke-dashoffset="${arcLen.toFixed(1)}" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+    <circle id="gDot" cx="25" cy="105" r="7" fill="${col}" style="transition:all 1.4s cubic-bezier(.4,0,.2,1)"/>
+    <text x="120" y="88" text-anchor="middle" font-family="'Playfair Display',serif" font-size="44" font-weight="700" fill="${col}">${score}</text>
+    <text x="24" y="122" font-size="9" fill="#90AAAA" text-anchor="middle">0</text>
+    <text x="216" y="122" font-size="9" fill="#90AAAA" text-anchor="middle">100</text>
+  </svg>`;
+  document.getElementById('gaugeRating').textContent=rating;
+  document.getElementById('gaugeRating').style.color=col;
+  document.getElementById('gaugeSub').textContent=verdicts[rating]||'';
+  setTimeout(()=>{
+    const fill=wrap.querySelector('.g-fill');
+    if(fill)fill.style.strokeDashoffset=dashOffset.toFixed(1);
+    const dot=document.getElementById('gDot');
+    if(dot){
+      const angle=Math.PI-(score/100)*Math.PI;
+      dot.setAttribute('cx',(120+85*Math.cos(angle)).toFixed(1));
+      dot.setAttribute('cy',(105-85*Math.sin(angle)).toFixed(1));
+    }
+  },80);
+}
+function buildScoreRows(sc,stored){
+  const rows=[{k:'enrollment',l:'Enrolment Health',w:'18%'},{k:'financial',l:'Financial Health',w:'18%'},{k:'retention',l:'Parent Retention',w:'12%'},{k:'dependency',l:'Owner Independence',w:'10%'},{k:'demographics',l:'Demographics',w:'10%'},{k:'staff',l:'Staff Stability',w:'10%'},{k:'competition',l:'Market Competition',w:'8%'},{k:'reputation',l:'Reputation',w:'5%'},{k:'facilities',l:'Facilities',w:'5%'},{k:'regulatory',l:'Regulatory',w:'4%'}];
+  const getScore=k=>(stored&&stored['score_'+k]!=null)?stored['score_'+k]:sc[k];
+  let html='';
+  rows.forEach(row=>{
+    const sv=Math.round(getScore(row.k));
+    const col=scoreColor(sv);
+    html+=`<div class="score-row"><div class="sr-label">${row.l} <span style="color:var(--txt-l);font-size:10px">${row.w}</span></div><div class="sr-bar"><div class="sr-fill" data-w="${sv}" style="width:0%;background:${col}"></div></div><div class="sr-score" style="color:${col}">${sv}</div></div>`;
+  });
+  document.getElementById('scoreRows').innerHTML=html;
+  setTimeout(()=>{document.querySelectorAll('.sr-fill').forEach(el=>{el.style.width=el.dataset.w+'%';});},120);
+}
+function buildGaugeDetail(d,sc){
+  const util=d.max_capacity>0?Math.round((d.current_enrollment/d.max_capacity)*100):0;
+  const margin=d.annual_revenue>0?Math.round((d.annual_profit/d.annual_revenue)*100):0;
+  document.getElementById('gaugeDetail').innerHTML=`<div class="gd-item"><div class="gd-lbl">Utilisation</div><div class="gd-val" style="color:${scoreColor(util>=85?85:util>=65?70:40)}">${util}%</div></div><div class="gd-item"><div class="gd-lbl">Net Margin</div><div class="gd-val" style="color:${scoreColor(margin>=15?85:margin>=8?60:35)}">${margin}%</div></div><div class="gd-item"><div class="gd-lbl">Retention</div><div class="gd-val" style="color:${scoreColor((d.annual_retention_rate||0)>=85?85:(d.annual_retention_rate||0)>=70?70:40)}">${d.annual_retention_rate||0}%</div></div><div class="gd-item"><div class="gd-lbl">Waitlist</div><div class="gd-val">${d.waitlist_count||0}</div></div>`;
+}
+function buildFlags(flags){
+  if(!flags||!flags.length){document.getElementById('flagsList').innerHTML='<div style="color:var(--txt-l);font-size:13px">No risk flags generated.</div>';return;}
+  const ico={critical:'🚨',high:'⚠️',medium:'💡',positive:'✅'};
+  const order={critical:0,high:1,medium:2,positive:3};
+  const sorted=[...flags].sort((a,b)=>order[a.t]-order[b.t]);
+  document.getElementById('flagsList').innerHTML=sorted.map(f=>`<div class="flag ${f.t}"><span class="flag-ico">${ico[f.t]||'•'}</span><span>${f.m}</span></div>`).join('');
+}
+function buildValuation(d,val){
+  document.getElementById('valGrid').innerHTML=`<div class="val-col" style="background:var(--bg)"><div class="val-lbl">Conservative</div><div class="val-amount">${fmtR(val.low)}</div><div class="val-desc">Distressed or motivated seller scenario</div></div><div class="val-col mid"><div class="val-lbl">Most Likely</div><div class="val-amount">${fmtR(val.mid)}</div><div class="val-desc">Fair market value at current performance</div></div><div class="val-col" style="background:var(--grn-lt);border-color:#B7DFCA"><div class="val-lbl">Optimistic</div><div class="val-amount" style="color:var(--grn)">${fmtR(val.high)}</div><div class="val-desc">Strategic buyer premium + growth upside</div></div>`;
+  const mg=d.annual_revenue>0?((d.annual_profit/d.annual_revenue)*100).toFixed(1):0;
+  document.getElementById('valMethod').innerHTML=`<strong>Methodology:</strong> Blended earnings multiple (60%) and revenue multiple (40%). Applied a <strong>${val.multiple}×</strong> earnings multiple, quality-adjusted for survival score of <strong>${d.survival_score||0}</strong>. Annual owner profit: <strong>${fmtR(d.annual_profit)}</strong> | Margin: <strong>${mg}%</strong>. ${d.expansion_possible?`Expansion premium for ${d.potential_additional_capacity} additional learners included.`:''}<em style="display:block;margin-top:6px;color:var(--txt-l)">Valuations are indicative only. Engage a qualified business broker for formal due diligence.</em>`;
+}
+function buildRecs(recs){
+  if(!recs||!recs.length){document.getElementById('recsList').innerHTML='<div style="color:var(--txt-l);font-size:13px">No specific recommendations generated.</div>';return;}
+  const priLabel={1:'Critical Priority',2:'High Priority',3:'Growth Opportunity'};
+  document.getElementById('recsList').innerHTML=recs.map((r,i)=>`<div class="rec"><div><div class="rec-badge p${r.p}">${i+1}</div></div><div><div class="rec-priority">${priLabel[r.p]||'Priority '+r.p}</div><div class="rec-text">${r.t}</div></div></div>`).join('');
+}
+function buildHeader(d){
+  const date=d.created_at?fmtDate(d.created_at):'Today';
+  const location=[d.suburb,d.city,d.province].filter(Boolean).join(', ');
+  document.getElementById('schoolHeader').innerHTML=`<div class="sh-top"><div><div class="sh-badge">School Intelligence Report</div><div class="sh-name">${d.school_name||'Unnamed School'}</div><div class="sh-meta"><span>📍 ${location||'Pretoria, Gauteng'}</span>${d.max_capacity?`<span class="sh-dot">·</span><span>Capacity: ${d.current_enrollment}/${d.max_capacity} learners</span>`:''}${d.monthly_fees?`<span class="sh-dot">·</span><span>R${d.monthly_fees.toLocaleString()}/mo fees</span>`:''}</div><div class="sh-date">Assessment generated ${date}</div></div>${d.assessor_name?`<div class="sh-right"><div class="sh-assessor-lbl">Assessed by</div><div class="sh-assessor">${d.assessor_name}</div></div>`:''}</div>`;
+}
+function copyLink(){
+  navigator.clipboard.writeText(window.location.href).then(()=>{alert('Report link copied to clipboard!\n\n'+window.location.href);}).catch(()=>{prompt('Copy this report link:',window.location.href);});
+}
+async function loadReport(){
+  const params=new URLSearchParams(window.location.search);
+  const id=params.get('id');
+  if(!id){document.getElementById('loadWrap').innerHTML='<div style="text-align:center;padding:60px 20px"><h2 style="font-family:\'Playfair Display\',serif;margin-bottom:12px">No assessment found</h2><p style="color:var(--txt-m);margin-bottom:24px">This link is missing an assessment ID.</p><a href="index.html" style="background:var(--teal);color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:500">Start New Assessment</a></div>';return;}
+  try{
+    const{data,error}=await sb.from('edu_assessments').select('*').eq('id',id).single();
+    if(error||!data)throw new Error(error?.message||'Not found');
+    const sc=computeScores(data);
+    const val=data.valuation_mid?{low:data.valuation_low,mid:data.valuation_mid,high:data.valuation_high,multiple:(data.earnings_multiple||0).toFixed(1)}:computeValuation(data,sc);
+    document.title=`${data.school_name} — School Intelligence Report`;
+    buildHeader(data);
+    buildGauge(data.survival_score||sc.survival,data.survival_rating||sc.rating);
+    buildGaugeDetail(data,sc);
+    buildScoreRows(sc,data);
+    buildFlags(data.risk_flags&&data.risk_flags.length?data.risk_flags:[]);
+    buildValuation(data,val);
+    buildRecs(data.recommendations&&data.recommendations.length?data.recommendations:[]);
+    document.getElementById('loadWrap').style.display='none';
+    document.getElementById('reportMain').style.display='block';
+  }catch(err){
+    document.getElementById('loadWrap').innerHTML=`<div style="text-align:center;padding:60px 20px"><h2 style="font-family:'Playfair Display',serif;margin-bottom:12px">Report not found</h2><p style="color:var(--txt-m);margin-bottom:8px">Error: ${err.message}</p><p style="color:var(--txt-m);margin-bottom:24px">The link may be incorrect.</p><a href="index.html" style="background:var(--teal);color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:500">Start New Assessment</a></div>`;
+  }
+}
+loadReport();
+</script>
+</body>
+</html>

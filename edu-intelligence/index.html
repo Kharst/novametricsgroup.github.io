@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Intelligence — Nova Metrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1B5D6B;--teal-dk:#124350;--teal-g:rgba(27,93,107,.08);
+  --grn:#2D6A4F;--grn-lt:#EBF5EF;--grn-dk:#1A4A36;
+  --amb:#C6975F;--amb-lt:#FBF3EA;
+  --bg:#EDF3F2;--surf:#FFFFFF;
+  --bdr:#D3E2E0;--bdr-s:#A8C3C0;
+  --txt:#192928;--txt-m:#5C7876;--txt-l:#90AAAA;
+  --sh-sm:0 1px 4px rgba(27,93,107,.07);
+  --sh:0 4px 20px rgba(27,93,107,.10);
+  --r:14px;--r-sm:8px;
+  --ok:#16A34A;--warn:#D97706;--bad:#DC2626;--crit:#991B1B
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+.topbar{background:var(--teal);height:58px;display:flex;align-items:center;padding:0 24px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.topbar-inner{width:100%;max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand-logo{width:36px;height:36px;background:var(--amb);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:#fff;flex-shrink:0}
+.brand-name{color:#fff;font-size:14px;font-weight:600;line-height:1.15;display:block}
+.brand-sub{color:rgba(255,255,255,.55);font-size:10.5px;font-weight:300;display:block}
+.nav-pill{background:rgba(255,255,255,.12);color:rgba(255,255,255,.8);text-decoration:none;font-size:12px;padding:5px 13px;border-radius:20px;transition:.2s;white-space:nowrap}
+.nav-pill:hover{background:rgba(255,255,255,.2);color:#fff}
+.wrap{max-width:860px;margin:0 auto;padding:32px 20px 90px}
+.prog-track{display:flex;align-items:flex-start;justify-content:center;margin-bottom:38px;overflow:hidden}
+.prog-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
+.prog-step:last-child{flex:0 0 auto}
+.prog-circle{width:33px;height:33px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;border:2px solid var(--bdr-s);background:var(--surf);color:var(--txt-l);transition:.3s;z-index:2;cursor:pointer;flex-shrink:0}
+.prog-circle.done{background:var(--teal);border-color:var(--teal);color:#fff}
+.prog-circle.active{background:var(--amb);border-color:var(--amb);color:#fff;box-shadow:0 0 0 5px rgba(198,151,95,.18)}
+.prog-label{font-size:9.5px;color:var(--txt-l);margin-top:5px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px}
+.prog-line{height:2px;flex:1;background:var(--bdr);margin:16px -2px 0;transition:.3s}
+.prog-line.done{background:var(--teal)}
+.step-panel{display:none}
+.step-panel.active{display:block;animation:fadeUp .28s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.step-header{margin-bottom:24px}
+.step-tag{display:inline-block;background:var(--grn-lt);color:var(--grn);font-size:10.5px;font-weight:600;padding:3px 11px;border-radius:20px;margin-bottom:9px;text-transform:uppercase;letter-spacing:.7px}
+.step-title{font-family:'Playfair Display',serif;font-size:27px;color:var(--txt);margin-bottom:5px;line-height:1.2}
+.step-desc{color:var(--txt-m);font-size:14px;line-height:1.65;max-width:640px}
+.insight{background:var(--teal-g);border-left:3px solid var(--teal);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--teal-dk);line-height:1.6}
+.insight strong{font-weight:600}
+.card{background:var(--surf);border-radius:var(--r);border:1px solid var(--bdr);padding:26px 28px;box-shadow:var(--sh-sm);margin-bottom:14px}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.9px;color:var(--txt-l);margin-bottom:20px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fg.c3{grid-template-columns:1fr 1fr 1fr}
+.fg.c1{grid-template-columns:1fr}
+.ff{display:flex;flex-direction:column;gap:5px}
+.ff.full{grid-column:1/-1}
+label{font-size:13px;font-weight:500;color:var(--txt)}
+.hint{font-size:11px;color:var(--txt-l);margin-top:2px;line-height:1.4}
+.ferr{font-size:11px;color:var(--bad);display:none;margin-top:2px}
+input[type=text],input[type=number],input[type=email],select{
+  width:100%;padding:9px 13px;border:1.5px solid var(--bdr);border-radius:var(--r-sm);
+  font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--txt);background:var(--surf);
+  transition:border-color .2s,box-shadow .2s;outline:none;-moz-appearance:textfield
+}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(27,93,107,.1)}
+input.err,select.err{border-color:var(--bad)}
+select{cursor:pointer}
+.pfx{position:relative}
+.pfx input{padding-left:26px}
+.pfx::before{content:attr(data-p);position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--txt-m);font-size:13px;font-weight:500;pointer-events:none}
+.sfx{position:relative}
+.sfx input{padding-right:34px}
+.sfx::after{content:attr(data-s);position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--txt-m);font-size:13px;font-weight:500;pointer-events:none}
+.toggle-grp{display:flex;flex-direction:column;gap:10px}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#FAFCFC;border-radius:var(--r-sm);border:1px solid var(--bdr);gap:12px}
+.trow-lbl{font-size:13px;color:var(--txt);line-height:1.4;flex:1}
+.ts{position:relative;width:40px;height:22px;flex-shrink:0}
+.ts input{opacity:0;width:0;height:0}
+.ts-sl{position:absolute;inset:0;background:var(--bdr-s);border-radius:11px;cursor:pointer;transition:.2s}
+.ts-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.ts input:checked+.ts-sl{background:var(--teal)}
+.ts input:checked+.ts-sl::before{transform:translateX(18px)}
+.trend-sel{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+.trend-opt{border:1.5px solid var(--bdr);border-radius:var(--r-sm);padding:9px 4px;text-align:center;cursor:pointer;font-size:10.5px;color:var(--txt-m);background:var(--surf);transition:.2s;user-select:none;line-height:1.4}
+.trend-opt:hover{border-color:var(--bdr-s);color:var(--txt)}
+.trend-opt.sel{border-color:var(--teal);background:rgba(27,93,107,.07);color:var(--teal);font-weight:600}
+.trend-ico{font-size:20px;display:block;margin-bottom:4px}
+.live-metric{background:var(--grn-lt);border-radius:var(--r-sm);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;margin-top:14px;transition:.4s}
+.live-metric-lbl{font-size:12px;color:var(--grn-dk);font-weight:500}
+.live-metric-val{font-size:22px;font-weight:700;color:var(--grn);font-family:'Playfair Display',serif;transition:.3s}
+.wfoot{position:fixed;bottom:0;left:0;right:0;background:rgba(237,243,242,.96);backdrop-filter:blur(10px);border-top:1px solid var(--bdr);padding:14px 20px;z-index:50}
+.wfoot-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.step-ctr{font-size:12px;color:var(--txt-m);text-align:center}
+.step-ctr strong{color:var(--txt);font-weight:600}
+.btn{padding:9px 22px;border-radius:8px;font-size:13.5px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:.2s;border:none;display:inline-flex;align-items:center;gap:7px}
+.btn-ghost{background:transparent;color:var(--txt-m);border:1.5px solid var(--bdr)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--teal-dk)}
+.btn-gen{background:var(--grn);color:#fff;padding:9px 28px;font-size:14px}
+.btn-gen:hover{background:var(--grn-dk)}
+.overlay{position:fixed;inset:0;background:rgba(20,35,34,.72);display:flex;align-items:center;justify-content:center;z-index:200}
+.ov-card{background:#fff;border-radius:20px;padding:40px 48px;text-align:center;max-width:320px;width:90%}
+.spin{width:44px;height:44px;border:3px solid var(--bdr);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ov-title{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:6px;color:var(--txt)}
+.ov-sub{font-size:13px;color:var(--txt-m);line-height:1.5}
+@media(max-width:600px){
+  .fg,.fg.c3{grid-template-columns:1fr 1fr}
+  .fg.c1{grid-template-columns:1fr}
+  .trend-sel{grid-template-columns:repeat(3,1fr)}
+  .prog-label{display:none}
+  .step-title{font-size:22px}
+  .card{padding:20px 18px}
+  .wrap{padding:24px 14px 90px}
+}
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">N</div>
+      <div><span class="brand-name">Nova Metrics</span><span class="brand-sub">School Intelligence</span></div>
+    </a>
+    <a href="../solar-intelligence.html" class="nav-pill">← Solar Intelligence</a>
+  </div>
+</nav>
+<div class="wrap">
+  <div class="prog-track" id="progTrack"></div>
+  <div class="step-panel" id="panel-1">
+    <div class="step-header"><div class="step-tag">Step 1 of 7</div><h1 class="step-title">School Identity</h1><p class="step-desc">Basic details about the school being assessed. This information appears on the generated report.</p></div>
+    <div class="card"><div class="card-title">School Details</div>
+      <div class="fg c1"><div class="ff"><label for="school_name">School Name *</label><input type="text" id="school_name" placeholder="e.g. Sunshine Montessori School"><span class="ferr" id="e_school_name">School name is required</span></div></div>
+      <div class="fg" style="margin-top:16px">
+        <div class="ff"><label for="suburb">Suburb *</label><input type="text" id="suburb" placeholder="e.g. Moreleta Park"><span class="ferr" id="e_suburb">Suburb is required</span></div>
+        <div class="ff"><label for="city">City</label><input type="text" id="city" value="Pretoria"></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Assessor Details</div>
+      <div class="fg">
+        <div class="ff"><label for="assessor_name">Your Name</label><input type="text" id="assessor_name" placeholder="e.g. Reuben Haasbroek"></div>
+        <div class="ff"><label for="assessor_email">Your Email</label><input type="email" id="assessor_email" placeholder="e.g. reuben@novametrics.co.za"></div>
+      </div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-2">
+    <div class="step-header"><div class="step-tag">Step 2 of 7</div><h1 class="step-title">Enrolment Health</h1><p class="step-desc">Enrolment is the lifeblood of any school. Utilisation rate and trend determine survival probability more than any other single factor.</p></div>
+    <div class="insight"><strong>Benchmark:</strong> Schools at 85–95% utilisation are in the strongest commercial position. An active waitlist is the most powerful indicator of future value — it confirms demand exceeds supply.</div>
+    <div class="card"><div class="card-title">Current Capacity</div>
+      <div class="fg c3">
+        <div class="ff"><label for="max_capacity">Maximum Capacity *</label><input type="number" id="max_capacity" placeholder="120" min="1"><span class="hint">Total learners school can accommodate</span><span class="ferr" id="e_max_capacity">Required</span></div>
+        <div class="ff"><label for="current_enrollment">Current Enrolment *</label><input type="number" id="current_enrollment" placeholder="98" min="0"><span class="ferr" id="e_current_enrollment">Required</span></div>
+        <div class="ff"><label for="waitlist_count">Waitlist Count</label><input type="number" id="waitlist_count" value="0" min="0"><span class="hint">Families waiting for a place</span></div>
+      </div>
+      <div class="live-metric" id="util-box" style="display:none"><span class="live-metric-lbl">📊 Utilisation Rate</span><span class="live-metric-val" id="util-val">—</span></div>
+    </div>
+    <div class="card"><div class="card-title">3-Year Enrolment History</div>
+      <div class="fg c3">
+        <div class="ff"><label for="enrollment_yr1">3 Years Ago</label><input type="number" id="enrollment_yr1" placeholder="78" min="0"></div>
+        <div class="ff"><label for="enrollment_yr2">2 Years Ago</label><input type="number" id="enrollment_yr2" placeholder="86" min="0"></div>
+        <div class="ff"><label for="enrollment_yr3">Last Year</label><input type="number" id="enrollment_yr3" placeholder="94" min="0"></div>
+      </div>
+      <div style="margin-top:20px">
+        <label>Overall Enrolment Trend *</label>
+        <div class="trend-sel" id="trendSel">
+          <div class="trend-opt" data-v="growing_fast"><span class="trend-ico">🚀</span>Growing Fast</div>
+          <div class="trend-opt" data-v="growing"><span class="trend-ico">📈</span>Growing</div>
+          <div class="trend-opt" data-v="stable"><span class="trend-ico">➡️</span>Stable</div>
+          <div class="trend-opt" data-v="declining_slightly"><span class="trend-ico">📉</span>Slight Decline</div>
+          <div class="trend-opt" data-v="declining_fast"><span class="trend-ico">⚠️</span>Declining</div>
+        </div>
+        <input type="hidden" id="enrollment_trend">
+        <span class="ferr" id="e_enrollment_trend" style="margin-top:8px">Please select an enrolment trend</span>
+      </div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-3">
+    <div class="step-header"><div class="step-tag">Step 3 of 7</div><h1 class="step-title">Financial Snapshot</h1><p class="step-desc">Profit margin, cash position, and fee collection reliability are the core metrics buyers use to establish whether a school is worth acquiring.</p></div>
+    <div class="insight"><strong>Target benchmark:</strong> 15–20% net profit margin is healthy for a Montessori school. Fee collection below 90% signals systemic cash-flow risk that buyers will heavily discount.</div>
+    <div class="card"><div class="card-title">Annual Financials</div>
+      <div class="fg">
+        <div class="ff"><label for="annual_revenue">Annual Gross Revenue *</label><div class="pfx" data-p="R"><input type="number" id="annual_revenue" placeholder="2 400 000" min="0"></div><span class="ferr" id="e_annual_revenue">Required</span></div>
+        <div class="ff"><label for="annual_profit">Owner Profit / EBITDA *</label><div class="pfx" data-p="R"><input type="number" id="annual_profit" placeholder="480 000" min="0"></div><span class="hint">Net earnings before owner drawings</span><span class="ferr" id="e_annual_profit">Required</span></div>
+        <div class="ff"><label for="cash_reserves">Cash Reserves</label><div class="pfx" data-p="R"><input type="number" id="cash_reserves" value="0" min="0"></div><span class="hint">Available cash / bank balance today</span></div>
+        <div class="ff"><label for="total_debt">Total Business Debt</label><div class="pfx" data-p="R"><input type="number" id="total_debt" value="0" min="0"></div></div>
+      </div>
+      <div class="live-metric" id="margin-box" style="display:none"><span class="live-metric-lbl">💰 Net Profit Margin</span><span class="live-metric-val" id="margin-val">—</span></div>
+    </div>
+    <div class="card"><div class="card-title">Fees & Collections</div>
+      <div class="fg">
+        <div class="ff"><label for="monthly_fees">Average Monthly Fee per Learner *</label><div class="pfx" data-p="R"><input type="number" id="monthly_fees" placeholder="3 200" min="0"></div><span class="ferr" id="e_monthly_fees">Required</span></div>
+        <div class="ff"><label for="fee_collection_rate">Fee Collection Rate</label><div class="sfx" data-s="%"><input type="number" id="fee_collection_rate" value="95" min="0" max="100"></div><span class="hint">% of fees collected on time each month</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-4">
+    <div class="step-header"><div class="step-tag">Step 4 of 7</div><h1 class="step-title">Parents & Reputation</h1><p class="step-desc">Parent retention is the most honest signal of school quality. Reviews can be gamed — but actual re-enrolment data cannot.</p></div>
+    <div class="insight"><strong>Referral schools are gold:</strong> If 50%+ of new enrolments come from parent word-of-mouth, the school has effectively zero marketing costs and an unbreakable community moat.</div>
+    <div class="card"><div class="card-title">Parent Retention</div>
+      <div class="fg c3">
+        <div class="ff"><label for="annual_retention_rate">Annual Retention Rate *</label><div class="sfx" data-s="%"><input type="number" id="annual_retention_rate" placeholder="88" min="0" max="100"></div><span class="hint">% of families who re-enrol year-on-year</span><span class="ferr" id="e_annual_retention_rate">Required</span></div>
+        <div class="ff"><label for="sibling_enrollment_rate">Sibling Enrolment Rate</label><div class="sfx" data-s="%"><input type="number" id="sibling_enrollment_rate" value="0" min="0" max="100"></div><span class="hint">% of learners with a sibling also enrolled</span></div>
+        <div class="ff"><label for="referral_rate">Referrals: % of New Enrolments</label><div class="sfx" data-s="%"><input type="number" id="referral_rate" value="0" min="0" max="100"></div><span class="hint">New families who came via word-of-mouth</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Online Presence</div>
+      <div class="fg c3">
+        <div class="ff"><label for="google_rating">Google Rating</label><input type="number" id="google_rating" placeholder="4.6" min="1" max="5" step="0.1"><span class="hint">Current star rating (1.0–5.0)</span></div>
+        <div class="ff"><label for="google_review_count">No. of Google Reviews</label><input type="number" id="google_review_count" value="0" min="0"></div>
+        <div class="ff"><label for="facebook_rating">Facebook Rating</label><input type="number" id="facebook_rating" placeholder="4.4" min="1" max="5" step="0.1"><span class="hint">Optional</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-5">
+    <div class="step-header"><div class="step-tag">Step 5 of 7</div><h1 class="step-title">Staff & Operations</h1><p class="step-desc">Staff quality drives retention. But the most critical question for any buyer: is this a real business, or a job disguised as a business?</p></div>
+    <div class="insight"><strong>The dependency trap:</strong> Many schools are not businesses — they are the founder. Owner dependency is the single biggest destroyer of acquisition value. A school that cannot run without its founder is essentially unsellable at a fair price.</div>
+    <div class="card"><div class="card-title">Teaching Team</div>
+      <div class="fg c3">
+        <div class="ff"><label for="teacher_count">Total Teaching Staff</label><input type="number" id="teacher_count" placeholder="8" min="1"></div>
+        <div class="ff"><label for="annual_turnover_pct">Annual Staff Turnover</label><div class="sfx" data-s="%"><input type="number" id="annual_turnover_pct" value="0" min="0" max="100"></div><span class="hint">% of staff who left last year</span></div>
+        <div class="ff"><label for="montessori_qualified_pct">Montessori Qualified</label><div class="sfx" data-s="%"><input type="number" id="montessori_qualified_pct" value="50" min="0" max="100"></div><span class="hint">% with formal Montessori qualification</span></div>
+        <div class="ff"><label for="avg_years_employed">Average Tenure</label><div class="sfx" data-s="yrs"><input type="number" id="avg_years_employed" value="2" min="0" step="0.5"></div><span class="hint">Avg years at this school</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Owner Dependency Assessment</div>
+      <div class="toggle-grp">
+        <div class="trow"><span class="trow-lbl">Owner teaches classes on a regular basis</span><label class="ts"><input type="checkbox" id="owner_teaches"><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">Owner is solely responsible for managing admissions and enquiries</span><label class="ts"><input type="checkbox" id="owner_manages_admissions"><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">Parents primarily communicate with the owner (not other staff)</span><label class="ts"><input type="checkbox" id="owner_primary_contact"><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">A written operations manual exists covering daily routines and admin</span><label class="ts"><input type="checkbox" id="has_ops_manual"><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">School could operate effectively for 6 months without the current owner</span><label class="ts"><input type="checkbox" id="school_runs_without_owner"><span class="ts-sl"></span></label></div>
+      </div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-6">
+    <div class="step-header"><div class="step-tag">Step 6 of 7</div><h1 class="step-title">Competition & Market</h1><p class="step-desc">A mediocre school in a growing suburb can become a great investment. A beautiful school in an ageing neighbourhood can become a dying asset. Demographics are destiny.</p></div>
+    <div class="insight"><strong>Competition ratio:</strong> We calculate total competitor seats ÷ preschool-age population within 5km. Below 0.5 = undersupplied market (positive). Above 1.0 = critically oversupplied (negative).</div>
+    <div class="card"><div class="card-title">Competitors Within 5km</div>
+      <div class="fg c3">
+        <div class="ff"><label for="montessori_competitors">Montessori Schools</label><input type="number" id="montessori_competitors" value="0" min="0"></div>
+        <div class="ff"><label for="curro_competitors">Curro / Castle Preschools</label><input type="number" id="curro_competitors" value="0" min="0"></div>
+        <div class="ff"><label for="independent_competitors">Independent Preschools</label><input type="number" id="independent_competitors" value="0" min="0"></div>
+        <div class="ff"><label for="church_schools">Church / Faith-Based Schools</label><input type="number" id="church_schools" value="0" min="0"></div>
+        <div class="ff"><label for="daycare_centres">Daycare Centres</label><input type="number" id="daycare_centres" value="0" min="0"></div>
+        <div class="ff"><label for="preschool_population_5km">Children Aged 0–6 (5km radius)</label><input type="number" id="preschool_population_5km" placeholder="500" min="0"><span class="hint">Estimated preschool-age children in catchment</span></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Area Demographics</div>
+      <div class="fg">
+        <div class="ff"><label for="area_growth_trend">Area Growth Trend *</label><select id="area_growth_trend"><option value="">Select…</option><option value="growing_fast">Growing Fast — new estates, many young families moving in</option><option value="growing">Growing — steady increase in young families</option><option value="stable">Stable — demographic base is consistent</option><option value="declining">Declining — families leaving, area is ageing</option></select><span class="ferr" id="e_area_growth_trend">Required</span></div>
+        <div class="ff"><label for="household_income_level">Household Income Level *</label><select id="household_income_level"><option value="">Select…</option><option value="high">High Income — R80k+/month household</option><option value="upper_middle">Upper Middle — R40–80k/month</option><option value="middle">Middle Income — R20–40k/month</option><option value="lower_middle">Lower Middle — R10–20k/month</option></select><span class="ferr" id="e_household_income_level">Required</span></div>
+        <div class="ff"><label for="children_0_6_density">Density of Children Aged 0–6</label><select id="children_0_6_density"><option value="high">High — many young families in immediate area</option><option value="medium" selected>Medium — typical suburban mix</option><option value="low">Low — older suburb with fewer young children</option></select></div>
+      </div>
+      <div class="trow" style="margin-top:14px"><span class="trow-lbl">New residential developments nearby (estates, townhouses, sectional title)</span><label class="ts"><input type="checkbox" id="new_developments"><span class="ts-sl"></span></label></div>
+    </div>
+  </div>
+  <div class="step-panel" id="panel-7">
+    <div class="step-header"><div class="step-tag">Step 7 of 7</div><h1 class="step-title">Facilities & Regulatory</h1><p class="step-desc">Physical infrastructure and compliance status complete the assessment. A short lease is a major red flag — buyers cannot build long-term value on uncertain tenure.</p></div>
+    <div class="insight"><strong>Expansion premium:</strong> Two schools with identical financials can have very different values if one can grow from 100 to 150 learners. We apply an explicit expansion premium to your valuation range.</div>
+    <div class="card"><div class="card-title">Property & Facilities</div>
+      <div class="fg">
+        <div class="ff"><label for="property_status">Property Status *</label><select id="property_status" onchange="toggleLease(this.value)"><option value="">Select…</option><option value="owned">Owned — freehold title held by school</option><option value="long_lease">Long Lease — 5+ years remaining</option><option value="medium_lease">Medium Lease — 2–5 years remaining</option><option value="short_lease">Short Lease — less than 2 years remaining</option></select><span class="ferr" id="e_property_status">Required</span></div>
+        <div class="ff" id="lease-field" style="display:none"><label for="lease_years_remaining">Lease Years Remaining</label><div class="sfx" data-s="yrs"><input type="number" id="lease_years_remaining" value="3" min="0"></div></div>
+        <div class="ff"><label for="facility_condition">Overall Facility Condition *</label><select id="facility_condition"><option value="">Select…</option><option value="excellent">Excellent — recently renovated, premium finish</option><option value="good">Good — well maintained, minor wear</option><option value="fair">Fair — functional but needs investment</option><option value="poor">Poor — significant deterioration, safety concerns</option></select><span class="ferr" id="e_facility_condition">Required</span></div>
+        <div class="ff"><label for="security_level">Security Level</label><select id="security_level"><option value="high">High — access control, cameras, guard / intercom</option><option value="medium" selected>Medium — gated, buzzer entry, basic measures</option><option value="low">Low — minimal security measures</option></select></div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">Expansion Potential</div>
+      <div class="trow"><span class="trow-lbl">School has physical capacity to expand (additional land, buildings, or classrooms possible)</span><label class="ts"><input type="checkbox" id="expansion_possible" onchange="toggleExpand(this.checked)"><span class="ts-sl"></span></label></div>
+      <div id="expand-field" style="display:none;margin-top:14px"><div class="ff"><label for="potential_additional_capacity">How many additional learners could the expanded school accommodate?</label><input type="number" id="potential_additional_capacity" value="0" min="0"><span class="hint">This unlocks an expansion premium in your valuation</span></div></div>
+    </div>
+    <div class="card"><div class="card-title">Regulatory & Compliance</div>
+      <div class="toggle-grp">
+        <div class="trow"><span class="trow-lbl">Registered with relevant governing body (ISASA, SAHISA, or equivalent)</span><label class="ts"><input type="checkbox" id="registered_governing_body" checked><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">Most recent inspection passed with no major findings</span><label class="ts"><input type="checkbox" id="recent_clean_inspection" checked><span class="ts-sl"></span></label></div>
+        <div class="trow"><span class="trow-lbl">There are currently active compliance issues or outstanding requirements</span><label class="ts"><input type="checkbox" id="has_compliance_issues"><span class="ts-sl"></span></label></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="wfoot">
+  <div class="wfoot-inner">
+    <button class="btn btn-ghost" id="btnBack" onclick="prevStep()">← Back</button>
+    <div class="step-ctr">Step <strong id="sNum">1</strong> of <strong>7</strong></div>
+    <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Next →</button>
+    <button class="btn btn-gen" id="btnGen" onclick="generateReport()" style="display:none">🎓 Generate Report</button>
+  </div>
+</div>
+<div class="overlay" id="overlay" style="display:none">
+  <div class="ov-card"><div class="spin"></div><div class="ov-title">Generating Report…</div><div class="ov-sub">Calculating survival score, risk intelligence &amp; business valuation</div></div>
+</div>
+<script>
+const SB_URL='https://zloxcqrhkcohheeixfns.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsb3hjcXJoa2NvaGhlZWl4Zm5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5MzYwMDAsImV4cCI6MjA3ODUxMjAwMH0.ijtsZHbv1aadnOBv1WOkhILsiHEeSLZkJ-iwr2KROdg';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+let cur=1;const TOTAL=7;
+const LABELS=['Identity','Enrolment','Financial','Parents','Staff','Market','Facilities'];
+(function buildProg(){
+  const t=document.getElementById('progTrack');
+  for(let i=1;i<=TOTAL;i++){
+    const s=document.createElement('div');s.className='prog-step';
+    s.innerHTML=`<div class="prog-circle" id="pc${i}" onclick="jumpTo(${i})">${i}</div><div class="prog-label">${LABELS[i-1]}</div>`;
+    t.appendChild(s);
+    if(i<TOTAL){const l=document.createElement('div');l.className='prog-line';l.id=`pl${i}`;t.appendChild(l);}
+  }
+  render();
+})();
+function render(){
+  for(let i=1;i<=TOTAL;i++){
+    const c=document.getElementById(`pc${i}`);
+    if(i<cur){c.className='prog-circle done';c.innerHTML='✓';}
+    else if(i===cur){c.className='prog-circle active';c.textContent=i;}
+    else{c.className='prog-circle';c.textContent=i;}
+    if(i<TOTAL){document.getElementById(`pl${i}`).className='prog-line'+(i<cur?' done':'');}
+  }
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`panel-${cur}`).classList.add('active');
+  document.getElementById('sNum').textContent=cur;
+  document.getElementById('btnBack').style.visibility=cur===1?'hidden':'visible';
+  document.getElementById('btnNext').style.display=cur<TOTAL?'inline-flex':'none';
+  document.getElementById('btnGen').style.display=cur===TOTAL?'inline-flex':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextStep(){if(validate(cur))cur<TOTAL&&(cur++,render());}
+function prevStep(){cur>1&&(cur--,render());}
+function jumpTo(n){if(n<cur){cur=n;render();}}
+function showErr(id,show){
+  const e=document.getElementById(`e_${id}`);
+  const i=document.getElementById(id);
+  if(e)e.style.display=show?'block':'none';
+  if(i)i.classList.toggle('err',show);
+  return !show;
+}
+function validate(step){
+  let ok=true;
+  if(step===1){
+    ok=showErr('school_name',!document.getElementById('school_name').value.trim())&&ok;
+    ok=showErr('suburb',!document.getElementById('suburb').value.trim())&&ok;
+  }
+  if(step===2){
+    ok=showErr('max_capacity',!document.getElementById('max_capacity').value)&&ok;
+    ok=showErr('current_enrollment',!document.getElementById('current_enrollment').value)&&ok;
+    ok=showErr('enrollment_trend',!document.getElementById('enrollment_trend').value)&&ok;
+  }
+  if(step===3){
+    ok=showErr('annual_revenue',!document.getElementById('annual_revenue').value)&&ok;
+    ok=showErr('annual_profit',!document.getElementById('annual_profit').value)&&ok;
+    ok=showErr('monthly_fees',!document.getElementById('monthly_fees').value)&&ok;
+  }
+  if(step===4){ok=showErr('annual_retention_rate',!document.getElementById('annual_retention_rate').value)&&ok;}
+  if(step===6){
+    ok=showErr('area_growth_trend',!document.getElementById('area_growth_trend').value)&&ok;
+    ok=showErr('household_income_level',!document.getElementById('household_income_level').value)&&ok;
+  }
+  if(step===7){
+    ok=showErr('property_status',!document.getElementById('property_status').value)&&ok;
+    ok=showErr('facility_condition',!document.getElementById('facility_condition').value)&&ok;
+  }
+  return ok;
+}
+['max_capacity','current_enrollment'].forEach(id=>document.getElementById(id).addEventListener('input',calcUtil));
+function calcUtil(){
+  const c=+document.getElementById('max_capacity').value,e=+document.getElementById('current_enrollment').value;
+  const b=document.getElementById('util-box');
+  if(c>0&&e>=0){
+    const p=Math.round((e/c)*100);
+    const v=document.getElementById('util-val');
+    v.textContent=p+'%';
+    b.style.display='flex';
+    v.style.color=p>=85?'var(--ok)':p>=65?'var(--warn)':'var(--bad)';
+  }else b.style.display='none';
+}
+['annual_revenue','annual_profit'].forEach(id=>document.getElementById(id).addEventListener('input',calcMargin));
+function calcMargin(){
+  const r=+document.getElementById('annual_revenue').value,p=+document.getElementById('annual_profit').value;
+  const b=document.getElementById('margin-box');
+  if(r>0){
+    const m=Math.round((p/r)*100);
+    const v=document.getElementById('margin-val');
+    v.textContent=m+'%';
+    b.style.display='flex';
+    v.style.color=m>=15?'var(--ok)':m>=8?'var(--warn)':'var(--bad)';
+  }else b.style.display='none';
+}
+document.querySelectorAll('.trend-opt').forEach(o=>{
+  o.addEventListener('click',function(){
+    document.querySelectorAll('.trend-opt').forEach(x=>x.classList.remove('sel'));
+    this.classList.add('sel');
+    document.getElementById('enrollment_trend').value=this.dataset.v;
+    showErr('enrollment_trend',false);
+  });
+});
+function toggleLease(v){document.getElementById('lease-field').style.display=(v&&v!=='owned')?'block':'none';}
+function toggleExpand(on){document.getElementById('expand-field').style.display=on?'block':'none';}
+function g(id){return document.getElementById(id);}
+function n(id){return parseFloat(g(id).value)||0;}
+function s(id){return g(id).value.trim();}
+function c(id){return g(id).checked;}
+function collectAll(){
+  return{
+    school_name:s('school_name'),suburb:s('suburb'),city:s('city'),province:'Gauteng',
+    assessor_name:s('assessor_name'),assessor_email:s('assessor_email'),
+    max_capacity:n('max_capacity'),current_enrollment:n('current_enrollment'),
+    waitlist_count:n('waitlist_count'),enrollment_yr1:n('enrollment_yr1'),
+    enrollment_yr2:n('enrollment_yr2'),enrollment_yr3:n('enrollment_yr3'),
+    enrollment_trend:s('enrollment_trend'),
+    annual_revenue:n('annual_revenue'),annual_profit:n('annual_profit'),
+    cash_reserves:n('cash_reserves'),total_debt:n('total_debt'),
+    monthly_fees:n('monthly_fees'),fee_collection_rate:n('fee_collection_rate'),
+    annual_retention_rate:n('annual_retention_rate'),sibling_enrollment_rate:n('sibling_enrollment_rate'),
+    referral_rate:n('referral_rate'),google_rating:n('google_rating'),
+    google_review_count:n('google_review_count'),facebook_rating:n('facebook_rating'),
+    teacher_count:n('teacher_count'),annual_turnover_pct:n('annual_turnover_pct'),
+    montessori_qualified_pct:n('montessori_qualified_pct'),avg_years_employed:n('avg_years_employed'),
+    owner_teaches:c('owner_teaches'),owner_manages_admissions:c('owner_manages_admissions'),
+    owner_primary_contact:c('owner_primary_contact'),has_ops_manual:c('has_ops_manual'),
+    school_runs_without_owner:c('school_runs_without_owner'),
+    montessori_competitors:n('montessori_competitors'),curro_competitors:n('curro_competitors'),
+    independent_competitors:n('independent_competitors'),church_schools:n('church_schools'),
+    daycare_centres:n('daycare_centres'),preschool_population_5km:n('preschool_population_5km')||500,
+    children_0_6_density:s('children_0_6_density')||'medium',
+    area_growth_trend:s('area_growth_trend')||'stable',
+    household_income_level:s('household_income_level')||'middle',
+    new_developments:c('new_developments'),
+    property_status:s('property_status'),lease_years_remaining:n('lease_years_remaining'),
+    facility_condition:s('facility_condition'),security_level:s('security_level')||'medium',
+    expansion_possible:c('expansion_possible'),potential_additional_capacity:n('potential_additional_capacity'),
+    registered_governing_body:c('registered_governing_body'),
+    recent_clean_inspection:c('recent_clean_inspection'),has_compliance_issues:c('has_compliance_issues')
+  };
+}
+function computeScores(d){
+  const sc={};
+  const util=d.max_capacity>0?(d.current_enrollment/d.max_capacity)*100:0;
+  let e=util>=95?60:util>=85?50:util>=70?35:util>=50?15:0;
+  const wlp=d.max_capacity>0?(d.waitlist_count/d.max_capacity)*100:0;
+  e+=wlp>=10?20:wlp>=1?10:0;
+  e+=({growing_fast:20,growing:15,stable:10,declining_slightly:5,declining_fast:0}[d.enrollment_trend]??10);
+  sc.enrollment=Math.min(100,e);
+  const ret=d.annual_retention_rate||0;
+  let r=ret>=90?70:ret>=80?50:ret>=70?30:ret>=60?15:0;
+  r+=(d.sibling_enrollment_rate||0)>=40?30:(d.sibling_enrollment_rate||0)>=20?20:(d.sibling_enrollment_rate||0)>=10?10:0;
+  sc.retention=Math.min(100,r);
+  const mg=d.annual_revenue>0?(d.annual_profit/d.annual_revenue)*100:0;
+  let f=mg>20?50:mg>=15?40:mg>=10?30:mg>=5?15:0;
+  const me=d.annual_revenue>0?(d.annual_revenue-d.annual_profit)/12:1;
+  const cm=me>0?(d.cash_reserves||0)/me:0;
+  f+=cm>=6?25:cm>=3?18:cm>=1?10:0;
+  const fc=d.fee_collection_rate||0;
+  f+=fc>=95?25:fc>=90?18:fc>=80?10:0;
+  sc.financial=Math.min(100,f);
+  let dep=100;
+  if(d.owner_teaches)dep-=30;
+  if(d.owner_manages_admissions)dep-=25;
+  if(d.owner_primary_contact)dep-=20;
+  if(!d.has_ops_manual)dep-=15;
+  if(!d.school_runs_without_owner)dep-=10;
+  sc.dependency=Math.max(0,dep);
+  const seats=(d.montessori_competitors||0)*60+(d.curro_competitors||0)*80+(d.independent_competitors||0)*50+(d.church_schools||0)*40+(d.daycare_centres||0)*30;
+  const pop=d.preschool_population_5km||500;
+  sc.competition=((pop>0?seats/pop:0)<0.3)?100:((pop>0?seats/pop:0)<0.5)?80:((pop>0?seats/pop:0)<0.7)?60:((pop>0?seats/pop:0)<1.0)?40:20;
+  const dn={high:35,medium:20,low:5};const gn={growing_fast:40,growing:30,stable:20,declining:5};const inc={high:25,upper_middle:20,middle:15,lower_middle:8};
+  let dm=(dn[d.children_0_6_density]||15)+(gn[d.area_growth_trend]||20)+(inc[d.household_income_level]||15);
+  if(d.new_developments)dm+=10;
+  sc.demographics=Math.min(100,dm);
+  const gr=d.google_rating||0;
+  let rp=gr>=4.8?50:gr>=4.5?40:gr>=4.0?25:gr>=3.5?10:0;
+  const gc=d.google_review_count||0;
+  rp+=gc>=50?20:gc>=20?15:gc>=10?10:5;
+  rp+=(d.referral_rate||0)>=50?30:(d.referral_rate||0)>=30?20:(d.referral_rate||0)>=10?10:0;
+  sc.reputation=Math.min(100,rp);
+  const to=d.annual_turnover_pct||0;
+  let st=to<10?40:to<20?25:to<30?10:0;
+  const mq=d.montessori_qualified_pct||0;
+  st+=mq>=80?35:mq>=60?25:mq>=40?15:5;
+  const ay=d.avg_years_employed||0;
+  st+=ay>=5?25:ay>=3?18:ay>=1?10:0;
+  sc.staff=Math.min(100,st);
+  const pm={owned:35,long_lease:25,medium_lease:15,short_lease:0};
+  const cm2={excellent:40,good:30,fair:15,poor:0};
+  const sm2={high:25,medium:15,low:0};
+  sc.facilities=Math.min(100,(pm[d.property_status]||15)+(cm2[d.facility_condition]||15)+(sm2[d.security_level]||10));
+  let reg=0;
+  if(d.registered_governing_body)reg+=50;
+  if(d.recent_clean_inspection)reg+=30;
+  if(!d.has_compliance_issues)reg+=20;
+  sc.regulatory=reg;
+  sc.survival=Math.round(sc.enrollment*0.18+sc.retention*0.12+sc.financial*0.18+sc.dependency*0.10+sc.competition*0.08+sc.demographics*0.10+sc.reputation*0.05+sc.staff*0.10+sc.facilities*0.05+sc.regulatory*0.04);
+  sc.rating=sc.survival>=85?'Thriving':sc.survival>=70?'Healthy':sc.survival>=55?'Stable but Vulnerable':sc.survival>=40?'High Risk':'Likely Decline';
+  return sc;
+}
+function computeValuation(d,sc){
+  const p=d.annual_profit||0,r=d.annual_revenue||0,sv=sc.survival;
+  const base=sv>=85?3.5:sv>=70?3.0:sv>=55?2.5:sv>=40?2.0:1.5;
+  const qm=sv>=90?1.4:sv>=80?1.2:sv>=70?1.0:sv>=60?0.8:0.5;
+  const multi=base*qm;
+  const mA=p*multi;
+  const mB=r*(sv>=80?1.0:sv>=65?0.7:sv>=50?0.5:0.3);
+  const mid=mA*0.6+mB*0.4;
+  const exp=d.expansion_possible?(d.potential_additional_capacity||0)*(d.monthly_fees||0)*12*0.3:0;
+  const rnd=v=>Math.round(v/10000)*10000;
+  return{low:rnd(mid*0.82),mid:rnd(mid+exp*0.5),high:rnd(mid*1.22+exp),multiple:multi.toFixed(1)};
+}
+function genFlags(d,sc){
+  const fl=[];
+  if(sc.survival<40)fl.push({t:'critical',m:'Critical survival risk: multiple indicators of imminent operational decline'});
+  if(d.enrollment_trend==='declining_fast')fl.push({t:'critical',m:'Rapidly declining enrolment: closure risk within 12–24 months without urgent intervention'});
+  if(sc.financial<25)fl.push({t:'critical',m:'Severe financial distress: current margins are structurally unsustainable'});
+  if(d.property_status==='short_lease')fl.push({t:'high',m:'Short lease remaining: major acquisition risk — buyer cannot secure long-term operational tenure'});
+  if(sc.dependency<40)fl.push({t:'high',m:'Extreme owner dependency: school may not be transferable to a new operator at any reasonable price'});
+  if((d.annual_turnover_pct||0)>30)fl.push({t:'high',m:`High staff turnover (${d.annual_turnover_pct}%): disruption to relationships and routines will likely impact enrolment`});
+  if((d.annual_retention_rate||0)<70)fl.push({t:'high',m:'Low parent retention: families are not staying — root cause investigation is urgently needed'});
+  if(sc.competition<35)fl.push({t:'medium',m:'Saturated market: high competitor density relative to preschool-age population limits growth headroom'});
+  if((d.fee_collection_rate||0)<85)fl.push({t:'medium',m:'Fee collection issues: inconsistent cash flow — move to debit orders immediately'});
+  if((d.google_review_count||0)<10)fl.push({t:'medium',m:'Very few online reviews: poor social proof is reducing discoverability and parent trust'});
+  if((d.waitlist_count||0)>0)fl.push({t:'positive',m:`Active waitlist of ${d.waitlist_count} families: confirmed demand exceeds current supply`});
+  if((d.annual_retention_rate||0)>=90)fl.push({t:'positive',m:'Exceptional parent retention (90%+): the school has extraordinary community trust and loyalty'});
+  if(sc.demographics>=70)fl.push({t:'positive',m:'Strong demographics: area growth supports sustained enrolment increases over the next 5+ years'});
+  if(d.expansion_possible)fl.push({t:'positive',m:`Expansion potential confirmed: adding ${d.potential_additional_capacity} learners significantly increases long-term enterprise value`});
+  if(sc.staff>=75)fl.push({t:'positive',m:'Excellent staff team: qualified, experienced, low-turnover staff are a significant and rare value asset'});
+  if(sc.dependency>=80)fl.push({t:'positive',m:'Low owner dependency: school operates as a genuine business with strong transferability for any buyer'});
+  return fl;
+}
+function genRecs(d,sc){
+  const rc=[];
+  if(sc.dependency<70)rc.push({p:1,t:'Create a written operations manual covering admissions, parent communication, class routines, and emergency procedures. This single document can increase acquisition value by 20–40%.'});
+  if((d.annual_retention_rate||0)<85)rc.push({p:1,t:'Launch quarterly parent satisfaction surveys with visible follow-through on results. Improving retention from 80% to 90% typically adds more value than enrolling 10 new learners.'});
+  if(sc.enrollment<65||(d.waitlist_count||0)===0)rc.push({p:2,t:"Implement a referral incentive programme: one free week's fees for each successful family referral. Target 30%+ of new enrolments from parent word-of-mouth within 12 months."});
+  if((d.google_review_count||0)<30)rc.push({p:2,t:'Run a targeted Google review campaign via WhatsApp to your 20 most engaged families. 30+ reviews at 4.5+ stars significantly lifts enquiry volume and conversion.'});
+  if(sc.staff<65)rc.push({p:2,t:'Invest in staff retention: salary benchmarking, Montessori qualification sponsorship, and a clear career growth path. Staff turnover above 20% predicts measurable enrolment decline within 18 months.'});
+  if(sc.financial<60)rc.push({p:1,t:'Review cost structure to improve net margin toward the 15–20% benchmark. Transition all families to debit orders — fee collection above 97% is achievable with the right system.'});
+  if(d.expansion_possible&&(d.potential_additional_capacity||0)>0){const addRev=(d.potential_additional_capacity||0)*(d.monthly_fees||0)*12;rc.push({p:3,t:`Execute expansion: adding ${d.potential_additional_capacity} learners at current fees generates R${(addRev/1000).toFixed(0)}k in additional annual revenue and approximately R${((addRev/1000)*3.2).toFixed(0)}k in additional business value.`});}
+  if(sc.competition<50)rc.push({p:3,t:'Deepen Montessori differentiation in all marketing: outdoor learning, parent education evenings, and philosophical positioning. In saturated markets, clear identity is the strongest competitive moat.'});
+  return rc.sort((a,b)=>a.p-b.p);
+}
+async function generateReport(){
+  if(!validate(7))return;
+  document.getElementById('overlay').style.display='flex';
+  const data=collectAll();
+  const scores=computeScores(data);
+  const val=computeValuation(data,scores);
+  const flags=genFlags(data,scores);
+  const recs=genRecs(data,scores);
+  const payload={...data,score_enrollment:scores.enrollment,score_retention:scores.retention,score_financial:scores.financial,score_dependency:scores.dependency,score_competition:scores.competition,score_demographics:scores.demographics,score_reputation:scores.reputation,score_staff:scores.staff,score_facilities:scores.facilities,score_regulatory:scores.regulatory,survival_score:scores.survival,survival_rating:scores.rating,valuation_low:val.low,valuation_mid:val.mid,valuation_high:val.high,earnings_multiple:parseFloat(val.multiple),risk_flags:flags,recommendations:recs};
+  try{
+    const{data:row,error}=await sb.from('edu_assessments').insert([payload]).select('id').single();
+    if(error)throw error;
+    window.location.href=`report.html?id=${row.id}`;
+  }catch(err){
+    document.getElementById('overlay').style.display='none';
+    alert('Error saving assessment: '+err.message+'\n\nPlease try again.');
+  }
+}
+</script>
+</body>
+</html>
