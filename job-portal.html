@@ -571,7 +571,6 @@ function setSyncStatus(s){
   else{el.textContent='● loading';el.style.color='var(--text3)';}
 }
 
-/* ── UPDATED: stage names now match the DB constraint ── */
 const STAGE_LABELS={
   lead:'Won — Awaiting Visit',
   accepted:'Won — Awaiting Visit',
@@ -597,13 +596,11 @@ const PANEL_UNLOCK=[
 
 const PB={0:{done:'Visit Complete',current:'Pending',locked:'Locked'},1:{done:'Scheduled',current:'Pending',locked:'Locked'},2:{done:'Complete',current:'In Progress',locked:'Locked'},3:{done:'Signed Off',current:'Pending',locked:'Locked'},4:{done:'✓ Handed Over',current:'Pending',locked:'Locked'}};
 
-/* Stage order for pipeline dots */
 const SO=['site_visit_scheduled','site_visit_completed','installation_scheduled','installation_in_progress','installation_completed','handover_completed'];
 function si(s){return SO.indexOf(s);}
 
 async function loadJobs(){
   setSyncStatus('loading');
-  /* ── UPDATED: query uses new stage names ── */
   const won='lead,accepted,site_visit_scheduled,site_visit_completed,deposit_received,materials_ordered,installation_scheduled,installation_in_progress,installation_completed,coc_issued,sseg_submitted,handover_completed';
   try{const d=await sbGet('ai_results',`select=*&job_status=in.(${won})&order=created_at.desc`);jobs=d||[];renderSidebar();setSyncStatus('online');
     var noJobsPanel=document.getElementById('placeholder-no-jobs');
@@ -816,7 +813,7 @@ function renderPanel1DesignNote(){
   note.style.display='block';
   if(declined){note.className='info-card error';note.textContent='🔴 Client declined the revised design ('+ok+' kWp → '+nk+' kWp) — contact them before proceeding.';}
   else if(v.design_change_category==='major'&&!approved){note.className='info-card error';note.textContent='🔴 Major design change — awaiting client approval. Original: '+ok+' kWp → Revised: '+nk+' kWp. Approval link sent.';}
-  else{note.className='info-card warning';note.textContent=approved?'✓ Client approved the revised design: '+ok+' → '+nk+' kWp.':'⚠ Design change on record: '+ok+' → '+nk+' kWp. Reason: \"'+(v.design_change_reason||'not yet documented')+'\""';}
+  else{note.className='info-card warning';note.textContent=approved?'✓ Client approved the revised design: '+ok+' → '+nk+' kWp.':'⚠ Design change on record: '+ok+' → '+nk+' kWp. Reason: \"'+(v.design_change_reason||'not yet documented')+'"';}
 }
 
 async function acknowledgeDesignChange(){
@@ -933,7 +930,6 @@ function renderProposalVersions(){
 function prefillForms(){
   const v=currentVisit;
 
-  /* Step 2: locked agreed spec */
   const approvedKw=v?.recommended_system_kw||currentJob?.system_size_kw||'';
   const approvedBatt=v?.recommended_battery_kwh||currentJob?.battery_capacity_kwh||'';
   const approvedPanels=currentProposalVersions[0]?.panels_qty||'';
@@ -941,7 +937,6 @@ function prefillForms(){
   setVal('inst-agreed-batt', approvedBatt?approvedBatt+' kWh':'—');
   setVal('inst-agreed-panels', approvedPanels?approvedPanels+' panels':'—');
 
-  /* Step 2: load hardware dropdowns from installer's product list */
   loadInstallerHardware();
 
   if(v){setVal('sv-assessor',v.assessor_name);setVal('sv-datetime',v.visited_at?v.visited_at.slice(0,16):'');setVal('sv-municipality',v.municipality);setVal('sv-gridref',v.grid_ref_number);setVal('sv-rooftype',v.roof_type);setVal('sv-roofcondition',v.roof_condition);setVal('sv-cablerun',v.cable_run_meters);setVal('sv-metertype',v.meter_type);setVal('sv-phase',v.phase);setVal('sv-db',String(v.db_board_adequate));setVal('sv-dbnotes',v.db_notes);setVal('sv-earthing',String(v.earthing_ok));setVal('sv-earthingnotes',v.earthing_notes);setVal('sv-shading',String(v.shading_issues));setVal('sv-shadingnotes',v.shading_notes);setVal('sv-kw',v.recommended_system_kw);setVal('sv-battery',v.recommended_battery_kwh);setVal('sv-notes',v.additional_notes);checkDesignChangeLive();}
@@ -991,7 +986,6 @@ async function _saveSiteVisit(complete){
     if(currentVisit){delete vd.client_notified_at;delete vd.client_notified_by;await sbPatch('site_visits','id=eq.'+currentVisit.id,vd);currentVisit={...currentVisit,...vd};}
     else{const r=await sbPost('site_visits',{...vd,installer_id:currentJob.installer_id||null});currentVisit=r?.[0]||null;}
     if(complete){
-      /* ── UPDATED: use new stage name site_visit_completed ── */
       await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'site_visit_completed',site_visit_completed_at:new Date().toISOString()});
       await logActivity('SITE VISIT',cat==='major'?'Site visit complete — MAJOR change. Client approval required.':cat==='minor'?'Site visit complete — minor adjustment.':'Site visit complete.',vd.assessor_name);
       toast(cat==='major'?'Site visit complete — client approval required':cat==='minor'?'Site visit complete — minor adjustment noted':'Site visit completed!',cat==='major'?'info':'success');
@@ -1024,7 +1018,6 @@ async function completeInstallation(){
   try{
     const cd={final_system_kw:parseFloat(getVal('comp-kw'))||null,final_battery_kwh:parseFloat(getVal('comp-battery'))||null,punch_list:getVal('comp-punchlist'),inspector_name:getVal('comp-inspector'),inspector_signed_at:getVal('comp-inspdate')?new Date(getVal('comp-inspdate')).toISOString():new Date().toISOString(),completed_at:new Date().toISOString(),install_checklist:collectChecklist()};
     if(currentInstall)await sbPatch('installations','id=eq.'+currentInstall.id,cd);
-    /* ── UPDATED: use new stage name installation_completed ── */
     await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'installation_completed',installation_completed_at:new Date().toISOString()});
     await logActivity('COMPLETION','Final sign-off by '+getVal('comp-inspector'),getVal('comp-inspector'));
     toast('Installation complete! Proceed to handover.','success');await openJob(currentJob.ai_id);
@@ -1036,7 +1029,6 @@ async function completeHandover(){
   try{
     const hd={job_id:String(currentJob.ai_id),installation_id:currentInstall?.id||null,coc_number:getVal('ho-cocnum'),coc_issued_by:getVal('ho-cocby'),coc_issued_at:getVal('ho-cocdate')||null,grid_application_number:getVal('ho-gridref'),grid_approved:getVal('ho-gridapproved')==='true',customer_trained:getVal('ho-trained')==='true',training_notes:getVal('ho-trainingnotes'),handed_over_by:getVal('ho-by'),handed_over_at:new Date().toISOString(),customer_signed:true,customer_signed_at:new Date().toISOString()};
     if(currentHandover){await sbPatch('handovers','id=eq.'+currentHandover.id,hd);}else{const r=await sbPost('handovers',{...hd,installer_id:currentJob.installer_id||null});currentHandover=r?.[0]||null;}
-    /* ── UPDATED: use new stage name handover_completed, also write handover_completed_at ── */
     await sbPatch('ai_results','ai_id=eq.'+currentJob.ai_id,{job_status:'handover_completed',handover_completed_at:new Date().toISOString()});
     await logActivity('HANDOVER','Handed over by '+getVal('ho-by'),getVal('ho-by'));
     toast('🎉 Job handed over!','success');renderHandoverDoc();
@@ -1077,8 +1069,6 @@ function getVal(id){return document.getElementById(id)?.value?.trim()||'';}
 
 /* ══════════════════════════════════════════════════════════════════
    SITE-VISIT RECALCULATION ENGINE
-   Runs the same NRS 097 compliance checks as Solar Intelligence,
-   using the installer's selected hardware + original load inputs.
 ══════════════════════════════════════════════════════════════════ */
 const RC_PR=0.80,RC_AVAIL=0.97,RC_BOS=3000,RC_DOD_LIMIT=0.85,RC_DOD_GOOD=0.70;
 const RC_DCAC_MIN=1.00,RC_DCAC_TARGET=1.30,RC_DCAC_MAX=1.50;
@@ -1110,7 +1100,6 @@ async function runSiteRecalc(){
   if(!el)return;
   if(!currentJob){el.style.display='block';el.innerHTML='<span style="font-family:var(--mono);font-size:11px;color:var(--red)">No job loaded.</span>';return;}
 
-  /* ── Collect selected hardware ── */
   const panelId=document.getElementById('inst-panel-select')?.value;
   const invId=document.getElementById('inst-inverter-select')?.value;
   const battId=document.getElementById('inst-battery-select')?.value;
@@ -1131,22 +1120,18 @@ async function runSiteRecalc(){
   el.style.display='block';
   el.innerHTML='<span style="font-family:var(--mono);font-size:11px;color:var(--text3)">⏳ Running compliance check…</span>';
 
-  /* ── Fetch PSH from design_gti using job location ── */
-  let psh=4.5; // SA average fallback
+  let psh=4.5;
   try{
     const locKey=currentJob.location||'';
     const gtiRows=await sbGet('design_gti',`city=ilike.${encodeURIComponent(locKey.split('–')[0].trim()+'%')}&select=design_gti_kwh_m2_day&limit=1`);
     if(gtiRows&&gtiRows[0])psh=parseFloat(gtiRows[0].design_gti_kwh_m2_day)||4.5;
   }catch(e){}
 
-  /* ── Load parameters from original job ── */
   const peakLoad=parseFloat(currentJob.required_load_kw)||2.0;
   const dailyUsage=parseFloat(currentJob.annual_consumption_kwh)/365||10;
   const autonomy=parseFloat(currentJob.required_autonomy_hrs)||8;
-  const tariff=parseFloat(currentJob.markup_pct?1.5:1.5); // default ZA tariff
   const markup=(parseFloat(currentJob.markup_pct)||10)/100;
 
-  /* ── Recalculate using selected hardware ── */
   const invAC=parseFloat(inv.ac_continuous_kw)||0;
   const invDC=parseFloat(inv.dc_max_kw)||invAC*RC_DCAC_TARGET;
   const panelWatts=parseFloat(panel.watts)||0;
@@ -1167,7 +1152,7 @@ async function runSiteRecalc(){
   const hwCost=(panelQty*parseFloat(panel.unit_price_r||0))+(battQty*parseFloat(batt.unit_price_r||0))+parseFloat(inv.unit_price_r||0);
   const totCost=hwCost+bosCost;
   const sellP=totCost*(1+markup);
-  const annSav=Math.min(expDaily,dailyUsage)*1.5*365; // ~R1.50/kWh default
+  const annSav=Math.min(expDaily,dailyUsage)*1.5*365;
   const simpPb=annSav>0?totCost/annSav:99;
 
   const dcAcSt=rcDcAcStatus(dcAc);
@@ -1180,11 +1165,9 @@ async function runSiteRecalc(){
   const nersa=sysDC<=1?'Category A (≤1 kW — no licence)':sysDC<=10?'Category B (1–10 kW — notify municipality)':sysDC<=100?'Category C (10–100 kW — NERSA SSEG licence required)':'Category D (>100 kW — full NERSA licence)';
   const nersaColor=sysDC<=10?'var(--green)':'var(--amber)';
 
-  /* ── Check if client notification cap is already reached ── */
   const alreadyNotified=!!(currentVisit?.client_notified_of_change_at);
   const approvalDone=currentVisit?.client_approval_status==='approved'||currentVisit?.client_approval_status==='accepted';
 
-  /* ── Render compliance dashboard card ── */
   el.innerHTML=`
     <div style="border:1px solid ${overallPass?'rgba(46,204,138,.25)':'rgba(224,82,82,.25)'};border-radius:7px;overflow:hidden;margin-top:4px">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${overallPass?'rgba(46,204,138,.06)':'rgba(224,82,82,.06)'};border-bottom:1px solid var(--border)">
@@ -1245,7 +1228,7 @@ async function createRevisionVersion(calc){
   if(!confirm('This will create Proposal V2 linked to V1 and trigger client approval.\n\nProceed?'))return;
 
   try{
-    const v1=currentProposalVersions[currentProposalVersions.length-1]; // oldest = original
+    const v1=currentProposalVersions[currentProposalVersions.length-1];
     const origId=v1?.id||null;
     const v1Kw=parseFloat(currentJob.system_size_kw)||0;
     const v1Batt=parseFloat(currentJob.battery_capacity_kwh)||0;
@@ -1289,12 +1272,10 @@ async function createRevisionVersion(calc){
 
     await logActivity('PROPOSAL REVISION','V'+(payload.version_number)+' created: '+payload.delta_summary,payload.created_by);
 
-    /* Reload proposal versions and trigger design change notification if major/moderate */
     currentProposalVersions=await sbGet('proposal_versions',`ai_id=eq.${currentJob.ai_id}&order=created_at.desc&limit=10`)||[];
     renderProposalVersions();
     toast('✓ Proposal V'+payload.version_number+' created','success');
 
-    /* Patch site_visit to reflect the revised spec */
     if(currentVisit){
       await sbPatch('site_visits',`id=eq.${currentVisit.id}`,{
         recommended_system_kw:calc.sysDC,
@@ -1313,12 +1294,10 @@ async function createRevisionVersion(calc){
       };
     }
 
-    /* Send notification if major or moderate — the existing function handles the one-send cap */
     if(maxDelta>=0.10&&currentJob.client_email&&!currentVisit?.client_notified_of_change_at){
       await sendDesignChangeNotification(currentJob,currentVisit,maxDelta>=0.20?'major':'minor');
     }
 
-    /* Update agreed spec locked fields */
     setVal('inst-agreed-kw',calc.sysDC.toFixed(2)+' kWp');
     setVal('inst-agreed-batt',calc.battTotal.toFixed(1)+' kWh');
     renderPanel1DesignNote();
@@ -1334,7 +1313,7 @@ async function loadInstallerHardware(){
   const iid=currentJob?.installer_id;
   if(!iid)return;
 
-  /* ── Fetch installer-specific hardware ── */
+  /* ── 1. Installer-specific hardware (their own uploaded products) ── */
   let instPanels=[],instInverters=[],instBatteries=[];
   try{
     const[panels,inverters,batteries]=await Promise.all([
@@ -1345,94 +1324,81 @@ async function loadInstallerHardware(){
     instPanels=panels||[];instInverters=inverters||[];instBatteries=batteries||[];
   }catch(e){}
 
-  /* ── Fetch demo/shared hardware as fallback ── */
-  let demoPanels=[],demoInverters=[],demoBatteries=[];
+  /* ── 2. Master catalogue fallback
+     Confirmed live column names:
+     PanelModels:     id, Brand, PanelModel, Watts, UnitPrice_R
+     InverterModels:  id, Brand, InverterModel, ACContinuous_kW, DCMax_kW, UnitPrice_R
+     BatteryModels_DB:id, Brand, BatteryModel, Usable_kWh, Nominal_kW, UnitPrice_R  ── */
+  let masterPanels=[],masterInverters=[],masterBatteries=[];
   try{
-    const[dp,di,db]=await Promise.all([
-      sbGet('PanelModels','order=brand.asc,panel_model.asc'),
-      sbGet('InverterModels','order=brand.asc,inverter_model.asc'),
-      sbGet('BatteryModels_DB','order=brand.asc,battery_model.asc'),
+    const[mp,mi,mb]=await Promise.all([
+      sbGet('PanelModels','select=id,Brand,PanelModel,Watts,UnitPrice_R&order=Brand.asc,PanelModel.asc'),
+      sbGet('InverterModels','select=id,Brand,InverterModel,ACContinuous_kW,DCMax_kW,UnitPrice_R&order=Brand.asc,InverterModel.asc'),
+      sbGet('BatteryModels_DB','select=id,Brand,BatteryModel,Usable_kWh,Nominal_kW,UnitPrice_R&order=Brand.asc,BatteryModel.asc'),
     ]);
-    demoPanels=dp||[];demoInverters=di||[];demoBatteries=db||[];
-  }catch(e){}
+    /* Normalise PascalCase → lowercase shape used by the rest of the JS */
+    masterPanels=(mp||[]).map(p=>({id:p.id,brand:p.Brand,panel_model:p.PanelModel,watts:p.Watts,unit_price_r:p.UnitPrice_R,_catalogue:true}));
+    masterInverters=(mi||[]).map(i=>({id:i.id,brand:i.Brand,inverter_model:i.InverterModel,ac_continuous_kw:i.ACContinuous_kW,dc_max_kw:i.DCMax_kW,unit_price_r:i.UnitPrice_R,_catalogue:true}));
+    masterBatteries=(mb||[]).map(b=>({id:b.id,brand:b.Brand,battery_model:b.BatteryModel,usable_kwh:b.Usable_kWh,nominal_kw:b.Nominal_kW,unit_price_r:b.UnitPrice_R,_catalogue:true}));
+  }catch(e){console.warn('Master catalogue fetch failed:',e);}
 
-  /* ── Decide which set to use; tag source for UI feedback ── */
-  const usingDemoPanels=instPanels.length===0;
-  const usingDemoInverters=instInverters.length===0;
-  const usingDemoBatteries=instBatteries.length===0;
-  _hwPanels   = usingDemoPanels    ? demoPanels.map(p=>({...p,_demo:true}))   : instPanels;
-  _hwInverters= usingDemoInverters ? demoInverters.map(i=>({...i,_demo:true})): instInverters;
-  _hwBatteries= usingDemoBatteries ? demoBatteries.map(b=>({...b,_demo:true})): instBatteries;
+  /* ── 3. Use installer stock where available; fall back to catalogue ── */
+  const usingCatPanels   =instPanels.length===0;
+  const usingCatInverters=instInverters.length===0;
+  const usingCatBatteries=instBatteries.length===0;
+  _hwPanels   =usingCatPanels    ?masterPanels   :instPanels;
+  _hwInverters=usingCatInverters ?masterInverters:instInverters;
+  _hwBatteries=usingCatBatteries ?masterBatteries:instBatteries;
 
-  /* ── Show/hide demo-hardware notice banner ── */
-  const anyDemo=usingDemoPanels||usingDemoInverters||usingDemoBatteries;
-  let demoNotice=document.getElementById('hw-demo-notice');
-  if(!demoNotice){
-    /* Create the notice element just above the equipment dropdowns zone */
-    const equipZone=document.querySelector('[data-hw-zone]');
-    if(equipZone){
-      demoNotice=document.createElement('div');
-      demoNotice.id='hw-demo-notice';
-      equipZone.parentNode.insertBefore(demoNotice,equipZone);
-    }
+  /* ── 4. Catalogue notice banner ── */
+  let notice=document.getElementById('hw-demo-notice');
+  if(!notice){
+    const zone=document.querySelector('[data-hw-zone]');
+    if(zone){notice=document.createElement('div');notice.id='hw-demo-notice';zone.parentNode.insertBefore(notice,zone);}
   }
-  if(demoNotice){
-    if(anyDemo){
-      const missingLabels=[];
-      if(usingDemoPanels)missingLabels.push('<a href="solar-intelligence.html#hardware-panels" style="color:var(--amber);font-weight:700;text-decoration:underline">panels</a>');
-      if(usingDemoInverters)missingLabels.push('<a href="solar-intelligence.html#hardware-inverters" style="color:var(--amber);font-weight:700;text-decoration:underline">inverters</a>');
-      if(usingDemoBatteries)missingLabels.push('<a href="solar-intelligence.html#hardware-batteries" style="color:var(--amber);font-weight:700;text-decoration:underline">batteries</a>');
-      const listStr=missingLabels.join(', ');
-      demoNotice.style.cssText='display:block;margin-bottom:12px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.25);border-radius:6px;font-size:11px;line-height:1.6;color:var(--text2)';
-      demoNotice.innerHTML=`<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.05em">📦 Using Demo Stock</span><br>`+
-        `Showing sample hardware for ${listStr}. The compliance check and pricing will use this demo data, which may not match your actual products. `+
-        `<a href="solar-intelligence.html#hardware" style="color:var(--blue);font-weight:600;text-decoration:underline">Upload your own hardware in Solar Intelligence → Hardware tab</a> for accurate results.`;
+  if(notice){
+    const catLinks=[];
+    if(usingCatPanels&&masterPanels.length)    catLinks.push('<a href="solar-intelligence.html" onclick="sessionStorage.setItem(\'hw_tab\',\'panels\')" style="color:var(--amber);font-weight:700;text-decoration:underline">panels</a>');
+    if(usingCatInverters&&masterInverters.length) catLinks.push('<a href="solar-intelligence.html" onclick="sessionStorage.setItem(\'hw_tab\',\'inverters\')" style="color:var(--amber);font-weight:700;text-decoration:underline">inverters</a>');
+    if(usingCatBatteries&&masterBatteries.length) catLinks.push('<a href="solar-intelligence.html" onclick="sessionStorage.setItem(\'hw_tab\',\'batteries\')" style="color:var(--amber);font-weight:700;text-decoration:underline">batteries</a>');
+    if(catLinks.length){
+      notice.style.cssText='display:block;margin-bottom:12px;padding:10px 14px;background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.25);border-radius:6px;font-size:11px;line-height:1.7;color:var(--text2)';
+      notice.innerHTML='<span style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.05em">📦 Using Shared Catalogue</span><br>'
+        +'Showing master catalogue hardware for '+catLinks.join(', ')+' — not your personal product list. Compliance and pricing may not match your actual stock. '
+        +'<a href="solar-intelligence.html" style="color:var(--blue);font-weight:600;text-decoration:underline">Add your own hardware in Solar Intelligence → Hardware tab</a> for accurate results.';
     }else{
-      demoNotice.style.display='none';
+      notice.style.display='none';
     }
   }
 
-  /* ── Populate dropdowns ── */
+  /* ── 5. Populate dropdowns ── */
   const ps=document.getElementById('inst-panel-select');
   const is=document.getElementById('inst-inverter-select');
   const bs=document.getElementById('inst-battery-select');
 
   if(ps){
-    if(_hwPanels.length){
-      const demoLabel=usingDemoPanels?' <span style="font-size:9px;color:var(--text3)">(demo)</span>':'';
-      ps.innerHTML='<option value="">Select panel…</option>'+
-        _hwPanels.map(p=>`<option value="${p.id}">${p.brand} ${p.panel_model} — ${p.watts}W${p._demo?' ★demo':''}</option>`).join('');
-    }else{
-      ps.innerHTML='<option value="">No panels available</option>';
-    }
+    ps.innerHTML=_hwPanels.length
+      ?'<option value="">Select panel…</option>'+_hwPanels.map(p=>`<option value="${p.id}">${p.brand} ${p.panel_model} — ${p.watts}W${p._catalogue?' ★catalogue':''}</option>`).join('')
+      :'<option value="">No panels found — add in Solar Intelligence</option>';
   }
   if(is){
-    if(_hwInverters.length){
-      is.innerHTML='<option value="">Select inverter…</option>'+
-        _hwInverters.map(i=>`<option value="${i.id}">${i.brand} ${i.inverter_model} — ${i.ac_continuous_kw}kW${i._demo?' ★demo':''}</option>`).join('');
-    }else{
-      is.innerHTML='<option value="">No inverters available</option>';
-    }
+    is.innerHTML=_hwInverters.length
+      ?'<option value="">Select inverter…</option>'+_hwInverters.map(i=>`<option value="${i.id}">${i.brand} ${i.inverter_model} — ${i.ac_continuous_kw}kW${i._catalogue?' ★catalogue':''}</option>`).join('')
+      :'<option value="">No inverters found — add in Solar Intelligence</option>';
   }
   if(bs){
-    if(_hwBatteries.length){
-      bs.innerHTML='<option value="">Select battery…</option>'+
-        _hwBatteries.map(b=>`<option value="${b.id}">${b.brand} ${b.battery_model} — ${b.usable_kwh}kWh${b._demo?' ★demo':''}</option>`).join('');
-    }else{
-      bs.innerHTML='<option value="">No batteries available</option>';
-    }
+    bs.innerHTML=_hwBatteries.length
+      ?'<option value="">Select battery…</option>'+_hwBatteries.map(b=>`<option value="${b.id}">${b.brand} ${b.battery_model} — ${b.usable_kwh}kWh${b._catalogue?' ★catalogue':''}</option>`).join('')
+      :'<option value="">No batteries found — add in Solar Intelligence</option>';
   }
 
-  /* ── Re-select previously saved values if currentInstall exists ── */
-  if(currentInstall){
-    _reselectHardware();
-  }
+  /* ── 6. Re-select previously saved values if install record exists ── */
+  if(currentInstall){_reselectHardware();}
 }
 
 function _reselectHardware(){
   const inst=currentInstall;
   if(!inst)return;
-  /* match saved brand+watt back to a panel option */
   const pMatch=_hwPanels.find(p=>p.brand===inst.panels_brand&&p.watts==inst.panels_watt);
   if(pMatch){const ps=document.getElementById('inst-panel-select');if(ps)ps.value=String(pMatch.id);onPanelSelect(true);}
   const iMatch=_hwInverters.find(i=>i.brand===inst.inverter_brand&&Number(i.ac_continuous_kw)==Number(inst.inverter_kw));
